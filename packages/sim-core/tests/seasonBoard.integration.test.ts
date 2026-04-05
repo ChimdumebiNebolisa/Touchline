@@ -100,6 +100,7 @@ describe("season board integration", () => {
     expect(board["club-a"].sackRisk).toBeGreaterThanOrEqual(0);
     expect(board["club-a"].sackRisk).toBeLessThanOrEqual(1);
     expect(board[topClubId].sackRisk).toBeGreaterThan(board[bottomClubId].sackRisk);
+    expect(Object.values(board).every((evaluation) => evaluation.reasonSummary.length > 0)).toBe(true);
   });
 
   it("derives recent form context from season progression for board evaluation", () => {
@@ -175,6 +176,7 @@ describe("season board integration", () => {
     expect(board["club-a"].reasonSummary.length).toBeGreaterThan(1);
     expect(board["club-a"].sackRisk).toBeGreaterThanOrEqual(0);
     expect(board["club-a"].sackRisk).toBeLessThanOrEqual(1);
+    expect(Object.values(board).every((evaluation) => evaluation.reasonSummary.length > 0)).toBe(true);
   });
 
   it("changes sack-risk ordering under matched table position when context shifts", () => {
