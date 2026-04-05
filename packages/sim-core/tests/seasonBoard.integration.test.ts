@@ -3,11 +3,89 @@ import { describe, expect, it } from "vitest";
 import {
   advanceSeasonState,
   createSeasonState,
+  deriveSackRiskPressureState,
   deriveSeasonBoardContextFromSeasonState,
   evaluateSeasonBoardContext,
   getFixturesForMatchday,
   isSeasonComplete
 } from "../src/index.js";
+
+function runSackRiskTimelineSimulation(): Array<{ risk: number; trend: string; level: string }> {
+  let state = createSeasonState([
+    { id: "club-a", name: "Club A", strength: 74 },
+    { id: "club-b", name: "Club B", strength: 71 },
+    { id: "club-c", name: "Club C", strength: 69 },
+    { id: "club-d", name: "Club D", strength: 67 }
+  ]);
+
+  const staticContext = {
+    "club-a": {
+      preseasonObjectivePosition: 4,
+      clubStature: 0.85,
+      financialPressure: 0.55,
+      styleAlignment: 0.56,
+      derbyResult: "none" as const
+    },
+    "club-b": {
+      preseasonObjectivePosition: 6,
+      clubStature: 0.45,
+      financialPressure: 0.32,
+      styleAlignment: 0.62,
+      derbyResult: "draw" as const
+    },
+    "club-c": {
+      preseasonObjectivePosition: 8,
+      clubStature: 0.3,
+      financialPressure: 0.22,
+      styleAlignment: 0.54,
+      derbyResult: "win" as const
+    },
+    "club-d": {
+      preseasonObjectivePosition: 10,
+      clubStature: 0.2,
+      financialPressure: 0.2,
+      styleAlignment: 0.5,
+      derbyResult: "loss" as const
+    }
+  };
+
+  let rolling = 21;
+  let previousRisk: number | undefined;
+  const timeline: Array<{ risk: number; trend: string; level: string }> = [];
+
+  while (!isSeasonComplete(state)) {
+    const fixtures = getFixturesForMatchday(state, state.currentMatchday);
+    const resultsByFixtureId = Object.fromEntries(
+      fixtures.map((fixture) => {
+        rolling += 1;
+        return [
+          fixture.id,
+          {
+            homeGoals: rolling % 4,
+            awayGoals: (rolling + 1) % 4
+          }
+        ];
+      })
+    );
+
+    state = advanceSeasonState(state, resultsByFixtureId);
+
+    const contextByClubId = deriveSeasonBoardContextFromSeasonState(state, staticContext);
+    const evaluationByClubId = evaluateSeasonBoardContext(state, contextByClubId);
+    const risk = evaluationByClubId["club-a"].sackRisk;
+    const pressure = deriveSackRiskPressureState(risk, previousRisk);
+
+    timeline.push({
+      risk,
+      trend: pressure.trend,
+      level: pressure.level
+    });
+
+    previousRisk = risk;
+  }
+
+  return timeline;
+}
 
 describe("season board integration", () => {
   it("evaluates contextual board outcomes from season standings", () => {
@@ -271,5 +349,15 @@ describe("season board integration", () => {
     });
 
     expect(lowerContext["club-a"].sackRisk).toBeGreaterThan(higherContext["club-a"].sackRisk);
+  });
+
+  it("keeps multi-matchday sack-risk progression deterministic", () => {
+    const firstRun = runSackRiskTimelineSimulation();
+    const secondRun = runSackRiskTimelineSimulation();
+
+    expect(firstRun).toEqual(secondRun);
+    expect(firstRun.length).toBeGreaterThan(0);
+    expect(firstRun.every((entry) => entry.risk >= 0 && entry.risk <= 1)).toBe(true);
+    expect(firstRun.every((entry) => entry.level.length > 0 && entry.trend.length > 0)).toBe(true);
   });
 });

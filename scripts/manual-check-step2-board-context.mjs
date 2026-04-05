@@ -1,13 +1,14 @@
 import {
   advanceSeasonState,
   createSeasonState,
+  deriveSackRiskPressureState,
   deriveSeasonBoardContextFromSeasonState,
   evaluateSeasonBoardContext,
   getFixturesForMatchday,
   isSeasonComplete
 } from "../packages/sim-core/dist/src/index.js";
 
-function buildSeasonState() {
+function buildSeasonStateAndTimeline() {
   const clubs = [
     { id: "club-a", name: "Club A", strength: 74 },
     { id: "club-b", name: "Club B", strength: 71 },
@@ -17,30 +18,6 @@ function buildSeasonState() {
 
   let state = createSeasonState(clubs);
   let rolling = 17;
-
-  while (!isSeasonComplete(state)) {
-    const fixtures = getFixturesForMatchday(state, state.currentMatchday);
-    const resultsByFixtureId = Object.fromEntries(
-      fixtures.map((fixture) => {
-        rolling += 1;
-        return [
-          fixture.id,
-          {
-            homeGoals: rolling % 4,
-            awayGoals: (rolling + 2) % 4
-          }
-        ];
-      })
-    );
-
-    state = advanceSeasonState(state, resultsByFixtureId);
-  }
-
-  return state;
-}
-
-function runStep2BoardContextManualCheck() {
-  const seasonState = buildSeasonState();
 
   const staticContext = {
     "club-a": {
@@ -73,6 +50,53 @@ function runStep2BoardContextManualCheck() {
     }
   };
 
+  const timelineRows = [];
+  let previousRisk;
+
+  while (!isSeasonComplete(state)) {
+    const fixtures = getFixturesForMatchday(state, state.currentMatchday);
+    const resultsByFixtureId = Object.fromEntries(
+      fixtures.map((fixture) => {
+        rolling += 1;
+        return [
+          fixture.id,
+          {
+            homeGoals: rolling % 4,
+            awayGoals: (rolling + 2) % 4
+          }
+        ];
+      })
+    );
+
+    state = advanceSeasonState(state, resultsByFixtureId);
+
+    const boardContext = deriveSeasonBoardContextFromSeasonState(state, staticContext);
+    const evaluations = evaluateSeasonBoardContext(state, boardContext);
+    const risk = evaluations["club-a"].sackRisk;
+    const pressure = deriveSackRiskPressureState(risk, previousRisk);
+
+    timelineRows.push({
+      matchdayComplete: state.currentMatchday - 1,
+      clubId: "club-a",
+      recentPPM: boardContext["club-a"].recentPointsPerMatch,
+      sackRisk: risk,
+      level: pressure.level,
+      trend: pressure.trend
+    });
+
+    previousRisk = risk;
+  }
+
+  return {
+    seasonState: state,
+    staticContext,
+    timelineRows
+  };
+}
+
+function runStep2BoardContextManualCheck() {
+  const { seasonState, staticContext, timelineRows } = buildSeasonStateAndTimeline();
+
   const boardContext = deriveSeasonBoardContextFromSeasonState(seasonState, staticContext);
   const evaluations = evaluateSeasonBoardContext(seasonState, boardContext);
 
@@ -92,11 +116,15 @@ function runStep2BoardContextManualCheck() {
   console.log("Step 2 Manual Check");
   console.log("- Season standings and board reasoning sample");
   console.table(rows);
+  console.log("- Matchday sack-risk progression sample (club-a)");
+  console.table(timelineRows);
 
   const validReasonCoverage = rows.every((entry) => entry.reasons.length > 0);
   const validSackRiskRange = rows.every((entry) => entry.sackRisk >= 0 && entry.sackRisk <= 1);
+  const validTimelineRange = timelineRows.every((entry) => entry.sackRisk >= 0 && entry.sackRisk <= 1);
+  const validTimelineFlags = timelineRows.every((entry) => entry.level.length > 0 && entry.trend.length > 0);
 
-  if (!validReasonCoverage || !validSackRiskRange) {
+  if (!validReasonCoverage || !validSackRiskRange || !validTimelineRange || !validTimelineFlags) {
     console.error("Step 2 manual check failed expected board-context thresholds.");
     process.exit(1);
   }
