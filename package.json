@@ -10,7 +10,8 @@
     "build": "npm run -ws build",
     "typecheck": "npm run -ws typecheck",
     "lint": "npm run -ws lint",
-    "test": "npm run -ws test"
+    "test": "npm run -ws test",
+    "manual:step1": "node scripts/manual-check-step1.mjs"
   },
   "devDependencies": {
     "@types/node": "^22.14.1",
