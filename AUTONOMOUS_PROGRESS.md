@@ -21,11 +21,11 @@
 - Passed: `npm run -w @touchline/sim-core test -- tests/negotiationCalibration.test.ts tests/negotiation.test.ts tests/transferEngine.test.ts`, `npm test`, `npm run typecheck`, `npm run lint`, `npm run build` after fixed-fixture stability proof for reputation-band delta artifacts (2026-04-05)
 
 ## Last commit hash
-- PENDING_COMMIT
+- 36ecac0
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`
 - Inspect git status and recent commits
 - Continue Step 3 with transfer/reputation bounded tasks only; do not jump to later steps.
 - Next bounded task: add baseline/comparison swap symmetry proof for reputation-band delta artifacts.
-- Last successful pushed commit before this pending change: a5fb1eb.
+- Last successful pushed commit: 36ecac0.
