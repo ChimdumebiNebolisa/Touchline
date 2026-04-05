@@ -47,6 +47,18 @@ describe("transfer negotiation calibration samples", () => {
       calibrationOutcomeVariants
     );
 
+    const highReputationBand = outcomeSummary.bands.find((band) => band.managerReputation === 82);
+    const lowReputationBand = outcomeSummary.bands.find((band) => band.managerReputation === 28);
+
+    expect(highReputationBand).toBeDefined();
+    expect(lowReputationBand).toBeDefined();
+    expect(highReputationBand!.boardBlockCount).toBe(0);
+    expect(lowReputationBand!.boardBlockCount).toBe(0);
+    expect(highReputationBand!.sportingDirectorBlockCount).toBeGreaterThan(0);
+    expect(highReputationBand!.playerBlockCount).toBe(0);
+    expect(lowReputationBand!.playerBlockCount).toBeGreaterThan(highReputationBand!.playerBlockCount);
+    expect(lowReputationBand!.sportingDirectorBlockCount).toBeLessThan(highReputationBand!.sportingDirectorBlockCount);
+
     const normalizedSample = {
       promiseTrustBands: promiseTrust.bands.map((band) => ({
         managerReputation: band.managerReputation,
