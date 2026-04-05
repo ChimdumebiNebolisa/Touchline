@@ -321,6 +321,45 @@ describe("transfer negotiation comparison", () => {
     expect(firstRun.conciseSummary).toContain("player block delta");
   });
 
+  it("keeps reputation-band delta summaries antisymmetric when bands are swapped", () => {
+    const variants = [
+      { pathwayClarity: 0.82, squadCompetition: 0.5, recentPromiseBreak: false },
+      { pathwayClarity: 0.7, squadCompetition: 0.56, recentPromiseBreak: false },
+      { pathwayClarity: 0.62, squadCompetition: 0.58, recentPromiseBreak: true },
+      { pathwayClarity: 0.58, squadCompetition: 0.61, recentPromiseBreak: true }
+    ];
+
+    const forward = buildReputationBandOutcomeDeltaSummary(
+      target,
+      {
+        clubWageBudget: baseContext.clubWageBudget,
+        clubStature: baseContext.clubStature,
+        boardWageDiscipline: baseContext.boardWageDiscipline
+      },
+      82,
+      28,
+      variants
+    );
+    const reverse = buildReputationBandOutcomeDeltaSummary(
+      target,
+      {
+        clubWageBudget: baseContext.clubWageBudget,
+        clubStature: baseContext.clubStature,
+        boardWageDiscipline: baseContext.boardWageDiscipline
+      },
+      28,
+      82,
+      variants
+    );
+
+    expect(forward.acceptedCountDelta).toBe(-reverse.acceptedCountDelta);
+    expect(forward.acceptanceRateDelta).toBeCloseTo(-reverse.acceptanceRateDelta, 10);
+    expect(forward.averageScoreDelta).toBeCloseTo(-reverse.averageScoreDelta, 10);
+    expect(forward.boardBlockDelta).toBeCloseTo(-reverse.boardBlockDelta, 10);
+    expect(forward.sportingDirectorBlockDelta).toBeCloseTo(-reverse.sportingDirectorBlockDelta, 10);
+    expect(forward.playerBlockDelta).toBeCloseTo(-reverse.playerBlockDelta, 10);
+  });
+
   it("builds deterministic equal-fee explainability artifacts with non-fee drivers", () => {
     const equalFeeTarget: TransferTargetProfile = {
       ...target,
