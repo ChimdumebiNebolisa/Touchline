@@ -660,4 +660,96 @@ describe("season board integration", () => {
       )
     ).toThrow("Cannot summarize season before completion.");
   });
+
+  it("changes board decision at matched position when context pressure shifts", () => {
+    const baseState = createSeasonState([
+      { id: "club-a", name: "Club A", strength: 74 },
+      { id: "club-b", name: "Club B", strength: 71 },
+      { id: "club-c", name: "Club C", strength: 69 },
+      { id: "club-d", name: "Club D", strength: 67 }
+    ]);
+
+    const fixtures = getFixturesForMatchday(baseState, baseState.currentMatchday);
+    const state = advanceSeasonState(
+      baseState,
+      Object.fromEntries(
+        fixtures.map((fixture) => [
+          fixture.id,
+          {
+            homeGoals: 1,
+            awayGoals: 1
+          }
+        ])
+      )
+    );
+
+    const lowPressureContext = {
+      "club-a": {
+        preseasonObjectivePosition: 1,
+        clubStature: 0.7,
+        financialPressure: 0.2,
+        recentPointsPerMatch: 1.3,
+        styleAlignment: 0.6,
+        derbyResult: "none" as const
+      },
+      "club-b": {
+        preseasonObjectivePosition: 2,
+        clubStature: 0.5,
+        financialPressure: 0.1,
+        recentPointsPerMatch: 1.7,
+        styleAlignment: 0.75,
+        derbyResult: "win" as const
+      },
+      "club-c": {
+        preseasonObjectivePosition: 3,
+        clubStature: 0.35,
+        financialPressure: 0.22,
+        recentPointsPerMatch: 1.2,
+        styleAlignment: 0.56,
+        derbyResult: "draw" as const
+      },
+      "club-d": {
+        preseasonObjectivePosition: 4,
+        clubStature: 0.3,
+        financialPressure: 0.25,
+        recentPointsPerMatch: 1,
+        styleAlignment: 0.54,
+        derbyResult: "loss" as const
+      }
+    };
+
+    const highPressureContext = {
+      ...lowPressureContext,
+      "club-b": {
+        preseasonObjectivePosition: 2,
+        clubStature: 0.5,
+        financialPressure: 0.8,
+        recentPointsPerMatch: 0.7,
+        styleAlignment: 0.35,
+        derbyResult: "loss" as const
+      }
+    };
+
+    const lowPressureEvaluations = evaluateSeasonBoardContext(state, lowPressureContext);
+    const highPressureEvaluations = evaluateSeasonBoardContext(state, highPressureContext);
+
+    const lowPressureSnapshots = evaluateSeasonBoardDecisions(state, lowPressureContext, {
+      "club-a": [lowPressureEvaluations["club-a"].sackRisk],
+      "club-b": [lowPressureEvaluations["club-b"].sackRisk],
+      "club-c": [lowPressureEvaluations["club-c"].sackRisk],
+      "club-d": [lowPressureEvaluations["club-d"].sackRisk]
+    });
+
+    const highPressureSnapshots = evaluateSeasonBoardDecisions(state, highPressureContext, {
+      "club-a": [highPressureEvaluations["club-a"].sackRisk],
+      "club-b": [highPressureEvaluations["club-b"].sackRisk],
+      "club-c": [highPressureEvaluations["club-c"].sackRisk],
+      "club-d": [highPressureEvaluations["club-d"].sackRisk]
+    });
+
+    expect(state.standings[1]?.clubId).toBe("club-b");
+    expect(highPressureEvaluations["club-b"].sackRisk).toBeGreaterThan(lowPressureEvaluations["club-b"].sackRisk);
+    expect(lowPressureSnapshots["club-b"].sackDecision.decision).toBe("retain");
+    expect(highPressureSnapshots["club-b"].sackDecision.decision).toBe("review");
+  });
 });

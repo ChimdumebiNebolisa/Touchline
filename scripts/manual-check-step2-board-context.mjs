@@ -126,9 +126,61 @@ function runStep2BoardContextManualCheck() {
     };
   });
 
+  const lowPressureContext = {
+    ...boardContext,
+    "club-b": {
+      preseasonObjectivePosition: 2,
+      clubStature: 0.5,
+      financialPressure: 0.1,
+      recentPointsPerMatch: 1.7,
+      styleAlignment: 0.75,
+      derbyResult: "win"
+    }
+  };
+
+  const highPressureContext = {
+    ...boardContext,
+    "club-b": {
+      preseasonObjectivePosition: 2,
+      clubStature: 0.5,
+      financialPressure: 0.8,
+      recentPointsPerMatch: 0.7,
+      styleAlignment: 0.35,
+      derbyResult: "loss"
+    }
+  };
+
+  const lowPressureEvaluations = evaluateSeasonBoardContext(seasonState, lowPressureContext);
+  const highPressureEvaluations = evaluateSeasonBoardContext(seasonState, highPressureContext);
+
+  const lowPressureSnapshots = evaluateSeasonBoardDecisions(seasonState, lowPressureContext, {
+    "club-a": [lowPressureEvaluations["club-a"].sackRisk],
+    "club-b": [lowPressureEvaluations["club-b"].sackRisk],
+    "club-c": [lowPressureEvaluations["club-c"].sackRisk],
+    "club-d": [lowPressureEvaluations["club-d"].sackRisk]
+  });
+
+  const highPressureSnapshots = evaluateSeasonBoardDecisions(seasonState, highPressureContext, {
+    "club-a": [highPressureEvaluations["club-a"].sackRisk],
+    "club-b": [highPressureEvaluations["club-b"].sackRisk],
+    "club-c": [highPressureEvaluations["club-c"].sackRisk],
+    "club-d": [highPressureEvaluations["club-d"].sackRisk]
+  });
+
+  const matchedPositionComparison = {
+    clubId: "club-b",
+    leaguePosition: seasonState.standings.findIndex((row) => row.clubId === "club-b") + 1,
+    lowPressureRisk: lowPressureEvaluations["club-b"].sackRisk,
+    highPressureRisk: highPressureEvaluations["club-b"].sackRisk,
+    lowPressureDecision: lowPressureSnapshots["club-b"].sackDecision.decision,
+    highPressureDecision: highPressureSnapshots["club-b"].sackDecision.decision
+  };
+
   console.log("Step 2 Manual Check");
   console.log("- Season standings and board reasoning sample");
   console.table(rows);
+  console.log("- Matched-position context variance sample (club-b)");
+  console.table([matchedPositionComparison]);
   console.log("- Matchday sack-risk progression sample (club-a)");
   console.table(timelineRows);
 
@@ -180,6 +232,10 @@ function runStep2BoardContextManualCheck() {
   const validSackDecision =
     sackDecision.reasonSummary.length > 0 &&
     seasonState.standings.every((row) => decisionSnapshots[row.clubId].sackDecision.reasonSummary.length > 0);
+  const validMatchedPositionVariance =
+    matchedPositionComparison.highPressureRisk > matchedPositionComparison.lowPressureRisk &&
+    matchedPositionComparison.lowPressureDecision === "retain" &&
+    matchedPositionComparison.highPressureDecision === "review";
   const validCompletedBoardSnapshots =
     Object.keys(completedBoardSummary.decisionSnapshotsByClubId).length === seasonState.standings.length;
   const validPromotionResolution =
@@ -196,6 +252,7 @@ function runStep2BoardContextManualCheck() {
     !validStreakSummary ||
     !validSnapshotCoverage ||
     !validSackDecision ||
+    !validMatchedPositionVariance ||
     !validCompletedBoardSnapshots ||
     !validPromotionResolution ||
     !validCompletedSummary
