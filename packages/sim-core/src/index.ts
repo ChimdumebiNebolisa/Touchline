@@ -49,6 +49,8 @@ export type { TransferDemandBreakdown } from "./transfers/demandModel.js";
 export { buildTransferDemandBreakdown, scoreTransferWageFit } from "./transfers/demandModel.js";
 export type {
   NegotiationScenarioVariant,
+  PromiseTrustImpactBandSummary,
+  PromiseTrustImpactSummary,
   ReputationBandNegotiationOutcome,
   TransferNegotiationExplainabilityArtifact,
   TransferNegotiationLogEntry,
@@ -58,6 +60,7 @@ export {
   buildEqualFeeNegotiationExplainabilityArtifact,
   buildTransferNegotiationLogSamples,
   compareTransferNegotiationContexts,
+  summarizePromiseTrustImpactByReputationBand,
   summarizeNegotiationAcceptanceByReputationBand
 } from "./transfers/negotiation.js";
 export type {

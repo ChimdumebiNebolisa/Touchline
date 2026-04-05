@@ -4,6 +4,7 @@ import {
   buildEqualFeeNegotiationExplainabilityArtifact,
   buildTransferNegotiationLogSamples,
   compareTransferNegotiationContexts,
+  summarizePromiseTrustImpactByReputationBand,
   summarizeNegotiationAcceptanceByReputationBand
 } from "../src/index.js";
 import type { TransferEvaluationContext, TransferTargetProfile } from "../src/index.js";
@@ -165,6 +166,45 @@ describe("transfer negotiation comparison", () => {
     expect(promiseComparison.firstDecision.score).toBeGreaterThan(promiseComparison.secondDecision.score);
   });
 
+  it("summarizes deterministic promise-trust impact by reputation band", () => {
+    const variants = [
+      { pathwayClarity: 0.78, squadCompetition: 0.52 },
+      { pathwayClarity: 0.7, squadCompetition: 0.56 },
+      { pathwayClarity: 0.62, squadCompetition: 0.58 },
+      { pathwayClarity: 0.58, squadCompetition: 0.61 }
+    ];
+
+    const firstRun = summarizePromiseTrustImpactByReputationBand(
+      target,
+      {
+        clubWageBudget: baseContext.clubWageBudget,
+        clubStature: baseContext.clubStature,
+        boardWageDiscipline: baseContext.boardWageDiscipline
+      },
+      [82, 28],
+      variants
+    );
+    const secondRun = summarizePromiseTrustImpactByReputationBand(
+      target,
+      {
+        clubWageBudget: baseContext.clubWageBudget,
+        clubStature: baseContext.clubStature,
+        boardWageDiscipline: baseContext.boardWageDiscipline
+      },
+      [82, 28],
+      variants
+    );
+
+    expect(firstRun).toEqual(secondRun);
+    expect(firstRun.bands).toHaveLength(2);
+    expect(firstRun.bands.some((band) => band.acceptanceRateDelta > 0)).toBe(true);
+    expect(firstRun.bands.every((band) => band.acceptanceRateDelta >= 0)).toBe(true);
+    expect(firstRun.bands[0].acceptanceRateDelta).toBeGreaterThan(0);
+    expect(firstRun.bands[0].intactTrustAcceptanceRate).toBeGreaterThan(firstRun.bands[0].brokenTrustAcceptanceRate);
+    expect(firstRun.bands[1].intactTrustAcceptanceRate).toBeGreaterThanOrEqual(firstRun.bands[1].brokenTrustAcceptanceRate);
+    expect(firstRun.conciseSummary[0]).toContain("intact trust");
+  });
+
   it("builds deterministic equal-fee explainability artifacts with non-fee drivers", () => {
     const equalFeeTarget: TransferTargetProfile = {
       ...target,
@@ -221,6 +261,21 @@ describe("transfer negotiation comparison", () => {
         []
       )
     ).toThrow("At least one negotiation scenario variant is required.");
+  });
+
+  it("rejects promise-trust summary with empty scenario variants", () => {
+    expect(() =>
+      summarizePromiseTrustImpactByReputationBand(
+        target,
+        {
+          clubWageBudget: baseContext.clubWageBudget,
+          clubStature: baseContext.clubStature,
+          boardWageDiscipline: baseContext.boardWageDiscipline
+        },
+        [82, 28],
+        []
+      )
+    ).toThrow("At least one promise-trust scenario variant is required.");
   });
 
   it("builds deterministic and explainable negotiation log samples", () => {

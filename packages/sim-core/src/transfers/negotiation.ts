@@ -27,6 +27,22 @@ export interface ReputationBandNegotiationOutcome {
   acceptanceRate: number;
 }
 
+export interface PromiseTrustImpactBandSummary {
+  managerReputation: number;
+  attempts: number;
+  intactTrustAcceptedCount: number;
+  brokenTrustAcceptedCount: number;
+  intactTrustAcceptanceRate: number;
+  brokenTrustAcceptanceRate: number;
+  acceptedCountDelta: number;
+  acceptanceRateDelta: number;
+}
+
+export interface PromiseTrustImpactSummary {
+  bands: PromiseTrustImpactBandSummary[];
+  conciseSummary: string[];
+}
+
 export interface TransferNegotiationLogEntry {
   attemptId: string;
   managerReputation: number;
@@ -211,6 +227,60 @@ export function summarizeNegotiationAcceptanceByReputationBand(
       acceptanceRate: acceptedCount / variants.length
     };
   });
+}
+
+export function summarizePromiseTrustImpactByReputationBand(
+  target: TransferTargetProfile,
+  baseContext: Omit<TransferEvaluationContext, "managerReputation" | "pathwayClarity" | "squadCompetition" | "recentPromiseBreak">,
+  managerReputationBands: number[],
+  variants: Omit<NegotiationScenarioVariant, "recentPromiseBreak">[]
+): PromiseTrustImpactSummary {
+  if (!variants.length) {
+    throw new Error("At least one promise-trust scenario variant is required.");
+  }
+
+  const intactTrustOutcomes = summarizeNegotiationAcceptanceByReputationBand(
+    target,
+    baseContext,
+    managerReputationBands,
+    variants.map((variant) => ({
+      ...variant,
+      recentPromiseBreak: false
+    }))
+  );
+  const brokenTrustOutcomes = summarizeNegotiationAcceptanceByReputationBand(
+    target,
+    baseContext,
+    managerReputationBands,
+    variants.map((variant) => ({
+      ...variant,
+      recentPromiseBreak: true
+    }))
+  );
+
+  const bands = intactTrustOutcomes.map((intactTrust, index) => {
+    const brokenTrust = brokenTrustOutcomes[index];
+    return {
+      managerReputation: intactTrust.managerReputation,
+      attempts: intactTrust.attempts,
+      intactTrustAcceptedCount: intactTrust.acceptedCount,
+      brokenTrustAcceptedCount: brokenTrust.acceptedCount,
+      intactTrustAcceptanceRate: intactTrust.acceptanceRate,
+      brokenTrustAcceptanceRate: brokenTrust.acceptanceRate,
+      acceptedCountDelta: intactTrust.acceptedCount - brokenTrust.acceptedCount,
+      acceptanceRateDelta: intactTrust.acceptanceRate - brokenTrust.acceptanceRate
+    };
+  });
+
+  const conciseSummary = bands.map(
+    (band) =>
+      `Manager reputation ${band.managerReputation}: intact trust ${band.intactTrustAcceptedCount}/${band.attempts} (${band.intactTrustAcceptanceRate.toFixed(2)}) vs broken trust ${band.brokenTrustAcceptedCount}/${band.attempts} (${band.brokenTrustAcceptanceRate.toFixed(2)}), delta ${band.acceptanceRateDelta.toFixed(2)}.`
+  );
+
+  return {
+    bands,
+    conciseSummary
+  };
 }
 
 export function buildTransferNegotiationLogSamples(
