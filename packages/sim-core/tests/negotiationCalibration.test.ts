@@ -240,6 +240,37 @@ describe("transfer negotiation calibration samples", () => {
     }
   });
 
+  it("keeps equal-fee explainability artifact field ordering and labels deterministic", () => {
+    const firstArtifact = buildEqualFeeNegotiationExplainabilityArtifact(
+      calibrationTarget,
+      calibrationEqualFeeContexts.first,
+      calibrationEqualFeeContexts.second
+    );
+    const secondArtifact = buildEqualFeeNegotiationExplainabilityArtifact(
+      calibrationTarget,
+      calibrationEqualFeeContexts.first,
+      calibrationEqualFeeContexts.second
+    );
+
+    expect(secondArtifact).toEqual(firstArtifact);
+    expect(Object.keys(firstArtifact)).toEqual([
+      "comparison",
+      "firstDemandBreakdown",
+      "secondDemandBreakdown",
+      "demandDelta",
+      "primaryNonFeeDrivers",
+      "nonFeeContextDroveDivergence",
+      "conciseSummary"
+    ]);
+    expect(firstArtifact.comparison.changedContextFactors).toEqual(["squadCompetition", "pathwayClarity"]);
+
+    for (const label of firstArtifact.primaryNonFeeDrivers) {
+      expect(label).toMatch(/^[A-Za-z\- ]+ [+-]\d+\.\d{2}$/);
+    }
+
+    expect(firstArtifact.conciseSummary).toContain(firstArtifact.primaryNonFeeDrivers.join(", "));
+  });
+
   it("keeps reputation-band delta artifacts deterministic across repeated fixed fixture evaluations", () => {
     const repeatedRuns = Array.from({ length: 12 }, () =>
       buildReputationBandOutcomeDeltaSummary(
