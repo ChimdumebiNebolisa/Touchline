@@ -250,6 +250,36 @@ describe("transfer negotiation comparison", () => {
     expect(firstRun.conciseSummary[0]).toContain("sporting-director blocks");
   });
 
+  it("keeps board wage-discipline blocks dominant regardless of reputation band", () => {
+    const boardBlockedTarget: TransferTargetProfile = {
+      ...target,
+      wageDemand: 420
+    };
+    const variants = [
+      { pathwayClarity: 0.82, squadCompetition: 0.5, recentPromiseBreak: false },
+      { pathwayClarity: 0.7, squadCompetition: 0.56, recentPromiseBreak: false },
+      { pathwayClarity: 0.62, squadCompetition: 0.58, recentPromiseBreak: true }
+    ];
+
+    const summary = summarizeTransferOutcomesByReputationBand(
+      boardBlockedTarget,
+      {
+        clubWageBudget: baseContext.clubWageBudget,
+        clubStature: baseContext.clubStature,
+        boardWageDiscipline: baseContext.boardWageDiscipline
+      },
+      [82, 62, 28],
+      variants
+    );
+
+    for (const band of summary.bands) {
+      expect(band.acceptedCount).toBe(0);
+      expect(band.boardBlockCount).toBe(variants.length);
+      expect(band.sportingDirectorBlockCount).toBe(0);
+      expect(band.playerBlockCount).toBe(0);
+    }
+  });
+
   it("builds deterministic equal-fee explainability artifacts with non-fee drivers", () => {
     const equalFeeTarget: TransferTargetProfile = {
       ...target,
