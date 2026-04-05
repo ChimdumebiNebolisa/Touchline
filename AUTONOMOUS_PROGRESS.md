@@ -21,11 +21,11 @@
 - Passed: `npm run -w @touchline/sim-core test -- tests/negotiation.test.ts tests/negotiationCalibration.test.ts tests/transferEngine.test.ts`, `npm test`, `npm run typecheck`, `npm run lint`, `npm run build` after no-board-bypass wage-discipline guard proof across reputation bands (2026-04-05)
 
 ## Last commit hash
-- PENDING_COMMIT
+- cf48dbc
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`
 - Inspect git status and recent commits
 - Continue Step 3 with transfer/reputation bounded tasks only; do not jump to later steps.
 - Next bounded task: add blocking-actor delta summary artifact between reputation bands for deterministic calibration checks.
-- Last successful pushed commit before this pending change: a505af6.
+- Last successful pushed commit: cf48dbc.
