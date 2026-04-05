@@ -157,34 +157,30 @@ describe("transfer negotiation calibration samples", () => {
     `);
   });
 
-  it("keeps reputation-band delta artifacts stable under fixed wage constraints", () => {
-    const firstRun = buildReputationBandOutcomeDeltaSummary(
-      calibrationTarget,
-      {
-        clubWageBudget: calibrationBaseContext.clubWageBudget,
-        clubStature: calibrationBaseContext.clubStature,
-        boardWageDiscipline: calibrationBaseContext.boardWageDiscipline
-      },
-      82,
-      28,
-      calibrationOutcomeVariants
-    );
-    const secondRun = buildReputationBandOutcomeDeltaSummary(
-      calibrationTarget,
-      {
-        clubWageBudget: calibrationBaseContext.clubWageBudget,
-        clubStature: calibrationBaseContext.clubStature,
-        boardWageDiscipline: calibrationBaseContext.boardWageDiscipline
-      },
-      82,
-      28,
-      calibrationOutcomeVariants
+  it("keeps reputation-band delta artifacts deterministic across repeated fixed fixture evaluations", () => {
+    const repeatedRuns = Array.from({ length: 12 }, () =>
+      buildReputationBandOutcomeDeltaSummary(
+        calibrationTarget,
+        {
+          clubWageBudget: calibrationBaseContext.clubWageBudget,
+          clubStature: calibrationBaseContext.clubStature,
+          boardWageDiscipline: calibrationBaseContext.boardWageDiscipline
+        },
+        82,
+        28,
+        calibrationOutcomeVariants
+      )
     );
 
-    expect(firstRun).toEqual(secondRun);
-    expect(firstRun.boardBlockDelta).toBe(0);
-    expect(firstRun.acceptedCountDelta).toBeGreaterThan(0);
-    expect(firstRun.sportingDirectorBlockDelta).toBeGreaterThan(0);
-    expect(firstRun.playerBlockDelta).toBeLessThan(0);
+    const baseline = repeatedRuns[0];
+    for (const run of repeatedRuns.slice(1)) {
+      expect(run).toEqual(baseline);
+    }
+
+    expect(new Set(repeatedRuns.map((run) => run.conciseSummary)).size).toBe(1);
+    expect(baseline.boardBlockDelta).toBe(0);
+    expect(baseline.acceptedCountDelta).toBeGreaterThan(0);
+    expect(baseline.sportingDirectorBlockDelta).toBeGreaterThan(0);
+    expect(baseline.playerBlockDelta).toBeLessThan(0);
   });
 });
