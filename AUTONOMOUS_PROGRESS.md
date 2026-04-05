@@ -4,10 +4,10 @@
 - Step 3: Transfer and reputation expansion
 
 ## Last completed verified task
-- Added deterministic promise-trust impact summary artifact by reputation band, with regression tests and empty-variant guard.
+- Added deterministic Step 3 calibration sample fixture and regression sample-output test using negotiation artifacts.
 
 ## Current subtask in progress
-- Add bounded Step 3 calibration coverage linking transfer trust impact to broader reputation leverage expectations.
+- Add bounded Step 3 calibration coverage summarizing how manager reputation bands shift transfer outcomes and blocking actors.
 
 ## Next queued subtasks
 - Keep Step 3 scope constrained to transfer/reputation logic without Step 4 academy drift.
@@ -18,14 +18,14 @@
 - None
 
 ## Last verification run
-- Passed: `npm run -w @touchline/sim-core test -- tests/negotiation.test.ts tests/transferEngine.test.ts`, `npm test`, `npm run typecheck`, `npm run lint`, `npm run build` after promise-trust impact summary helper + deterministic coverage (2026-04-05)
+- Passed: `npm run -w @touchline/sim-core test -- -u tests/negotiationCalibration.test.ts tests/negotiation.test.ts tests/transferEngine.test.ts`, `npm test`, `npm run typecheck`, `npm run lint`, `npm run build` after Step 3 calibration fixture and deterministic sample-output regression artifact (2026-04-05)
 
 ## Last commit hash
-- a23708a
+- PENDING_COMMIT
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`
 - Inspect git status and recent commits
 - Continue Step 3 with transfer/reputation bounded tasks only; do not jump to later steps.
-- Next bounded task: add deterministic calibration-proof sample output using the Step 3 negotiation artifacts.
-- Last successful pushed commit: a23708a.
+- Next bounded task: add reputation-band calibration summary for transfer outcomes and blocking actors.
+- Last successful pushed commit before this pending change: 03748ba.
