@@ -45,6 +45,8 @@ export type {
   TransferFollowUpEvent,
   TransferTargetProfile
 } from "./transfers/transferEngine.js";
+export type { TransferDemandBreakdown } from "./transfers/demandModel.js";
+export { buildTransferDemandBreakdown, scoreTransferWageFit } from "./transfers/demandModel.js";
 export type {
   CompletedSeasonSummary,
   Fixture,

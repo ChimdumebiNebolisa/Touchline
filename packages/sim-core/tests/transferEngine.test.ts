@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { buildTransferFollowUpEvent, evaluateTransferDecision } from "../src/index.js";
+import {
+  buildTransferDemandBreakdown,
+  buildTransferFollowUpEvent,
+  evaluateTransferDecision
+} from "../src/index.js";
 import type { TransferEvaluationContext, TransferTargetProfile } from "../src/index.js";
 
 const target: TransferTargetProfile = {
@@ -25,6 +29,34 @@ const baseContext: TransferEvaluationContext = {
 };
 
 describe("transfer engine", () => {
+  it("resolves equal-fee offers differently when project and pathway context diverge", () => {
+    const equalFeeTarget: TransferTargetProfile = {
+      ...target,
+      wageDemand: 190,
+      roleFit: 0.65,
+      projectFit: 0.61,
+      pathwayPreference: 0.7
+    };
+
+    const highPathDecision = evaluateTransferDecision(equalFeeTarget, {
+      ...baseContext,
+      pathwayClarity: 0.88,
+      squadCompetition: 0.48,
+      managerReputation: 68
+    });
+
+    const blockedPathDecision = evaluateTransferDecision(equalFeeTarget, {
+      ...baseContext,
+      pathwayClarity: 0.28,
+      squadCompetition: 0.85,
+      managerReputation: 68
+    });
+
+    expect(highPathDecision.accepted).toBe(true);
+    expect(blockedPathDecision.accepted).toBe(false);
+    expect(highPathDecision.score).toBeGreaterThan(blockedPathDecision.score);
+  });
+
   it("changes outcome when promise context changes under similar financial terms", () => {
     const trustedDecision = evaluateTransferDecision(target, {
       ...baseContext,
@@ -62,5 +94,23 @@ describe("transfer engine", () => {
     });
 
     expect(event.reasonSummary.join(" ").toLowerCase()).toMatch(/reputation|promise|trust/);
+  });
+
+  it("produces higher demand breakdown score for stronger pathway and competition fit", () => {
+    const fitBreakdown = buildTransferDemandBreakdown(target, {
+      ...baseContext,
+      pathwayClarity: 0.86,
+      squadCompetition: target.competitionTolerance,
+      managerReputation: 66
+    });
+    const poorBreakdown = buildTransferDemandBreakdown(target, {
+      ...baseContext,
+      pathwayClarity: 0.22,
+      squadCompetition: 0.9,
+      managerReputation: 66
+    });
+
+    expect(fitBreakdown.totalScore).toBeGreaterThan(poorBreakdown.totalScore);
+    expect(fitBreakdown.pathwayScore).toBeGreaterThan(poorBreakdown.pathwayScore);
   });
 });
