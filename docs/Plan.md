@@ -4,11 +4,10 @@
 
 **Active**
 
-* Step 1: First build slice
+* Step 2: Full season loop and board-context model
 
 **Backlog**
 
-* Step 2: Full season loop and board-context model
 * Step 3: Transfer and reputation expansion
 * Step 4: Academy, loans, and pathway pressure
 * Step 5: Shadow world and country-pack scaling
@@ -21,7 +20,7 @@
 
 **Done**
 
-* None
+* Step 1: First build slice
 
 **Dropped**
 
@@ -41,7 +40,7 @@ The first build slice must be the smallest end-to-end playable core. It is not s
 ## 3. Step 1
 
 **Status**
-Active
+Done
 
 **Objective**
 Build one playable vertical slice with:
@@ -116,7 +115,7 @@ A player can:
 ## 4. Step 2
 
 **Status**
-Backlog
+Active
 
 **Objective**
 Extend the slice into a full season loop with fixtures, standings, board expectations, sack risk, and promotion-relegation resolution. 
