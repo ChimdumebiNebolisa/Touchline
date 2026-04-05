@@ -21,11 +21,11 @@
 - Passed: `npm run -w @touchline/sim-core test -- tests/negotiationCalibration.test.ts tests/negotiation.test.ts tests/transferEngine.test.ts`, `npm test`, `npm run typecheck`, `npm run lint`, `npm run build` after repeated-run concise explainability summary determinism proof (2026-04-05)
 
 ## Last commit hash
-- pending (next commit: concise explainability summary determinism proof)
+- 261a0a9
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`
 - Inspect git status and recent commits
 - Continue Step 3 with transfer/reputation bounded tasks only; do not jump to later steps.
 - Next bounded task: add bounded Step 3 regression checks that preserve deterministic transfer explainability artifact structure.
-- Last successful pushed commit: b27ed32.
+- Last successful pushed commit: 261a0a9.
