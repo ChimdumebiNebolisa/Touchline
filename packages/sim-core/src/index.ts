@@ -33,6 +33,10 @@ export type {
   PostMatchPerceptionContext
 } from "./club/types.js";
 export type {
+  BoardExpectationContext,
+  BoardExpectationEvaluation
+} from "./club/board.js";
+export type {
   TransferDecision,
   TransferEvaluationContext,
   TransferFollowUpEvent,
@@ -50,6 +54,7 @@ export {
   applyMatchPreparationCommand
 } from "./match/commands.js";
 export { computeBoardConfidenceDelta } from "./club/board.js";
+export { evaluateBoardExpectationContext } from "./club/board.js";
 export { computeTeamMoraleDelta } from "./club/morale.js";
 export { computeManagerReputationDelta } from "./club/reputation.js";
 export { applyPostMatchFallout } from "./club/postMatchFallout.js";
