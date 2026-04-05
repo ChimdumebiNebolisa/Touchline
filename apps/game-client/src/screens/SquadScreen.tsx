@@ -26,6 +26,7 @@ const tacticLabels: Record<keyof TacticalSetup, string> = {
 
 export function SquadScreen(props: SquadScreenProps) {
   const tacticKeys = Object.keys(props.config.tactics) as Array<keyof TacticalSetup & string>;
+  const canContinue = props.config.clubId.length > 0;
 
   return (
     <section className="panel">
@@ -67,9 +68,13 @@ export function SquadScreen(props: SquadScreenProps) {
         ))}
       </div>
 
-      {props.commandMessage ? <p className="inline-message">{props.commandMessage}</p> : null}
+      {props.commandMessage ? (
+        <p className="inline-message" role="status" aria-live="polite">
+          {props.commandMessage}
+        </p>
+      ) : null}
 
-      <button className="primary" type="button" onClick={props.onContinue}>
+      <button className="primary" type="button" onClick={props.onContinue} disabled={!canContinue}>
         Continue To Match
       </button>
     </section>

@@ -15,7 +15,7 @@ import type {
   TacticalSetup,
   TransferTargetProfile
 } from "@touchline/sim-core";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import firstCountryPackJson from "../../../packages/sim-core/content/countries/first-country.json";
 
@@ -100,20 +100,54 @@ export function App() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [commandMessage, setCommandMessage] = useState<string | null>(null);
 
-  const countryPack = useMemo(() => {
-    return assertValidCountryPack(firstCountryPackJson as CountryPack);
+  const [countryPack, setCountryPack] = useState<CountryPack | null>(null);
+  const [loadingPack, setLoadingPack] = useState(true);
+  const [packError, setPackError] = useState<string | null>(null);
+
+  useEffect(() => {
+    try {
+      const validated = assertValidCountryPack(firstCountryPackJson as CountryPack);
+      setCountryPack(validated);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Country pack failed to load.";
+      setPackError(message);
+    } finally {
+      setLoadingPack(false);
+    }
   }, []);
 
-  const playableClubs = useMemo(() => findPlayableClubs(countryPack), [countryPack]);
+  const playableClubs = useMemo(() => {
+    if (!countryPack) {
+      return [];
+    }
+    return findPlayableClubs(countryPack);
+  }, [countryPack]);
 
   const [squadConfig, setSquadConfig] = useState<SquadConfig>(() => {
-    const initialClub = playableClubs[0];
     return {
-      clubId: initialClub?.id ?? "",
-      clubName: initialClub?.name ?? "",
+      clubId: "",
+      clubName: "",
       tactics: { ...defaultTactics }
     };
   });
+
+  useEffect(() => {
+    if (playableClubs.length === 0) {
+      return;
+    }
+
+    setSquadConfig((previous) => {
+      if (previous.clubId) {
+        return previous;
+      }
+
+      return {
+        ...previous,
+        clubId: playableClubs[0].id,
+        clubName: playableClubs[0].name
+      };
+    });
+  }, [playableClubs]);
 
   const [matchConfig, setMatchConfig] = useState<MatchConfig>({
     mode: "instant",
@@ -124,7 +158,29 @@ export function App() {
   const [currentPerception, setCurrentPerception] = useState<ClubPerceptionState>(basePerceptionState);
   const [runResult, setRunResult] = useState<MatchRunResult | null>(null);
 
-  if (!playableClubs.length) {
+  if (loadingPack) {
+    return (
+      <main className="app-shell">
+        <section className="panel">
+          <h1>Loading Country Pack</h1>
+          <p>Preparing Step 1 playable data for club and match setup.</p>
+        </section>
+      </main>
+    );
+  }
+
+  if (packError) {
+    return (
+      <main className="app-shell">
+        <section className="panel">
+          <h1>Country Pack Error</h1>
+          <p>{packError}</p>
+        </section>
+      </main>
+    );
+  }
+
+  if (!countryPack || !playableClubs.length) {
     return (
       <main className="app-shell">
         <section className="panel">

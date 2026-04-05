@@ -89,6 +89,13 @@ input[type="range"] {
   width: 100%;
 }
 
+select:focus-visible,
+input[type="range"]:focus-visible,
+button:focus-visible {
+  outline: 2px solid #1d6f8d;
+  outline-offset: 2px;
+}
+
 select {
   border-radius: 0.6rem;
   border: 1px solid var(--line);
@@ -190,7 +197,7 @@ button.ghost:hover {
 }
 
 button:disabled {
-  opacity: 0.6;
+  opacity: 0.45;
   cursor: not-allowed;
   transform: none;
 }
