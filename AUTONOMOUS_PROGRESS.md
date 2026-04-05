@@ -21,11 +21,11 @@
 - Passed: `npm run -w @touchline/sim-core test -- tests/negotiationCalibration.test.ts tests/negotiation.test.ts tests/transferEngine.test.ts`, `npm test`, `npm run typecheck`, `npm run lint`, `npm run build` after deterministic concise-summary formatting regression proof (2026-04-05)
 
 ## Last commit hash
-- pending (next commit: deterministic concise-summary formatting proof)
+- ec3b1c1
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`
 - Inspect git status and recent commits
 - Continue Step 3 with transfer/reputation bounded tasks only; do not jump to later steps.
 - Next bounded task: add deterministic calibration artifact checks that keep sample-output structure stable for regression checks.
-- Last successful pushed commit: 4dab489.
+- Last successful pushed commit: ec3b1c1.
