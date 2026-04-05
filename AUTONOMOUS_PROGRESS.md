@@ -4,21 +4,21 @@
 - Step 2: Full season loop and board-context model
 
 ## Last completed verified task
-- Added a season-level contextual sack-risk integration assertion proving board outcomes are not table-position only.
+- Wired season progression into board context with a deterministic recent-points-per-match adapter and integration coverage.
 
 ## Current subtask in progress
-- Wire season progression output into future board-evaluation inputs.
+- Extend Step 2 season assertions for contrasting club contexts under matched table positions.
 
 ## Next queued subtasks
-- Add a deterministic adapter for recent points-per-match context from season progression state.
-- Add integration coverage that board context can consume progression-derived form inputs without UI-owned rules.
-- Extend Step 2 season assertions for contrasting club contexts under matched table positions.
+- Add a direct matched-position integration assertion showing contextual inputs can reverse sack-risk ordering.
+- Add a season-level fixture/context sample artifact for board expectation reasoning traces.
+- Reconcile Plan status metadata so active-step tracking aligns with ongoing verified Step 2 commits.
 
 ## Known blockers
 - None
 
 ## Last verification run
-- Passed: `npm run -w @touchline/sim-core test -- tests/seasonBoard.integration.test.ts`, `npm test`, `npm run typecheck`, `npm run lint`, `npm run build` after contextual sack-risk season integration assertion (2026-04-05)
+- Passed: `npm run -w @touchline/sim-core test -- tests/seasonBoard.integration.test.ts`, `npm test`, `npm run typecheck`, `npm run lint`, `npm run build` after season-progression board-context adapter and integration coverage (2026-04-05)
 
 ## Last commit hash
 - PENDING_COMMIT
@@ -26,5 +26,5 @@
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`
 - Inspect git status and recent commits
-- Continue Step 2 with season-state progression to board-context wiring artifacts only; do not jump to later Plan steps.
-- Last successful pushed commit before this pending change: 2b08ee0.
+- Continue Step 2 with contextual board-judgment/sack-risk artifacts only; do not jump to later Plan steps.
+- Last successful pushed commit before this pending change: 1bd99f7.

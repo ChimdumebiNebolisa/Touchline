@@ -12,6 +12,36 @@ export interface SeasonBoardContext {
   derbyResult: "none" | "win" | "draw" | "loss";
 }
 
+export interface SeasonBoardStaticContext {
+  preseasonObjectivePosition: number;
+  clubStature: number;
+  financialPressure: number;
+  styleAlignment: number;
+  derbyResult: "none" | "win" | "draw" | "loss";
+}
+
+export function deriveSeasonBoardContextFromSeasonState(
+  state: SeasonState,
+  staticContextByClubId: Record<string, SeasonBoardStaticContext>
+): Record<string, SeasonBoardContext> {
+  const contextByClubId: Record<string, SeasonBoardContext> = {};
+
+  for (const row of state.standings) {
+    const staticContext = staticContextByClubId[row.clubId];
+    if (!staticContext) {
+      throw new Error(`Missing static board context for club ${row.clubId}.`);
+    }
+
+    const recentPointsPerMatch = row.played > 0 ? row.points / row.played : 1.25;
+    contextByClubId[row.clubId] = {
+      ...staticContext,
+      recentPointsPerMatch
+    };
+  }
+
+  return contextByClubId;
+}
+
 export function evaluateSeasonBoardContext(
   state: SeasonState,
   contextByClubId: Record<string, SeasonBoardContext>
