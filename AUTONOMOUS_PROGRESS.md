@@ -7,15 +7,14 @@
 - Added deterministic season board action-count helper from grouped retain/review/sack statuses, with integration and manual artifact coverage.
 
 ## Current subtask in progress
-- Add a deterministic Step 2 readiness artifact that summarizes board decision variance and season resolution counts in one output contract.
+- BLOCKED: Await decision on whether Step 2 is now complete and should be closed before starting Step 3.
 
 ## Next queued subtasks
-- Add helper that composes matched-position variance and season action counts into one deterministic Step 2 verification artifact.
-- Add integration/manual coverage proving the composed readiness artifact remains deterministic across reruns.
-- Keep Step 2 scope constrained to season/board context without transfer-system drift.
+- If Step 2 is confirmed incomplete: implement only the explicitly requested missing Step 2 criterion.
+- If Step 2 is confirmed complete: update Plan/progress status and begin Step 3 bounded subtask selection.
 
 ## Known blockers
-- None
+- Step-transition decision needed: current Step 2 exit criteria appear satisfied by existing artifacts (season completion with promotion/relegation, contextual board decision variance, deterministic sack/review/retain outcomes, and season-resolution summaries). Further Step 2 work risks speculative scope. Human decision required on whether to mark Step 2 done and start Step 3.
 
 ## Last verification run
 - Passed: `npm run -w @touchline/sim-core test -- tests/seasonBoard.integration.test.ts`, `npm run build`, `npm run manual:step2`, `npm test`, `npm run typecheck`, `npm run lint`, `npm run build` after deterministic season board action-count helper + integration/manual coverage (2026-04-05)
@@ -26,6 +25,6 @@
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`
 - Inspect git status and recent commits
-- Continue Step 2 with contextual board-judgment/sack-risk artifacts only; do not jump to later Plan steps.
-- Next bounded task: compose a deterministic Step 2 readiness artifact combining decision variance and season action counts.
-- Last successful pushed commit before this pending change: 578f4fe.
+- Resolve blocker first: confirm whether Step 2 is complete or identify a single explicit missing Step 2 requirement.
+- After decision: either close Step 2 and start Step 3, or implement the specified missing Step 2 gap.
+- Last successful pushed commit before this pending change: 817d7b7.
