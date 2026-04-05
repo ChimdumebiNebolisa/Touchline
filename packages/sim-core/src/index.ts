@@ -19,6 +19,14 @@ export type {
   TacticalSetup,
   TeamMatchStats
 } from "./match/types.js";
+export type {
+  MatchPreparationCommand,
+  MatchPreparationCommandResult,
+  MatchPreparationState
+} from "./match/commands.js";
+export {
+  applyMatchPreparationCommand
+} from "./match/commands.js";
 
 export { parseCountryPackJson } from "./content/countryPackLoader.js";
 export { runInstantMatch, runLiveMatch } from "./match/modes.js";
