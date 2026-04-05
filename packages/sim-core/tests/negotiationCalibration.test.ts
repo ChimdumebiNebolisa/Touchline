@@ -204,6 +204,25 @@ describe("transfer negotiation calibration samples", () => {
     expect(baseline.primaryNonFeeDrivers.length).toBeGreaterThan(0);
   });
 
+  it("keeps negotiation log explainability reasons deterministic under fixed contexts", () => {
+    const firstRun = buildTransferNegotiationLogSamples(calibrationTarget, calibrationLogContexts);
+    const secondRun = buildTransferNegotiationLogSamples(calibrationTarget, calibrationLogContexts);
+
+    expect(secondRun).toEqual(firstRun);
+
+    for (const entry of firstRun) {
+      expect(entry.reasonSummary.length).toBeGreaterThan(0);
+
+      if (entry.blockingActor === "player") {
+        expect(entry.reasonSummary.join(" ")).toContain("Player side rejected");
+      }
+
+      if (entry.blockingActor === "sporting-director") {
+        expect(entry.reasonSummary.join(" ")).toContain("Wage demand pressured");
+      }
+    }
+  });
+
   it("keeps reputation-band transfer outcome artifacts invariant under fixed fixture reordering", () => {
     const forwardSummary = summarizeTransferOutcomesByReputationBand(
       calibrationTarget,
