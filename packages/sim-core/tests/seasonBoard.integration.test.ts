@@ -176,4 +176,98 @@ describe("season board integration", () => {
     expect(board["club-a"].sackRisk).toBeGreaterThanOrEqual(0);
     expect(board["club-a"].sackRisk).toBeLessThanOrEqual(1);
   });
+
+  it("changes sack-risk ordering under matched table position when context shifts", () => {
+    const state = createSeasonState([
+      { id: "club-a", name: "Club A", strength: 74 },
+      { id: "club-b", name: "Club B", strength: 71 },
+      { id: "club-c", name: "Club C", strength: 69 },
+      { id: "club-d", name: "Club D", strength: 67 }
+    ]);
+
+    const fixtures = getFixturesForMatchday(state, state.currentMatchday);
+    const resultsByFixtureId = Object.fromEntries(
+      fixtures.map((fixture) => [
+        fixture.id,
+        {
+          homeGoals: 1,
+          awayGoals: 1
+        }
+      ])
+    );
+
+    const progressedState = advanceSeasonState(state, resultsByFixtureId);
+
+    const lowerContext = evaluateSeasonBoardContext(progressedState, {
+      "club-a": {
+        preseasonObjectivePosition: 4,
+        clubStature: 0.5,
+        financialPressure: 0.85,
+        recentPointsPerMatch: 0.8,
+        styleAlignment: 0.3,
+        derbyResult: "loss"
+      },
+      "club-b": {
+        preseasonObjectivePosition: 6,
+        clubStature: 0.4,
+        financialPressure: 0.3,
+        recentPointsPerMatch: 1.4,
+        styleAlignment: 0.65,
+        derbyResult: "none"
+      },
+      "club-c": {
+        preseasonObjectivePosition: 8,
+        clubStature: 0.25,
+        financialPressure: 0.2,
+        recentPointsPerMatch: 1.2,
+        styleAlignment: 0.56,
+        derbyResult: "draw"
+      },
+      "club-d": {
+        preseasonObjectivePosition: 10,
+        clubStature: 0.2,
+        financialPressure: 0.22,
+        recentPointsPerMatch: 1.3,
+        styleAlignment: 0.59,
+        derbyResult: "win"
+      }
+    });
+
+    const higherContext = evaluateSeasonBoardContext(progressedState, {
+      "club-a": {
+        preseasonObjectivePosition: 4,
+        clubStature: 0.5,
+        financialPressure: 0.15,
+        recentPointsPerMatch: 2,
+        styleAlignment: 0.88,
+        derbyResult: "win"
+      },
+      "club-b": {
+        preseasonObjectivePosition: 6,
+        clubStature: 0.4,
+        financialPressure: 0.3,
+        recentPointsPerMatch: 1.4,
+        styleAlignment: 0.65,
+        derbyResult: "none"
+      },
+      "club-c": {
+        preseasonObjectivePosition: 8,
+        clubStature: 0.25,
+        financialPressure: 0.2,
+        recentPointsPerMatch: 1.2,
+        styleAlignment: 0.56,
+        derbyResult: "draw"
+      },
+      "club-d": {
+        preseasonObjectivePosition: 10,
+        clubStature: 0.2,
+        financialPressure: 0.22,
+        recentPointsPerMatch: 1.3,
+        styleAlignment: 0.59,
+        derbyResult: "win"
+      }
+    });
+
+    expect(lowerContext["club-a"].sackRisk).toBeGreaterThan(higherContext["club-a"].sackRisk);
+  });
 });
