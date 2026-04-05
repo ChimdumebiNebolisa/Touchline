@@ -28,6 +28,13 @@ export const calibrationPromiseVariants = [
   { pathwayClarity: 0.58, squadCompetition: 0.61 }
 ];
 
+export const calibrationOutcomeVariants = [
+  { pathwayClarity: 0.78, squadCompetition: 0.52, recentPromiseBreak: false },
+  { pathwayClarity: 0.7, squadCompetition: 0.56, recentPromiseBreak: false },
+  { pathwayClarity: 0.62, squadCompetition: 0.58, recentPromiseBreak: true },
+  { pathwayClarity: 0.58, squadCompetition: 0.61, recentPromiseBreak: true }
+];
+
 export const calibrationReputationBands = [82, 62, 28];
 
 export const calibrationLogContexts: TransferEvaluationContext[] = [

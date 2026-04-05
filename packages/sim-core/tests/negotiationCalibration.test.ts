@@ -10,6 +10,7 @@ import {
   calibrationBaseContext,
   calibrationEqualFeeContexts,
   calibrationLogContexts,
+  calibrationOutcomeVariants,
   calibrationPromiseVariants,
   calibrationReputationBands,
   calibrationTarget
@@ -43,10 +44,7 @@ describe("transfer negotiation calibration samples", () => {
         boardWageDiscipline: calibrationBaseContext.boardWageDiscipline
       },
       calibrationReputationBands,
-      calibrationPromiseVariants.map((variant) => ({
-        ...variant,
-        recentPromiseBreak: false
-      }))
+      calibrationOutcomeVariants
     );
 
     const normalizedSample = {
@@ -125,9 +123,9 @@ describe("transfer negotiation calibration samples", () => {
           "Manager reputation 28: intact trust 0/4 (0.00) vs broken trust 0/4 (0.00), delta 0.00.",
         ],
         "reputationOutcomeSummary": [
-          "Manager reputation 82: accepted 4/4 (1.00), average score 3.18, board blocks 0, sporting-director blocks 0, player blocks 0.",
-          "Manager reputation 62: accepted 4/4 (1.00), average score 2.16, board blocks 0, sporting-director blocks 0, player blocks 0.",
-          "Manager reputation 28: accepted 0/4 (0.00), average score 0.43, board blocks 0, sporting-director blocks 0, player blocks 4.",
+          "Manager reputation 82: accepted 2/4 (0.50), average score 1.06, board blocks 0, sporting-director blocks 2, player blocks 0.",
+          "Manager reputation 62: accepted 2/4 (0.50), average score 0.04, board blocks 0, sporting-director blocks 2, player blocks 0.",
+          "Manager reputation 28: accepted 0/4 (0.00), average score -1.69, board blocks 0, sporting-director blocks 0, player blocks 4.",
         ],
       }
     `);

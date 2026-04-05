@@ -4,10 +4,10 @@
 - Step 3: Transfer and reputation expansion
 
 ## Last completed verified task
-- Added reputation-band transfer outcome calibration summary with blocking-actor counts, deterministic tests, and updated calibration sample outputs.
+- Added mixed promise-break calibration variants for deterministic blocking-actor shift outputs across reputation bands.
 
 ## Current subtask in progress
-- Add bounded Step 3 calibration variant set that mixes promise-break states to trace blocking-actor shifts under comparable reputation bands.
+- Add bounded Step 3 calibration proof that low-reputation contexts shift from sporting-director friction toward player-side rejection under equivalent wage constraints.
 
 ## Next queued subtasks
 - Keep Step 3 scope constrained to transfer/reputation logic without Step 4 academy drift.
@@ -18,14 +18,14 @@
 - None
 
 ## Last verification run
-- Passed: `npm run -w @touchline/sim-core test -- -u tests/negotiationCalibration.test.ts tests/negotiation.test.ts tests/transferEngine.test.ts`, `npm test`, `npm run typecheck`, `npm run lint`, `npm run build` after reputation-band transfer outcome summary + blocking-actor calibration coverage (2026-04-05)
+- Passed: `npm run -w @touchline/sim-core test -- -u tests/negotiationCalibration.test.ts tests/negotiation.test.ts tests/transferEngine.test.ts`, `npm test`, `npm run typecheck`, `npm run lint`, `npm run build` after mixed promise-break calibration variant coverage for blocking-actor shifts (2026-04-05)
 
 ## Last commit hash
-- 4109a20
+- PENDING_COMMIT
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`
 - Inspect git status and recent commits
 - Continue Step 3 with transfer/reputation bounded tasks only; do not jump to later steps.
-- Next bounded task: add mixed promise-break calibration variant coverage for blocking-actor shifts by reputation band.
-- Last successful pushed commit: 4109a20.
+- Next bounded task: add low-reputation blocking-actor shift proof under equivalent wage-structure constraints.
+- Last successful pushed commit before this pending change: b44ae7b.
