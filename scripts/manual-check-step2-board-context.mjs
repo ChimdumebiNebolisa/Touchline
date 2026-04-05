@@ -5,7 +5,8 @@ import {
   deriveSeasonBoardContextFromSeasonState,
   evaluateSeasonBoardContext,
   getFixturesForMatchday,
-  isSeasonComplete
+  isSeasonComplete,
+  summarizeSeasonSackRiskPressureTimeline
 } from "../packages/sim-core/dist/src/index.js";
 
 function buildSeasonStateAndTimeline() {
@@ -119,12 +120,19 @@ function runStep2BoardContextManualCheck() {
   console.log("- Matchday sack-risk progression sample (club-a)");
   console.table(timelineRows);
 
+  const pressureSummary = summarizeSeasonSackRiskPressureTimeline(
+    timelineRows.map((row) => row.sackRisk)
+  );
+  console.log("- Season pressure streak summary (club-a)");
+  console.table([pressureSummary]);
+
   const validReasonCoverage = rows.every((entry) => entry.reasons.length > 0);
   const validSackRiskRange = rows.every((entry) => entry.sackRisk >= 0 && entry.sackRisk <= 1);
   const validTimelineRange = timelineRows.every((entry) => entry.sackRisk >= 0 && entry.sackRisk <= 1);
   const validTimelineFlags = timelineRows.every((entry) => entry.level.length > 0 && entry.trend.length > 0);
+  const validStreakSummary = pressureSummary.samplesProcessed === timelineRows.length;
 
-  if (!validReasonCoverage || !validSackRiskRange || !validTimelineRange || !validTimelineFlags) {
+  if (!validReasonCoverage || !validSackRiskRange || !validTimelineRange || !validTimelineFlags || !validStreakSummary) {
     console.error("Step 2 manual check failed expected board-context thresholds.");
     process.exit(1);
   }

@@ -7,7 +7,8 @@ import {
   deriveSeasonBoardContextFromSeasonState,
   evaluateSeasonBoardContext,
   getFixturesForMatchday,
-  isSeasonComplete
+  isSeasonComplete,
+  summarizeSeasonSackRiskPressureTimeline
 } from "../src/index.js";
 
 function runSackRiskTimelineSimulation(): Array<{ risk: number; trend: string; level: string }> {
@@ -359,5 +360,25 @@ describe("season board integration", () => {
     expect(firstRun.length).toBeGreaterThan(0);
     expect(firstRun.every((entry) => entry.risk >= 0 && entry.risk <= 1)).toBe(true);
     expect(firstRun.every((entry) => entry.level.length > 0 && entry.trend.length > 0)).toBe(true);
+  });
+
+  it("aggregates warning and critical sack-risk streaks deterministically", () => {
+    const summary = summarizeSeasonSackRiskPressureTimeline([0.32, 0.58, 0.79, 0.81, 0.63, 0.44]);
+
+    expect(summary.samplesProcessed).toBe(6);
+    expect(summary.maxWarningOrHigherStreak).toBe(4);
+    expect(summary.maxCriticalStreak).toBe(2);
+    expect(summary.currentLevel).toBe("stable");
+    expect(summary.currentTrend).toBe("falling");
+  });
+
+  it("returns stable empty summary for missing timeline samples", () => {
+    const summary = summarizeSeasonSackRiskPressureTimeline([]);
+
+    expect(summary.samplesProcessed).toBe(0);
+    expect(summary.currentLevel).toBe("stable");
+    expect(summary.currentTrend).toBe("steady");
+    expect(summary.maxWarningOrHigherStreak).toBe(0);
+    expect(summary.maxCriticalStreak).toBe(0);
   });
 });

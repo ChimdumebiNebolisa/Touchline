@@ -53,7 +53,11 @@ export type {
   StandingsUpdateInput,
   WorldClub
 } from "./world/season.js";
-export type { SeasonBoardContext, SeasonBoardStaticContext } from "./world/seasonBoard.js";
+export type {
+  SeasonBoardContext,
+  SeasonBoardStaticContext,
+  SeasonSackRiskPressureSummary
+} from "./world/seasonBoard.js";
 export {
   applyMatchPreparationCommand
 } from "./match/commands.js";
@@ -73,7 +77,11 @@ export {
   getFixturesForMatchday,
   isSeasonComplete
 } from "./world/season.js";
-export { deriveSeasonBoardContextFromSeasonState, evaluateSeasonBoardContext } from "./world/seasonBoard.js";
+export {
+  deriveSeasonBoardContextFromSeasonState,
+  evaluateSeasonBoardContext,
+  summarizeSeasonSackRiskPressureTimeline
+} from "./world/seasonBoard.js";
 
 export { parseCountryPackJson } from "./content/countryPackLoader.js";
 export { runInstantMatch, runLiveMatch } from "./match/modes.js";
