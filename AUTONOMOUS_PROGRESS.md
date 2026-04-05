@@ -4,10 +4,10 @@
 - Step 3: Transfer and reputation expansion
 
 ## Last completed verified task
-- Added deterministic guard proof that board wage-discipline blocks remain dominant across reputation bands and cannot be bypassed.
+- Added deterministic reputation-band outcome delta summary artifact and calibration sample output coverage for blocking-actor shifts.
 
 ## Current subtask in progress
-- Add bounded Step 3 calibration artifact that summarizes blocking-actor deltas between high- and low-reputation bands for regression checks.
+- Add bounded Step 3 proof that reputation-band delta artifacts remain stable under fixed scenario fixtures and wage constraints.
 
 ## Next queued subtasks
 - Keep Step 3 scope constrained to transfer/reputation logic without Step 4 academy drift.
@@ -18,14 +18,14 @@
 - None
 
 ## Last verification run
-- Passed: `npm run -w @touchline/sim-core test -- tests/negotiation.test.ts tests/negotiationCalibration.test.ts tests/transferEngine.test.ts`, `npm test`, `npm run typecheck`, `npm run lint`, `npm run build` after no-board-bypass wage-discipline guard proof across reputation bands (2026-04-05)
+- Passed: `npm run -w @touchline/sim-core test -- -u tests/negotiationCalibration.test.ts tests/negotiation.test.ts tests/transferEngine.test.ts`, `npm test`, `npm run typecheck`, `npm run lint`, `npm run build` after reputation-band outcome delta summary artifact + deterministic calibration output coverage (2026-04-05)
 
 ## Last commit hash
-- cf48dbc
+- PENDING_COMMIT
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`
 - Inspect git status and recent commits
 - Continue Step 3 with transfer/reputation bounded tasks only; do not jump to later steps.
-- Next bounded task: add blocking-actor delta summary artifact between reputation bands for deterministic calibration checks.
-- Last successful pushed commit: cf48dbc.
+- Next bounded task: add fixed-fixture stability proof for reputation-band delta artifacts under constant wage constraints.
+- Last successful pushed commit before this pending change: 401fc22.

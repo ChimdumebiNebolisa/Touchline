@@ -51,6 +51,7 @@ export type {
   NegotiationScenarioVariant,
   PromiseTrustImpactBandSummary,
   PromiseTrustImpactSummary,
+  ReputationBandOutcomeDeltaSummary,
   ReputationBandTransferOutcomeCalibrationSummary,
   ReputationBandTransferOutcomeSummary,
   ReputationBandNegotiationOutcome,
@@ -59,6 +60,7 @@ export type {
   TransferNegotiationComparison
 } from "./transfers/negotiation.js";
 export {
+  buildReputationBandOutcomeDeltaSummary,
   buildEqualFeeNegotiationExplainabilityArtifact,
   buildTransferNegotiationLogSamples,
   compareTransferNegotiationContexts,

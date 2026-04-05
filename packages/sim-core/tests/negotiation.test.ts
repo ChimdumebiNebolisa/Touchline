@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  buildReputationBandOutcomeDeltaSummary,
   buildEqualFeeNegotiationExplainabilityArtifact,
   buildTransferNegotiationLogSamples,
   compareTransferNegotiationContexts,
@@ -278,6 +279,46 @@ describe("transfer negotiation comparison", () => {
       expect(band.sportingDirectorBlockCount).toBe(0);
       expect(band.playerBlockCount).toBe(0);
     }
+  });
+
+  it("builds deterministic reputation-band blocking-actor delta summaries", () => {
+    const variants = [
+      { pathwayClarity: 0.82, squadCompetition: 0.5, recentPromiseBreak: false },
+      { pathwayClarity: 0.7, squadCompetition: 0.56, recentPromiseBreak: false },
+      { pathwayClarity: 0.62, squadCompetition: 0.58, recentPromiseBreak: true },
+      { pathwayClarity: 0.58, squadCompetition: 0.61, recentPromiseBreak: true }
+    ];
+
+    const firstRun = buildReputationBandOutcomeDeltaSummary(
+      target,
+      {
+        clubWageBudget: baseContext.clubWageBudget,
+        clubStature: baseContext.clubStature,
+        boardWageDiscipline: baseContext.boardWageDiscipline
+      },
+      82,
+      28,
+      variants
+    );
+    const secondRun = buildReputationBandOutcomeDeltaSummary(
+      target,
+      {
+        clubWageBudget: baseContext.clubWageBudget,
+        clubStature: baseContext.clubStature,
+        boardWageDiscipline: baseContext.boardWageDiscipline
+      },
+      82,
+      28,
+      variants
+    );
+
+    expect(firstRun).toEqual(secondRun);
+    expect(firstRun.acceptedCountDelta).toBeGreaterThan(0);
+    expect(firstRun.acceptanceRateDelta).toBeGreaterThan(0);
+    expect(firstRun.averageScoreDelta).toBeGreaterThan(0);
+    expect(firstRun.sportingDirectorBlockDelta).toBeGreaterThanOrEqual(0);
+    expect(firstRun.playerBlockDelta).toBeLessThan(0);
+    expect(firstRun.conciseSummary).toContain("player block delta");
   });
 
   it("builds deterministic equal-fee explainability artifacts with non-fee drivers", () => {

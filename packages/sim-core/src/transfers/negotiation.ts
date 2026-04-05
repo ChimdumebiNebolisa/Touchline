@@ -59,6 +59,18 @@ export interface ReputationBandTransferOutcomeCalibrationSummary {
   conciseSummary: string[];
 }
 
+export interface ReputationBandOutcomeDeltaSummary {
+  baselineReputation: number;
+  comparisonReputation: number;
+  acceptedCountDelta: number;
+  acceptanceRateDelta: number;
+  averageScoreDelta: number;
+  boardBlockDelta: number;
+  sportingDirectorBlockDelta: number;
+  playerBlockDelta: number;
+  conciseSummary: string;
+}
+
 export interface TransferNegotiationLogEntry {
   attemptId: string;
   managerReputation: number;
@@ -361,6 +373,50 @@ export function summarizeTransferOutcomesByReputationBand(
 
   return {
     bands,
+    conciseSummary
+  };
+}
+
+export function buildReputationBandOutcomeDeltaSummary(
+  target: TransferTargetProfile,
+  baseContext: Omit<TransferEvaluationContext, "managerReputation" | "pathwayClarity" | "squadCompetition" | "recentPromiseBreak">,
+  baselineReputation: number,
+  comparisonReputation: number,
+  variants: NegotiationScenarioVariant[]
+): ReputationBandOutcomeDeltaSummary {
+  const summary = summarizeTransferOutcomesByReputationBand(
+    target,
+    baseContext,
+    [baselineReputation, comparisonReputation],
+    variants
+  );
+
+  const baseline = summary.bands[0];
+  const comparison = summary.bands[1];
+
+  const acceptedCountDelta = baseline.acceptedCount - comparison.acceptedCount;
+  const acceptanceRateDelta = baseline.acceptanceRate - comparison.acceptanceRate;
+  const averageScoreDelta = baseline.averageScore - comparison.averageScore;
+  const boardBlockDelta = baseline.boardBlockCount - comparison.boardBlockCount;
+  const sportingDirectorBlockDelta =
+    baseline.sportingDirectorBlockCount - comparison.sportingDirectorBlockCount;
+  const playerBlockDelta = baseline.playerBlockCount - comparison.playerBlockCount;
+
+  const conciseSummary =
+    `Reputation ${baselineReputation} vs ${comparisonReputation}: accepted delta ${acceptedCountDelta}, ` +
+    `rate delta ${acceptanceRateDelta.toFixed(2)}, score delta ${averageScoreDelta.toFixed(2)}, ` +
+    `board block delta ${boardBlockDelta}, sporting-director block delta ${sportingDirectorBlockDelta}, ` +
+    `player block delta ${playerBlockDelta}.`;
+
+  return {
+    baselineReputation,
+    comparisonReputation,
+    acceptedCountDelta,
+    acceptanceRateDelta,
+    averageScoreDelta,
+    boardBlockDelta,
+    sportingDirectorBlockDelta,
+    playerBlockDelta,
     conciseSummary
   };
 }

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  buildReputationBandOutcomeDeltaSummary,
   buildEqualFeeNegotiationExplainabilityArtifact,
   buildTransferNegotiationLogSamples,
   summarizePromiseTrustImpactByReputationBand,
@@ -46,6 +47,17 @@ describe("transfer negotiation calibration samples", () => {
       calibrationReputationBands,
       calibrationOutcomeVariants
     );
+    const outcomeDeltaSummary = buildReputationBandOutcomeDeltaSummary(
+      calibrationTarget,
+      {
+        clubWageBudget: calibrationBaseContext.clubWageBudget,
+        clubStature: calibrationBaseContext.clubStature,
+        boardWageDiscipline: calibrationBaseContext.boardWageDiscipline
+      },
+      82,
+      28,
+      calibrationOutcomeVariants
+    );
 
     const highReputationBand = outcomeSummary.bands.find((band) => band.managerReputation === 82);
     const lowReputationBand = outcomeSummary.bands.find((band) => band.managerReputation === 28);
@@ -69,6 +81,7 @@ describe("transfer negotiation calibration samples", () => {
       })),
       promiseTrustSummary: promiseTrust.conciseSummary,
       reputationOutcomeSummary: outcomeSummary.conciseSummary,
+      reputationOutcomeDeltaSummary: outcomeDeltaSummary.conciseSummary,
       equalFeeSummary: equalFee.conciseSummary,
       equalFeePrimaryDrivers: equalFee.primaryNonFeeDrivers,
       negotiationLog: negotiationLog.map((entry) => ({
@@ -134,6 +147,7 @@ describe("transfer negotiation calibration samples", () => {
           "Manager reputation 62: intact trust 4/4 (1.00) vs broken trust 0/4 (0.00), delta 1.00.",
           "Manager reputation 28: intact trust 0/4 (0.00) vs broken trust 0/4 (0.00), delta 0.00.",
         ],
+        "reputationOutcomeDeltaSummary": "Reputation 82 vs 28: accepted delta 2, rate delta 0.50, score delta 2.75, board block delta 0, sporting-director block delta 2, player block delta -4.",
         "reputationOutcomeSummary": [
           "Manager reputation 82: accepted 2/4 (0.50), average score 1.06, board blocks 0, sporting-director blocks 2, player blocks 0.",
           "Manager reputation 62: accepted 2/4 (0.50), average score 0.04, board blocks 0, sporting-director blocks 2, player blocks 0.",
