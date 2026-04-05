@@ -41,6 +41,7 @@ export type {
 export type {
   Fixture,
   FixtureResult,
+  SeasonState,
   StandingsRow,
   StandingsUpdateInput,
   WorldClub
@@ -53,7 +54,15 @@ export { computeTeamMoraleDelta } from "./club/morale.js";
 export { computeManagerReputationDelta } from "./club/reputation.js";
 export { applyPostMatchFallout } from "./club/postMatchFallout.js";
 export { buildTransferFollowUpEvent, evaluateTransferDecision } from "./transfers/transferEngine.js";
-export { applyResultToStandings, createInitialStandings, createRoundRobinFixtures } from "./world/season.js";
+export {
+  advanceSeasonState,
+  applyResultToStandings,
+  createInitialStandings,
+  createRoundRobinFixtures,
+  createSeasonState,
+  getFixturesForMatchday,
+  isSeasonComplete
+} from "./world/season.js";
 
 export { parseCountryPackJson } from "./content/countryPackLoader.js";
 export { runInstantMatch, runLiveMatch } from "./match/modes.js";

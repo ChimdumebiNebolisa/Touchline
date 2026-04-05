@@ -1,6 +1,14 @@
 import { describe, expect, it } from "vitest";
 
-import { applyResultToStandings, createInitialStandings, createRoundRobinFixtures } from "../src/index.js";
+import {
+  advanceSeasonState,
+  applyResultToStandings,
+  createInitialStandings,
+  createRoundRobinFixtures,
+  createSeasonState,
+  getFixturesForMatchday,
+  isSeasonComplete
+} from "../src/index.js";
 
 describe("world season foundations", () => {
   it("creates home-and-away round robin fixtures for each pair", () => {
@@ -45,5 +53,34 @@ describe("world season foundations", () => {
     expect(top.points).toBe(3);
     expect(bottom.clubId).toBe("club-b");
     expect(bottom.points).toBe(0);
+  });
+
+  it("creates season state and advances by one matchday", () => {
+    const state = createSeasonState([
+      { id: "club-a", name: "Club A", strength: 72 },
+      { id: "club-b", name: "Club B", strength: 70 },
+      { id: "club-c", name: "Club C", strength: 69 },
+      { id: "club-d", name: "Club D", strength: 67 }
+    ]);
+
+    expect(state.currentMatchday).toBe(1);
+    expect(isSeasonComplete(state)).toBe(false);
+
+    const matchdayFixtures = getFixturesForMatchday(state, 1);
+    const resultsByFixtureId = Object.fromEntries(
+      matchdayFixtures.map((fixture, index) => [
+        fixture.id,
+        {
+          homeGoals: 1 + (index % 2),
+          awayGoals: index % 2
+        }
+      ])
+    );
+
+    const next = advanceSeasonState(state, resultsByFixtureId);
+
+    expect(next.currentMatchday).toBe(2);
+    expect(next.completedFixtureIds.length).toBe(matchdayFixtures.length);
+    expect(next.standings.every((row) => row.played <= 1)).toBe(true);
   });
 });

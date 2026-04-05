@@ -34,6 +34,14 @@ export interface StandingsUpdateInput {
   result: FixtureResult;
 }
 
+export interface SeasonState {
+  clubs: WorldClub[];
+  fixtures: Fixture[];
+  standings: StandingsRow[];
+  currentMatchday: number;
+  completedFixtureIds: string[];
+}
+
 function createRow(clubId: string): StandingsRow {
   return {
     clubId,
@@ -159,4 +167,60 @@ export function applyResultToStandings(input: StandingsUpdateInput): StandingsRo
   next[awayIndex] = applyToRow(next[awayIndex], input.result.awayGoals, input.result.homeGoals);
 
   return next.sort(standingsSort);
+}
+
+export function createSeasonState(clubs: WorldClub[]): SeasonState {
+  const clubIds = clubs.map((club) => club.id);
+  return {
+    clubs,
+    fixtures: createRoundRobinFixtures(clubIds),
+    standings: createInitialStandings(clubIds),
+    currentMatchday: 1,
+    completedFixtureIds: []
+  };
+}
+
+export function getFixturesForMatchday(state: SeasonState, matchday: number): Fixture[] {
+  return state.fixtures.filter((fixture) => fixture.matchday === matchday);
+}
+
+export function isSeasonComplete(state: SeasonState): boolean {
+  return state.completedFixtureIds.length >= state.fixtures.length;
+}
+
+export function advanceSeasonState(
+  state: SeasonState,
+  resultsByFixtureId: Record<string, FixtureResult>
+): SeasonState {
+  const fixtures = getFixturesForMatchday(state, state.currentMatchday);
+  if (!fixtures.length) {
+    return {
+      ...state,
+      currentMatchday: state.currentMatchday + 1
+    };
+  }
+
+  let standings = [...state.standings];
+  const completedFixtureIds = [...state.completedFixtureIds];
+
+  for (const fixture of fixtures) {
+    const result = resultsByFixtureId[fixture.id];
+    if (!result) {
+      throw new Error(`Missing result for fixture ${fixture.id}.`);
+    }
+
+    standings = applyResultToStandings({
+      standings,
+      fixture,
+      result
+    });
+    completedFixtureIds.push(fixture.id);
+  }
+
+  return {
+    ...state,
+    standings,
+    completedFixtureIds,
+    currentMatchday: state.currentMatchday + 1
+  };
 }
