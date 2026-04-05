@@ -21,11 +21,11 @@
 - Passed: `npm run -w @touchline/sim-core test -- tests/negotiation.test.ts tests/transferEngine.test.ts`, `npm test`, `npm run typecheck`, `npm run lint`, `npm run build` after promise-trust impact summary helper + deterministic coverage (2026-04-05)
 
 ## Last commit hash
-- PENDING_COMMIT
+- a23708a
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`
 - Inspect git status and recent commits
 - Continue Step 3 with transfer/reputation bounded tasks only; do not jump to later steps.
 - Next bounded task: add deterministic calibration-proof sample output using the Step 3 negotiation artifacts.
-- Last successful pushed commit before this pending change: 2a8bdac.
+- Last successful pushed commit: a23708a.
