@@ -42,6 +42,11 @@ export interface SeasonState {
   completedFixtureIds: string[];
 }
 
+export interface PromotionRelegationOutcome {
+  promotedClubIds: string[];
+  relegatedClubIds: string[];
+}
+
 function createRow(clubId: string): StandingsRow {
   return {
     clubId,
@@ -186,6 +191,29 @@ export function getFixturesForMatchday(state: SeasonState, matchday: number): Fi
 
 export function isSeasonComplete(state: SeasonState): boolean {
   return state.completedFixtureIds.length >= state.fixtures.length;
+}
+
+export function resolvePromotionRelegation(
+  standings: StandingsRow[],
+  promotionSpots: number,
+  relegationSpots: number
+): PromotionRelegationOutcome {
+  if (promotionSpots < 0 || relegationSpots < 0) {
+    throw new Error("Promotion and relegation spots must be non-negative.");
+  }
+
+  if (promotionSpots + relegationSpots > standings.length) {
+    throw new Error("Promotion and relegation spots exceed standings size.");
+  }
+
+  const sorted = [...standings].sort(standingsSort);
+  const promotedClubIds = sorted.slice(0, promotionSpots).map((row) => row.clubId);
+  const relegatedClubIds = sorted.slice(Math.max(0, sorted.length - relegationSpots)).map((row) => row.clubId);
+
+  return {
+    promotedClubIds,
+    relegatedClubIds
+  };
 }
 
 export function advanceSeasonState(

@@ -6,6 +6,7 @@ import {
   evaluateSeasonBoardContext,
   getFixturesForMatchday,
   isSeasonComplete,
+  resolvePromotionRelegation,
   summarizeSeasonSackRiskPressureTimeline
 } from "../packages/sim-core/dist/src/index.js";
 
@@ -126,13 +127,33 @@ function runStep2BoardContextManualCheck() {
   console.log("- Season pressure streak summary (club-a)");
   console.table([pressureSummary]);
 
+  const promotionOutcome = resolvePromotionRelegation(seasonState.standings, 1, 1);
+  console.log("- Promotion / relegation resolution sample");
+  console.table([
+    {
+      promotedClubIds: promotionOutcome.promotedClubIds.join(", "),
+      relegatedClubIds: promotionOutcome.relegatedClubIds.join(", ")
+    }
+  ]);
+
   const validReasonCoverage = rows.every((entry) => entry.reasons.length > 0);
   const validSackRiskRange = rows.every((entry) => entry.sackRisk >= 0 && entry.sackRisk <= 1);
   const validTimelineRange = timelineRows.every((entry) => entry.sackRisk >= 0 && entry.sackRisk <= 1);
   const validTimelineFlags = timelineRows.every((entry) => entry.level.length > 0 && entry.trend.length > 0);
   const validStreakSummary = pressureSummary.samplesProcessed === timelineRows.length;
+  const validPromotionResolution =
+    promotionOutcome.promotedClubIds.length === 1 &&
+    promotionOutcome.relegatedClubIds.length === 1 &&
+    promotionOutcome.promotedClubIds[0] !== promotionOutcome.relegatedClubIds[0];
 
-  if (!validReasonCoverage || !validSackRiskRange || !validTimelineRange || !validTimelineFlags || !validStreakSummary) {
+  if (
+    !validReasonCoverage ||
+    !validSackRiskRange ||
+    !validTimelineRange ||
+    !validTimelineFlags ||
+    !validStreakSummary ||
+    !validPromotionResolution
+  ) {
     console.error("Step 2 manual check failed expected board-context thresholds.");
     process.exit(1);
   }

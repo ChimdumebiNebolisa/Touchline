@@ -48,6 +48,7 @@ export type {
 export type {
   Fixture,
   FixtureResult,
+  PromotionRelegationOutcome,
   SeasonState,
   StandingsRow,
   StandingsUpdateInput,
@@ -75,7 +76,8 @@ export {
   createRoundRobinFixtures,
   createSeasonState,
   getFixturesForMatchday,
-  isSeasonComplete
+  isSeasonComplete,
+  resolvePromotionRelegation
 } from "./world/season.js";
 export {
   deriveSeasonBoardContextFromSeasonState,
