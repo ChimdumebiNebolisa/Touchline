@@ -157,6 +157,89 @@ describe("transfer negotiation calibration samples", () => {
     `);
   });
 
+  it("keeps normalized calibration sample structure deterministic across repeated runs", () => {
+    const buildNormalizedCalibrationSample = () => {
+      const promiseTrust = summarizePromiseTrustImpactByReputationBand(
+        calibrationTarget,
+        {
+          clubWageBudget: calibrationBaseContext.clubWageBudget,
+          clubStature: calibrationBaseContext.clubStature,
+          boardWageDiscipline: calibrationBaseContext.boardWageDiscipline
+        },
+        calibrationReputationBands,
+        calibrationPromiseVariants
+      );
+
+      const equalFee = buildEqualFeeNegotiationExplainabilityArtifact(
+        calibrationTarget,
+        calibrationEqualFeeContexts.first,
+        calibrationEqualFeeContexts.second
+      );
+
+      const negotiationLog = buildTransferNegotiationLogSamples(calibrationTarget, calibrationLogContexts);
+      const outcomeSummary = summarizeTransferOutcomesByReputationBand(
+        calibrationTarget,
+        {
+          clubWageBudget: calibrationBaseContext.clubWageBudget,
+          clubStature: calibrationBaseContext.clubStature,
+          boardWageDiscipline: calibrationBaseContext.boardWageDiscipline
+        },
+        calibrationReputationBands,
+        calibrationOutcomeVariants
+      );
+      const outcomeDeltaSummary = buildReputationBandOutcomeDeltaSummary(
+        calibrationTarget,
+        {
+          clubWageBudget: calibrationBaseContext.clubWageBudget,
+          clubStature: calibrationBaseContext.clubStature,
+          boardWageDiscipline: calibrationBaseContext.boardWageDiscipline
+        },
+        82,
+        28,
+        calibrationOutcomeVariants
+      );
+
+      return {
+        promiseTrustBands: promiseTrust.bands.map((band) => ({
+          managerReputation: band.managerReputation,
+          attempts: band.attempts,
+          intactTrustAcceptedCount: band.intactTrustAcceptedCount,
+          brokenTrustAcceptedCount: band.brokenTrustAcceptedCount,
+          acceptanceRateDelta: Number(band.acceptanceRateDelta.toFixed(2))
+        })),
+        promiseTrustSummary: promiseTrust.conciseSummary,
+        reputationOutcomeSummary: outcomeSummary.conciseSummary,
+        reputationOutcomeDeltaSummary: outcomeDeltaSummary.conciseSummary,
+        equalFeeSummary: equalFee.conciseSummary,
+        equalFeePrimaryDrivers: equalFee.primaryNonFeeDrivers,
+        negotiationLog: negotiationLog.map((entry) => ({
+          attemptId: entry.attemptId,
+          accepted: entry.accepted,
+          blockingActor: entry.blockingActor,
+          score: Number(entry.score.toFixed(2))
+        }))
+      };
+    };
+
+    const firstRun = buildNormalizedCalibrationSample();
+    const secondRun = buildNormalizedCalibrationSample();
+
+    expect(secondRun).toEqual(firstRun);
+    expect(Object.keys(firstRun)).toEqual([
+      "promiseTrustBands",
+      "promiseTrustSummary",
+      "reputationOutcomeSummary",
+      "reputationOutcomeDeltaSummary",
+      "equalFeeSummary",
+      "equalFeePrimaryDrivers",
+      "negotiationLog"
+    ]);
+
+    for (const logEntry of firstRun.negotiationLog) {
+      expect(Object.keys(logEntry)).toEqual(["attemptId", "accepted", "blockingActor", "score"]);
+    }
+  });
+
   it("keeps reputation-band delta artifacts deterministic across repeated fixed fixture evaluations", () => {
     const repeatedRuns = Array.from({ length: 12 }, () =>
       buildReputationBandOutcomeDeltaSummary(
