@@ -1,6 +1,6 @@
 import { computeBoardConfidenceDelta } from "./board.js";
 import { computeTeamMoraleDelta } from "./morale.js";
-import { computeManagerReputationDelta } from "./reputation.js";
+import { deriveManagerCareerLeverageSnapshot, computeManagerReputationDelta } from "./reputation.js";
 import type { PostMatchFalloutInput, PostMatchFalloutResult } from "./types.js";
 
 function clamp(value: number, min: number, max: number): number {
@@ -30,6 +30,7 @@ function buildReasonSummary(
   fanDelta: number,
   moraleDelta: number,
   reputationDelta: number,
+  careerLeverageReason: string,
   goalsFor: number,
   goalsAgainst: number
 ): string[] {
@@ -49,6 +50,8 @@ function buildReasonSummary(
   if (reputationDelta !== 0) {
     reasons.push(`Manager reputation moved by ${reputationDelta.toFixed(2)} from perception fallout.`);
   }
+
+  reasons.push(careerLeverageReason);
 
   return reasons;
 }
@@ -92,6 +95,12 @@ export function applyPostMatchFallout(input: PostMatchFalloutInput): PostMatchFa
     managerReputation: clamp(input.state.managerReputation + reputationDelta, 0, 100)
   };
 
+  const careerLeverage = deriveManagerCareerLeverageSnapshot({
+    managerReputation: nextState.managerReputation,
+    boardConfidence: nextState.boardConfidence,
+    fanSentiment: nextState.fanSentiment
+  });
+
   return {
     nextState,
     deltas: {
@@ -100,11 +109,13 @@ export function applyPostMatchFallout(input: PostMatchFalloutInput): PostMatchFa
       teamMorale: moraleDelta,
       managerReputation: reputationDelta
     },
+    careerLeverage,
     reasonSummary: buildReasonSummary(
       boardDelta,
       fanDelta,
       moraleDelta,
       reputationDelta,
+      careerLeverage.reasonSummary,
       goalsFor,
       goalsAgainst
     )

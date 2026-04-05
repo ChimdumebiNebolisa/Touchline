@@ -10,6 +10,14 @@ export interface ClubPerceptionState {
   managerReputation: number;
 }
 
+export type ManagerCareerLeverageBand = "fragile" | "credible" | "in-demand" | "elite";
+
+export interface ManagerCareerLeverageSnapshot {
+  score: number;
+  band: ManagerCareerLeverageBand;
+  reasonSummary: string;
+}
+
 export interface PostMatchPerceptionContext {
   expectationBand: ExpectationBand;
   identityStyleFit: number;
@@ -34,5 +42,6 @@ export interface PostMatchFalloutResult {
     teamMorale: number;
     managerReputation: number;
   };
+  careerLeverage: ManagerCareerLeverageSnapshot;
   reasonSummary: string[];
 }

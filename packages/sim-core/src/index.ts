@@ -27,6 +27,8 @@ export type {
 export type {
   ClubPerceptionState,
   ExpectationBand,
+  ManagerCareerLeverageBand,
+  ManagerCareerLeverageSnapshot,
   MediaCommentTone,
   PostMatchFalloutInput,
   PostMatchFalloutResult,
@@ -97,7 +99,7 @@ export { computeBoardConfidenceDelta } from "./club/board.js";
 export { deriveSackRiskPressureState } from "./club/board.js";
 export { evaluateBoardExpectationContext } from "./club/board.js";
 export { computeTeamMoraleDelta } from "./club/morale.js";
-export { computeManagerReputationDelta } from "./club/reputation.js";
+export { computeManagerReputationDelta, deriveManagerCareerLeverageSnapshot } from "./club/reputation.js";
 export { applyPostMatchFallout } from "./club/postMatchFallout.js";
 export { buildTransferFollowUpEvent, evaluateTransferDecision } from "./transfers/transferEngine.js";
 export {

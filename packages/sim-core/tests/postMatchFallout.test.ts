@@ -61,6 +61,9 @@ describe("post-match fallout", () => {
     ].filter(Boolean).length;
 
     expect(improvedCount).toBeGreaterThanOrEqual(2);
+    expect(result.careerLeverage.score).toBeGreaterThan(0);
+    expect(result.careerLeverage.band).not.toBe("fragile");
+    expect(result.careerLeverage.reasonSummary).toContain("Career leverage is");
     expect(result.reasonSummary.length).toBeGreaterThan(1);
   });
 
@@ -101,6 +104,9 @@ describe("post-match fallout", () => {
     ].filter(Boolean).length;
 
     expect(reducedCount).toBeGreaterThanOrEqual(2);
+    expect(result.careerLeverage.score).toBeGreaterThanOrEqual(0);
+    expect(result.careerLeverage.score).toBeLessThanOrEqual(100);
+    expect(result.reasonSummary[result.reasonSummary.length - 1]).toContain("Career leverage is");
   });
 
   it("evaluates board confidence contextually beyond scoreline", () => {
