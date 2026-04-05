@@ -21,11 +21,11 @@
 - Passed: `npm run -w @touchline/sim-core test -- -u tests/negotiationCalibration.test.ts tests/negotiation.test.ts tests/transferEngine.test.ts`, `npm test`, `npm run typecheck`, `npm run lint`, `npm run build` after low-reputation blocking-actor shift proof assertions under equivalent wage constraints (2026-04-05)
 
 ## Last commit hash
-- PENDING_COMMIT
+- fa03ffe
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`
 - Inspect git status and recent commits
 - Continue Step 3 with transfer/reputation bounded tasks only; do not jump to later steps.
 - Next bounded task: add deterministic no-board-bypass calibration guard proof in transfer outcome summaries.
-- Last successful pushed commit before this pending change: 0484c9b.
+- Last successful pushed commit: fa03ffe.
