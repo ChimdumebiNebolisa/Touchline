@@ -4,10 +4,10 @@
 - Step 3: Transfer and reputation expansion
 
 ## Last completed verified task
-- Added fixture-order invariance proof for reputation-band transfer outcome artifacts, with precision-tolerant deterministic assertions.
+- Added repeated-run determinism proof for concise equal-fee explainability summaries in Step 3 calibration artifacts.
 
 ## Current subtask in progress
-- Add bounded Step 3 calibration artifact coverage that preserves deterministic explainability summaries for regression checks.
+- Add bounded Step 3 calibration regression checks that keep transfer explainability artifacts concise and stable.
 
 ## Next queued subtasks
 - Keep Step 3 scope constrained to transfer/reputation logic without Step 4 academy drift.
@@ -18,14 +18,14 @@
 - None
 
 ## Last verification run
-- Passed: `npm run -w @touchline/sim-core test -- tests/negotiationCalibration.test.ts tests/negotiation.test.ts tests/transferEngine.test.ts`, `npm test`, `npm run typecheck`, `npm run lint`, `npm run build` after fixture-order invariance proof and precision assertion fix for reputation-band outcome artifacts (2026-04-05)
+- Passed: `npm run -w @touchline/sim-core test -- tests/negotiationCalibration.test.ts tests/negotiation.test.ts tests/transferEngine.test.ts`, `npm test`, `npm run typecheck`, `npm run lint`, `npm run build` after repeated-run concise explainability summary determinism proof (2026-04-05)
 
 ## Last commit hash
-- pending (next commit: fixture-order invariance proof)
+- pending (next commit: concise explainability summary determinism proof)
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`
 - Inspect git status and recent commits
 - Continue Step 3 with transfer/reputation bounded tasks only; do not jump to later steps.
-- Next bounded task: add deterministic calibration artifact checks for concise transfer explainability summaries.
-- Last successful pushed commit: 2d1ca84.
+- Next bounded task: add bounded Step 3 regression checks that preserve deterministic transfer explainability artifact structure.
+- Last successful pushed commit: b27ed32.

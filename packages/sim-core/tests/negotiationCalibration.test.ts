@@ -184,6 +184,26 @@ describe("transfer negotiation calibration samples", () => {
     expect(baseline.playerBlockDelta).toBeLessThan(0);
   });
 
+  it("keeps concise equal-fee explainability summaries deterministic across repeated runs", () => {
+    const repeatedArtifacts = Array.from({ length: 8 }, () =>
+      buildEqualFeeNegotiationExplainabilityArtifact(
+        calibrationTarget,
+        calibrationEqualFeeContexts.first,
+        calibrationEqualFeeContexts.second
+      )
+    );
+
+    const baseline = repeatedArtifacts[0];
+    for (const artifact of repeatedArtifacts.slice(1)) {
+      expect(artifact.conciseSummary).toBe(baseline.conciseSummary);
+      expect(artifact.primaryNonFeeDrivers).toEqual(baseline.primaryNonFeeDrivers);
+      expect(artifact.nonFeeContextDroveDivergence).toBe(baseline.nonFeeContextDroveDivergence);
+    }
+
+    expect(baseline.conciseSummary).toContain("Equal-fee comparison aligned");
+    expect(baseline.primaryNonFeeDrivers.length).toBeGreaterThan(0);
+  });
+
   it("keeps reputation-band transfer outcome artifacts invariant under fixed fixture reordering", () => {
     const forwardSummary = summarizeTransferOutcomesByReputationBand(
       calibrationTarget,
