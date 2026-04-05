@@ -38,6 +38,13 @@ export type {
   TransferFollowUpEvent,
   TransferTargetProfile
 } from "./transfers/transferEngine.js";
+export type {
+  Fixture,
+  FixtureResult,
+  StandingsRow,
+  StandingsUpdateInput,
+  WorldClub
+} from "./world/season.js";
 export {
   applyMatchPreparationCommand
 } from "./match/commands.js";
@@ -46,6 +53,7 @@ export { computeTeamMoraleDelta } from "./club/morale.js";
 export { computeManagerReputationDelta } from "./club/reputation.js";
 export { applyPostMatchFallout } from "./club/postMatchFallout.js";
 export { buildTransferFollowUpEvent, evaluateTransferDecision } from "./transfers/transferEngine.js";
+export { applyResultToStandings, createInitialStandings, createRoundRobinFixtures } from "./world/season.js";
 
 export { parseCountryPackJson } from "./content/countryPackLoader.js";
 export { runInstantMatch, runLiveMatch } from "./match/modes.js";
