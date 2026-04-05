@@ -4,11 +4,10 @@
 
 **Active**
 
-* Step 2: Full season loop and board-context model
+* Step 3: Transfer and reputation expansion
 
 **Backlog**
 
-* Step 3: Transfer and reputation expansion
 * Step 4: Academy, loans, and pathway pressure
 * Step 5: Shadow world and country-pack scaling
 * Step 6: Save/load and career continuity
@@ -21,6 +20,7 @@
 **Done**
 
 * Step 1: First build slice
+* Step 2: Full season loop and board-context model
 
 **Dropped**
 
@@ -115,7 +115,7 @@ A player can:
 ## 4. Step 2
 
 **Status**
-Active
+Done
 
 **Objective**
 Extend the slice into a full season loop with fixtures, standings, board expectations, sack risk, and promotion-relegation resolution. 
@@ -162,7 +162,7 @@ A full season can run with contextual board judgment based on club stature, fina
 ## 5. Step 3
 
 **Status**
-Backlog
+Active
 
 **Objective**
 Make transfers human and multi-factor, and wire manager reputation into trust, board patience, transfer pull, and career leverage. 
