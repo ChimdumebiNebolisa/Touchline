@@ -11,6 +11,7 @@ import {
   evaluateSeasonBoardContext,
   getFixturesForMatchday,
   isSeasonComplete,
+  summarizeSeasonBoardActionCounts,
   summarizeSeasonBoardResolutionStatus,
   summarizeCompletedSeasonBoardOutcomes,
   summarizeSeasonSackRiskPressureTimeline
@@ -911,5 +912,31 @@ describe("season board integration", () => {
     expect(() => summarizeSeasonBoardResolutionStatus(missingSnapshotSummary)).toThrow(
       "Missing board decision snapshot for club club-b."
     );
+  });
+
+  it("summarizes deterministic season board action counts from grouped statuses", () => {
+    const run = runCompletedSeasonStateWithContext();
+
+    const summary = summarizeCompletedSeasonBoardOutcomes(
+      run.state,
+      run.finalContextByClubId,
+      {
+        "club-a": [0.56, 0.78, 0.82, 0.84],
+        "club-b": [0.42, 0.51, 0.55, 0.54],
+        "club-c": [0.31, 0.37, 0.35, 0.39],
+        "club-d": [0.25, 0.32, 0.36, 0.34]
+      },
+      1,
+      1
+    );
+
+    const firstCounts = summarizeSeasonBoardActionCounts(summary.resolutionStatus);
+    const secondCounts = summarizeSeasonBoardActionCounts(summary.resolutionStatus);
+
+    expect(firstCounts).toEqual(secondCounts);
+    expect(firstCounts.sackCount).toBe(summary.resolutionStatus.sackedClubIds.length);
+    expect(firstCounts.reviewCount).toBe(summary.resolutionStatus.reviewClubIds.length);
+    expect(firstCounts.retainCount).toBe(summary.resolutionStatus.retainedClubIds.length);
+    expect(firstCounts.totalClubs).toBe(summary.completedSeason.finalStandings.length);
   });
 });

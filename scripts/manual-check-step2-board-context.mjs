@@ -8,6 +8,7 @@ import {
   evaluateSeasonBoardContext,
   getFixturesForMatchday,
   isSeasonComplete,
+  summarizeSeasonBoardActionCounts,
   summarizeCompletedSeasonBoardOutcomes
 } from "../packages/sim-core/dist/src/index.js";
 
@@ -226,6 +227,7 @@ function runStep2BoardContextManualCheck() {
 
   const sackOutcomes = extractSeasonSackOutcomes(completedBoardSummary);
   const resolutionStatus = completedBoardSummary.resolutionStatus;
+  const actionCounts = summarizeSeasonBoardActionCounts(resolutionStatus);
   console.log("- Extracted season sack outcomes sample");
   console.table(
     sackOutcomes.length
@@ -247,6 +249,8 @@ function runStep2BoardContextManualCheck() {
       sackedClubIds: resolutionStatus.sackedClubIds.join(", ") || "none"
     }
   ]);
+  console.log("- Season board action counts sample");
+  console.table([actionCounts]);
 
   const validReasonCoverage = rows.every((entry) => entry.reasons.length > 0);
   const validSackRiskRange = rows.every((entry) => entry.sackRisk >= 0 && entry.sackRisk <= 1);
@@ -274,6 +278,11 @@ function runStep2BoardContextManualCheck() {
     expectedRetainedClubIds.join("|") === resolutionStatus.retainedClubIds.join("|") &&
     expectedReviewClubIds.join("|") === resolutionStatus.reviewClubIds.join("|") &&
     expectedSackedClubIds.join("|") === resolutionStatus.sackedClubIds.join("|");
+  const validActionCounts =
+    actionCounts.retainCount === expectedRetainedClubIds.length &&
+    actionCounts.reviewCount === expectedReviewClubIds.length &&
+    actionCounts.sackCount === expectedSackedClubIds.length &&
+    actionCounts.totalClubs === seasonState.standings.length;
   const validMatchedPositionVariance =
     matchedPositionComparison.highPressureRisk > matchedPositionComparison.lowPressureRisk &&
     matchedPositionComparison.lowPressureDecision === "retain" &&
@@ -296,6 +305,7 @@ function runStep2BoardContextManualCheck() {
     !validSackDecision ||
     !validSackExtraction ||
     !validResolutionGrouping ||
+    !validActionCounts ||
     !validMatchedPositionVariance ||
     !validCompletedBoardSnapshots ||
     !validPromotionResolution ||

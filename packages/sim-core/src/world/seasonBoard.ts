@@ -64,6 +64,13 @@ export interface SeasonBoardResolutionStatus {
   sackedClubIds: string[];
 }
 
+export interface SeasonBoardActionCounts {
+  retainCount: number;
+  reviewCount: number;
+  sackCount: number;
+  totalClubs: number;
+}
+
 interface SeasonBoardDecisionSnapshotSource {
   completedSeason: CompletedSeasonSummary;
   decisionSnapshotsByClubId: Record<string, SeasonBoardDecisionSnapshot>;
@@ -350,5 +357,20 @@ export function summarizeSeasonBoardResolutionStatus(
     retainedClubIds,
     reviewClubIds,
     sackedClubIds
+  };
+}
+
+export function summarizeSeasonBoardActionCounts(
+  status: SeasonBoardResolutionStatus
+): SeasonBoardActionCounts {
+  const retainCount = status.retainedClubIds.length;
+  const reviewCount = status.reviewClubIds.length;
+  const sackCount = status.sackedClubIds.length;
+
+  return {
+    retainCount,
+    reviewCount,
+    sackCount,
+    totalClubs: retainCount + reviewCount + sackCount
   };
 }
