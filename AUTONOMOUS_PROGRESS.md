@@ -21,11 +21,11 @@
 - Passed: `npm run -w @touchline/sim-core test -- tests/negotiation.test.ts tests/transferEngine.test.ts`, `npm test`, `npm run typecheck`, `npm run lint`, `npm run build` after equal-fee explainability artifact + deterministic non-fee driver coverage (2026-04-05)
 
 ## Last commit hash
-- PENDING_COMMIT
+- 65ab491
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`
 - Inspect git status and recent commits
 - Continue Step 3 with transfer/reputation bounded tasks only; do not jump to later steps.
 - Next bounded task: add broken-promise trust regression proof in comparable negotiation context.
-- Last successful pushed commit before this pending change: 3d010bb.
+- Last successful pushed commit: 65ab491.
