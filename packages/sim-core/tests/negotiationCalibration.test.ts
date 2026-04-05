@@ -327,6 +327,70 @@ describe("transfer negotiation calibration samples", () => {
     expect(new Set(repeatedSummarySnapshots.map((snapshot) => snapshot.equalFeeSummary)).size).toBe(1);
   });
 
+  it("keeps explainability summary bundle keys and value shapes stable across runs", () => {
+    const buildSummaryBundle = () => {
+      const promiseTrust = summarizePromiseTrustImpactByReputationBand(
+        calibrationTarget,
+        {
+          clubWageBudget: calibrationBaseContext.clubWageBudget,
+          clubStature: calibrationBaseContext.clubStature,
+          boardWageDiscipline: calibrationBaseContext.boardWageDiscipline
+        },
+        calibrationReputationBands,
+        calibrationPromiseVariants
+      );
+      const outcomeSummary = summarizeTransferOutcomesByReputationBand(
+        calibrationTarget,
+        {
+          clubWageBudget: calibrationBaseContext.clubWageBudget,
+          clubStature: calibrationBaseContext.clubStature,
+          boardWageDiscipline: calibrationBaseContext.boardWageDiscipline
+        },
+        calibrationReputationBands,
+        calibrationOutcomeVariants
+      );
+      const outcomeDeltaSummary = buildReputationBandOutcomeDeltaSummary(
+        calibrationTarget,
+        {
+          clubWageBudget: calibrationBaseContext.clubWageBudget,
+          clubStature: calibrationBaseContext.clubStature,
+          boardWageDiscipline: calibrationBaseContext.boardWageDiscipline
+        },
+        82,
+        28,
+        calibrationOutcomeVariants
+      );
+      const equalFee = buildEqualFeeNegotiationExplainabilityArtifact(
+        calibrationTarget,
+        calibrationEqualFeeContexts.first,
+        calibrationEqualFeeContexts.second
+      );
+
+      return {
+        promiseTrustSummary: promiseTrust.conciseSummary,
+        outcomeSummary: outcomeSummary.conciseSummary,
+        outcomeDeltaSummary: outcomeDeltaSummary.conciseSummary,
+        equalFeeSummary: equalFee.conciseSummary
+      };
+    };
+
+    const repeatedBundles = Array.from({ length: 6 }, () => buildSummaryBundle());
+    const expectedKeys = [
+      "promiseTrustSummary",
+      "outcomeSummary",
+      "outcomeDeltaSummary",
+      "equalFeeSummary"
+    ];
+
+    for (const bundle of repeatedBundles) {
+      expect(Object.keys(bundle)).toEqual(expectedKeys);
+      expect(Array.isArray(bundle.promiseTrustSummary)).toBe(true);
+      expect(Array.isArray(bundle.outcomeSummary)).toBe(true);
+      expect(typeof bundle.outcomeDeltaSummary).toBe("string");
+      expect(typeof bundle.equalFeeSummary).toBe("string");
+    }
+  });
+
   it("keeps reputation-band delta artifacts deterministic across repeated fixed fixture evaluations", () => {
     const repeatedRuns = Array.from({ length: 12 }, () =>
       buildReputationBandOutcomeDeltaSummary(

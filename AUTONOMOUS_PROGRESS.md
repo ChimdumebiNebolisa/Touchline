@@ -4,10 +4,10 @@
 - Step 3: Transfer and reputation expansion
 
 ## Last completed verified task
-- Added deterministic calibration proof that repeated-run explainability summaries stay stable across transfer artifacts.
+- Added deterministic calibration proof that explainability summary bundle keys and value shapes remain stable across repeated runs.
 
 ## Current subtask in progress
-- Add bounded Step 3 calibration checks that preserve deterministic explainability summary bundles for regression diffs.
+- Add bounded Step 3 calibration checks that preserve deterministic explainability summary labels in regression snapshots.
 
 ## Next queued subtasks
 - Keep Step 3 scope constrained to transfer/reputation logic without Step 4 academy drift.
@@ -18,14 +18,14 @@
 - None
 
 ## Last verification run
-- Passed: `npm run -w @touchline/sim-core test -- tests/reputation.test.ts tests/postMatchFallout.test.ts tests/negotiationCalibration.test.ts tests/negotiation.test.ts tests/transferEngine.test.ts`, `npm test`, `npm run typecheck`, `npm run lint`, `npm run build` after repeated-run explainability-summary stability regression proof (2026-04-05)
+- Passed: `npm run -w @touchline/sim-core test -- tests/reputation.test.ts tests/postMatchFallout.test.ts tests/negotiationCalibration.test.ts tests/negotiation.test.ts tests/transferEngine.test.ts`, `npm test`, `npm run typecheck`, `npm run lint`, `npm run build` after explainability summary bundle key/value-shape stability regression proof (2026-04-05)
 
 ## Last commit hash
-- 2785d4e
+- pending (next commit: explainability summary bundle key/value-shape stability proof)
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`
 - Inspect git status and recent commits
 - Continue Step 3 with transfer/reputation bounded tasks only; do not jump to later steps.
-- Next bounded task: add deterministic calibration checks that preserve explainability summary bundle keys for regression comparisons.
-- Last successful pushed commit: 2785d4e.
+- Next bounded task: add deterministic calibration checks that preserve explainability summary label stability in regression snapshots.
+- Last successful pushed commit: 5c1a6a1.
