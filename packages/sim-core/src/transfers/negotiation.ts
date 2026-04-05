@@ -4,6 +4,7 @@ import {
   type TransferEvaluationContext,
   type TransferTargetProfile
 } from "./transferEngine.js";
+import { buildTransferDemandBreakdown, type TransferDemandBreakdown } from "./demandModel.js";
 
 export interface TransferNegotiationComparison {
   firstDecision: TransferDecision;
@@ -35,6 +36,53 @@ export interface TransferNegotiationLogEntry {
   reasonSummary: string[];
 }
 
+export interface TransferNegotiationExplainabilityArtifact {
+  comparison: TransferNegotiationComparison;
+  firstDemandBreakdown: TransferDemandBreakdown;
+  secondDemandBreakdown: TransferDemandBreakdown;
+  demandDelta: TransferDemandBreakdown;
+  primaryNonFeeDrivers: string[];
+  nonFeeContextDroveDivergence: boolean;
+  conciseSummary: string;
+}
+
+type NonFeeDemandFactor =
+  | "roleScore"
+  | "projectScore"
+  | "statureScore"
+  | "competitionScore"
+  | "pathwayScore"
+  | "reputationScore"
+  | "promisePenalty";
+
+const NON_FEE_FACTORS: NonFeeDemandFactor[] = [
+  "roleScore",
+  "projectScore",
+  "statureScore",
+  "competitionScore",
+  "pathwayScore",
+  "reputationScore",
+  "promisePenalty"
+];
+
+const NON_FEE_FACTOR_LABELS: Record<NonFeeDemandFactor, string> = {
+  roleScore: "Role fit",
+  projectScore: "Project fit",
+  statureScore: "Club stature",
+  competitionScore: "Squad competition",
+  pathwayScore: "Pathway clarity",
+  reputationScore: "Manager reputation",
+  promisePenalty: "Promise trust"
+};
+
+const NON_FEE_CONTEXT_FIELDS = new Set([
+  "clubStature",
+  "managerReputation",
+  "squadCompetition",
+  "pathwayClarity",
+  "recentPromiseBreak"
+]);
+
 function identifyChangedContextFactors(
   firstContext: TransferEvaluationContext,
   secondContext: TransferEvaluationContext
@@ -64,6 +112,38 @@ function identifyChangedContextFactors(
   }
 
   return changed;
+}
+
+function buildDemandDelta(
+  first: TransferDemandBreakdown,
+  second: TransferDemandBreakdown
+): TransferDemandBreakdown {
+  return {
+    wageScore: first.wageScore - second.wageScore,
+    roleScore: first.roleScore - second.roleScore,
+    projectScore: first.projectScore - second.projectScore,
+    statureScore: first.statureScore - second.statureScore,
+    competitionScore: first.competitionScore - second.competitionScore,
+    pathwayScore: first.pathwayScore - second.pathwayScore,
+    reputationScore: first.reputationScore - second.reputationScore,
+    promisePenalty: first.promisePenalty - second.promisePenalty,
+    totalScore: first.totalScore - second.totalScore
+  };
+}
+
+function formatSignedValue(value: number): string {
+  return `${value >= 0 ? "+" : ""}${value.toFixed(2)}`;
+}
+
+function identifyPrimaryNonFeeDrivers(demandDelta: TransferDemandBreakdown): string[] {
+  return NON_FEE_FACTORS.map((factor) => ({
+    factor,
+    delta: demandDelta[factor]
+  }))
+    .filter((entry) => Math.abs(entry.delta) >= 0.05)
+    .sort((first, second) => Math.abs(second.delta) - Math.abs(first.delta))
+    .slice(0, 3)
+    .map((entry) => `${NON_FEE_FACTOR_LABELS[entry.factor]} ${formatSignedValue(entry.delta)}`);
 }
 
 export function compareTransferNegotiationContexts(
@@ -148,4 +228,36 @@ export function buildTransferNegotiationLogSamples(
       reasonSummary: decision.reasonSummary
     };
   });
+}
+
+export function buildEqualFeeNegotiationExplainabilityArtifact(
+  target: TransferTargetProfile,
+  firstContext: TransferEvaluationContext,
+  secondContext: TransferEvaluationContext
+): TransferNegotiationExplainabilityArtifact {
+  const comparison = compareTransferNegotiationContexts(target, firstContext, secondContext);
+  const firstDemandBreakdown = buildTransferDemandBreakdown(target, firstContext);
+  const secondDemandBreakdown = buildTransferDemandBreakdown(target, secondContext);
+  const demandDelta = buildDemandDelta(firstDemandBreakdown, secondDemandBreakdown);
+
+  const nonFeeContextChanged = comparison.changedContextFactors.some((field) =>
+    NON_FEE_CONTEXT_FIELDS.has(field)
+  );
+  const primaryNonFeeDrivers = identifyPrimaryNonFeeDrivers(demandDelta);
+  const nonFeeContextDroveDivergence =
+    comparison.diverged && nonFeeContextChanged && primaryNonFeeDrivers.length > 0;
+
+  const conciseSummary = comparison.diverged
+    ? `Equal-fee comparison diverged (${comparison.firstDecision.accepted ? "accepted" : "rejected"} vs ${comparison.secondDecision.accepted ? "accepted" : "rejected"}); primary non-fee drivers: ${primaryNonFeeDrivers.join(", ") || "none"}.`
+    : `Equal-fee comparison aligned (${comparison.firstDecision.accepted ? "accepted" : "rejected"}); primary contextual deltas: ${primaryNonFeeDrivers.join(", ") || "none"}.`;
+
+  return {
+    comparison,
+    firstDemandBreakdown,
+    secondDemandBreakdown,
+    demandDelta,
+    primaryNonFeeDrivers,
+    nonFeeContextDroveDivergence,
+    conciseSummary
+  };
 }

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  buildEqualFeeNegotiationExplainabilityArtifact,
   buildTransferNegotiationLogSamples,
   compareTransferNegotiationContexts,
   summarizeNegotiationAcceptanceByReputationBand
@@ -110,6 +111,49 @@ describe("transfer negotiation comparison", () => {
     expect(firstRun[0].acceptanceRate).toBeGreaterThan(firstRun[1].acceptanceRate);
     expect(firstRun[0].attempts).toBe(variants.length);
     expect(firstRun[1].attempts).toBe(variants.length);
+  });
+
+  it("builds deterministic equal-fee explainability artifacts with non-fee drivers", () => {
+    const equalFeeTarget: TransferTargetProfile = {
+      ...target,
+      roleFit: 0.65,
+      projectFit: 0.61,
+      pathwayPreference: 0.7
+    };
+
+    const firstContext = {
+      ...baseContext,
+      managerReputation: 68,
+      pathwayClarity: 0.88,
+      squadCompetition: 0.48
+    };
+    const secondContext = {
+      ...baseContext,
+      managerReputation: 68,
+      pathwayClarity: 0.28,
+      squadCompetition: 0.85
+    };
+
+    const firstRun = buildEqualFeeNegotiationExplainabilityArtifact(
+      equalFeeTarget,
+      firstContext,
+      secondContext
+    );
+    const secondRun = buildEqualFeeNegotiationExplainabilityArtifact(
+      equalFeeTarget,
+      firstContext,
+      secondContext
+    );
+
+    expect(firstRun).toEqual(secondRun);
+    expect(firstRun.comparison.diverged).toBe(true);
+    expect(firstRun.nonFeeContextDroveDivergence).toBe(true);
+    expect(firstRun.primaryNonFeeDrivers).toHaveLength(2);
+    expect(firstRun.primaryNonFeeDrivers[0]).toContain("Pathway clarity");
+    expect(firstRun.primaryNonFeeDrivers[1]).toContain("Squad competition");
+    expect(firstRun.firstDemandBreakdown.totalScore).toBeCloseTo(firstRun.comparison.firstDecision.score, 10);
+    expect(firstRun.secondDemandBreakdown.totalScore).toBeCloseTo(firstRun.comparison.secondDecision.score, 10);
+    expect(firstRun.conciseSummary).toContain("Equal-fee comparison diverged");
   });
 
   it("rejects reputation-band summary with empty scenario variants", () => {
