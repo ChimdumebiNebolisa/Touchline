@@ -46,6 +46,7 @@ export type {
   TransferTargetProfile
 } from "./transfers/transferEngine.js";
 export type {
+  CompletedSeasonSummary,
   Fixture,
   FixtureResult,
   PromotionRelegationOutcome,
@@ -77,7 +78,8 @@ export {
   createSeasonState,
   getFixturesForMatchday,
   isSeasonComplete,
-  resolvePromotionRelegation
+  resolvePromotionRelegation,
+  summarizeCompletedSeason
 } from "./world/season.js";
 export {
   deriveSeasonBoardContextFromSeasonState,

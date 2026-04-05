@@ -47,6 +47,11 @@ export interface PromotionRelegationOutcome {
   relegatedClubIds: string[];
 }
 
+export interface CompletedSeasonSummary {
+  finalStandings: StandingsRow[];
+  promotionRelegation: PromotionRelegationOutcome;
+}
+
 function createRow(clubId: string): StandingsRow {
   return {
     clubId,
@@ -213,6 +218,30 @@ export function resolvePromotionRelegation(
   return {
     promotedClubIds,
     relegatedClubIds
+  };
+}
+
+export function summarizeCompletedSeason(
+  state: SeasonState,
+  promotionSpots: number,
+  relegationSpots: number
+): CompletedSeasonSummary {
+  if (!isSeasonComplete(state)) {
+    throw new Error("Cannot summarize season before completion.");
+  }
+
+  const finalStandings = [...state.standings].sort(standingsSort);
+  const promotionRelegation = resolvePromotionRelegation(finalStandings, promotionSpots, relegationSpots);
+
+  const promotedSet = new Set(promotionRelegation.promotedClubIds);
+  const hasOverlap = promotionRelegation.relegatedClubIds.some((clubId) => promotedSet.has(clubId));
+  if (hasOverlap) {
+    throw new Error("Promotion and relegation outcomes may not overlap.");
+  }
+
+  return {
+    finalStandings,
+    promotionRelegation
   };
 }
 

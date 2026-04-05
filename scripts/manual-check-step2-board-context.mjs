@@ -7,6 +7,7 @@ import {
   getFixturesForMatchday,
   isSeasonComplete,
   resolvePromotionRelegation,
+  summarizeCompletedSeason,
   summarizeSeasonSackRiskPressureTimeline
 } from "../packages/sim-core/dist/src/index.js";
 
@@ -128,6 +129,7 @@ function runStep2BoardContextManualCheck() {
   console.table([pressureSummary]);
 
   const promotionOutcome = resolvePromotionRelegation(seasonState.standings, 1, 1);
+  const completedSummary = summarizeCompletedSeason(seasonState, 1, 1);
   console.log("- Promotion / relegation resolution sample");
   console.table([
     {
@@ -145,6 +147,7 @@ function runStep2BoardContextManualCheck() {
     promotionOutcome.promotedClubIds.length === 1 &&
     promotionOutcome.relegatedClubIds.length === 1 &&
     promotionOutcome.promotedClubIds[0] !== promotionOutcome.relegatedClubIds[0];
+  const validCompletedSummary = completedSummary.finalStandings.length === seasonState.standings.length;
 
   if (
     !validReasonCoverage ||
@@ -152,7 +155,8 @@ function runStep2BoardContextManualCheck() {
     !validTimelineRange ||
     !validTimelineFlags ||
     !validStreakSummary ||
-    !validPromotionResolution
+    !validPromotionResolution ||
+    !validCompletedSummary
   ) {
     console.error("Step 2 manual check failed expected board-context thresholds.");
     process.exit(1);

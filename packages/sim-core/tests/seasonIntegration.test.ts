@@ -5,7 +5,8 @@ import {
   createSeasonState,
   getFixturesForMatchday,
   isSeasonComplete,
-  resolvePromotionRelegation
+  resolvePromotionRelegation,
+  summarizeCompletedSeason
 } from "../src/index.js";
 
 describe("season integration", () => {
@@ -44,6 +45,15 @@ describe("season integration", () => {
     expect(outcome.promotedClubIds).toHaveLength(1);
     expect(outcome.relegatedClubIds).toHaveLength(1);
     expect(outcome.promotedClubIds[0]).not.toBe(outcome.relegatedClubIds[0]);
+
+    const summary = summarizeCompletedSeason(state, 2, 2);
+    const promotedSet = new Set(summary.promotionRelegation.promotedClubIds);
+    const overlap = summary.promotionRelegation.relegatedClubIds.some((clubId) => promotedSet.has(clubId));
+
+    expect(summary.finalStandings).toHaveLength(4);
+    expect(summary.promotionRelegation.promotedClubIds).toHaveLength(2);
+    expect(summary.promotionRelegation.relegatedClubIds).toHaveLength(2);
+    expect(overlap).toBe(false);
   });
 
   it("rejects invalid promotion and relegation slot sizes", () => {
@@ -59,6 +69,9 @@ describe("season integration", () => {
     );
     expect(() => resolvePromotionRelegation(state.standings, 3, 2)).toThrow(
       "Promotion and relegation spots exceed standings size."
+    );
+    expect(() => summarizeCompletedSeason(state, 1, 1)).toThrow(
+      "Cannot summarize season before completion."
     );
   });
 });
