@@ -34,7 +34,10 @@ export type {
 } from "./club/types.js";
 export type {
   BoardExpectationContext,
-  BoardExpectationEvaluation
+  BoardExpectationEvaluation,
+  SackRiskPressureLevel,
+  SackRiskPressureState,
+  SackRiskTrend
 } from "./club/board.js";
 export type {
   TransferDecision,
@@ -55,6 +58,7 @@ export {
   applyMatchPreparationCommand
 } from "./match/commands.js";
 export { computeBoardConfidenceDelta } from "./club/board.js";
+export { deriveSackRiskPressureState } from "./club/board.js";
 export { evaluateBoardExpectationContext } from "./club/board.js";
 export { computeTeamMoraleDelta } from "./club/morale.js";
 export { computeManagerReputationDelta } from "./club/reputation.js";

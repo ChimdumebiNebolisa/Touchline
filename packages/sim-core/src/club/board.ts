@@ -52,6 +52,33 @@ export interface BoardExpectationEvaluation {
   reasonSummary: string[];
 }
 
+export type SackRiskPressureLevel = "stable" | "warning" | "critical";
+export type SackRiskTrend = "rising" | "steady" | "falling";
+
+export interface SackRiskPressureState {
+  level: SackRiskPressureLevel;
+  trend: SackRiskTrend;
+  reasonSummary: string;
+}
+
+export function deriveSackRiskPressureState(
+  currentSackRisk: number,
+  previousSackRisk?: number
+): SackRiskPressureState {
+  const current = clamp(currentSackRisk, 0, 1);
+  const previous = previousSackRisk === undefined ? current : clamp(previousSackRisk, 0, 1);
+  const delta = current - previous;
+
+  const level: SackRiskPressureLevel = current >= 0.75 ? "critical" : current >= 0.5 ? "warning" : "stable";
+  const trend: SackRiskTrend = delta > 0.05 ? "rising" : delta < -0.05 ? "falling" : "steady";
+
+  return {
+    level,
+    trend,
+    reasonSummary: `Sack risk ${(current * 100).toFixed(1)}% classified as ${level} with ${trend} pressure trend.`
+  };
+}
+
 export function computeBoardConfidenceDelta(input: BoardDeltaInput): number {
   const points = matchPoints(input.goalsFor, input.goalsAgainst);
   const expectationGap = points - expectedPoints(input.context.expectationBand);
