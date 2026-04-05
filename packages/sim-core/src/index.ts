@@ -47,8 +47,15 @@ export type {
 } from "./transfers/transferEngine.js";
 export type { TransferDemandBreakdown } from "./transfers/demandModel.js";
 export { buildTransferDemandBreakdown, scoreTransferWageFit } from "./transfers/demandModel.js";
-export type { TransferNegotiationComparison } from "./transfers/negotiation.js";
-export { compareTransferNegotiationContexts } from "./transfers/negotiation.js";
+export type {
+  NegotiationScenarioVariant,
+  ReputationBandNegotiationOutcome,
+  TransferNegotiationComparison
+} from "./transfers/negotiation.js";
+export {
+  compareTransferNegotiationContexts,
+  summarizeNegotiationAcceptanceByReputationBand
+} from "./transfers/negotiation.js";
 export type {
   CompletedSeasonSummary,
   Fixture,

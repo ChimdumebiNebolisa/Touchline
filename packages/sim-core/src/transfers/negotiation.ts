@@ -13,6 +13,19 @@ export interface TransferNegotiationComparison {
   reasonSummary: string[];
 }
 
+export interface NegotiationScenarioVariant {
+  pathwayClarity: number;
+  squadCompetition: number;
+  recentPromiseBreak: boolean;
+}
+
+export interface ReputationBandNegotiationOutcome {
+  managerReputation: number;
+  attempts: number;
+  acceptedCount: number;
+  acceptanceRate: number;
+}
+
 function identifyChangedContextFactors(
   firstContext: TransferEvaluationContext,
   secondContext: TransferEvaluationContext
@@ -73,4 +86,40 @@ export function compareTransferNegotiationContexts(
     changedContextFactors,
     reasonSummary
   };
+}
+
+export function summarizeNegotiationAcceptanceByReputationBand(
+  target: TransferTargetProfile,
+  baseContext: Omit<TransferEvaluationContext, "managerReputation" | "pathwayClarity" | "squadCompetition" | "recentPromiseBreak">,
+  managerReputationBands: number[],
+  variants: NegotiationScenarioVariant[]
+): ReputationBandNegotiationOutcome[] {
+  if (!variants.length) {
+    throw new Error("At least one negotiation scenario variant is required.");
+  }
+
+  return managerReputationBands.map((managerReputation) => {
+    let acceptedCount = 0;
+
+    for (const variant of variants) {
+      const decision = evaluateTransferDecision(target, {
+        ...baseContext,
+        managerReputation,
+        pathwayClarity: variant.pathwayClarity,
+        squadCompetition: variant.squadCompetition,
+        recentPromiseBreak: variant.recentPromiseBreak
+      });
+
+      if (decision.accepted) {
+        acceptedCount += 1;
+      }
+    }
+
+    return {
+      managerReputation,
+      attempts: variants.length,
+      acceptedCount,
+      acceptanceRate: acceptedCount / variants.length
+    };
+  });
 }

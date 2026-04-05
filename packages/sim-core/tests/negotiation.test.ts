@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { compareTransferNegotiationContexts } from "../src/index.js";
+import {
+  compareTransferNegotiationContexts,
+  summarizeNegotiationAcceptanceByReputationBand
+} from "../src/index.js";
 import type { TransferEvaluationContext, TransferTargetProfile } from "../src/index.js";
 
 const target: TransferTargetProfile = {
@@ -71,5 +74,55 @@ describe("transfer negotiation comparison", () => {
 
     expect(comparison.firstDecision.score).toBeGreaterThan(comparison.secondDecision.score);
     expect(comparison.changedContextFactors).toContain("managerReputation");
+  });
+
+  it("shows lower acceptance rate for low-reputation manager under comparable scenarios", () => {
+    const variants = [
+      { pathwayClarity: 0.82, squadCompetition: 0.5, recentPromiseBreak: false },
+      { pathwayClarity: 0.64, squadCompetition: 0.56, recentPromiseBreak: false },
+      { pathwayClarity: 0.48, squadCompetition: 0.63, recentPromiseBreak: false },
+      { pathwayClarity: 0.52, squadCompetition: 0.58, recentPromiseBreak: true }
+    ];
+
+    const firstRun = summarizeNegotiationAcceptanceByReputationBand(
+      target,
+      {
+        clubWageBudget: baseContext.clubWageBudget,
+        clubStature: baseContext.clubStature,
+        boardWageDiscipline: baseContext.boardWageDiscipline
+      },
+      [82, 28],
+      variants
+    );
+    const secondRun = summarizeNegotiationAcceptanceByReputationBand(
+      target,
+      {
+        clubWageBudget: baseContext.clubWageBudget,
+        clubStature: baseContext.clubStature,
+        boardWageDiscipline: baseContext.boardWageDiscipline
+      },
+      [82, 28],
+      variants
+    );
+
+    expect(firstRun).toEqual(secondRun);
+    expect(firstRun[0].acceptanceRate).toBeGreaterThan(firstRun[1].acceptanceRate);
+    expect(firstRun[0].attempts).toBe(variants.length);
+    expect(firstRun[1].attempts).toBe(variants.length);
+  });
+
+  it("rejects reputation-band summary with empty scenario variants", () => {
+    expect(() =>
+      summarizeNegotiationAcceptanceByReputationBand(
+        target,
+        {
+          clubWageBudget: baseContext.clubWageBudget,
+          clubStature: baseContext.clubStature,
+          boardWageDiscipline: baseContext.boardWageDiscipline
+        },
+        [82, 28],
+        []
+      )
+    ).toThrow("At least one negotiation scenario variant is required.");
   });
 });
