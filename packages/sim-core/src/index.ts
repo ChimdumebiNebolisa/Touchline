@@ -57,6 +57,7 @@ export type {
 } from "./world/season.js";
 export type {
   CompletedSeasonBoardSummary,
+  SeasonBoardResolutionStatus,
   SeasonSackOutcome,
   SeasonBoardDecisionSnapshot,
   SeasonSackDecision,
@@ -92,6 +93,7 @@ export {
   extractSeasonSackOutcomes,
   evaluateSeasonBoardDecisions,
   evaluateSeasonBoardContext,
+  summarizeSeasonBoardResolutionStatus,
   summarizeCompletedSeasonBoardOutcomes,
   summarizeSeasonSackRiskPressureTimeline
 } from "./world/seasonBoard.js";

@@ -57,6 +57,12 @@ export interface SeasonSackOutcome {
   sackRisk: number;
 }
 
+export interface SeasonBoardResolutionStatus {
+  retainedClubIds: string[];
+  reviewClubIds: string[];
+  sackedClubIds: string[];
+}
+
 export function summarizeSeasonSackRiskPressureTimeline(
   sackRiskTimeline: number[]
 ): SeasonSackRiskPressureSummary {
@@ -297,4 +303,39 @@ export function extractSeasonSackOutcomes(summary: CompletedSeasonBoardSummary):
   }
 
   return outcomes;
+}
+
+export function summarizeSeasonBoardResolutionStatus(
+  summary: CompletedSeasonBoardSummary
+): SeasonBoardResolutionStatus {
+  const retainedClubIds: string[] = [];
+  const reviewClubIds: string[] = [];
+  const sackedClubIds: string[] = [];
+
+  for (const row of summary.completedSeason.finalStandings) {
+    const snapshot = summary.decisionSnapshotsByClubId[row.clubId];
+    if (!snapshot) {
+      throw new Error(`Missing board decision snapshot for club ${row.clubId}.`);
+    }
+
+    switch (snapshot.sackDecision.decision) {
+      case "retain":
+        retainedClubIds.push(row.clubId);
+        break;
+      case "review":
+        reviewClubIds.push(row.clubId);
+        break;
+      case "sack":
+        sackedClubIds.push(row.clubId);
+        break;
+      default:
+        throw new Error(`Unknown sack decision status for club ${row.clubId}.`);
+    }
+  }
+
+  return {
+    retainedClubIds,
+    reviewClubIds,
+    sackedClubIds
+  };
 }

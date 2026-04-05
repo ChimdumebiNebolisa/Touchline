@@ -8,6 +8,7 @@ import {
   evaluateSeasonBoardContext,
   getFixturesForMatchday,
   isSeasonComplete,
+  summarizeSeasonBoardResolutionStatus,
   summarizeCompletedSeasonBoardOutcomes
 } from "../packages/sim-core/dist/src/index.js";
 
@@ -225,6 +226,7 @@ function runStep2BoardContextManualCheck() {
   );
 
   const sackOutcomes = extractSeasonSackOutcomes(completedBoardSummary);
+  const resolutionStatus = summarizeSeasonBoardResolutionStatus(completedBoardSummary);
   console.log("- Extracted season sack outcomes sample");
   console.table(
     sackOutcomes.length
@@ -238,6 +240,14 @@ function runStep2BoardContextManualCheck() {
           }
         ]
   );
+  console.log("- Grouped season-resolution status sample");
+  console.table([
+    {
+      retainedClubIds: resolutionStatus.retainedClubIds.join(", ") || "none",
+      reviewClubIds: resolutionStatus.reviewClubIds.join(", ") || "none",
+      sackedClubIds: resolutionStatus.sackedClubIds.join(", ") || "none"
+    }
+  ]);
 
   const validReasonCoverage = rows.every((entry) => entry.reasons.length > 0);
   const validSackRiskRange = rows.every((entry) => entry.sackRisk >= 0 && entry.sackRisk <= 1);
@@ -255,6 +265,16 @@ function runStep2BoardContextManualCheck() {
   const validSackExtraction =
     expectedSackedClubIds.length === extractedSackedClubIds.length &&
     expectedSackedClubIds.every((clubId) => extractedSackedClubIds.includes(clubId));
+  const expectedRetainedClubIds = completedSummary.finalStandings
+    .filter((row) => completedBoardSummary.decisionSnapshotsByClubId[row.clubId].sackDecision.decision === "retain")
+    .map((row) => row.clubId);
+  const expectedReviewClubIds = completedSummary.finalStandings
+    .filter((row) => completedBoardSummary.decisionSnapshotsByClubId[row.clubId].sackDecision.decision === "review")
+    .map((row) => row.clubId);
+  const validResolutionGrouping =
+    expectedRetainedClubIds.join("|") === resolutionStatus.retainedClubIds.join("|") &&
+    expectedReviewClubIds.join("|") === resolutionStatus.reviewClubIds.join("|") &&
+    expectedSackedClubIds.join("|") === resolutionStatus.sackedClubIds.join("|");
   const validMatchedPositionVariance =
     matchedPositionComparison.highPressureRisk > matchedPositionComparison.lowPressureRisk &&
     matchedPositionComparison.lowPressureDecision === "retain" &&
@@ -276,6 +296,7 @@ function runStep2BoardContextManualCheck() {
     !validSnapshotCoverage ||
     !validSackDecision ||
     !validSackExtraction ||
+    !validResolutionGrouping ||
     !validMatchedPositionVariance ||
     !validCompletedBoardSnapshots ||
     !validPromotionResolution ||

@@ -11,6 +11,7 @@ import {
   evaluateSeasonBoardContext,
   getFixturesForMatchday,
   isSeasonComplete,
+  summarizeSeasonBoardResolutionStatus,
   summarizeCompletedSeasonBoardOutcomes,
   summarizeSeasonSackRiskPressureTimeline
 } from "../src/index.js";
@@ -866,6 +867,45 @@ describe("season board integration", () => {
 
     expect(() => extractSeasonSackOutcomes(missingSnapshotSummary)).toThrow(
       "Missing board decision snapshot for club club-a."
+    );
+  });
+
+  it("summarizes grouped season-resolution statuses deterministically", () => {
+    const run = runCompletedSeasonStateWithContext();
+
+    const summary = summarizeCompletedSeasonBoardOutcomes(
+      run.state,
+      run.finalContextByClubId,
+      {
+        "club-a": [0.56, 0.78, 0.82, 0.84],
+        "club-b": [0.42, 0.51, 0.55, 0.54],
+        "club-c": [0.31, 0.37, 0.35, 0.39],
+        "club-d": [0.25, 0.32, 0.36, 0.34]
+      },
+      1,
+      1
+    );
+
+    const firstStatus = summarizeSeasonBoardResolutionStatus(summary);
+    const secondStatus = summarizeSeasonBoardResolutionStatus(summary);
+
+    expect(firstStatus).toEqual(secondStatus);
+    expect(firstStatus.sackedClubIds).toEqual(["club-a"]);
+    expect(firstStatus.reviewClubIds).toEqual(["club-b"]);
+    expect(firstStatus.retainedClubIds).toEqual(["club-c", "club-d"]);
+  });
+
+  it("rejects grouped status summary when decision snapshots are incomplete", () => {
+    const summary = runCompletedSeasonBoardSummarySimulation();
+    const missingSnapshotSummary = {
+      ...summary,
+      decisionSnapshotsByClubId: Object.fromEntries(
+        Object.entries(summary.decisionSnapshotsByClubId).filter(([clubId]) => clubId !== "club-b")
+      )
+    };
+
+    expect(() => summarizeSeasonBoardResolutionStatus(missingSnapshotSummary)).toThrow(
+      "Missing board decision snapshot for club club-b."
     );
   });
 });
