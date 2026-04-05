@@ -1,0 +1,66 @@
+{
+  "id": "country-novara",
+  "name": "Novara",
+  "divisions": [
+    {
+      "id": "novara-premier",
+      "name": "Novara Premier Division",
+      "tier": 1,
+      "simulationDepth": "deep",
+      "clubs": [
+        {
+          "id": "nvr-harbor-fc",
+          "name": "Harbor FC",
+          "shortName": "HFC",
+          "isPlayable": true
+        },
+        {
+          "id": "nvr-old-town-athletic",
+          "name": "Old Town Athletic",
+          "shortName": "OTA",
+          "isPlayable": false
+        }
+      ]
+    },
+    {
+      "id": "novara-championship",
+      "name": "Novara Championship",
+      "tier": 2,
+      "simulationDepth": "deep",
+      "clubs": [
+        {
+          "id": "nvr-eastford-united",
+          "name": "Eastford United",
+          "shortName": "EUN",
+          "isPlayable": false
+        },
+        {
+          "id": "nvr-rivergate-city",
+          "name": "Rivergate City",
+          "shortName": "RGC",
+          "isPlayable": false
+        }
+      ]
+    },
+    {
+      "id": "novara-league-one",
+      "name": "Novara League One",
+      "tier": 3,
+      "simulationDepth": "shadow",
+      "clubs": [
+        {
+          "id": "nvr-lakeside-rovers",
+          "name": "Lakeside Rovers",
+          "shortName": "LRV",
+          "isPlayable": false
+        },
+        {
+          "id": "nvr-crestfield",
+          "name": "Crestfield",
+          "shortName": "CRF",
+          "isPlayable": false
+        }
+      ]
+    }
+  ]
+}
