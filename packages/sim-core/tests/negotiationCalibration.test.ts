@@ -223,6 +223,65 @@ describe("transfer negotiation calibration samples", () => {
     }
   });
 
+  it("keeps concise transfer summaries deterministic and regression-friendly", () => {
+    const firstPromiseTrust = summarizePromiseTrustImpactByReputationBand(
+      calibrationTarget,
+      {
+        clubWageBudget: calibrationBaseContext.clubWageBudget,
+        clubStature: calibrationBaseContext.clubStature,
+        boardWageDiscipline: calibrationBaseContext.boardWageDiscipline
+      },
+      calibrationReputationBands,
+      calibrationPromiseVariants
+    );
+    const secondPromiseTrust = summarizePromiseTrustImpactByReputationBand(
+      calibrationTarget,
+      {
+        clubWageBudget: calibrationBaseContext.clubWageBudget,
+        clubStature: calibrationBaseContext.clubStature,
+        boardWageDiscipline: calibrationBaseContext.boardWageDiscipline
+      },
+      calibrationReputationBands,
+      calibrationPromiseVariants
+    );
+
+    const firstOutcomeSummary = summarizeTransferOutcomesByReputationBand(
+      calibrationTarget,
+      {
+        clubWageBudget: calibrationBaseContext.clubWageBudget,
+        clubStature: calibrationBaseContext.clubStature,
+        boardWageDiscipline: calibrationBaseContext.boardWageDiscipline
+      },
+      calibrationReputationBands,
+      calibrationOutcomeVariants
+    );
+    const secondOutcomeSummary = summarizeTransferOutcomesByReputationBand(
+      calibrationTarget,
+      {
+        clubWageBudget: calibrationBaseContext.clubWageBudget,
+        clubStature: calibrationBaseContext.clubStature,
+        boardWageDiscipline: calibrationBaseContext.boardWageDiscipline
+      },
+      calibrationReputationBands,
+      calibrationOutcomeVariants
+    );
+
+    expect(secondPromiseTrust.conciseSummary).toEqual(firstPromiseTrust.conciseSummary);
+    expect(secondOutcomeSummary.conciseSummary).toEqual(firstOutcomeSummary.conciseSummary);
+
+    for (const line of firstPromiseTrust.conciseSummary) {
+      expect(line).toMatch(
+        /^Manager reputation \d+: intact trust \d+\/\d+ \(\d\.\d{2}\) vs broken trust \d+\/\d+ \(\d\.\d{2}\), delta -?\d\.\d{2}\.$/
+      );
+    }
+
+    for (const line of firstOutcomeSummary.conciseSummary) {
+      expect(line).toMatch(
+        /^Manager reputation \d+: accepted \d+\/\d+ \(\d\.\d{2}\), average score -?\d+\.\d{2}, board blocks \d+, sporting-director blocks \d+, player blocks \d+\.$/
+      );
+    }
+  });
+
   it("keeps reputation-band transfer outcome artifacts invariant under fixed fixture reordering", () => {
     const forwardSummary = summarizeTransferOutcomesByReputationBand(
       calibrationTarget,
