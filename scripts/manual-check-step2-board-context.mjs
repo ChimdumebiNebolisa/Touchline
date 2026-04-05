@@ -7,8 +7,7 @@ import {
   evaluateSeasonBoardContext,
   getFixturesForMatchday,
   isSeasonComplete,
-  resolvePromotionRelegation,
-  summarizeCompletedSeason,
+  summarizeCompletedSeasonBoardOutcomes
 } from "../packages/sim-core/dist/src/index.js";
 
 function buildSeasonStateAndTimeline() {
@@ -146,8 +145,15 @@ function runStep2BoardContextManualCheck() {
     }
   ]);
 
-  const promotionOutcome = resolvePromotionRelegation(seasonState.standings, 1, 1);
-  const completedSummary = summarizeCompletedSeason(seasonState, 1, 1);
+  const completedBoardSummary = summarizeCompletedSeasonBoardOutcomes(
+    seasonState,
+    boardContext,
+    timelinesByClubId,
+    1,
+    1
+  );
+  const promotionOutcome = completedBoardSummary.completedSeason.promotionRelegation;
+  const completedSummary = completedBoardSummary.completedSeason;
   console.log("- Promotion / relegation resolution sample");
   console.table([
     {
@@ -155,6 +161,15 @@ function runStep2BoardContextManualCheck() {
       relegatedClubIds: promotionOutcome.relegatedClubIds.join(", ")
     }
   ]);
+  console.log("- Completed season board artifact sample");
+  console.table(
+    completedSummary.finalStandings.map((row, index) => ({
+      clubId: row.clubId,
+      finalPosition: index + 1,
+      decision: completedBoardSummary.decisionSnapshotsByClubId[row.clubId].sackDecision.decision,
+      decisionReasons: completedBoardSummary.decisionSnapshotsByClubId[row.clubId].sackDecision.reasonSummary.join(" | ")
+    }))
+  );
 
   const validReasonCoverage = rows.every((entry) => entry.reasons.length > 0);
   const validSackRiskRange = rows.every((entry) => entry.sackRisk >= 0 && entry.sackRisk <= 1);
@@ -165,6 +180,8 @@ function runStep2BoardContextManualCheck() {
   const validSackDecision =
     sackDecision.reasonSummary.length > 0 &&
     seasonState.standings.every((row) => decisionSnapshots[row.clubId].sackDecision.reasonSummary.length > 0);
+  const validCompletedBoardSnapshots =
+    Object.keys(completedBoardSummary.decisionSnapshotsByClubId).length === seasonState.standings.length;
   const validPromotionResolution =
     promotionOutcome.promotedClubIds.length === 1 &&
     promotionOutcome.relegatedClubIds.length === 1 &&
@@ -179,6 +196,7 @@ function runStep2BoardContextManualCheck() {
     !validStreakSummary ||
     !validSnapshotCoverage ||
     !validSackDecision ||
+    !validCompletedBoardSnapshots ||
     !validPromotionResolution ||
     !validCompletedSummary
   ) {

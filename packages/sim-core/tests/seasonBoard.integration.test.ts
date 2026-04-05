@@ -10,6 +10,7 @@ import {
   evaluateSeasonBoardContext,
   getFixturesForMatchday,
   isSeasonComplete,
+  summarizeCompletedSeasonBoardOutcomes,
   summarizeSeasonSackRiskPressureTimeline
 } from "../src/index.js";
 
@@ -88,6 +89,81 @@ function runSackRiskTimelineSimulation(): Array<{ risk: number; trend: string; l
   }
 
   return timeline;
+}
+
+function runCompletedSeasonBoardSummarySimulation() {
+  let state = createSeasonState([
+    { id: "club-a", name: "Club A", strength: 74 },
+    { id: "club-b", name: "Club B", strength: 71 },
+    { id: "club-c", name: "Club C", strength: 69 },
+    { id: "club-d", name: "Club D", strength: 67 }
+  ]);
+
+  const staticContext = {
+    "club-a": {
+      preseasonObjectivePosition: 3,
+      clubStature: 0.85,
+      financialPressure: 0.55,
+      styleAlignment: 0.58,
+      derbyResult: "none" as const
+    },
+    "club-b": {
+      preseasonObjectivePosition: 6,
+      clubStature: 0.45,
+      financialPressure: 0.35,
+      styleAlignment: 0.63,
+      derbyResult: "win" as const
+    },
+    "club-c": {
+      preseasonObjectivePosition: 8,
+      clubStature: 0.3,
+      financialPressure: 0.22,
+      styleAlignment: 0.54,
+      derbyResult: "draw" as const
+    },
+    "club-d": {
+      preseasonObjectivePosition: 10,
+      clubStature: 0.2,
+      financialPressure: 0.2,
+      styleAlignment: 0.49,
+      derbyResult: "loss" as const
+    }
+  };
+
+  const timelinesByClubId: Record<string, number[]> = {
+    "club-a": [],
+    "club-b": [],
+    "club-c": [],
+    "club-d": []
+  };
+
+  let rolling = 17;
+  while (!isSeasonComplete(state)) {
+    const fixtures = getFixturesForMatchday(state, state.currentMatchday);
+    const resultsByFixtureId = Object.fromEntries(
+      fixtures.map((fixture) => {
+        rolling += 1;
+        return [
+          fixture.id,
+          {
+            homeGoals: rolling % 4,
+            awayGoals: (rolling + 2) % 4
+          }
+        ];
+      })
+    );
+
+    state = advanceSeasonState(state, resultsByFixtureId);
+    const contextByClubId = deriveSeasonBoardContextFromSeasonState(state, staticContext);
+    const boardByClubId = evaluateSeasonBoardContext(state, contextByClubId);
+
+    for (const clubId of Object.keys(timelinesByClubId)) {
+      timelinesByClubId[clubId].push(boardByClubId[clubId].sackRisk);
+    }
+  }
+
+  const finalContextByClubId = deriveSeasonBoardContextFromSeasonState(state, staticContext);
+  return summarizeCompletedSeasonBoardOutcomes(state, finalContextByClubId, timelinesByClubId, 1, 1);
 }
 
 describe("season board integration", () => {
@@ -524,5 +600,64 @@ describe("season board integration", () => {
         }
       )
     ).toThrow("Missing sack-risk timeline for club club-b.");
+  });
+
+  it("summarizes completed season board outcomes deterministically", () => {
+    const firstRun = runCompletedSeasonBoardSummarySimulation();
+    const secondRun = runCompletedSeasonBoardSummarySimulation();
+
+    const promotedSet = new Set(firstRun.completedSeason.promotionRelegation.promotedClubIds);
+    const overlap = firstRun.completedSeason.promotionRelegation.relegatedClubIds.some((clubId) =>
+      promotedSet.has(clubId)
+    );
+
+    expect(firstRun).toEqual(secondRun);
+    expect(firstRun.completedSeason.finalStandings).toHaveLength(4);
+    expect(firstRun.completedSeason.promotionRelegation.promotedClubIds).toHaveLength(1);
+    expect(firstRun.completedSeason.promotionRelegation.relegatedClubIds).toHaveLength(1);
+    expect(overlap).toBe(false);
+    expect(Object.keys(firstRun.decisionSnapshotsByClubId)).toHaveLength(4);
+    expect(
+      Object.values(firstRun.decisionSnapshotsByClubId).every(
+        (snapshot) => snapshot.boardEvaluation.reasonSummary.length > 0 && snapshot.sackDecision.reasonSummary.length > 0
+      )
+    ).toBe(true);
+  });
+
+  it("rejects completed season board summary generation before season completion", () => {
+    const state = createSeasonState([
+      { id: "club-a", name: "Club A", strength: 74 },
+      { id: "club-b", name: "Club B", strength: 71 }
+    ]);
+
+    expect(() =>
+      summarizeCompletedSeasonBoardOutcomes(
+        state,
+        {
+          "club-a": {
+            preseasonObjectivePosition: 2,
+            clubStature: 0.75,
+            financialPressure: 0.4,
+            recentPointsPerMatch: 1.25,
+            styleAlignment: 0.56,
+            derbyResult: "none"
+          },
+          "club-b": {
+            preseasonObjectivePosition: 4,
+            clubStature: 0.45,
+            financialPressure: 0.3,
+            recentPointsPerMatch: 1.25,
+            styleAlignment: 0.59,
+            derbyResult: "none"
+          }
+        },
+        {
+          "club-a": [0.45],
+          "club-b": [0.42]
+        },
+        1,
+        1
+      )
+    ).toThrow("Cannot summarize season before completion.");
   });
 });

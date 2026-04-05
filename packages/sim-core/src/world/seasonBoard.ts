@@ -2,7 +2,8 @@ import { deriveSackRiskPressureState, evaluateBoardExpectationContext } from "..
 import type { BoardExpectationEvaluation } from "../club/board.js";
 import type { SackRiskPressureLevel, SackRiskTrend } from "../club/board.js";
 
-import type { SeasonState } from "./season.js";
+import { summarizeCompletedSeason } from "./season.js";
+import type { CompletedSeasonSummary, SeasonState } from "./season.js";
 
 export interface SeasonBoardContext {
   preseasonObjectivePosition: number;
@@ -42,6 +43,11 @@ export interface SeasonBoardDecisionSnapshot {
   boardEvaluation: BoardExpectationEvaluation;
   pressureSummary: SeasonSackRiskPressureSummary;
   sackDecision: SeasonSackDecisionResult;
+}
+
+export interface CompletedSeasonBoardSummary {
+  completedSeason: CompletedSeasonSummary;
+  decisionSnapshotsByClubId: Record<string, SeasonBoardDecisionSnapshot>;
 }
 
 export function summarizeSeasonSackRiskPressureTimeline(
@@ -236,4 +242,27 @@ export function evaluateSeasonBoardDecisions(
   }
 
   return snapshots;
+}
+
+export function summarizeCompletedSeasonBoardOutcomes(
+  state: SeasonState,
+  contextByClubId: Record<string, SeasonBoardContext>,
+  sackRiskTimelineByClubId: Record<string, number[]>,
+  promotionSpots: number,
+  relegationSpots: number
+): CompletedSeasonBoardSummary {
+  const completedSeason = summarizeCompletedSeason(state, promotionSpots, relegationSpots);
+  const seasonStateWithFinalStandings: SeasonState = {
+    ...state,
+    standings: completedSeason.finalStandings
+  };
+
+  return {
+    completedSeason,
+    decisionSnapshotsByClubId: evaluateSeasonBoardDecisions(
+      seasonStateWithFinalStandings,
+      contextByClubId,
+      sackRiskTimelineByClubId
+    )
+  };
 }
