@@ -271,6 +271,62 @@ describe("transfer negotiation calibration samples", () => {
     expect(firstArtifact.conciseSummary).toContain(firstArtifact.primaryNonFeeDrivers.join(", "));
   });
 
+  it("keeps repeated-run explainability summaries stable across transfer artifacts", () => {
+    const repeatedSummarySnapshots = Array.from({ length: 10 }, () => {
+      const promiseTrust = summarizePromiseTrustImpactByReputationBand(
+        calibrationTarget,
+        {
+          clubWageBudget: calibrationBaseContext.clubWageBudget,
+          clubStature: calibrationBaseContext.clubStature,
+          boardWageDiscipline: calibrationBaseContext.boardWageDiscipline
+        },
+        calibrationReputationBands,
+        calibrationPromiseVariants
+      );
+
+      const outcomeSummary = summarizeTransferOutcomesByReputationBand(
+        calibrationTarget,
+        {
+          clubWageBudget: calibrationBaseContext.clubWageBudget,
+          clubStature: calibrationBaseContext.clubStature,
+          boardWageDiscipline: calibrationBaseContext.boardWageDiscipline
+        },
+        calibrationReputationBands,
+        calibrationOutcomeVariants
+      );
+
+      const outcomeDeltaSummary = buildReputationBandOutcomeDeltaSummary(
+        calibrationTarget,
+        {
+          clubWageBudget: calibrationBaseContext.clubWageBudget,
+          clubStature: calibrationBaseContext.clubStature,
+          boardWageDiscipline: calibrationBaseContext.boardWageDiscipline
+        },
+        82,
+        28,
+        calibrationOutcomeVariants
+      );
+
+      const equalFee = buildEqualFeeNegotiationExplainabilityArtifact(
+        calibrationTarget,
+        calibrationEqualFeeContexts.first,
+        calibrationEqualFeeContexts.second
+      );
+
+      return {
+        promiseTrustSummary: promiseTrust.conciseSummary.join("|"),
+        outcomeSummary: outcomeSummary.conciseSummary.join("|"),
+        outcomeDeltaSummary: outcomeDeltaSummary.conciseSummary,
+        equalFeeSummary: equalFee.conciseSummary
+      };
+    });
+
+    expect(new Set(repeatedSummarySnapshots.map((snapshot) => snapshot.promiseTrustSummary)).size).toBe(1);
+    expect(new Set(repeatedSummarySnapshots.map((snapshot) => snapshot.outcomeSummary)).size).toBe(1);
+    expect(new Set(repeatedSummarySnapshots.map((snapshot) => snapshot.outcomeDeltaSummary)).size).toBe(1);
+    expect(new Set(repeatedSummarySnapshots.map((snapshot) => snapshot.equalFeeSummary)).size).toBe(1);
+  });
+
   it("keeps reputation-band delta artifacts deterministic across repeated fixed fixture evaluations", () => {
     const repeatedRuns = Array.from({ length: 12 }, () =>
       buildReputationBandOutcomeDeltaSummary(
