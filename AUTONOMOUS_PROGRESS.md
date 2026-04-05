@@ -21,11 +21,11 @@
 - Passed: `npm run -w @touchline/sim-core test -- -u tests/negotiationCalibration.test.ts tests/negotiation.test.ts tests/transferEngine.test.ts`, `npm test`, `npm run typecheck`, `npm run lint`, `npm run build` after reputation-band outcome delta summary artifact + deterministic calibration output coverage (2026-04-05)
 
 ## Last commit hash
-- PENDING_COMMIT
+- 1728bae
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`
 - Inspect git status and recent commits
 - Continue Step 3 with transfer/reputation bounded tasks only; do not jump to later steps.
 - Next bounded task: add fixed-fixture stability proof for reputation-band delta artifacts under constant wage constraints.
-- Last successful pushed commit before this pending change: 401fc22.
+- Last successful pushed commit: 1728bae.
