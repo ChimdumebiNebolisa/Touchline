@@ -113,6 +113,58 @@ describe("transfer negotiation comparison", () => {
     expect(firstRun[1].attempts).toBe(variants.length);
   });
 
+  it("shows broken promises reduce trust and acceptance under comparable contexts", () => {
+    const intactTrustVariants = [
+      { pathwayClarity: 0.78, squadCompetition: 0.52, recentPromiseBreak: false },
+      { pathwayClarity: 0.7, squadCompetition: 0.56, recentPromiseBreak: false },
+      { pathwayClarity: 0.62, squadCompetition: 0.58, recentPromiseBreak: false },
+      { pathwayClarity: 0.58, squadCompetition: 0.61, recentPromiseBreak: false }
+    ];
+    const brokenTrustVariants = intactTrustVariants.map((variant) => ({
+      ...variant,
+      recentPromiseBreak: true
+    }));
+
+    const intactTrustRun = summarizeNegotiationAcceptanceByReputationBand(
+      target,
+      {
+        clubWageBudget: baseContext.clubWageBudget,
+        clubStature: baseContext.clubStature,
+        boardWageDiscipline: baseContext.boardWageDiscipline
+      },
+      [baseContext.managerReputation],
+      intactTrustVariants
+    );
+    const brokenTrustRun = summarizeNegotiationAcceptanceByReputationBand(
+      target,
+      {
+        clubWageBudget: baseContext.clubWageBudget,
+        clubStature: baseContext.clubStature,
+        boardWageDiscipline: baseContext.boardWageDiscipline
+      },
+      [baseContext.managerReputation],
+      brokenTrustVariants
+    );
+
+    expect(intactTrustRun[0].acceptanceRate).toBeGreaterThan(brokenTrustRun[0].acceptanceRate);
+    expect(intactTrustRun[0].acceptedCount).toBeGreaterThan(brokenTrustRun[0].acceptedCount);
+
+    const promiseComparison = compareTransferNegotiationContexts(
+      target,
+      {
+        ...baseContext,
+        recentPromiseBreak: false
+      },
+      {
+        ...baseContext,
+        recentPromiseBreak: true
+      }
+    );
+
+    expect(promiseComparison.changedContextFactors).toEqual(["recentPromiseBreak"]);
+    expect(promiseComparison.firstDecision.score).toBeGreaterThan(promiseComparison.secondDecision.score);
+  });
+
   it("builds deterministic equal-fee explainability artifacts with non-fee drivers", () => {
     const equalFeeTarget: TransferTargetProfile = {
       ...target,
