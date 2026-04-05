@@ -32,6 +32,12 @@ export type {
   PostMatchFalloutResult,
   PostMatchPerceptionContext
 } from "./club/types.js";
+export type {
+  TransferDecision,
+  TransferEvaluationContext,
+  TransferFollowUpEvent,
+  TransferTargetProfile
+} from "./transfers/transferEngine.js";
 export {
   applyMatchPreparationCommand
 } from "./match/commands.js";
@@ -39,6 +45,7 @@ export { computeBoardConfidenceDelta } from "./club/board.js";
 export { computeTeamMoraleDelta } from "./club/morale.js";
 export { computeManagerReputationDelta } from "./club/reputation.js";
 export { applyPostMatchFallout } from "./club/postMatchFallout.js";
+export { buildTransferFollowUpEvent, evaluateTransferDecision } from "./transfers/transferEngine.js";
 
 export { parseCountryPackJson } from "./content/countryPackLoader.js";
 export { runInstantMatch, runLiveMatch } from "./match/modes.js";
