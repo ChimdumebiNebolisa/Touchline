@@ -183,4 +183,74 @@ describe("transfer negotiation calibration samples", () => {
     expect(baseline.sportingDirectorBlockDelta).toBeGreaterThan(0);
     expect(baseline.playerBlockDelta).toBeLessThan(0);
   });
+
+  it("keeps reputation-band transfer outcome artifacts invariant under fixed fixture reordering", () => {
+    const forwardSummary = summarizeTransferOutcomesByReputationBand(
+      calibrationTarget,
+      {
+        clubWageBudget: calibrationBaseContext.clubWageBudget,
+        clubStature: calibrationBaseContext.clubStature,
+        boardWageDiscipline: calibrationBaseContext.boardWageDiscipline
+      },
+      calibrationReputationBands,
+      calibrationOutcomeVariants
+    );
+    const reversedSummary = summarizeTransferOutcomesByReputationBand(
+      calibrationTarget,
+      {
+        clubWageBudget: calibrationBaseContext.clubWageBudget,
+        clubStature: calibrationBaseContext.clubStature,
+        boardWageDiscipline: calibrationBaseContext.boardWageDiscipline
+      },
+      calibrationReputationBands,
+      [...calibrationOutcomeVariants].reverse()
+    );
+
+    const forwardDelta = buildReputationBandOutcomeDeltaSummary(
+      calibrationTarget,
+      {
+        clubWageBudget: calibrationBaseContext.clubWageBudget,
+        clubStature: calibrationBaseContext.clubStature,
+        boardWageDiscipline: calibrationBaseContext.boardWageDiscipline
+      },
+      82,
+      28,
+      calibrationOutcomeVariants
+    );
+    const reversedDelta = buildReputationBandOutcomeDeltaSummary(
+      calibrationTarget,
+      {
+        clubWageBudget: calibrationBaseContext.clubWageBudget,
+        clubStature: calibrationBaseContext.clubStature,
+        boardWageDiscipline: calibrationBaseContext.boardWageDiscipline
+      },
+      82,
+      28,
+      [...calibrationOutcomeVariants].reverse()
+    );
+
+    expect(reversedSummary.bands).toHaveLength(forwardSummary.bands.length);
+    for (const [index, forwardBand] of forwardSummary.bands.entries()) {
+      const reversedBand = reversedSummary.bands[index];
+      expect(reversedBand.managerReputation).toBe(forwardBand.managerReputation);
+      expect(reversedBand.attempts).toBe(forwardBand.attempts);
+      expect(reversedBand.acceptedCount).toBe(forwardBand.acceptedCount);
+      expect(reversedBand.acceptanceRate).toBeCloseTo(forwardBand.acceptanceRate, 12);
+      expect(reversedBand.averageScore).toBeCloseTo(forwardBand.averageScore, 12);
+      expect(reversedBand.boardBlockCount).toBe(forwardBand.boardBlockCount);
+      expect(reversedBand.sportingDirectorBlockCount).toBe(forwardBand.sportingDirectorBlockCount);
+      expect(reversedBand.playerBlockCount).toBe(forwardBand.playerBlockCount);
+    }
+
+    expect(reversedSummary.conciseSummary).toEqual(forwardSummary.conciseSummary);
+    expect(reversedDelta.baselineReputation).toBe(forwardDelta.baselineReputation);
+    expect(reversedDelta.comparisonReputation).toBe(forwardDelta.comparisonReputation);
+    expect(reversedDelta.acceptedCountDelta).toBe(forwardDelta.acceptedCountDelta);
+    expect(reversedDelta.acceptanceRateDelta).toBeCloseTo(forwardDelta.acceptanceRateDelta, 12);
+    expect(reversedDelta.averageScoreDelta).toBeCloseTo(forwardDelta.averageScoreDelta, 12);
+    expect(reversedDelta.boardBlockDelta).toBe(forwardDelta.boardBlockDelta);
+    expect(reversedDelta.sportingDirectorBlockDelta).toBe(forwardDelta.sportingDirectorBlockDelta);
+    expect(reversedDelta.playerBlockDelta).toBe(forwardDelta.playerBlockDelta);
+    expect(reversedDelta.conciseSummary).toBe(forwardDelta.conciseSummary);
+  });
 });
