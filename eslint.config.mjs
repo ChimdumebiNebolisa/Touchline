@@ -6,11 +6,16 @@ export default [
     ignores: ["**/node_modules/**", "**/dist/**", "**/coverage/**"]
   },
   {
-    files: ["**/*.ts"],
+    files: ["**/*.ts", "**/*.tsx"],
     languageOptions: {
       parser: tsParser,
       ecmaVersion: "latest",
-      sourceType: "module"
+      sourceType: "module",
+      parserOptions: {
+        ecmaFeatures: {
+          jsx: true
+        }
+      }
     },
     plugins: {
       "@typescript-eslint": tsPlugin
