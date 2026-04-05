@@ -3,7 +3,8 @@ import { describe, expect, it } from "vitest";
 import {
   buildEqualFeeNegotiationExplainabilityArtifact,
   buildTransferNegotiationLogSamples,
-  summarizePromiseTrustImpactByReputationBand
+  summarizePromiseTrustImpactByReputationBand,
+  summarizeTransferOutcomesByReputationBand
 } from "../src/index.js";
 import {
   calibrationBaseContext,
@@ -34,6 +35,19 @@ describe("transfer negotiation calibration samples", () => {
     );
 
     const negotiationLog = buildTransferNegotiationLogSamples(calibrationTarget, calibrationLogContexts);
+    const outcomeSummary = summarizeTransferOutcomesByReputationBand(
+      calibrationTarget,
+      {
+        clubWageBudget: calibrationBaseContext.clubWageBudget,
+        clubStature: calibrationBaseContext.clubStature,
+        boardWageDiscipline: calibrationBaseContext.boardWageDiscipline
+      },
+      calibrationReputationBands,
+      calibrationPromiseVariants.map((variant) => ({
+        ...variant,
+        recentPromiseBreak: false
+      }))
+    );
 
     const normalizedSample = {
       promiseTrustBands: promiseTrust.bands.map((band) => ({
@@ -44,6 +58,7 @@ describe("transfer negotiation calibration samples", () => {
         acceptanceRateDelta: Number(band.acceptanceRateDelta.toFixed(2))
       })),
       promiseTrustSummary: promiseTrust.conciseSummary,
+      reputationOutcomeSummary: outcomeSummary.conciseSummary,
       equalFeeSummary: equalFee.conciseSummary,
       equalFeePrimaryDrivers: equalFee.primaryNonFeeDrivers,
       negotiationLog: negotiationLog.map((entry) => ({
@@ -108,6 +123,11 @@ describe("transfer negotiation calibration samples", () => {
           "Manager reputation 82: intact trust 4/4 (1.00) vs broken trust 0/4 (0.00), delta 1.00.",
           "Manager reputation 62: intact trust 4/4 (1.00) vs broken trust 0/4 (0.00), delta 1.00.",
           "Manager reputation 28: intact trust 0/4 (0.00) vs broken trust 0/4 (0.00), delta 0.00.",
+        ],
+        "reputationOutcomeSummary": [
+          "Manager reputation 82: accepted 4/4 (1.00), average score 3.18, board blocks 0, sporting-director blocks 0, player blocks 0.",
+          "Manager reputation 62: accepted 4/4 (1.00), average score 2.16, board blocks 0, sporting-director blocks 0, player blocks 0.",
+          "Manager reputation 28: accepted 0/4 (0.00), average score 0.43, board blocks 0, sporting-director blocks 0, player blocks 4.",
         ],
       }
     `);

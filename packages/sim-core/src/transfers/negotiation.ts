@@ -43,6 +43,22 @@ export interface PromiseTrustImpactSummary {
   conciseSummary: string[];
 }
 
+export interface ReputationBandTransferOutcomeSummary {
+  managerReputation: number;
+  attempts: number;
+  acceptedCount: number;
+  acceptanceRate: number;
+  averageScore: number;
+  boardBlockCount: number;
+  sportingDirectorBlockCount: number;
+  playerBlockCount: number;
+}
+
+export interface ReputationBandTransferOutcomeCalibrationSummary {
+  bands: ReputationBandTransferOutcomeSummary[];
+  conciseSummary: string[];
+}
+
 export interface TransferNegotiationLogEntry {
   attemptId: string;
   managerReputation: number;
@@ -275,6 +291,72 @@ export function summarizePromiseTrustImpactByReputationBand(
   const conciseSummary = bands.map(
     (band) =>
       `Manager reputation ${band.managerReputation}: intact trust ${band.intactTrustAcceptedCount}/${band.attempts} (${band.intactTrustAcceptanceRate.toFixed(2)}) vs broken trust ${band.brokenTrustAcceptedCount}/${band.attempts} (${band.brokenTrustAcceptanceRate.toFixed(2)}), delta ${band.acceptanceRateDelta.toFixed(2)}.`
+  );
+
+  return {
+    bands,
+    conciseSummary
+  };
+}
+
+export function summarizeTransferOutcomesByReputationBand(
+  target: TransferTargetProfile,
+  baseContext: Omit<TransferEvaluationContext, "managerReputation" | "pathwayClarity" | "squadCompetition" | "recentPromiseBreak">,
+  managerReputationBands: number[],
+  variants: NegotiationScenarioVariant[]
+): ReputationBandTransferOutcomeCalibrationSummary {
+  if (!variants.length) {
+    throw new Error("At least one transfer outcome scenario variant is required.");
+  }
+
+  const bands = managerReputationBands.map((managerReputation) => {
+    let acceptedCount = 0;
+    let totalScore = 0;
+    let boardBlockCount = 0;
+    let sportingDirectorBlockCount = 0;
+    let playerBlockCount = 0;
+
+    for (const variant of variants) {
+      const decision = evaluateTransferDecision(target, {
+        ...baseContext,
+        managerReputation,
+        pathwayClarity: variant.pathwayClarity,
+        squadCompetition: variant.squadCompetition,
+        recentPromiseBreak: variant.recentPromiseBreak
+      });
+
+      totalScore += decision.score;
+
+      if (decision.accepted) {
+        acceptedCount += 1;
+      }
+
+      if (decision.blockingActor === "board") {
+        boardBlockCount += 1;
+      }
+      if (decision.blockingActor === "sporting-director") {
+        sportingDirectorBlockCount += 1;
+      }
+      if (decision.blockingActor === "player") {
+        playerBlockCount += 1;
+      }
+    }
+
+    return {
+      managerReputation,
+      attempts: variants.length,
+      acceptedCount,
+      acceptanceRate: acceptedCount / variants.length,
+      averageScore: totalScore / variants.length,
+      boardBlockCount,
+      sportingDirectorBlockCount,
+      playerBlockCount
+    };
+  });
+
+  const conciseSummary = bands.map(
+    (band) =>
+      `Manager reputation ${band.managerReputation}: accepted ${band.acceptedCount}/${band.attempts} (${band.acceptanceRate.toFixed(2)}), average score ${band.averageScore.toFixed(2)}, board blocks ${band.boardBlockCount}, sporting-director blocks ${band.sportingDirectorBlockCount}, player blocks ${band.playerBlockCount}.`
   );
 
   return {

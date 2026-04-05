@@ -51,6 +51,8 @@ export type {
   NegotiationScenarioVariant,
   PromiseTrustImpactBandSummary,
   PromiseTrustImpactSummary,
+  ReputationBandTransferOutcomeCalibrationSummary,
+  ReputationBandTransferOutcomeSummary,
   ReputationBandNegotiationOutcome,
   TransferNegotiationExplainabilityArtifact,
   TransferNegotiationLogEntry,
@@ -61,6 +63,7 @@ export {
   buildTransferNegotiationLogSamples,
   compareTransferNegotiationContexts,
   summarizePromiseTrustImpactByReputationBand,
+  summarizeTransferOutcomesByReputationBand,
   summarizeNegotiationAcceptanceByReputationBand
 } from "./transfers/negotiation.js";
 export type {

@@ -5,6 +5,7 @@ import {
   buildTransferNegotiationLogSamples,
   compareTransferNegotiationContexts,
   summarizePromiseTrustImpactByReputationBand,
+  summarizeTransferOutcomesByReputationBand,
   summarizeNegotiationAcceptanceByReputationBand
 } from "../src/index.js";
 import type { TransferEvaluationContext, TransferTargetProfile } from "../src/index.js";
@@ -205,6 +206,50 @@ describe("transfer negotiation comparison", () => {
     expect(firstRun.conciseSummary[0]).toContain("intact trust");
   });
 
+  it("summarizes deterministic transfer outcomes and blocking actors by reputation band", () => {
+    const variants = [
+      { pathwayClarity: 0.82, squadCompetition: 0.5, recentPromiseBreak: false },
+      { pathwayClarity: 0.7, squadCompetition: 0.56, recentPromiseBreak: false },
+      { pathwayClarity: 0.58, squadCompetition: 0.61, recentPromiseBreak: true },
+      { pathwayClarity: 0.35, squadCompetition: 0.8, recentPromiseBreak: true }
+    ];
+
+    const firstRun = summarizeTransferOutcomesByReputationBand(
+      target,
+      {
+        clubWageBudget: baseContext.clubWageBudget,
+        clubStature: baseContext.clubStature,
+        boardWageDiscipline: baseContext.boardWageDiscipline
+      },
+      [82, 28],
+      variants
+    );
+    const secondRun = summarizeTransferOutcomesByReputationBand(
+      target,
+      {
+        clubWageBudget: baseContext.clubWageBudget,
+        clubStature: baseContext.clubStature,
+        boardWageDiscipline: baseContext.boardWageDiscipline
+      },
+      [82, 28],
+      variants
+    );
+
+    expect(firstRun).toEqual(secondRun);
+    expect(firstRun.bands).toHaveLength(2);
+    expect(firstRun.bands[0].acceptanceRate).toBeGreaterThan(firstRun.bands[1].acceptanceRate);
+    expect(firstRun.bands[0].averageScore).toBeGreaterThan(firstRun.bands[1].averageScore);
+    expect(firstRun.bands[1].playerBlockCount).toBeGreaterThanOrEqual(firstRun.bands[0].playerBlockCount);
+
+    for (const band of firstRun.bands) {
+      expect(band.attempts).toBe(
+        band.acceptedCount + band.boardBlockCount + band.sportingDirectorBlockCount + band.playerBlockCount
+      );
+    }
+
+    expect(firstRun.conciseSummary[0]).toContain("sporting-director blocks");
+  });
+
   it("builds deterministic equal-fee explainability artifacts with non-fee drivers", () => {
     const equalFeeTarget: TransferTargetProfile = {
       ...target,
@@ -276,6 +321,21 @@ describe("transfer negotiation comparison", () => {
         []
       )
     ).toThrow("At least one promise-trust scenario variant is required.");
+  });
+
+  it("rejects transfer outcome summary with empty scenario variants", () => {
+    expect(() =>
+      summarizeTransferOutcomesByReputationBand(
+        target,
+        {
+          clubWageBudget: baseContext.clubWageBudget,
+          clubStature: baseContext.clubStature,
+          boardWageDiscipline: baseContext.boardWageDiscipline
+        },
+        [82, 28],
+        []
+      )
+    ).toThrow("At least one transfer outcome scenario variant is required.");
   });
 
   it("builds deterministic and explainable negotiation log samples", () => {
