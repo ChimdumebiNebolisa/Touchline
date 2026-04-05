@@ -48,6 +48,7 @@ export interface SeasonBoardDecisionSnapshot {
 export interface CompletedSeasonBoardSummary {
   completedSeason: CompletedSeasonSummary;
   decisionSnapshotsByClubId: Record<string, SeasonBoardDecisionSnapshot>;
+  resolutionStatus: SeasonBoardResolutionStatus;
 }
 
 export interface SeasonSackOutcome {
@@ -61,6 +62,11 @@ export interface SeasonBoardResolutionStatus {
   retainedClubIds: string[];
   reviewClubIds: string[];
   sackedClubIds: string[];
+}
+
+interface SeasonBoardDecisionSnapshotSource {
+  completedSeason: CompletedSeasonSummary;
+  decisionSnapshotsByClubId: Record<string, SeasonBoardDecisionSnapshot>;
 }
 
 export function summarizeSeasonSackRiskPressureTimeline(
@@ -270,13 +276,20 @@ export function summarizeCompletedSeasonBoardOutcomes(
     standings: completedSeason.finalStandings
   };
 
-  return {
+  const decisionSnapshotsByClubId = evaluateSeasonBoardDecisions(
+    seasonStateWithFinalStandings,
+    contextByClubId,
+    sackRiskTimelineByClubId
+  );
+
+  const summaryBase = {
     completedSeason,
-    decisionSnapshotsByClubId: evaluateSeasonBoardDecisions(
-      seasonStateWithFinalStandings,
-      contextByClubId,
-      sackRiskTimelineByClubId
-    )
+    decisionSnapshotsByClubId
+  };
+
+  return {
+    ...summaryBase,
+    resolutionStatus: summarizeSeasonBoardResolutionStatus(summaryBase)
   };
 }
 
@@ -306,7 +319,7 @@ export function extractSeasonSackOutcomes(summary: CompletedSeasonBoardSummary):
 }
 
 export function summarizeSeasonBoardResolutionStatus(
-  summary: CompletedSeasonBoardSummary
+  summary: SeasonBoardDecisionSnapshotSource
 ): SeasonBoardResolutionStatus {
   const retainedClubIds: string[] = [];
   const reviewClubIds: string[] = [];

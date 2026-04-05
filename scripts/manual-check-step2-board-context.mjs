@@ -8,7 +8,6 @@ import {
   evaluateSeasonBoardContext,
   getFixturesForMatchday,
   isSeasonComplete,
-  summarizeSeasonBoardResolutionStatus,
   summarizeCompletedSeasonBoardOutcomes
 } from "../packages/sim-core/dist/src/index.js";
 
@@ -226,7 +225,7 @@ function runStep2BoardContextManualCheck() {
   );
 
   const sackOutcomes = extractSeasonSackOutcomes(completedBoardSummary);
-  const resolutionStatus = summarizeSeasonBoardResolutionStatus(completedBoardSummary);
+  const resolutionStatus = completedBoardSummary.resolutionStatus;
   console.log("- Extracted season sack outcomes sample");
   console.table(
     sackOutcomes.length

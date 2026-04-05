@@ -683,6 +683,9 @@ describe("season board integration", () => {
     expect(firstRun.completedSeason.promotionRelegation.relegatedClubIds).toHaveLength(1);
     expect(overlap).toBe(false);
     expect(Object.keys(firstRun.decisionSnapshotsByClubId)).toHaveLength(4);
+    expect(firstRun.resolutionStatus.retainedClubIds.length).toBeGreaterThanOrEqual(0);
+    expect(firstRun.resolutionStatus.reviewClubIds.length).toBeGreaterThanOrEqual(0);
+    expect(firstRun.resolutionStatus.sackedClubIds.length).toBeGreaterThanOrEqual(0);
     expect(
       Object.values(firstRun.decisionSnapshotsByClubId).every(
         (snapshot) => snapshot.boardEvaluation.reasonSummary.length > 0 && snapshot.sackDecision.reasonSummary.length > 0
@@ -889,6 +892,7 @@ describe("season board integration", () => {
     const firstStatus = summarizeSeasonBoardResolutionStatus(summary);
     const secondStatus = summarizeSeasonBoardResolutionStatus(summary);
 
+    expect(summary.resolutionStatus).toEqual(firstStatus);
     expect(firstStatus).toEqual(secondStatus);
     expect(firstStatus.sackedClubIds).toEqual(["club-a"]);
     expect(firstStatus.reviewClubIds).toEqual(["club-b"]);
