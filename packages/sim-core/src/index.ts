@@ -50,9 +50,11 @@ export { buildTransferDemandBreakdown, scoreTransferWageFit } from "./transfers/
 export type {
   NegotiationScenarioVariant,
   ReputationBandNegotiationOutcome,
+  TransferNegotiationLogEntry,
   TransferNegotiationComparison
 } from "./transfers/negotiation.js";
 export {
+  buildTransferNegotiationLogSamples,
   compareTransferNegotiationContexts,
   summarizeNegotiationAcceptanceByReputationBand
 } from "./transfers/negotiation.js";

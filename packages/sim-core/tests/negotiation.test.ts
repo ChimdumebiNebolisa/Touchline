@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  buildTransferNegotiationLogSamples,
   compareTransferNegotiationContexts,
   summarizeNegotiationAcceptanceByReputationBand
 } from "../src/index.js";
@@ -124,5 +125,33 @@ describe("transfer negotiation comparison", () => {
         []
       )
     ).toThrow("At least one negotiation scenario variant is required.");
+  });
+
+  it("builds deterministic and explainable negotiation log samples", () => {
+    const contexts: TransferEvaluationContext[] = [
+      {
+        ...baseContext,
+        managerReputation: 78,
+        pathwayClarity: 0.82,
+        squadCompetition: 0.5,
+        recentPromiseBreak: false
+      },
+      {
+        ...baseContext,
+        managerReputation: 32,
+        pathwayClarity: 0.35,
+        squadCompetition: 0.8,
+        recentPromiseBreak: true
+      }
+    ];
+
+    const firstRun = buildTransferNegotiationLogSamples(target, contexts);
+    const secondRun = buildTransferNegotiationLogSamples(target, contexts);
+
+    expect(firstRun).toEqual(secondRun);
+    expect(firstRun).toHaveLength(2);
+    expect(firstRun[0].attemptId).toBe("attempt-1");
+    expect(firstRun[1].attemptId).toBe("attempt-2");
+    expect(firstRun.every((entry) => entry.reasonSummary.length > 0)).toBe(true);
   });
 });

@@ -26,6 +26,15 @@ export interface ReputationBandNegotiationOutcome {
   acceptanceRate: number;
 }
 
+export interface TransferNegotiationLogEntry {
+  attemptId: string;
+  managerReputation: number;
+  accepted: boolean;
+  score: number;
+  blockingActor: TransferDecision["blockingActor"];
+  reasonSummary: string[];
+}
+
 function identifyChangedContextFactors(
   firstContext: TransferEvaluationContext,
   secondContext: TransferEvaluationContext
@@ -120,6 +129,23 @@ export function summarizeNegotiationAcceptanceByReputationBand(
       attempts: variants.length,
       acceptedCount,
       acceptanceRate: acceptedCount / variants.length
+    };
+  });
+}
+
+export function buildTransferNegotiationLogSamples(
+  target: TransferTargetProfile,
+  contexts: TransferEvaluationContext[]
+): TransferNegotiationLogEntry[] {
+  return contexts.map((context, index) => {
+    const decision = evaluateTransferDecision(target, context);
+    return {
+      attemptId: `attempt-${index + 1}`,
+      managerReputation: context.managerReputation,
+      accepted: decision.accepted,
+      score: decision.score,
+      blockingActor: decision.blockingActor,
+      reasonSummary: decision.reasonSummary
     };
   });
 }
