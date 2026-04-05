@@ -156,4 +156,35 @@ describe("transfer negotiation calibration samples", () => {
       }
     `);
   });
+
+  it("keeps reputation-band delta artifacts stable under fixed wage constraints", () => {
+    const firstRun = buildReputationBandOutcomeDeltaSummary(
+      calibrationTarget,
+      {
+        clubWageBudget: calibrationBaseContext.clubWageBudget,
+        clubStature: calibrationBaseContext.clubStature,
+        boardWageDiscipline: calibrationBaseContext.boardWageDiscipline
+      },
+      82,
+      28,
+      calibrationOutcomeVariants
+    );
+    const secondRun = buildReputationBandOutcomeDeltaSummary(
+      calibrationTarget,
+      {
+        clubWageBudget: calibrationBaseContext.clubWageBudget,
+        clubStature: calibrationBaseContext.clubStature,
+        boardWageDiscipline: calibrationBaseContext.boardWageDiscipline
+      },
+      82,
+      28,
+      calibrationOutcomeVariants
+    );
+
+    expect(firstRun).toEqual(secondRun);
+    expect(firstRun.boardBlockDelta).toBe(0);
+    expect(firstRun.acceptedCountDelta).toBeGreaterThan(0);
+    expect(firstRun.sportingDirectorBlockDelta).toBeGreaterThan(0);
+    expect(firstRun.playerBlockDelta).toBeLessThan(0);
+  });
 });
