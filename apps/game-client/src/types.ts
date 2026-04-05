@@ -13,6 +13,7 @@ export interface SquadConfig {
   clubId: string;
   clubName: string;
   tactics: TacticalSetup;
+  lineupPlayerIds: string[];
 }
 
 export interface MatchConfig {

@@ -10,6 +10,7 @@ import type {
   ClubPerceptionState,
   CountryPack,
   MatchInput,
+  MatchPlayer,
   MatchPreparationState,
   MatchTeamInput,
   TacticalSetup,
@@ -94,6 +95,21 @@ function createPreparedTeam(team: MatchTeamInput): MatchTeamInput {
   return lineupResult.state.team;
 }
 
+function buildLineupFromIds(
+  allPlayers: MatchPlayer[],
+  lineupPlayerIds: string[]
+): { lineup: MatchPlayer[]; bench: MatchPlayer[] } {
+  const playerMap = new Map(allPlayers.map((player) => [player.id, player]));
+  const lineup = lineupPlayerIds.map((id) => playerMap.get(id)).filter((player): player is MatchPlayer => !!player);
+  const lineupIdSet = new Set(lineup.map((player) => player.id));
+  const bench = allPlayers.filter((player) => !lineupIdSet.has(player.id));
+
+  return {
+    lineup,
+    bench
+  };
+}
+
 export function App() {
   const [step, setStep] = useState<ViewStep>("squad");
   const [runningMatch, setRunningMatch] = useState(false);
@@ -127,7 +143,8 @@ export function App() {
     return {
       clubId: "",
       clubName: "",
-      tactics: { ...defaultTactics }
+      tactics: { ...defaultTactics },
+      lineupPlayerIds: []
     };
   });
 
@@ -144,10 +161,24 @@ export function App() {
       return {
         ...previous,
         clubId: playableClubs[0].id,
-        clubName: playableClubs[0].name
+        clubName: playableClubs[0].name,
+        lineupPlayerIds: createClubSquad(playableClubs[0].id).lineup.map((player) => player.id)
       };
     });
   }, [playableClubs]);
+
+  const selectedClubPlayers = useMemo(() => {
+    if (!squadConfig.clubId) {
+      return [];
+    }
+    const squad = createClubSquad(squadConfig.clubId);
+    return [...squad.lineup, ...squad.bench];
+  }, [squadConfig.clubId]);
+
+  const selectedLineup = useMemo(
+    () => buildLineupFromIds(selectedClubPlayers, squadConfig.lineupPlayerIds),
+    [selectedClubPlayers, squadConfig.lineupPlayerIds]
+  );
 
   const [matchConfig, setMatchConfig] = useState<MatchConfig>({
     mode: "instant",
@@ -196,7 +227,42 @@ export function App() {
     if (!selected) {
       return;
     }
-    setSquadConfig((prev) => ({ ...prev, clubId: selected.id, clubName: selected.name }));
+    const squad = createClubSquad(selected.id);
+    setSquadConfig((prev) => ({
+      ...prev,
+      clubId: selected.id,
+      clubName: selected.name,
+      lineupPlayerIds: squad.lineup.map((player) => player.id)
+    }));
+  };
+
+  const handleSwapLineupPlayer = (playerId: string): void => {
+    setSquadConfig((previous) => {
+      const currentLineupIds = [...previous.lineupPlayerIds];
+      const allPlayers = createClubSquad(previous.clubId);
+      const allPlayerIds = [...allPlayers.lineup, ...allPlayers.bench].map((player) => player.id);
+      const benchIds = allPlayerIds.filter((id) => !currentLineupIds.includes(id));
+
+      if (currentLineupIds.includes(playerId)) {
+        if (benchIds.length === 0) {
+          return previous;
+        }
+
+        const replaceIndex = currentLineupIds.indexOf(playerId);
+        currentLineupIds[replaceIndex] = benchIds[0];
+      } else {
+        if (currentLineupIds.length === 0) {
+          return previous;
+        }
+
+        currentLineupIds[currentLineupIds.length - 1] = playerId;
+      }
+
+      return {
+        ...previous,
+        lineupPlayerIds: currentLineupIds
+      };
+    });
   };
 
   const handleTacticChange = (key: keyof TacticalSetup, value: number): void => {
@@ -211,6 +277,10 @@ export function App() {
 
   const handleContinueToMatch = (): void => {
     setErrorMessage(null);
+    if (selectedLineup.lineup.length !== 11) {
+      setCommandMessage("Select exactly eleven starters before continuing.");
+      return;
+    }
     setCommandMessage("Lineup and tactic commands validated in sim-core.");
     setStep("match");
   };
@@ -220,17 +290,21 @@ export function App() {
     setErrorMessage(null);
 
     try {
-      const homeSquad = createClubSquad(squadConfig.clubId);
       const opponent = pickOpponent(countryPack, squadConfig.clubId);
       const awaySquad = createClubSquad(opponent.id);
+      const homeLineupState = selectedLineup;
+
+      if (homeLineupState.lineup.length !== 11) {
+        throw new Error("Lineup must contain exactly eleven players.");
+      }
 
       const homeTeam = createPreparedTeam(
         createTeamInput(
           squadConfig.clubId,
           squadConfig.clubName,
           squadConfig.tactics,
-          homeSquad.lineup,
-          homeSquad.bench
+          homeLineupState.lineup,
+          homeLineupState.bench
         )
       );
 
@@ -312,9 +386,12 @@ export function App() {
         <SquadScreen
           clubs={playableClubs}
           config={squadConfig}
+          lineupPlayers={selectedLineup.lineup.map((player) => ({ id: player.id, name: player.name }))}
+          benchPlayers={selectedLineup.bench.map((player) => ({ id: player.id, name: player.name }))}
           commandMessage={commandMessage}
           onClubChange={handleClubChange}
           onTacticChange={handleTacticChange}
+          onSwapLineupPlayer={handleSwapLineupPlayer}
           onContinue={handleContinueToMatch}
         />
       ) : null}
