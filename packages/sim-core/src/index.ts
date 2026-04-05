@@ -57,6 +57,7 @@ export type {
 } from "./world/season.js";
 export type {
   CompletedSeasonBoardSummary,
+  SeasonSackOutcome,
   SeasonBoardDecisionSnapshot,
   SeasonSackDecision,
   SeasonSackDecisionResult,
@@ -88,6 +89,7 @@ export {
 export {
   deriveSeasonSackDecisionFromPressureSummary,
   deriveSeasonBoardContextFromSeasonState,
+  extractSeasonSackOutcomes,
   evaluateSeasonBoardDecisions,
   evaluateSeasonBoardContext,
   summarizeCompletedSeasonBoardOutcomes,

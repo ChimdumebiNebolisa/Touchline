@@ -50,6 +50,13 @@ export interface CompletedSeasonBoardSummary {
   decisionSnapshotsByClubId: Record<string, SeasonBoardDecisionSnapshot>;
 }
 
+export interface SeasonSackOutcome {
+  clubId: string;
+  leaguePosition: number;
+  reasonSummary: string[];
+  sackRisk: number;
+}
+
 export function summarizeSeasonSackRiskPressureTimeline(
   sackRiskTimeline: number[]
 ): SeasonSackRiskPressureSummary {
@@ -265,4 +272,29 @@ export function summarizeCompletedSeasonBoardOutcomes(
       sackRiskTimelineByClubId
     )
   };
+}
+
+export function extractSeasonSackOutcomes(summary: CompletedSeasonBoardSummary): SeasonSackOutcome[] {
+  const outcomes: SeasonSackOutcome[] = [];
+
+  for (let index = 0; index < summary.completedSeason.finalStandings.length; index += 1) {
+    const row = summary.completedSeason.finalStandings[index];
+    const snapshot = summary.decisionSnapshotsByClubId[row.clubId];
+    if (!snapshot) {
+      throw new Error(`Missing board decision snapshot for club ${row.clubId}.`);
+    }
+
+    if (snapshot.sackDecision.decision !== "sack") {
+      continue;
+    }
+
+    outcomes.push({
+      clubId: row.clubId,
+      leaguePosition: index + 1,
+      reasonSummary: snapshot.sackDecision.reasonSummary,
+      sackRisk: snapshot.boardEvaluation.sackRisk
+    });
+  }
+
+  return outcomes;
 }

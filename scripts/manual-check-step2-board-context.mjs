@@ -3,6 +3,7 @@ import {
   createSeasonState,
   deriveSackRiskPressureState,
   deriveSeasonBoardContextFromSeasonState,
+  extractSeasonSackOutcomes,
   evaluateSeasonBoardDecisions,
   evaluateSeasonBoardContext,
   getFixturesForMatchday,
@@ -223,6 +224,21 @@ function runStep2BoardContextManualCheck() {
     }))
   );
 
+  const sackOutcomes = extractSeasonSackOutcomes(completedBoardSummary);
+  console.log("- Extracted season sack outcomes sample");
+  console.table(
+    sackOutcomes.length
+      ? sackOutcomes
+      : [
+          {
+            clubId: "none",
+            leaguePosition: "n/a",
+            sackRisk: 0,
+            reasonSummary: "No clubs crossed sack thresholds in this deterministic sample."
+          }
+        ]
+  );
+
   const validReasonCoverage = rows.every((entry) => entry.reasons.length > 0);
   const validSackRiskRange = rows.every((entry) => entry.sackRisk >= 0 && entry.sackRisk <= 1);
   const validTimelineRange = timelineRows.every((entry) => entry.sackRisk >= 0 && entry.sackRisk <= 1);
@@ -232,6 +248,13 @@ function runStep2BoardContextManualCheck() {
   const validSackDecision =
     sackDecision.reasonSummary.length > 0 &&
     seasonState.standings.every((row) => decisionSnapshots[row.clubId].sackDecision.reasonSummary.length > 0);
+  const expectedSackedClubIds = completedSummary.finalStandings
+    .filter((row) => completedBoardSummary.decisionSnapshotsByClubId[row.clubId].sackDecision.decision === "sack")
+    .map((row) => row.clubId);
+  const extractedSackedClubIds = sackOutcomes.map((outcome) => outcome.clubId);
+  const validSackExtraction =
+    expectedSackedClubIds.length === extractedSackedClubIds.length &&
+    expectedSackedClubIds.every((clubId) => extractedSackedClubIds.includes(clubId));
   const validMatchedPositionVariance =
     matchedPositionComparison.highPressureRisk > matchedPositionComparison.lowPressureRisk &&
     matchedPositionComparison.lowPressureDecision === "retain" &&
@@ -252,6 +275,7 @@ function runStep2BoardContextManualCheck() {
     !validStreakSummary ||
     !validSnapshotCoverage ||
     !validSackDecision ||
+    !validSackExtraction ||
     !validMatchedPositionVariance ||
     !validCompletedBoardSnapshots ||
     !validPromotionResolution ||

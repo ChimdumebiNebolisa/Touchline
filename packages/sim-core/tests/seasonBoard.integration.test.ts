@@ -5,6 +5,7 @@ import {
   createSeasonState,
   deriveSeasonSackDecisionFromPressureSummary,
   deriveSackRiskPressureState,
+  extractSeasonSackOutcomes,
   evaluateSeasonBoardDecisions,
   deriveSeasonBoardContextFromSeasonState,
   evaluateSeasonBoardContext,
@@ -164,6 +165,70 @@ function runCompletedSeasonBoardSummarySimulation() {
 
   const finalContextByClubId = deriveSeasonBoardContextFromSeasonState(state, staticContext);
   return summarizeCompletedSeasonBoardOutcomes(state, finalContextByClubId, timelinesByClubId, 1, 1);
+}
+
+function runCompletedSeasonStateWithContext() {
+  let state = createSeasonState([
+    { id: "club-a", name: "Club A", strength: 74 },
+    { id: "club-b", name: "Club B", strength: 71 },
+    { id: "club-c", name: "Club C", strength: 69 },
+    { id: "club-d", name: "Club D", strength: 67 }
+  ]);
+
+  const staticContext = {
+    "club-a": {
+      preseasonObjectivePosition: 3,
+      clubStature: 0.85,
+      financialPressure: 0.55,
+      styleAlignment: 0.58,
+      derbyResult: "none" as const
+    },
+    "club-b": {
+      preseasonObjectivePosition: 6,
+      clubStature: 0.45,
+      financialPressure: 0.35,
+      styleAlignment: 0.63,
+      derbyResult: "win" as const
+    },
+    "club-c": {
+      preseasonObjectivePosition: 8,
+      clubStature: 0.3,
+      financialPressure: 0.22,
+      styleAlignment: 0.54,
+      derbyResult: "draw" as const
+    },
+    "club-d": {
+      preseasonObjectivePosition: 10,
+      clubStature: 0.2,
+      financialPressure: 0.2,
+      styleAlignment: 0.49,
+      derbyResult: "loss" as const
+    }
+  };
+
+  let rolling = 17;
+  while (!isSeasonComplete(state)) {
+    const fixtures = getFixturesForMatchday(state, state.currentMatchday);
+    const resultsByFixtureId = Object.fromEntries(
+      fixtures.map((fixture) => {
+        rolling += 1;
+        return [
+          fixture.id,
+          {
+            homeGoals: rolling % 4,
+            awayGoals: (rolling + 2) % 4
+          }
+        ];
+      })
+    );
+
+    state = advanceSeasonState(state, resultsByFixtureId);
+  }
+
+  return {
+    state,
+    finalContextByClubId: deriveSeasonBoardContextFromSeasonState(state, staticContext)
+  };
 }
 
 describe("season board integration", () => {
@@ -751,5 +816,56 @@ describe("season board integration", () => {
     expect(highPressureEvaluations["club-b"].sackRisk).toBeGreaterThan(lowPressureEvaluations["club-b"].sackRisk);
     expect(lowPressureSnapshots["club-b"].sackDecision.decision).toBe("retain");
     expect(highPressureSnapshots["club-b"].sackDecision.decision).toBe("review");
+  });
+
+  it("extracts deterministic completed-season sack outcomes", () => {
+    const firstRun = runCompletedSeasonStateWithContext();
+    const secondRun = runCompletedSeasonStateWithContext();
+
+    const highPressureTimelineByClubId = {
+      "club-a": [0.56, 0.78, 0.82, 0.84],
+      "club-b": [0.42, 0.51, 0.55, 0.54],
+      "club-c": [0.31, 0.37, 0.35, 0.39],
+      "club-d": [0.25, 0.32, 0.36, 0.34]
+    };
+
+    const firstSummary = summarizeCompletedSeasonBoardOutcomes(
+      firstRun.state,
+      firstRun.finalContextByClubId,
+      highPressureTimelineByClubId,
+      1,
+      1
+    );
+    const secondSummary = summarizeCompletedSeasonBoardOutcomes(
+      secondRun.state,
+      secondRun.finalContextByClubId,
+      highPressureTimelineByClubId,
+      1,
+      1
+    );
+
+    const firstOutcomes = extractSeasonSackOutcomes(firstSummary);
+    const secondOutcomes = extractSeasonSackOutcomes(secondSummary);
+
+    expect(firstOutcomes).toEqual(secondOutcomes);
+    expect(firstOutcomes).toHaveLength(1);
+    expect(firstOutcomes[0]?.clubId).toBe("club-a");
+    expect(firstOutcomes[0]?.reasonSummary.length).toBeGreaterThan(0);
+    expect(firstOutcomes[0]?.sackRisk).toBeGreaterThanOrEqual(0);
+    expect(firstOutcomes[0]?.sackRisk).toBeLessThanOrEqual(1);
+  });
+
+  it("rejects sack-outcome extraction when decision snapshots are incomplete", () => {
+    const summary = runCompletedSeasonBoardSummarySimulation();
+    const missingSnapshotSummary = {
+      ...summary,
+      decisionSnapshotsByClubId: Object.fromEntries(
+        Object.entries(summary.decisionSnapshotsByClubId).filter(([clubId]) => clubId !== "club-a")
+      )
+    };
+
+    expect(() => extractSeasonSackOutcomes(missingSnapshotSummary)).toThrow(
+      "Missing board decision snapshot for club club-a."
+    );
   });
 });
