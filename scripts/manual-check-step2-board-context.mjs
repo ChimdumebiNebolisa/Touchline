@@ -1,6 +1,7 @@
 import {
   advanceSeasonState,
   createSeasonState,
+  deriveSeasonSackDecisionFromPressureSummary,
   deriveSackRiskPressureState,
   deriveSeasonBoardContextFromSeasonState,
   evaluateSeasonBoardContext,
@@ -125,8 +126,16 @@ function runStep2BoardContextManualCheck() {
   const pressureSummary = summarizeSeasonSackRiskPressureTimeline(
     timelineRows.map((row) => row.sackRisk)
   );
+  const sackDecision = deriveSeasonSackDecisionFromPressureSummary(pressureSummary);
   console.log("- Season pressure streak summary (club-a)");
   console.table([pressureSummary]);
+  console.log("- Season sack decision sample (club-a)");
+  console.table([
+    {
+      decision: sackDecision.decision,
+      reasons: sackDecision.reasonSummary.join(" | ")
+    }
+  ]);
 
   const promotionOutcome = resolvePromotionRelegation(seasonState.standings, 1, 1);
   const completedSummary = summarizeCompletedSeason(seasonState, 1, 1);
@@ -143,6 +152,7 @@ function runStep2BoardContextManualCheck() {
   const validTimelineRange = timelineRows.every((entry) => entry.sackRisk >= 0 && entry.sackRisk <= 1);
   const validTimelineFlags = timelineRows.every((entry) => entry.level.length > 0 && entry.trend.length > 0);
   const validStreakSummary = pressureSummary.samplesProcessed === timelineRows.length;
+  const validSackDecision = sackDecision.reasonSummary.length > 0;
   const validPromotionResolution =
     promotionOutcome.promotedClubIds.length === 1 &&
     promotionOutcome.relegatedClubIds.length === 1 &&
@@ -155,6 +165,7 @@ function runStep2BoardContextManualCheck() {
     !validTimelineRange ||
     !validTimelineFlags ||
     !validStreakSummary ||
+    !validSackDecision ||
     !validPromotionResolution ||
     !validCompletedSummary
   ) {

@@ -56,6 +56,8 @@ export type {
   WorldClub
 } from "./world/season.js";
 export type {
+  SeasonSackDecision,
+  SeasonSackDecisionResult,
   SeasonBoardContext,
   SeasonBoardStaticContext,
   SeasonSackRiskPressureSummary
@@ -82,6 +84,7 @@ export {
   summarizeCompletedSeason
 } from "./world/season.js";
 export {
+  deriveSeasonSackDecisionFromPressureSummary,
   deriveSeasonBoardContextFromSeasonState,
   evaluateSeasonBoardContext,
   summarizeSeasonSackRiskPressureTimeline

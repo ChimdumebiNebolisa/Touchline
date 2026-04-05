@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   advanceSeasonState,
   createSeasonState,
+  deriveSeasonSackDecisionFromPressureSummary,
   deriveSackRiskPressureState,
   deriveSeasonBoardContextFromSeasonState,
   evaluateSeasonBoardContext,
@@ -380,5 +381,35 @@ describe("season board integration", () => {
     expect(summary.currentTrend).toBe("steady");
     expect(summary.maxWarningOrHigherStreak).toBe(0);
     expect(summary.maxCriticalStreak).toBe(0);
+  });
+
+  it("triggers sack decision for sustained critical pressure", () => {
+    const summary = summarizeSeasonSackRiskPressureTimeline([0.52, 0.77, 0.8, 0.83]);
+    const decision = deriveSeasonSackDecisionFromPressureSummary(summary);
+
+    expect(summary.currentLevel).toBe("critical");
+    expect(summary.criticalStreak).toBeGreaterThanOrEqual(2);
+    expect(decision.decision).toBe("sack");
+    expect(decision.reasonSummary.length).toBeGreaterThan(0);
+  });
+
+  it("triggers review decision for warning pressure below sack threshold", () => {
+    const summary = summarizeSeasonSackRiskPressureTimeline([0.42, 0.54, 0.59, 0.56]);
+    const decision = deriveSeasonSackDecisionFromPressureSummary(summary);
+
+    expect(summary.currentLevel).toBe("warning");
+    expect(summary.maxCriticalStreak).toBe(0);
+    expect(decision.decision).toBe("review");
+    expect(decision.reasonSummary.some((reason) => reason.length > 0)).toBe(true);
+  });
+
+  it("retains manager when pressure remains stable", () => {
+    const summary = summarizeSeasonSackRiskPressureTimeline([0.34, 0.39, 0.4, 0.37]);
+    const decision = deriveSeasonSackDecisionFromPressureSummary(summary);
+
+    expect(summary.currentLevel).toBe("stable");
+    expect(summary.maxWarningOrHigherStreak).toBe(0);
+    expect(decision.decision).toBe("retain");
+    expect(decision.reasonSummary.length).toBeGreaterThan(0);
   });
 });

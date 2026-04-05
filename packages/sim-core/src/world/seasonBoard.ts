@@ -31,6 +31,13 @@ export interface SeasonSackRiskPressureSummary {
   maxCriticalStreak: number;
 }
 
+export type SeasonSackDecision = "retain" | "review" | "sack";
+
+export interface SeasonSackDecisionResult {
+  decision: SeasonSackDecision;
+  reasonSummary: string[];
+}
+
 export function summarizeSeasonSackRiskPressureTimeline(
   sackRiskTimeline: number[]
 ): SeasonSackRiskPressureSummary {
@@ -83,6 +90,70 @@ export function summarizeSeasonSackRiskPressureTimeline(
     criticalStreak,
     maxWarningOrHigherStreak,
     maxCriticalStreak
+  };
+}
+
+export function deriveSeasonSackDecisionFromPressureSummary(
+  summary: SeasonSackRiskPressureSummary
+): SeasonSackDecisionResult {
+  if (summary.samplesProcessed === 0) {
+    return {
+      decision: "retain",
+      reasonSummary: [
+        "No season sack-risk samples were processed, so no dismissal decision can be justified."
+      ]
+    };
+  }
+
+  const reasons: string[] = [];
+
+  const sustainedCriticalPressure =
+    summary.currentLevel === "critical" && summary.criticalStreak >= 2 && summary.currentTrend !== "falling";
+  const repeatedCriticalRuns = summary.maxCriticalStreak >= 3;
+  const prolongedWarningOrHigherPressure =
+    summary.warningOrHigherStreak >= 5 && summary.currentTrend !== "falling";
+
+  if (sustainedCriticalPressure) {
+    reasons.push(
+      "Current risk pressure is critical for at least two consecutive samples without a falling trend."
+    );
+  }
+  if (repeatedCriticalRuns) {
+    reasons.push("Season timeline includes a sustained critical run of three or more samples.");
+  }
+  if (prolongedWarningOrHigherPressure) {
+    reasons.push("Warning-or-higher pressure persisted for at least five consecutive samples.");
+  }
+
+  if (reasons.length > 0) {
+    return {
+      decision: "sack",
+      reasonSummary: reasons
+    };
+  }
+
+  const reviewPressure =
+    summary.currentLevel !== "stable" ||
+    summary.warningOrHigherStreak >= 3 ||
+    summary.maxWarningOrHigherStreak >= 4;
+
+  if (reviewPressure) {
+    const reviewReasons = [
+      "Current or recent pressure indicates the board should run a formal manager review.",
+      `Current level is ${summary.currentLevel} with ${summary.currentTrend} trend.`
+    ];
+
+    return {
+      decision: "review",
+      reasonSummary: reviewReasons
+    };
+  }
+
+  return {
+    decision: "retain",
+    reasonSummary: [
+      "Pressure remains below dismissal and review thresholds, so the manager is retained."
+    ]
   };
 }
 
