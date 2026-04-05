@@ -38,6 +38,12 @@ export interface SeasonSackDecisionResult {
   reasonSummary: string[];
 }
 
+export interface SeasonBoardDecisionSnapshot {
+  boardEvaluation: BoardExpectationEvaluation;
+  pressureSummary: SeasonSackRiskPressureSummary;
+  sackDecision: SeasonSackDecisionResult;
+}
+
 export function summarizeSeasonSackRiskPressureTimeline(
   sackRiskTimeline: number[]
 ): SeasonSackRiskPressureSummary {
@@ -205,4 +211,29 @@ export function evaluateSeasonBoardContext(
   }
 
   return evaluations;
+}
+
+export function evaluateSeasonBoardDecisions(
+  state: SeasonState,
+  contextByClubId: Record<string, SeasonBoardContext>,
+  sackRiskTimelineByClubId: Record<string, number[]>
+): Record<string, SeasonBoardDecisionSnapshot> {
+  const boardEvaluations = evaluateSeasonBoardContext(state, contextByClubId);
+  const snapshots: Record<string, SeasonBoardDecisionSnapshot> = {};
+
+  for (const row of state.standings) {
+    const sackRiskTimeline = sackRiskTimelineByClubId[row.clubId];
+    if (!sackRiskTimeline) {
+      throw new Error(`Missing sack-risk timeline for club ${row.clubId}.`);
+    }
+
+    const pressureSummary = summarizeSeasonSackRiskPressureTimeline(sackRiskTimeline);
+    snapshots[row.clubId] = {
+      boardEvaluation: boardEvaluations[row.clubId],
+      pressureSummary,
+      sackDecision: deriveSeasonSackDecisionFromPressureSummary(pressureSummary)
+    };
+  }
+
+  return snapshots;
 }

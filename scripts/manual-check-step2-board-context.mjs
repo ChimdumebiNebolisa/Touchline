@@ -1,15 +1,14 @@
 import {
   advanceSeasonState,
   createSeasonState,
-  deriveSeasonSackDecisionFromPressureSummary,
   deriveSackRiskPressureState,
   deriveSeasonBoardContextFromSeasonState,
+  evaluateSeasonBoardDecisions,
   evaluateSeasonBoardContext,
   getFixturesForMatchday,
   isSeasonComplete,
   resolvePromotionRelegation,
   summarizeCompletedSeason,
-  summarizeSeasonSackRiskPressureTimeline
 } from "../packages/sim-core/dist/src/index.js";
 
 function buildSeasonStateAndTimeline() {
@@ -55,7 +54,8 @@ function buildSeasonStateAndTimeline() {
   };
 
   const timelineRows = [];
-  let previousRisk;
+  const timelinesByClubId = Object.fromEntries(clubs.map((club) => [club.id, []]));
+  const previousRiskByClubId = {};
 
   while (!isSeasonComplete(state)) {
     const fixtures = getFixturesForMatchday(state, state.currentMatchday);
@@ -76,36 +76,45 @@ function buildSeasonStateAndTimeline() {
 
     const boardContext = deriveSeasonBoardContextFromSeasonState(state, staticContext);
     const evaluations = evaluateSeasonBoardContext(state, boardContext);
-    const risk = evaluations["club-a"].sackRisk;
-    const pressure = deriveSackRiskPressureState(risk, previousRisk);
 
-    timelineRows.push({
-      matchdayComplete: state.currentMatchday - 1,
-      clubId: "club-a",
-      recentPPM: boardContext["club-a"].recentPointsPerMatch,
-      sackRisk: risk,
-      level: pressure.level,
-      trend: pressure.trend
-    });
+    for (const club of clubs) {
+      const risk = evaluations[club.id].sackRisk;
+      timelinesByClubId[club.id].push(risk);
 
-    previousRisk = risk;
+      if (club.id === "club-a") {
+        const pressure = deriveSackRiskPressureState(risk, previousRiskByClubId[club.id]);
+        timelineRows.push({
+          matchdayComplete: state.currentMatchday - 1,
+          clubId: "club-a",
+          recentPPM: boardContext["club-a"].recentPointsPerMatch,
+          sackRisk: risk,
+          level: pressure.level,
+          trend: pressure.trend
+        });
+      }
+
+      previousRiskByClubId[club.id] = risk;
+    }
   }
 
   return {
     seasonState: state,
     staticContext,
-    timelineRows
+    timelineRows,
+    timelinesByClubId
   };
 }
 
 function runStep2BoardContextManualCheck() {
-  const { seasonState, staticContext, timelineRows } = buildSeasonStateAndTimeline();
+  const { seasonState, staticContext, timelineRows, timelinesByClubId } = buildSeasonStateAndTimeline();
 
   const boardContext = deriveSeasonBoardContextFromSeasonState(seasonState, staticContext);
   const evaluations = evaluateSeasonBoardContext(seasonState, boardContext);
+  const decisionSnapshots = evaluateSeasonBoardDecisions(seasonState, boardContext, timelinesByClubId);
 
   const rows = seasonState.standings.map((row, index) => {
     const board = evaluations[row.clubId];
+    const snapshot = decisionSnapshots[row.clubId];
     return {
       clubId: row.clubId,
       leaguePosition: index + 1,
@@ -113,6 +122,7 @@ function runStep2BoardContextManualCheck() {
       recentPPM: boardContext[row.clubId].recentPointsPerMatch,
       boardDelta: board.boardDelta,
       sackRisk: board.sackRisk,
+      sackDecision: snapshot.sackDecision.decision,
       reasons: board.reasonSummary.join(" | ")
     };
   });
@@ -123,10 +133,9 @@ function runStep2BoardContextManualCheck() {
   console.log("- Matchday sack-risk progression sample (club-a)");
   console.table(timelineRows);
 
-  const pressureSummary = summarizeSeasonSackRiskPressureTimeline(
-    timelineRows.map((row) => row.sackRisk)
-  );
-  const sackDecision = deriveSeasonSackDecisionFromPressureSummary(pressureSummary);
+  const clubASnapshot = decisionSnapshots["club-a"];
+  const pressureSummary = clubASnapshot.pressureSummary;
+  const sackDecision = clubASnapshot.sackDecision;
   console.log("- Season pressure streak summary (club-a)");
   console.table([pressureSummary]);
   console.log("- Season sack decision sample (club-a)");
@@ -152,7 +161,10 @@ function runStep2BoardContextManualCheck() {
   const validTimelineRange = timelineRows.every((entry) => entry.sackRisk >= 0 && entry.sackRisk <= 1);
   const validTimelineFlags = timelineRows.every((entry) => entry.level.length > 0 && entry.trend.length > 0);
   const validStreakSummary = pressureSummary.samplesProcessed === timelineRows.length;
-  const validSackDecision = sackDecision.reasonSummary.length > 0;
+  const validSnapshotCoverage = Object.keys(decisionSnapshots).length === seasonState.standings.length;
+  const validSackDecision =
+    sackDecision.reasonSummary.length > 0 &&
+    seasonState.standings.every((row) => decisionSnapshots[row.clubId].sackDecision.reasonSummary.length > 0);
   const validPromotionResolution =
     promotionOutcome.promotedClubIds.length === 1 &&
     promotionOutcome.relegatedClubIds.length === 1 &&
@@ -165,6 +177,7 @@ function runStep2BoardContextManualCheck() {
     !validTimelineRange ||
     !validTimelineFlags ||
     !validStreakSummary ||
+    !validSnapshotCoverage ||
     !validSackDecision ||
     !validPromotionResolution ||
     !validCompletedSummary

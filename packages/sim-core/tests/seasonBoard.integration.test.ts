@@ -5,6 +5,7 @@ import {
   createSeasonState,
   deriveSeasonSackDecisionFromPressureSummary,
   deriveSackRiskPressureState,
+  evaluateSeasonBoardDecisions,
   deriveSeasonBoardContextFromSeasonState,
   evaluateSeasonBoardContext,
   getFixturesForMatchday,
@@ -411,5 +412,117 @@ describe("season board integration", () => {
     expect(summary.maxWarningOrHigherStreak).toBe(0);
     expect(decision.decision).toBe("retain");
     expect(decision.reasonSummary.length).toBeGreaterThan(0);
+  });
+
+  it("builds per-club season board decision snapshots with mixed outcomes", () => {
+    const baseState = createSeasonState([
+      { id: "club-a", name: "Club A", strength: 74 },
+      { id: "club-b", name: "Club B", strength: 71 },
+      { id: "club-c", name: "Club C", strength: 69 },
+      { id: "club-d", name: "Club D", strength: 67 }
+    ]);
+
+    const fixtures = getFixturesForMatchday(baseState, baseState.currentMatchday);
+    const progressedState = advanceSeasonState(
+      baseState,
+      Object.fromEntries(
+        fixtures.map((fixture) => [
+          fixture.id,
+          {
+            homeGoals: 1,
+            awayGoals: 1
+          }
+        ])
+      )
+    );
+
+    const snapshots = evaluateSeasonBoardDecisions(
+      progressedState,
+      {
+        "club-a": {
+          preseasonObjectivePosition: 3,
+          clubStature: 0.9,
+          financialPressure: 0.75,
+          recentPointsPerMatch: 0.75,
+          styleAlignment: 0.35,
+          derbyResult: "loss"
+        },
+        "club-b": {
+          preseasonObjectivePosition: 5,
+          clubStature: 0.55,
+          financialPressure: 0.45,
+          recentPointsPerMatch: 1.1,
+          styleAlignment: 0.52,
+          derbyResult: "none"
+        },
+        "club-c": {
+          preseasonObjectivePosition: 8,
+          clubStature: 0.3,
+          financialPressure: 0.2,
+          recentPointsPerMatch: 1.5,
+          styleAlignment: 0.66,
+          derbyResult: "win"
+        },
+        "club-d": {
+          preseasonObjectivePosition: 10,
+          clubStature: 0.2,
+          financialPressure: 0.18,
+          recentPointsPerMatch: 1.4,
+          styleAlignment: 0.62,
+          derbyResult: "draw"
+        }
+      },
+      {
+        "club-a": [0.56, 0.77, 0.82, 0.85],
+        "club-b": [0.44, 0.53, 0.58, 0.56],
+        "club-c": [0.31, 0.37, 0.35, 0.39],
+        "club-d": [0.25, 0.32, 0.36, 0.34]
+      }
+    );
+
+    expect(Object.keys(snapshots)).toHaveLength(4);
+    expect(snapshots["club-a"].sackDecision.decision).toBe("sack");
+    expect(snapshots["club-b"].sackDecision.decision).toBe("review");
+    expect(snapshots["club-c"].sackDecision.decision).toBe("retain");
+    expect(snapshots["club-d"].sackDecision.decision).toBe("retain");
+    expect(
+      Object.values(snapshots).every(
+        (snapshot) => snapshot.boardEvaluation.reasonSummary.length > 0 && snapshot.sackDecision.reasonSummary.length > 0
+      )
+    ).toBe(true);
+  });
+
+  it("rejects season board decision snapshots when a club timeline is missing", () => {
+    const state = createSeasonState([
+      { id: "club-a", name: "Club A", strength: 74 },
+      { id: "club-b", name: "Club B", strength: 71 }
+    ]);
+
+    expect(() =>
+      evaluateSeasonBoardDecisions(
+        state,
+        {
+          "club-a": {
+            preseasonObjectivePosition: 2,
+            clubStature: 0.7,
+            financialPressure: 0.4,
+            recentPointsPerMatch: 1.2,
+            styleAlignment: 0.55,
+            derbyResult: "none"
+          },
+          "club-b": {
+            preseasonObjectivePosition: 4,
+            clubStature: 0.4,
+            financialPressure: 0.3,
+            recentPointsPerMatch: 1.1,
+            styleAlignment: 0.58,
+            derbyResult: "none"
+          }
+        },
+        {
+          "club-a": [0.45, 0.5]
+        }
+      )
+    ).toThrow("Missing sack-risk timeline for club club-b.");
   });
 });
