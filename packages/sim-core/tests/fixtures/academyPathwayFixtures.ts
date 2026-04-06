@@ -66,6 +66,7 @@ function buildIntakeInput(
   seed: number,
   academyQuality: number,
   pathwayBias: number,
+  squadCongestion: number,
   intakeSize: number
 ): AcademyIntakeInput {
   return {
@@ -74,6 +75,7 @@ function buildIntakeInput(
     seed,
     academyQuality,
     pathwayBias,
+    squadCongestion,
     intakeSize
   };
 }
@@ -85,6 +87,7 @@ export function buildLoanPathFixtureWindow(options: {
   seasons: number;
   academyQuality: number;
   pathwayBias: number;
+  squadCongestion?: number;
   intakeSize: number;
 }): AcademyIntakeInput[] {
   return Array.from({ length: options.seasons }, (_, seasonOffset) =>
@@ -94,6 +97,7 @@ export function buildLoanPathFixtureWindow(options: {
       options.seed,
       options.academyQuality,
       options.pathwayBias,
+      options.squadCongestion ?? 0.5,
       options.intakeSize
     )
   );

@@ -156,6 +156,62 @@ describe("academy intake", () => {
     expect(highBiasFirstTeamRate).toBeGreaterThan(lowBiasFirstTeamRate);
   });
 
+  it("shifts pathway recommendations toward loans when squad congestion is high", () => {
+    const lowCongestionRuns = Array.from({ length: 140 }, (_, seasonOffset) =>
+      generateAcademyIntake({
+        clubId: "club-g",
+        seasonYear: 2068 + seasonOffset,
+        seed: 519,
+        academyQuality: 0.7,
+        pathwayBias: 0.58,
+        squadCongestion: 0.2,
+        intakeSize: 9
+      })
+    );
+    const highCongestionRuns = Array.from({ length: 140 }, (_, seasonOffset) =>
+      generateAcademyIntake({
+        clubId: "club-g",
+        seasonYear: 2068 + seasonOffset,
+        seed: 519,
+        academyQuality: 0.7,
+        pathwayBias: 0.58,
+        squadCongestion: 0.9,
+        intakeSize: 9
+      })
+    );
+
+    const countRecommendations = (
+      runs: ReturnType<typeof generateAcademyIntake>[],
+      recommendation: "first-team-minutes" | "loan-pathway"
+    ) =>
+      runs.reduce(
+        (sum, run) =>
+          sum + run.prospects.filter((prospect) => prospect.pathwayRecommendation === recommendation).length,
+        0
+      );
+
+    const lowCongestionFirstTeamRate =
+      countRecommendations(lowCongestionRuns, "first-team-minutes") /
+      lowCongestionRuns.reduce((sum, run) => sum + run.prospects.length, 0);
+    const highCongestionFirstTeamRate =
+      countRecommendations(highCongestionRuns, "first-team-minutes") /
+      highCongestionRuns.reduce((sum, run) => sum + run.prospects.length, 0);
+
+    const lowCongestionLoanRate =
+      countRecommendations(lowCongestionRuns, "loan-pathway") /
+      lowCongestionRuns.reduce((sum, run) => sum + run.prospects.length, 0);
+    const highCongestionLoanRate =
+      countRecommendations(highCongestionRuns, "loan-pathway") /
+      highCongestionRuns.reduce((sum, run) => sum + run.prospects.length, 0);
+
+    const averageBlockage = (runs: ReturnType<typeof generateAcademyIntake>[]) =>
+      runs.reduce((sum, run) => sum + run.pathwayPressure.blockageScore, 0) / runs.length;
+
+    expect(highCongestionFirstTeamRate).toBeLessThan(lowCongestionFirstTeamRate);
+    expect(highCongestionLoanRate).toBeGreaterThan(lowCongestionLoanRate);
+    expect(averageBlockage(highCongestionRuns)).toBeGreaterThan(averageBlockage(lowCongestionRuns));
+  });
+
   it("keeps pathway-pressure signals deterministic for identical intake inputs", () => {
     const firstRun = generateAcademyIntake({
       clubId: "club-e",

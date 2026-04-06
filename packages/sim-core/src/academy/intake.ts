@@ -39,15 +39,17 @@ function deriveTier(randomRoll: number, academyQuality: number): AcademyProspect
 function buildPathwayRecommendation(
   readiness: number,
   potential: number,
-  pathwayBias: number
+  pathwayBias: number,
+  squadCongestion: number
 ): AcademyPathwayRecommendation {
-  const firstTeamSignal = readiness * 0.7 + potential * 0.2 + pathwayBias * 18;
+  const congestionPenalty = (squadCongestion - 0.5) * 16;
+  const firstTeamSignal = readiness * 0.7 + potential * 0.2 + pathwayBias * 18 - congestionPenalty;
 
   if (firstTeamSignal >= 58) {
     return "first-team-minutes";
   }
 
-  if (potential >= 62 && pathwayBias >= 0.45) {
+  if (potential >= 62 && (pathwayBias >= 0.45 || squadCongestion >= 0.6)) {
     return "loan-pathway";
   }
 
@@ -60,6 +62,7 @@ function buildProspect(
   index: number,
   academyQuality: number,
   pathwayBias: number,
+  squadCongestion: number,
   nextRandom: () => number
 ): AcademyProspect {
   const tier = deriveTier(nextRandom(), academyQuality);
@@ -91,14 +94,15 @@ function buildProspect(
     potential,
     readiness,
     tier,
-    pathwayRecommendation: buildPathwayRecommendation(readiness, potential, pathwayBias)
+    pathwayRecommendation: buildPathwayRecommendation(readiness, potential, pathwayBias, squadCongestion)
   };
 }
 
 function buildPathwayPressureSignal(
   prospects: AcademyProspect[],
   eliteCount: number,
-  pathwayBias: number
+  pathwayBias: number,
+  squadCongestion: number
 ): AcademyPathwayPressureSignal {
   const firstTeamCandidateCount = prospects.filter(
     (prospect) => prospect.pathwayRecommendation === "first-team-minutes"
@@ -106,7 +110,8 @@ function buildPathwayPressureSignal(
   const loanCandidateCount = prospects.filter(
     (prospect) => prospect.pathwayRecommendation === "loan-pathway"
   ).length;
-  const pathwayCapacity = Math.max(1, Math.round(1 + pathwayBias * 3));
+  const congestionCapacityPenalty = Math.max(0, squadCongestion - 0.5) * 2;
+  const pathwayCapacity = Math.max(1, Math.round(1 + pathwayBias * 3 - congestionCapacityPenalty));
   const promotionOverflow = Math.max(0, firstTeamCandidateCount - pathwayCapacity);
   const promotionPressure = clamp(
     promotionOverflow / Math.max(1, prospects.length * 0.35),
@@ -115,7 +120,8 @@ function buildPathwayPressureSignal(
   );
   const loanPressure = clamp(
     ((loanCandidateCount + promotionOverflow) / Math.max(1, prospects.length * 0.5)) *
-      (1.1 - pathwayBias * 0.4),
+      (1.1 - pathwayBias * 0.4) *
+      (1 + Math.max(0, squadCongestion - 0.5) * 0.8),
     0,
     1
   );
@@ -138,7 +144,8 @@ function buildPathwayPressureSignal(
     blockageRisk,
     reasonSummary: [
       `First-team candidates ${firstTeamCandidateCount} against pathway capacity ${pathwayCapacity}.`,
-      `Loan-pathway candidates ${loanCandidateCount}; promotion pressure ${promotionPressure.toFixed(2)} and loan pressure ${loanPressure.toFixed(2)}.`
+      `Loan-pathway candidates ${loanCandidateCount}; promotion pressure ${promotionPressure.toFixed(2)} and loan pressure ${loanPressure.toFixed(2)}.`,
+      `Squad congestion ${squadCongestion.toFixed(2)} adjusted pathway capacity by ${congestionCapacityPenalty.toFixed(2)}.`
     ]
   };
 }
@@ -150,6 +157,7 @@ export function generateAcademyIntake(input: AcademyIntakeInput): AcademyIntakeR
 
   const academyQuality = clamp(input.academyQuality, 0, 1);
   const pathwayBias = clamp(input.pathwayBias, 0, 1);
+  const squadCongestion = clamp(input.squadCongestion ?? 0.5, 0, 1);
   const randomSeed =
     (input.seed >>> 0) ^
     ((input.seasonYear * 2654435761) >>> 0) ^
@@ -163,6 +171,7 @@ export function generateAcademyIntake(input: AcademyIntakeInput): AcademyIntakeR
       index,
       academyQuality,
       pathwayBias,
+      squadCongestion,
       random.next
     )
   );
@@ -170,7 +179,7 @@ export function generateAcademyIntake(input: AcademyIntakeInput): AcademyIntakeR
   const eliteCount = prospects.filter((prospect) => prospect.tier === "elite").length;
   const highPotentialCount = prospects.filter((prospect) => prospect.tier !== "regular").length;
   const averagePotential = prospects.reduce((sum, prospect) => sum + prospect.potential, 0) / prospects.length;
-  const pathwayPressure = buildPathwayPressureSignal(prospects, eliteCount, pathwayBias);
+  const pathwayPressure = buildPathwayPressureSignal(prospects, eliteCount, pathwayBias, squadCongestion);
 
   return {
     clubId: input.clubId,
@@ -183,6 +192,7 @@ export function generateAcademyIntake(input: AcademyIntakeInput): AcademyIntakeR
     conciseSummary: [
       `Intake ${input.seasonYear}: ${eliteCount} elite, ${highPotentialCount} high-potential from ${prospects.length} prospects.`,
       `Average potential ${averagePotential.toFixed(2)} with pathway bias ${pathwayBias.toFixed(2)}.`,
+      `Squad congestion ${squadCongestion.toFixed(2)} with pathway pressure ${pathwayPressure.blockageScore.toFixed(2)} (${pathwayPressure.blockageRisk}).`,
       `Pathway pressure ${pathwayPressure.blockageScore.toFixed(2)} (${pathwayPressure.blockageRisk}).`
     ]
   };

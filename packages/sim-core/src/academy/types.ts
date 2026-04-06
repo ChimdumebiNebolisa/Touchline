@@ -13,6 +13,7 @@ export interface AcademyIntakeInput {
   seed: number;
   academyQuality: number;
   pathwayBias: number;
+  squadCongestion?: number;
   intakeSize: number;
 }
 
