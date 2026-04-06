@@ -5,6 +5,7 @@ import {
   createSeasonState,
   deriveSeasonSackDecisionFromPressureSummary,
   deriveSackRiskPressureState,
+  evaluateBoardExpectationContext,
   extractSeasonSackOutcomes,
   evaluateSeasonBoardDecisions,
   deriveSeasonBoardContextFromSeasonState,
@@ -16,6 +17,11 @@ import {
   summarizeCompletedSeasonBoardOutcomes,
   summarizeSeasonSackRiskPressureTimeline
 } from "../src/index.js";
+import {
+  buildLoanPathFixtureWindow,
+  buildSeasonAcademyOutputSummaryArtifact,
+  deriveBoardFinancialPressureFromAcademySummary
+} from "./fixtures/academyPathwayFixtures.js";
 
 function runSackRiskTimelineSimulation(): Array<{ risk: number; trend: string; level: string }> {
   let state = createSeasonState([
@@ -234,6 +240,66 @@ function runCompletedSeasonStateWithContext() {
 }
 
 describe("season board integration", () => {
+  it("wires academy pathway-pressure summaries into board sample financial-pressure context", () => {
+    const lowPathwayBiasSummary = buildSeasonAcademyOutputSummaryArtifact(
+      buildLoanPathFixtureWindow({
+        clubId: "club-board-link",
+        seed: 911,
+        startSeasonYear: 2090,
+        seasons: 10,
+        academyQuality: 0.7,
+        pathwayBias: 0.3,
+        intakeSize: 10
+      })
+    );
+    const highPathwayBiasSummary = buildSeasonAcademyOutputSummaryArtifact(
+      buildLoanPathFixtureWindow({
+        clubId: "club-board-link",
+        seed: 911,
+        startSeasonYear: 2090,
+        seasons: 10,
+        academyQuality: 0.7,
+        pathwayBias: 0.75,
+        intakeSize: 10
+      })
+    );
+
+    const baselineFinancialPressure = 0.35;
+    const lowDerivedPressure = deriveBoardFinancialPressureFromAcademySummary(
+      lowPathwayBiasSummary,
+      baselineFinancialPressure
+    );
+    const highDerivedPressure = deriveBoardFinancialPressureFromAcademySummary(
+      highPathwayBiasSummary,
+      baselineFinancialPressure
+    );
+
+    const baseContext = {
+      leaguePosition: 9,
+      totalTeams: 20,
+      preseasonObjectivePosition: 8,
+      clubStature: 0.46,
+      recentPointsPerMatch: 1.32,
+      styleAlignment: 0.59,
+      derbyResult: "draw" as const
+    };
+
+    const lowPressureEvaluation = evaluateBoardExpectationContext({
+      ...baseContext,
+      financialPressure: lowDerivedPressure
+    });
+    const highPressureEvaluation = evaluateBoardExpectationContext({
+      ...baseContext,
+      financialPressure: highDerivedPressure
+    });
+
+    expect(lowDerivedPressure).not.toBe(highDerivedPressure);
+    expect(highPressureEvaluation.sackRisk).toBeGreaterThan(lowPressureEvaluation.sackRisk);
+    expect(highPressureEvaluation.boardDelta).toBeLessThan(lowPressureEvaluation.boardDelta);
+    expect(lowPressureEvaluation.reasonSummary.length).toBeGreaterThan(0);
+    expect(highPressureEvaluation.reasonSummary.length).toBeGreaterThan(0);
+  });
+
   it("evaluates contextual board outcomes from season standings", () => {
     let state = createSeasonState([
       { id: "club-a", name: "Club A", strength: 74 },

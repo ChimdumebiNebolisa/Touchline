@@ -16,8 +16,70 @@ import {
   calibrationReputationBands,
   calibrationTarget
 } from "./fixtures/negotiationFixtures.js";
+import {
+  buildLoanPathFixtureWindow,
+  buildSeasonAcademyOutputSummaryArtifact,
+  buildTransferVariantsFromAcademySummary
+} from "./fixtures/academyPathwayFixtures.js";
 
 describe("transfer negotiation calibration samples", () => {
+  it("wires academy pathway-pressure summaries into transfer calibration sample variants", () => {
+    const lowPathwayBiasSummary = buildSeasonAcademyOutputSummaryArtifact(
+      buildLoanPathFixtureWindow({
+        clubId: "club-transfer-link",
+        seed: 844,
+        startSeasonYear: 2096,
+        seasons: 8,
+        academyQuality: 0.69,
+        pathwayBias: 0.35,
+        intakeSize: 10
+      })
+    );
+
+    const highPathwayBiasSummary = buildSeasonAcademyOutputSummaryArtifact(
+      buildLoanPathFixtureWindow({
+        clubId: "club-transfer-link",
+        seed: 844,
+        startSeasonYear: 2096,
+        seasons: 8,
+        academyQuality: 0.69,
+        pathwayBias: 0.75,
+        intakeSize: 10
+      })
+    );
+
+    const lowPathwayVariants = buildTransferVariantsFromAcademySummary(lowPathwayBiasSummary);
+    const highPathwayVariants = buildTransferVariantsFromAcademySummary(highPathwayBiasSummary);
+
+    const lowPathwayOutcome = summarizeTransferOutcomesByReputationBand(
+      calibrationTarget,
+      {
+        clubWageBudget: calibrationBaseContext.clubWageBudget,
+        clubStature: calibrationBaseContext.clubStature,
+        boardWageDiscipline: calibrationBaseContext.boardWageDiscipline
+      },
+      [62],
+      lowPathwayVariants
+    );
+
+    const highPathwayOutcome = summarizeTransferOutcomesByReputationBand(
+      calibrationTarget,
+      {
+        clubWageBudget: calibrationBaseContext.clubWageBudget,
+        clubStature: calibrationBaseContext.clubStature,
+        boardWageDiscipline: calibrationBaseContext.boardWageDiscipline
+      },
+      [62],
+      highPathwayVariants
+    );
+
+    expect(lowPathwayOutcome.bands[0].attempts).toBe(lowPathwayBiasSummary.rows.length);
+    expect(highPathwayOutcome.bands[0].attempts).toBe(highPathwayBiasSummary.rows.length);
+    expect(lowPathwayOutcome.bands[0].averageScore).not.toBe(highPathwayOutcome.bands[0].averageScore);
+    expect(lowPathwayOutcome.conciseSummary[0]).toContain("Manager reputation 62");
+    expect(highPathwayOutcome.conciseSummary[0]).toContain("Manager reputation 62");
+  });
+
   it("produces deterministic sample outputs for Step 3 calibration checks", () => {
     const promiseTrust = summarizePromiseTrustImpactByReputationBand(
       calibrationTarget,

@@ -1,5 +1,9 @@
 import { generateAcademyIntake } from "../../src/index.js";
-import type { AcademyIntakeInput, AcademyPathwayBlockageRisk } from "../../src/index.js";
+import type {
+  AcademyIntakeInput,
+  AcademyPathwayBlockageRisk,
+  NegotiationScenarioVariant
+} from "../../src/index.js";
 
 export interface AcademySeasonOutputSummaryRow {
   seasonYear: number;
@@ -20,6 +24,10 @@ export interface AcademySeasonOutputSummaryArtifact {
   averagePotential: number;
   totalLoanRecommendations: number;
   conciseSummary: string[];
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, value));
 }
 
 function buildIntakeInput(
@@ -103,4 +111,28 @@ export function buildSeasonAcademyOutputSummaryArtifact(
       `Total loan-pathway recommendations across window: ${totalLoanRecommendations}.`
     ]
   };
+}
+
+export function buildTransferVariantsFromAcademySummary(
+  artifact: AcademySeasonOutputSummaryArtifact
+): NegotiationScenarioVariant[] {
+  return artifact.rows.map((row) => ({
+    pathwayClarity: clamp(1 - row.blockageScore * 0.85, 0.05, 0.95),
+    squadCompetition: clamp(0.35 + row.blockageScore * 0.55, 0.05, 0.98),
+    recentPromiseBreak: row.blockageRisk === "high"
+  }));
+}
+
+export function deriveBoardFinancialPressureFromAcademySummary(
+  artifact: AcademySeasonOutputSummaryArtifact,
+  baselineFinancialPressure: number
+): number {
+  const loanRecommendationDensity =
+    artifact.totalLoanRecommendations / Math.max(1, artifact.rows.length * 20);
+
+  return clamp(
+    baselineFinancialPressure + artifact.averageBlockageScore * 0.2 + loanRecommendationDensity * 0.1,
+    0,
+    1
+  );
 }
