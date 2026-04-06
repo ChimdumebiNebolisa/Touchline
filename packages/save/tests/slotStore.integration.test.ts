@@ -4,9 +4,27 @@ import { join } from "node:path";
 
 import { describe, expect, it } from "vitest";
 
-import { advanceSeasonState, createSeasonState, getFixturesForMatchday } from "@touchline/sim-core";
+import {
+  advanceSeasonState,
+  createSeasonState,
+  deriveManagerCareerLeverageSnapshot,
+  getFixturesForMatchday
+} from "@touchline/sim-core";
 
 import { readSaveSlot, writeSaveSlot, type SaveGameStateV1 } from "../src/index.js";
+
+function bandRank(band: "fragile" | "credible" | "in-demand" | "elite"): number {
+  switch (band) {
+    case "fragile":
+      return 0;
+    case "credible":
+      return 1;
+    case "in-demand":
+      return 2;
+    case "elite":
+      return 3;
+  }
+}
 
 function createSaveState(worldState: SaveGameStateV1["worldState"]): SaveGameStateV1 {
   return {
@@ -139,6 +157,52 @@ describe("save slot store integration", () => {
       expect(restored.state.managerCareer.careerLeverageHistory[1].band).toBe("in-demand");
       expect(restored.state.worldState.currentMatchday).toBe(secondSeasonState.currentMatchday);
       expect(restored.state.worldState.completedFixtureIds).toEqual(secondSeasonState.completedFixtureIds);
+    } finally {
+      await rm(rootDirectory, { recursive: true, force: true });
+    }
+  });
+
+  it("preserves reputation and sack history that drives future career leverage after reload", async () => {
+    const rootDirectory = await mkdtemp(join(tmpdir(), "touchline-save-slot-career-"));
+
+    try {
+      const seasonState = createSeasonState([
+        { id: "club-a", name: "Club A", strength: 74 },
+        { id: "club-b", name: "Club B", strength: 71 },
+        { id: "club-c", name: "Club C", strength: 69 },
+        { id: "club-d", name: "Club D", strength: 67 }
+      ]);
+
+      const saveState = createSaveState(seasonState);
+      saveState.managerCareer.reputationHistory = [48, 53, 59, 66];
+
+      await writeSaveSlot({
+        rootDirectory,
+        slotId: "career-continuity",
+        state: saveState,
+        savedAtIso: "2037-08-15T10:00:00.000Z"
+      });
+
+      const restored = await readSaveSlot({ rootDirectory, slotId: "career-continuity" });
+
+      const earliestLeverage = deriveManagerCareerLeverageSnapshot({
+        managerReputation: restored.state.managerCareer.reputationHistory[0],
+        boardConfidence: restored.state.clubPerceptionState.boardConfidence,
+        fanSentiment: restored.state.clubPerceptionState.fanSentiment
+      });
+      const latestLeverage = deriveManagerCareerLeverageSnapshot({
+        managerReputation:
+          restored.state.managerCareer.reputationHistory[
+            restored.state.managerCareer.reputationHistory.length - 1
+          ],
+        boardConfidence: restored.state.clubPerceptionState.boardConfidence,
+        fanSentiment: restored.state.clubPerceptionState.fanSentiment
+      });
+
+      expect(restored.state.managerCareer.reputationHistory).toEqual([48, 53, 59, 66]);
+      expect(restored.state.managerCareer.sackHistory).toEqual(saveState.managerCareer.sackHistory);
+      expect(latestLeverage.score).toBeGreaterThan(earliestLeverage.score);
+      expect(bandRank(latestLeverage.band)).toBeGreaterThanOrEqual(bandRank(earliestLeverage.band));
     } finally {
       await rm(rootDirectory, { recursive: true, force: true });
     }
