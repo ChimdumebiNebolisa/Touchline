@@ -4,12 +4,10 @@
 
 **Active**
 
-* Step 3: Transfer and reputation expansion
+* Step 5: Shadow world and country-pack scaling
 
 **Backlog**
 
-* Step 4: Academy, loans, and pathway pressure
-* Step 5: Shadow world and country-pack scaling
 * Step 6: Save/load and career continuity
 * Step 7: Calibration and regression gate
 
@@ -21,6 +19,8 @@
 
 * Step 1: First build slice
 * Step 2: Full season loop and board-context model
+* Step 3: Transfer and reputation expansion
+* Step 4: Academy, loans, and pathway pressure
 
 **Dropped**
 

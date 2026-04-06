@@ -1,18 +1,18 @@
 # Autonomous Progress
 
 ## Current active Plan step
-- Step 4: Academy, loans, and pathway pressure
+- Step 5: Shadow world and country-pack scaling
 
 ## Last completed verified task
-- Extended and verified `manual:step4` with explicit squad-congestion evidence windows (first-team vs loan routing and blockage pressure), and fixed a script wiring bug where `squadCongestion` was not passed into `generateAcademyIntake`.
+- Completed the Step 4 verification closure set: academy congestion-pathway integration in sim-core, focused congestion regression tests, and expanded `manual:step4` evidence with explicit congestion windows.
 
 ## Current subtask in progress
-- Final Step 4 exit-criteria audit before a completion checkpoint decision.
+- Select the smallest valid Step 5 subtask (shadow league output artifact) without crossing into Step 6+.
 
 ## Next queued subtasks
-- Confirm whether Step 4 completion criteria are fully satisfied after manual congestion-evidence coverage.
-- If no Step 4 gaps remain, prepare a bounded Step 4 completion checkpoint update.
-- Keep Step 4 scope only; do not start Step 5 work until Step 4 completion is explicitly verified.
+- Add a minimal Step 5 shadow-league module artifact with deterministic sample output.
+- Add targeted Step 5 tests proving top-two-deep and rest-shadow contract behavior.
+- Keep Step 5 scope only; do not start Step 6+ until Step 5 verification is explicit.
 
 ## Known blockers
 - None
@@ -21,11 +21,11 @@
 - Passed: `npm run manual:step4`; `npm run -w @touchline/sim-core test -- tests/academyIntake.test.ts tests/negotiationCalibration.test.ts tests/seasonBoard.integration.test.ts`; `npm test`; `npm run typecheck`; `npm run lint`; `npm run build` (2026-04-06)
 
 ## Last commit hash
-- 6efd368 (new commit pending)
+- 8a2ae03 (new commit pending)
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`
 - Inspect git status and recent commits
-- Continue with Step 4 bounded tasks only; do not jump to Step 5+.
-- Next bounded task: run final Step 4 completion audit and either record completion or capture the smallest remaining gap.
-- Last successful pushed commit before this pending checkpoint: 6efd368.
+- Continue with Step 5 bounded tasks only; do not jump to Step 6+.
+- Next bounded task: implement the smallest deterministic shadow-league artifact and verify contract coverage.
+- Last successful pushed commit before this pending checkpoint: 8a2ae03.
