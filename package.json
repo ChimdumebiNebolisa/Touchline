@@ -16,7 +16,8 @@
     "manual:step4": "node scripts/manual-check-step4.mjs",
     "manual:step5": "node scripts/manual-check-step5-shadow-world.mjs",
     "manual:step6": "node scripts/manual-check-step6-save-load.mjs",
-    "manual:step6:multiseason": "node scripts/manual-check-step6-multiseason.mjs"
+    "manual:step6:multiseason": "node scripts/manual-check-step6-multiseason.mjs",
+    "manual:step7:calibration": "node scripts/manual-check-step7-calibration.mjs"
   },
   "devDependencies": {
     "@types/node": "^22.14.1",

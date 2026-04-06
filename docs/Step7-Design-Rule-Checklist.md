@@ -34,16 +34,15 @@ If any command fails, Step 7 is not complete.
 
 ## Step 7 Required Additions Before Completion
 
-The following Step 7 outputs are still required by `docs/Plan.md` and are not complete yet:
+Implemented in this step:
 
-1. Calibration suite artifact with tracked metrics for:
-   - goal rates
-   - upset rates
-   - red-card impact
-   - late-goal distribution
-   - youth rarity
-2. Regression suite artifact that can be rerun after balancing passes.
-3. Final verification report artifact that summarizes all must-have flows and evidence.
+1. Calibration suite entrypoint: `scripts/manual-check-step7-calibration.mjs` (run via `npm run manual:step7:calibration`).
+   - Tracks goal rates, upset rates, red-card impact, late-goal distribution, and youth rarity with deterministic threshold checks.
+
+Still required by `docs/Plan.md` before Step 7 completion:
+
+1. Regression suite artifact that can be rerun after balancing passes.
+2. Final verification report artifact that summarizes all must-have flows and evidence.
 
 ## Gate Rule
 
