@@ -21,11 +21,11 @@
 - Passed: `npm run -w @touchline/sim-core test -- tests/reputation.test.ts tests/postMatchFallout.test.ts tests/negotiationCalibration.test.ts tests/negotiation.test.ts tests/transferEngine.test.ts`, `npm test`, `npm run typecheck`, `npm run lint`, `npm run build` after explainability summary label-stability regression proof (2026-04-05)
 
 ## Last commit hash
-- pending (next commit: explainability summary label-stability proof)
+- 7ecb18f
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`
 - Inspect git status and recent commits
 - Continue Step 3 with transfer/reputation bounded tasks only; do not jump to later steps.
 - Next bounded task: add deterministic calibration checks that preserve explainability summary phrase ordering in regression snapshots.
-- Last successful pushed commit: 80c687a.
+- Last successful pushed commit: 7ecb18f.
