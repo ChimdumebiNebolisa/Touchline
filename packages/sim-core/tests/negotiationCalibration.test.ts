@@ -899,6 +899,39 @@ describe("transfer negotiation calibration samples", () => {
     }
   });
 
+  it("keeps concise promise-trust summary metric labels consistent across reputation bands", () => {
+    const buildPromiseTrustSummary = () =>
+      summarizePromiseTrustImpactByReputationBand(
+        calibrationTarget,
+        {
+          clubWageBudget: calibrationBaseContext.clubWageBudget,
+          clubStature: calibrationBaseContext.clubStature,
+          boardWageDiscipline: calibrationBaseContext.boardWageDiscipline
+        },
+        calibrationReputationBands,
+        calibrationPromiseVariants
+      ).conciseSummary;
+
+    const runs = Array.from({ length: 6 }, () => buildPromiseTrustSummary());
+    const baseline = runs[0];
+    const expectedClauses = ["intact trust", "broken trust", "delta"];
+
+    for (const run of runs.slice(1)) {
+      expect(run).toEqual(baseline);
+    }
+
+    expect(baseline).toHaveLength(calibrationReputationBands.length);
+
+    for (const line of baseline) {
+      let cursor = -1;
+      for (const clause of expectedClauses) {
+        const nextCursor = line.indexOf(clause);
+        expect(nextCursor).toBeGreaterThan(cursor);
+        cursor = nextCursor;
+      }
+    }
+  });
+
   it("keeps reputation-band transfer outcome artifacts invariant under fixed fixture reordering", () => {
     const forwardSummary = summarizeTransferOutcomesByReputationBand(
       calibrationTarget,
