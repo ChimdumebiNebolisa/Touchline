@@ -1101,6 +1101,38 @@ describe("transfer negotiation calibration samples", () => {
     }
   });
 
+  it("keeps promise-trust acceptance deltas monotonic by reputation in fixed calibration runs", () => {
+    const buildPromiseDeltaProfile = () =>
+      summarizePromiseTrustImpactByReputationBand(
+        calibrationTarget,
+        {
+          clubWageBudget: calibrationBaseContext.clubWageBudget,
+          clubStature: calibrationBaseContext.clubStature,
+          boardWageDiscipline: calibrationBaseContext.boardWageDiscipline
+        },
+        calibrationReputationBands,
+        calibrationPromiseVariants
+      ).bands.map((band) => ({
+        managerReputation: band.managerReputation,
+        acceptanceRateDelta: band.acceptanceRateDelta
+      }));
+
+    const runs = Array.from({ length: 8 }, () => buildPromiseDeltaProfile());
+    const baseline = runs[0];
+
+    for (const run of runs.slice(1)) {
+      expect(run).toEqual(baseline);
+    }
+
+    expect(baseline.map((band) => band.managerReputation)).toEqual([82, 62, 28]);
+
+    for (let index = 1; index < baseline.length; index += 1) {
+      expect(baseline[index].acceptanceRateDelta).toBeLessThanOrEqual(
+        baseline[index - 1].acceptanceRateDelta
+      );
+    }
+  });
+
   it("keeps reputation-band transfer outcome artifacts invariant under fixed fixture reordering", () => {
     const forwardSummary = summarizeTransferOutcomesByReputationBand(
       calibrationTarget,
