@@ -40,10 +40,11 @@ Implemented in this step:
    - Tracks goal rates, upset rates, red-card impact, late-goal distribution, and youth rarity with deterministic threshold checks.
 2. Regression suite entrypoint: `scripts/manual-check-step7-regression.mjs` (run via `npm run manual:step7:regression`).
    - Re-runs bounded manual checks from Steps 1, 2, 4, 5, 6 and Step 7 calibration.
+3. Final verification report: `docs/Step7-Final-Verification-Report.md`.
 
 Still required by `docs/Plan.md` before Step 7 completion:
 
-1. Final verification report artifact that summarizes all must-have flows and evidence.
+- None.
 
 ## Gate Rule
 

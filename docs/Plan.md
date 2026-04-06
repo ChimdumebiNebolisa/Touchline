@@ -4,7 +4,7 @@
 
 **Active**
 
-* Step 7: Calibration and regression gate
+* None
 
 **Backlog**
 
@@ -22,6 +22,7 @@
 * Step 4: Academy, loans, and pathway pressure
 * Step 5: Shadow world and country-pack scaling
 * Step 6: Save/load and career continuity
+* Step 7: Calibration and regression gate
 
 **Dropped**
 
@@ -337,7 +338,7 @@ The player can save, reload, continue career, and carry reputation and relations
 ## 9. Step 7
 
 **Status**
-Active
+Done
 
 **Objective**
 Lock the game against drift, random-feeling outcomes, and scope creep. The workflow explicitly requires the plan to end with a calibration and regression gate.  
