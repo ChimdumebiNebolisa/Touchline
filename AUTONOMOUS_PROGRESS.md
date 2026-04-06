@@ -21,11 +21,11 @@
 - Passed: `npm run -w @touchline/sim-core test -- tests/academyIntake.test.ts`, then `npm test`, `npm run typecheck`, `npm run lint`, `npm run build` after Step 4 season-level academy summary artifact integration (2026-04-06)
 
 ## Last commit hash
-- pending (next commit will capture Step 4 season-level academy summary artifact integration)
+- ae8eaa7
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`
 - Inspect git status and recent commits
 - Continue with Step 4 bounded tasks only; do not jump to Step 5+.
 - Next bounded task: wire pathway-pressure summaries into Step 4 transfer/board sample artifacts.
-- Last successful pushed commit: 478d5ba.
+- Last successful pushed commit: ae8eaa7.
