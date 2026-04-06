@@ -590,6 +590,76 @@ describe("transfer negotiation calibration samples", () => {
     expect(baseline.deltaCommaCount).toBeGreaterThanOrEqual(5);
   });
 
+  it("keeps explainability-summary segment counts stable in regression snapshots", () => {
+    const buildSegmentCounts = () => {
+      const promiseTrust = summarizePromiseTrustImpactByReputationBand(
+        calibrationTarget,
+        {
+          clubWageBudget: calibrationBaseContext.clubWageBudget,
+          clubStature: calibrationBaseContext.clubStature,
+          boardWageDiscipline: calibrationBaseContext.boardWageDiscipline
+        },
+        calibrationReputationBands,
+        calibrationPromiseVariants
+      );
+      const outcomeSummary = summarizeTransferOutcomesByReputationBand(
+        calibrationTarget,
+        {
+          clubWageBudget: calibrationBaseContext.clubWageBudget,
+          clubStature: calibrationBaseContext.clubStature,
+          boardWageDiscipline: calibrationBaseContext.boardWageDiscipline
+        },
+        calibrationReputationBands,
+        calibrationOutcomeVariants
+      );
+      const equalFeeSummary = buildEqualFeeNegotiationExplainabilityArtifact(
+        calibrationTarget,
+        calibrationEqualFeeContexts.first,
+        calibrationEqualFeeContexts.second
+      ).conciseSummary;
+      const deltaSummary = buildReputationBandOutcomeDeltaSummary(
+        calibrationTarget,
+        {
+          clubWageBudget: calibrationBaseContext.clubWageBudget,
+          clubStature: calibrationBaseContext.clubStature,
+          boardWageDiscipline: calibrationBaseContext.boardWageDiscipline
+        },
+        82,
+        28,
+        calibrationOutcomeVariants
+      ).conciseSummary;
+
+      const equalFeeDriverClause = equalFeeSummary.split(":").at(1) ?? "";
+
+      return {
+        promiseTrustLineCount: promiseTrust.conciseSummary.length,
+        outcomeSummaryLineCount: outcomeSummary.conciseSummary.length,
+        equalFeeSemicolonSegmentCount: equalFeeSummary.split(";").length,
+        equalFeeDriverSegmentCount: equalFeeDriverClause
+          .split(",")
+          .map((segment) => segment.trim())
+          .filter(Boolean).length,
+        deltaMetricSegmentCount: deltaSummary
+          .split(",")
+          .map((segment) => segment.trim())
+          .filter(Boolean).length
+      };
+    };
+
+    const runs = Array.from({ length: 8 }, () => buildSegmentCounts());
+    const baseline = runs[0];
+
+    for (const run of runs.slice(1)) {
+      expect(run).toEqual(baseline);
+    }
+
+    expect(baseline.promiseTrustLineCount).toBe(3);
+    expect(baseline.outcomeSummaryLineCount).toBe(3);
+    expect(baseline.equalFeeSemicolonSegmentCount).toBe(2);
+    expect(baseline.equalFeeDriverSegmentCount).toBe(2);
+    expect(baseline.deltaMetricSegmentCount).toBe(6);
+  });
+
   it("keeps reputation-band delta artifacts deterministic across repeated fixed fixture evaluations", () => {
     const repeatedRuns = Array.from({ length: 12 }, () =>
       buildReputationBandOutcomeDeltaSummary(
