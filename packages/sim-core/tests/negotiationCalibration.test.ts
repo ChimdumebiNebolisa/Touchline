@@ -1072,6 +1072,35 @@ describe("transfer negotiation calibration samples", () => {
     }
   });
 
+  it("keeps equal-fee primary driver ordering stable by impact across repeated runs", () => {
+    const buildPrimaryDrivers = () =>
+      buildEqualFeeNegotiationExplainabilityArtifact(
+        calibrationTarget,
+        calibrationEqualFeeContexts.first,
+        calibrationEqualFeeContexts.second
+      ).primaryNonFeeDrivers;
+
+    const runs = Array.from({ length: 8 }, () => buildPrimaryDrivers());
+    const baseline = runs[0];
+
+    for (const run of runs.slice(1)) {
+      expect(run).toEqual(baseline);
+    }
+
+    expect(baseline.length).toBeGreaterThan(0);
+
+    const parseImpact = (driver: string) => {
+      const match = driver.match(/([+-]\d+\.\d{2})$/);
+      expect(match).not.toBeNull();
+      return Math.abs(Number(match![1]));
+    };
+
+    const impactMagnitudes = baseline.map((driver) => parseImpact(driver));
+    for (let index = 1; index < impactMagnitudes.length; index += 1) {
+      expect(impactMagnitudes[index]).toBeLessThanOrEqual(impactMagnitudes[index - 1]);
+    }
+  });
+
   it("keeps reputation-band transfer outcome artifacts invariant under fixed fixture reordering", () => {
     const forwardSummary = summarizeTransferOutcomesByReputationBand(
       calibrationTarget,
