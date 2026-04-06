@@ -4,28 +4,28 @@
 - Step 5: Shadow world and country-pack scaling
 
 ## Last completed verified task
-- Added and verified `manual:step5` sample world-state artifact output for shadow transfer supply, loan destinations, promotion-relegation continuity links, and second-country content-only compatibility checks.
+- Added and verified a Step 5 integration artifact test (`shadowWorld.integration`) that combines completed season output with shadow-league context to prove transfer/loan continuity compatibility in world flow.
 
 ## Current subtask in progress
-- Choose the next smallest Step 5 integration gap after manual artifact coverage.
+- Final Step 5 exit-criteria audit and completion-checkpoint decision.
 
 ## Next queued subtasks
-- Expand Step 5 integration coverage to prove shadow context hooks into season/world outputs.
-- Add a compact Step 5 integration flow that combines season summary with shadow context snapshot output.
+- Confirm whether Step 5 exit criteria are fully satisfied with contract validation, shadow snapshot artifacts, integration tests, and manual evidence.
+- If Step 5 is complete, prepare a bounded Step 5 completion checkpoint update before moving to Step 6.
 - Keep Step 5 scope only; do not start Step 6+ until Step 5 verification is explicit.
 
 ## Known blockers
 - None
 
 ## Last verification run
-- Passed: `npm run manual:step5`; `npm test`; `npm run typecheck`; `npm run lint`; `npm run build` (2026-04-06)
+- Passed: `npm run -w @touchline/sim-core test -- tests/shadowWorld.integration.test.ts tests/shadowLeagues.test.ts tests/seasonWorld.test.ts`; `npm test`; `npm run typecheck`; `npm run lint`; `npm run build` (2026-04-06)
 
 ## Last commit hash
-- 90a7bf0 (new commit pending)
+- 43617b3 (new commit pending)
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`
 - Inspect git status and recent commits
 - Continue with Step 5 bounded tasks only; do not jump to Step 6+.
-- Next bounded task: add a compact Step 5 integration flow combining season summary and shadow context artifact output.
-- Last successful pushed commit before this pending checkpoint: 90a7bf0.
+- Next bounded task: run Step 5 completion audit and either close Step 5 or document the smallest remaining gap.
+- Last successful pushed commit before this pending checkpoint: 43617b3.
