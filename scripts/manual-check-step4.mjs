@@ -43,6 +43,7 @@ function evaluateWindow(options) {
       seed: options.seed,
       academyQuality: options.academyQuality,
       pathwayBias: options.pathwayBias,
+      squadCongestion: options.squadCongestion,
       intakeSize: options.intakeSize
     });
 
@@ -95,6 +96,7 @@ function evaluateWindow(options) {
     label: options.label,
     academyQuality: options.academyQuality,
     pathwayBias: options.pathwayBias,
+    squadCongestion: options.squadCongestion ?? 0.5,
     seasons: options.seasons,
     intakeSize: options.intakeSize,
     averagePotential: totalAveragePotential / options.seasons,
@@ -103,6 +105,7 @@ function evaluateWindow(options) {
     averageBlockageScore: totalBlockageScore / options.seasons,
     totalLoanRecommendations,
     totalFirstTeamRecommendations,
+    firstTeamRecommendationRate: totalFirstTeamRecommendations / totalProspects,
     usableYouthRecommendationRate: usableYouthRecommendations / totalProspects,
     transferAcceptedRate: totalTransferAccepted / options.seasons,
     averageTransferScore: totalTransferScore / options.seasons,
@@ -121,12 +124,14 @@ function printWindowSummary(result) {
       label: result.label,
       academyQuality: result.academyQuality.toFixed(2),
       pathwayBias: result.pathwayBias.toFixed(2),
+      squadCongestion: result.squadCongestion.toFixed(2),
       averagePotential: result.averagePotential.toFixed(2),
       highPotentialRate: formatPercent(result.highPotentialRate),
       eliteRate: formatPercent(result.eliteRate),
       averageBlockageScore: result.averageBlockageScore.toFixed(2),
       loanRecommendations: result.totalLoanRecommendations,
       firstTeamRecommendations: result.totalFirstTeamRecommendations,
+      firstTeamRecommendationRate: formatPercent(result.firstTeamRecommendationRate),
       usableYouthRecommendationRate: formatPercent(result.usableYouthRecommendationRate),
       transferAcceptedRate: formatPercent(result.transferAcceptedRate),
       averageTransferScore: result.averageTransferScore.toFixed(2),
@@ -179,6 +184,30 @@ const highPathwayBiasWindow = evaluateWindow({
   intakeSize: 10
 });
 
+const lowCongestionWindow = evaluateWindow({
+  label: "low-squad-congestion",
+  clubId: "club-step4-congestion",
+  seed: 519,
+  startSeasonYear: 2068,
+  seasons: 20,
+  academyQuality: 0.7,
+  pathwayBias: 0.58,
+  squadCongestion: 0.2,
+  intakeSize: 9
+});
+
+const highCongestionWindow = evaluateWindow({
+  label: "high-squad-congestion",
+  clubId: "club-step4-congestion",
+  seed: 519,
+  startSeasonYear: 2068,
+  seasons: 20,
+  academyQuality: 0.7,
+  pathwayBias: 0.58,
+  squadCongestion: 0.9,
+  intakeSize: 9
+});
+
 const blockedPathwayWindow =
   highPathwayBiasWindow.averageBlockageScore >= lowPathwayBiasWindow.averageBlockageScore
     ? highPathwayBiasWindow
@@ -197,6 +226,11 @@ const checks = {
     highQualityWindow.eliteRate < 0.07,
   strongerPathwayBiasRaisesUsableYouth:
     highPathwayBiasWindow.usableYouthRecommendationRate > lowPathwayBiasWindow.usableYouthRecommendationRate,
+  higherCongestionShiftsPathwayTowardLoans:
+    highCongestionWindow.firstTeamRecommendationRate < lowCongestionWindow.firstTeamRecommendationRate &&
+    highCongestionWindow.totalLoanRecommendations > lowCongestionWindow.totalLoanRecommendations,
+  higherCongestionIncreasesPathwayBlockage:
+    highCongestionWindow.averageBlockageScore > lowCongestionWindow.averageBlockageScore,
   blockedPathwaysRaisePressureOrLoanUsage:
     blockedPathwayWindow.totalLoanRecommendations > clearPathwayWindow.totalLoanRecommendations ||
     blockedPathwayWindow.averageTransferScore < clearPathwayWindow.averageTransferScore ||
@@ -213,6 +247,10 @@ printWindowSummary(highQualityWindow);
 console.log("- Pathway pressure and downstream transfer/board context window");
 printWindowSummary(lowPathwayBiasWindow);
 printWindowSummary(highPathwayBiasWindow);
+
+console.log("- Squad-congestion pathway friction window");
+printWindowSummary(lowCongestionWindow);
+printWindowSummary(highCongestionWindow);
 
 console.log("- Blocked-vs-clear pathway mapping");
 console.table([
@@ -234,6 +272,8 @@ console.table([
     qualityRaisesHighPotentialRate: checks.qualityRaisesHighPotentialRate,
     eliteOutcomesRemainRare: checks.eliteOutcomesRemainRare,
     strongerPathwayBiasRaisesUsableYouth: checks.strongerPathwayBiasRaisesUsableYouth,
+    higherCongestionShiftsPathwayTowardLoans: checks.higherCongestionShiftsPathwayTowardLoans,
+    higherCongestionIncreasesPathwayBlockage: checks.higherCongestionIncreasesPathwayBlockage,
     blockedPathwaysRaisePressureOrLoanUsage: checks.blockedPathwaysRaisePressureOrLoanUsage,
     blockedPathwaysIncreaseBoardRisk: checks.blockedPathwaysIncreaseBoardRisk
   }
