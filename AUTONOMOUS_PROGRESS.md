@@ -4,14 +4,14 @@
 - Step 6: Save/load and career continuity
 
 ## Last completed verified task
-- Extended and verified `manual:step6` to include slot-based save/load continuity checks (write/read/list slot flow plus deterministic post-reload continuation parity).
+- Added and verified long-save slot overwrite continuity coverage, ensuring latest saved timeline state preserves reputation history, leverage progression, sack history, and world progression.
 
 ## Current subtask in progress
-- Audit remaining Step 6 persistence gaps after slot-backed manual evidence.
+- Run Step 6 completion audit against exit criteria and identify final gap(s), if any.
 
 ## Next queued subtasks
-- Evaluate whether Step 6 exit criteria are now met or identify the smallest remaining persistence gap.
-- If needed, add bounded save-slot metadata/manual artifact coverage for multi-save continuity.
+- Evaluate whether Step 6 exit criteria are met with current serialization, slot persistence, integration tests, and manual artifacts.
+- If any gap remains, add the smallest bounded persistence/manual evidence artifact to close it.
 - Keep Step 6 scope only; do not start Step 7 until Step 6 verification is explicit.
 
 ## Known blockers
@@ -21,11 +21,11 @@
 - Passed: `npm run -w @touchline/save test`; `npm run -w @touchline/save typecheck`; `npm run -w @touchline/save lint`; `npm run -w @touchline/save build`; `npm test`; `npm run typecheck`; `npm run lint`; `npm run build` (2026-04-06)
 
 ## Last commit hash
-- e70a5c1 (new commit pending)
+- fff0980 (new commit pending)
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`
 - Inspect git status and recent commits
 - Continue with Step 6 bounded tasks only; do not jump to Step 7.
-- Next bounded task: run a Step 6 completion audit and select the smallest remaining persistence artifact gap if any.
-- Last successful pushed commit before this pending checkpoint: e70a5c1.
+- Next bounded task: complete Step 6 exit-criteria audit and either checkpoint completion or implement the smallest remaining artifact.
+- Last successful pushed commit before this pending checkpoint: fff0980.

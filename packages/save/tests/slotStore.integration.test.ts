@@ -81,4 +81,66 @@ describe("save slot store integration", () => {
       await rm(rootDirectory, { recursive: true, force: true });
     }
   });
+
+  it("preserves latest long-save timeline state when a slot is overwritten", async () => {
+    const rootDirectory = await mkdtemp(join(tmpdir(), "touchline-save-slot-timeline-"));
+
+    try {
+      const firstSeasonState = createSeasonState([
+        { id: "club-a", name: "Club A", strength: 74 },
+        { id: "club-b", name: "Club B", strength: 71 },
+        { id: "club-c", name: "Club C", strength: 69 },
+        { id: "club-d", name: "Club D", strength: 67 }
+      ]);
+
+      await writeSaveSlot({
+        rootDirectory,
+        slotId: "career-timeline",
+        state: createSaveState(firstSeasonState),
+        savedAtIso: "2035-06-01T08:00:00.000Z"
+      });
+
+      const secondSeasonState = advanceSeasonState(
+        firstSeasonState,
+        Object.fromEntries(
+          getFixturesForMatchday(firstSeasonState, firstSeasonState.currentMatchday).map((fixture, index) => [
+            fixture.id,
+            {
+              homeGoals: (index + 2) % 3,
+              awayGoals: (index + 1) % 3
+            }
+          ])
+        )
+      );
+
+      const secondState = createSaveState(secondSeasonState);
+      secondState.managerCareer.reputationHistory = [51, 56, 60, 63];
+      secondState.managerCareer.careerLeverageHistory = [
+        ...secondState.managerCareer.careerLeverageHistory,
+        {
+          score: 0.7,
+          band: "in-demand",
+          reasonSummary: "Second-season results increased board confidence and transfer pull."
+        }
+      ];
+
+      await writeSaveSlot({
+        rootDirectory,
+        slotId: "career-timeline",
+        state: secondState,
+        savedAtIso: "2036-06-01T08:00:00.000Z"
+      });
+
+      const restored = await readSaveSlot({ rootDirectory, slotId: "career-timeline" });
+
+      expect(restored.savedAtIso).toBe("2036-06-01T08:00:00.000Z");
+      expect(restored.state.managerCareer.reputationHistory).toEqual([51, 56, 60, 63]);
+      expect(restored.state.managerCareer.careerLeverageHistory).toHaveLength(2);
+      expect(restored.state.managerCareer.careerLeverageHistory[1].band).toBe("in-demand");
+      expect(restored.state.worldState.currentMatchday).toBe(secondSeasonState.currentMatchday);
+      expect(restored.state.worldState.completedFixtureIds).toEqual(secondSeasonState.completedFixtureIds);
+    } finally {
+      await rm(rootDirectory, { recursive: true, force: true });
+    }
+  });
 });
