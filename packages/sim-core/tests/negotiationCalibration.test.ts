@@ -429,6 +429,53 @@ describe("transfer negotiation calibration samples", () => {
     );
   });
 
+  it("keeps explainability summary phrase ordering deterministic in regression snapshots", () => {
+    const equalFeeSummary = buildEqualFeeNegotiationExplainabilityArtifact(
+      calibrationTarget,
+      calibrationEqualFeeContexts.first,
+      calibrationEqualFeeContexts.second
+    ).conciseSummary;
+    const deltaSummary = buildReputationBandOutcomeDeltaSummary(
+      calibrationTarget,
+      {
+        clubWageBudget: calibrationBaseContext.clubWageBudget,
+        clubStature: calibrationBaseContext.clubStature,
+        boardWageDiscipline: calibrationBaseContext.boardWageDiscipline
+      },
+      82,
+      28,
+      calibrationOutcomeVariants
+    ).conciseSummary;
+
+    const equalFeeSegments = [
+      "Equal-fee comparison",
+      "primary",
+      ":"
+    ];
+    const deltaSegments = [
+      "accepted delta",
+      "rate delta",
+      "score delta",
+      "board block delta",
+      "sporting-director block delta",
+      "player block delta"
+    ];
+
+    let equalFeeCursor = -1;
+    for (const segment of equalFeeSegments) {
+      const nextCursor = equalFeeSummary.indexOf(segment);
+      expect(nextCursor).toBeGreaterThan(equalFeeCursor);
+      equalFeeCursor = nextCursor;
+    }
+
+    let deltaCursor = -1;
+    for (const segment of deltaSegments) {
+      const nextCursor = deltaSummary.indexOf(segment);
+      expect(nextCursor).toBeGreaterThan(deltaCursor);
+      deltaCursor = nextCursor;
+    }
+  });
+
   it("keeps reputation-band delta artifacts deterministic across repeated fixed fixture evaluations", () => {
     const repeatedRuns = Array.from({ length: 12 }, () =>
       buildReputationBandOutcomeDeltaSummary(
