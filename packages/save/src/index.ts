@@ -7,6 +7,14 @@ export {
   serializeSaveEnvelope
 } from "./codec.js";
 export {
+  buildSaveSlotFilePath,
+  deleteSaveSlot,
+  listSaveSlots,
+  readSaveSlot,
+  writeSaveSlot,
+  type SaveSlotMetadata
+} from "./slotStore.js";
+export {
   CURRENT_SAVE_VERSION,
   SUPPORTED_SAVE_VERSIONS,
   type ManagerCareerSaveState,
