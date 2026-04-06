@@ -37,7 +37,9 @@ export type {
 export type {
   AcademyIntakeInput,
   AcademyIntakeResult,
+  AcademyPathwayBlockageRisk,
   AcademyPathwayRecommendation,
+  AcademyPathwayPressureSignal,
   AcademyProspect,
   AcademyProspectTier
 } from "./academy/types.js";

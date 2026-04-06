@@ -2,7 +2,9 @@ import { createSeededRandom } from "../match/rng.js";
 import type {
   AcademyIntakeInput,
   AcademyIntakeResult,
+  AcademyPathwayBlockageRisk,
   AcademyPathwayRecommendation,
+  AcademyPathwayPressureSignal,
   AcademyProspect,
   AcademyProspectTier
 } from "./types.js";
@@ -93,6 +95,54 @@ function buildProspect(
   };
 }
 
+function buildPathwayPressureSignal(
+  prospects: AcademyProspect[],
+  eliteCount: number,
+  pathwayBias: number
+): AcademyPathwayPressureSignal {
+  const firstTeamCandidateCount = prospects.filter(
+    (prospect) => prospect.pathwayRecommendation === "first-team-minutes"
+  ).length;
+  const loanCandidateCount = prospects.filter(
+    (prospect) => prospect.pathwayRecommendation === "loan-pathway"
+  ).length;
+  const pathwayCapacity = Math.max(1, Math.round(1 + pathwayBias * 3));
+  const promotionOverflow = Math.max(0, firstTeamCandidateCount - pathwayCapacity);
+  const promotionPressure = clamp(
+    promotionOverflow / Math.max(1, prospects.length * 0.35),
+    0,
+    1
+  );
+  const loanPressure = clamp(
+    ((loanCandidateCount + promotionOverflow) / Math.max(1, prospects.length * 0.5)) *
+      (1.1 - pathwayBias * 0.4),
+    0,
+    1
+  );
+  const eliteRate = eliteCount / prospects.length;
+  const blockageScore = clamp(Math.max(promotionPressure, loanPressure) + eliteRate * 0.2, 0, 1);
+
+  let blockageRisk: AcademyPathwayBlockageRisk = "low";
+  if (blockageScore >= 0.65) {
+    blockageRisk = "high";
+  } else if (blockageScore >= 0.3) {
+    blockageRisk = "moderate";
+  }
+
+  return {
+    firstTeamCandidateCount,
+    loanCandidateCount,
+    promotionPressure,
+    loanPressure,
+    blockageScore,
+    blockageRisk,
+    reasonSummary: [
+      `First-team candidates ${firstTeamCandidateCount} against pathway capacity ${pathwayCapacity}.`,
+      `Loan-pathway candidates ${loanCandidateCount}; promotion pressure ${promotionPressure.toFixed(2)} and loan pressure ${loanPressure.toFixed(2)}.`
+    ]
+  };
+}
+
 export function generateAcademyIntake(input: AcademyIntakeInput): AcademyIntakeResult {
   if (input.intakeSize <= 0) {
     throw new Error("Academy intake size must be greater than zero.");
@@ -120,6 +170,7 @@ export function generateAcademyIntake(input: AcademyIntakeInput): AcademyIntakeR
   const eliteCount = prospects.filter((prospect) => prospect.tier === "elite").length;
   const highPotentialCount = prospects.filter((prospect) => prospect.tier !== "regular").length;
   const averagePotential = prospects.reduce((sum, prospect) => sum + prospect.potential, 0) / prospects.length;
+  const pathwayPressure = buildPathwayPressureSignal(prospects, eliteCount, pathwayBias);
 
   return {
     clubId: input.clubId,
@@ -128,9 +179,11 @@ export function generateAcademyIntake(input: AcademyIntakeInput): AcademyIntakeR
     eliteCount,
     highPotentialCount,
     averagePotential,
+    pathwayPressure,
     conciseSummary: [
       `Intake ${input.seasonYear}: ${eliteCount} elite, ${highPotentialCount} high-potential from ${prospects.length} prospects.`,
-      `Average potential ${averagePotential.toFixed(2)} with pathway bias ${pathwayBias.toFixed(2)}.`
+      `Average potential ${averagePotential.toFixed(2)} with pathway bias ${pathwayBias.toFixed(2)}.`,
+      `Pathway pressure ${pathwayPressure.blockageScore.toFixed(2)} (${pathwayPressure.blockageRisk}).`
     ]
   };
 }

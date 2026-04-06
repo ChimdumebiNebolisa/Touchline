@@ -24,6 +24,7 @@ describe("academy intake", () => {
     expect(secondRun).toEqual(firstRun);
     expect(firstRun.prospects).toHaveLength(8);
     expect(firstRun.conciseSummary[0]).toContain("elite");
+    expect(firstRun.pathwayPressure.reasonSummary.length).toBeGreaterThan(0);
   });
 
   it("raises average potential and high-potential yield for stronger academy quality", () => {
@@ -120,6 +121,57 @@ describe("academy intake", () => {
       highBiasRuns.reduce((sum, run) => sum + run.prospects.length, 0);
 
     expect(highBiasFirstTeamRate).toBeGreaterThan(lowBiasFirstTeamRate);
+  });
+
+  it("keeps pathway-pressure signals deterministic for identical intake inputs", () => {
+    const firstRun = generateAcademyIntake({
+      clubId: "club-e",
+      seasonYear: 2064,
+      seed: 122,
+      academyQuality: 0.74,
+      pathwayBias: 0.51,
+      intakeSize: 9
+    });
+    const secondRun = generateAcademyIntake({
+      clubId: "club-e",
+      seasonYear: 2064,
+      seed: 122,
+      academyQuality: 0.74,
+      pathwayBias: 0.51,
+      intakeSize: 9
+    });
+
+    expect(secondRun.pathwayPressure).toEqual(firstRun.pathwayPressure);
+    expect(firstRun.pathwayPressure.blockageScore).toBeGreaterThanOrEqual(0);
+    expect(firstRun.pathwayPressure.blockageScore).toBeLessThanOrEqual(1);
+  });
+
+  it("raises pathway pressure under higher academy-quality intake demand", () => {
+    const lowQualityRuns = Array.from({ length: 120 }, (_, seasonOffset) =>
+      generateAcademyIntake({
+        clubId: "club-f",
+        seasonYear: 2070 + seasonOffset,
+        seed: 455,
+        academyQuality: 0.25,
+        pathwayBias: 0.5,
+        intakeSize: 10
+      })
+    );
+    const highQualityRuns = Array.from({ length: 120 }, (_, seasonOffset) =>
+      generateAcademyIntake({
+        clubId: "club-f",
+        seasonYear: 2070 + seasonOffset,
+        seed: 455,
+        academyQuality: 0.85,
+        pathwayBias: 0.5,
+        intakeSize: 10
+      })
+    );
+
+    const averageBlockageScore = (runs: ReturnType<typeof generateAcademyIntake>[]) =>
+      runs.reduce((sum, run) => sum + run.pathwayPressure.blockageScore, 0) / runs.length;
+
+    expect(averageBlockageScore(highQualityRuns)).toBeGreaterThan(averageBlockageScore(lowQualityRuns));
   });
 
   it("rejects intake requests without any prospect slots", () => {

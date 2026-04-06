@@ -5,6 +5,8 @@ export type AcademyPathwayRecommendation =
   | "loan-pathway"
   | "academy-development";
 
+export type AcademyPathwayBlockageRisk = "low" | "moderate" | "high";
+
 export interface AcademyIntakeInput {
   clubId: string;
   seasonYear: number;
@@ -22,6 +24,16 @@ export interface AcademyProspect {
   pathwayRecommendation: AcademyPathwayRecommendation;
 }
 
+export interface AcademyPathwayPressureSignal {
+  firstTeamCandidateCount: number;
+  loanCandidateCount: number;
+  promotionPressure: number;
+  loanPressure: number;
+  blockageScore: number;
+  blockageRisk: AcademyPathwayBlockageRisk;
+  reasonSummary: string[];
+}
+
 export interface AcademyIntakeResult {
   clubId: string;
   seasonYear: number;
@@ -29,5 +41,6 @@ export interface AcademyIntakeResult {
   eliteCount: number;
   highPotentialCount: number;
   averagePotential: number;
+  pathwayPressure: AcademyPathwayPressureSignal;
   conciseSummary: string[];
 }
