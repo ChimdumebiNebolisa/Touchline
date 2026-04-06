@@ -4,28 +4,28 @@
 - Step 6: Save/load and career continuity
 
 ## Last completed verified task
-- Added and verified deterministic pre-event save/load continuation coverage in `@touchline/save` to prove reload continuity around a major event boundary using identical fixture results.
+- Added and verified `manual:step6` deterministic save/load evidence output, including save-envelope summary, manager career persistence checks, and reload continuation parity around a major event boundary.
 
 ## Current subtask in progress
-- Audit remaining Step 6 persistence gaps after continuation evidence.
+- Implement the next bounded Step 6 persistence hardening subtask.
 
 ## Next queued subtasks
 - Add a bounded save-schema evolution guard for migration-safe version checks.
-- Add a Step 6 manual artifact script that surfaces save/load continuity evidence using realistic world samples.
+- Add local save-slot filesystem persistence helpers with explicit load/write failure reasons.
 - Keep Step 6 scope only; do not start Step 7 until Step 6 verification is explicit.
 
 ## Known blockers
 - None
 
 ## Last verification run
-- Passed: `npm run -w @touchline/save test`; `npm run -w @touchline/save typecheck`; `npm run -w @touchline/save lint`; `npm run -w @touchline/save build`; `npm test`; `npm run typecheck`; `npm run lint`; `npm run build` (2026-04-06)
+- Passed: `npm run manual:step6`; `npm test`; `npm run typecheck`; `npm run lint`; `npm run build` (2026-04-06)
 
 ## Last commit hash
-- 0b43cc9 (new commit pending)
+- b30ee74 (new commit pending)
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`
 - Inspect git status and recent commits
 - Continue with Step 6 bounded tasks only; do not jump to Step 7.
-- Next bounded task: add a Step 6 manual save/load evidence artifact script with deterministic continuation checks.
-- Last successful pushed commit before this pending checkpoint: 0b43cc9.
+- Next bounded task: add a migration-safe save-schema version guard with explicit verification.
+- Last successful pushed commit before this pending checkpoint: b30ee74.
