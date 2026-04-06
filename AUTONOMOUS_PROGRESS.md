@@ -1,31 +1,31 @@
 # Autonomous Progress
 
 ## Current active Plan step
-- Step 3: Transfer and reputation expansion
+- Step 4: Academy, loans, and pathway pressure
 
 ## Last completed verified task
-- Added deterministic calibration proof that promise-trust acceptance-rate deltas remain monotonic across reputation bands in repeated Step 3 runs.
+- Ran an explicit Step 3 completion gate and verified all Step 3 exit criteria with deterministic test evidence.
 
 ## Current subtask in progress
-- Add bounded Step 3 calibration checks that preserve concise transfer artifact stability for regression snapshots.
+- Implement the first bounded Step 4 subtask: deterministic academy intake core with rarity-weighted outcomes.
 
 ## Next queued subtasks
-- Keep Step 3 scope constrained to transfer/reputation logic without Step 4 academy drift.
-- Preserve concise transfer artifacts for calibration and regression checks.
-- Add deterministic sample outputs that can be used in Step 3 calibration/regression checks.
+- Add Step 4 long-run calibration tests to validate elite intake rarity.
+- Add pathway-pressure signals that can feed transfer and board systems.
+- Add loan-path fixture scaffolding for intake-to-pathway progression checks.
 
 ## Known blockers
 - None
 
 ## Last verification run
-- Passed: `npm run -w @touchline/sim-core test -- tests/reputation.test.ts tests/postMatchFallout.test.ts tests/negotiationCalibration.test.ts tests/negotiation.test.ts tests/transferEngine.test.ts`, `npm test`, `npm run typecheck`, `npm run lint`, `npm run build` after monotonic promise-trust delta determinism regression proof (2026-04-05)
+- Passed explicit Step 3 gate: `npm run -w @touchline/sim-core test -- tests/transferEngine.test.ts tests/negotiation.test.ts tests/negotiationCalibration.test.ts tests/reputation.test.ts tests/postMatchFallout.test.ts`, then `npm test`, `npm run typecheck`, `npm run lint`, `npm run build` (2026-04-06)
 
 ## Last commit hash
-- 870d829
+- 9cb1eed
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`
 - Inspect git status and recent commits
-- Continue Step 3 with transfer/reputation bounded tasks only; do not jump to later steps.
-- Next bounded task: add bounded Step 3 calibration checks that preserve concise transfer artifact stability for regression snapshots.
-- Last successful pushed commit: 870d829.
+- Continue with Step 4 bounded tasks only; do not jump to Step 5+.
+- Next bounded task: implement deterministic academy intake core and tests for rarity-weighted outputs.
+- Last successful pushed commit: 9cb1eed.
