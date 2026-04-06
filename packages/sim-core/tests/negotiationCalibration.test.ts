@@ -391,6 +391,44 @@ describe("transfer negotiation calibration samples", () => {
     }
   });
 
+  it("keeps explainability summary labels stable across repeated runs", () => {
+    const repeatedSummaries = Array.from({ length: 8 }, () => {
+      const equalFee = buildEqualFeeNegotiationExplainabilityArtifact(
+        calibrationTarget,
+        calibrationEqualFeeContexts.first,
+        calibrationEqualFeeContexts.second
+      );
+      const outcomeDeltaSummary = buildReputationBandOutcomeDeltaSummary(
+        calibrationTarget,
+        {
+          clubWageBudget: calibrationBaseContext.clubWageBudget,
+          clubStature: calibrationBaseContext.clubStature,
+          boardWageDiscipline: calibrationBaseContext.boardWageDiscipline
+        },
+        82,
+        28,
+        calibrationOutcomeVariants
+      );
+
+      return {
+        equalFeeSummary: equalFee.conciseSummary,
+        deltaSummary: outcomeDeltaSummary.conciseSummary
+      };
+    });
+
+    const baseline = repeatedSummaries[0];
+    for (const summary of repeatedSummaries.slice(1)) {
+      expect(summary).toEqual(baseline);
+    }
+
+    expect(baseline.equalFeeSummary).toMatch(
+      /^Equal-fee comparison (aligned|diverged) \((accepted|rejected)( vs (accepted|rejected))?\); primary (contextual deltas|non-fee drivers): .+\.$/
+    );
+    expect(baseline.deltaSummary).toMatch(
+      /^Reputation \d+ vs \d+: accepted delta -?\d+, rate delta -?\d+\.\d{2}, score delta -?\d+\.\d{2}, board block delta -?\d+, sporting-director block delta -?\d+, player block delta -?\d+\.$/
+    );
+  });
+
   it("keeps reputation-band delta artifacts deterministic across repeated fixed fixture evaluations", () => {
     const repeatedRuns = Array.from({ length: 12 }, () =>
       buildReputationBandOutcomeDeltaSummary(
