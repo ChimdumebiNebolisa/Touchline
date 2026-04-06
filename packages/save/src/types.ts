@@ -6,6 +6,7 @@ import type {
 } from "@touchline/sim-core";
 
 export const CURRENT_SAVE_VERSION = 1;
+export const SUPPORTED_SAVE_VERSIONS = [CURRENT_SAVE_VERSION] as const;
 
 export type SaveLoadErrorCode = "INVALID_JSON" | "UNSUPPORTED_VERSION" | "MALFORMED_PAYLOAD";
 

@@ -7,6 +7,7 @@ import type {
 
 import {
   CURRENT_SAVE_VERSION,
+  SUPPORTED_SAVE_VERSIONS,
   type ManagerCareerSaveState,
   type SaveEnvelopeV1,
   type SaveGameStateV1,
@@ -20,6 +21,16 @@ export class SaveLoadError extends Error {
     super(message);
     this.name = "SaveLoadError";
     this.code = code;
+  }
+}
+
+export function isSupportedSaveVersion(version: number): boolean {
+  return SUPPORTED_SAVE_VERSIONS.includes(version as (typeof SUPPORTED_SAVE_VERSIONS)[number]);
+}
+
+export function assertSupportedSaveVersion(version: number): void {
+  if (!isSupportedSaveVersion(version)) {
+    throw new SaveLoadError("UNSUPPORTED_VERSION", `Unsupported save payload version ${String(version)}.`);
   }
 }
 
@@ -142,12 +153,7 @@ function assertValidSaveEnvelope(envelope: unknown): asserts envelope is SaveEnv
     throw new SaveLoadError("MALFORMED_PAYLOAD", "Save payload version must be numeric.");
   }
 
-  if (envelope.version !== CURRENT_SAVE_VERSION) {
-    throw new SaveLoadError(
-      "UNSUPPORTED_VERSION",
-      `Unsupported save payload version ${String(envelope.version)}.`
-    );
-  }
+  assertSupportedSaveVersion(envelope.version);
 
   if (!isString(envelope.savedAtIso) || Number.isNaN(Date.parse(envelope.savedAtIso))) {
     throw new SaveLoadError(

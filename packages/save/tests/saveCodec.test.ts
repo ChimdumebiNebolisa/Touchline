@@ -10,11 +10,14 @@ import {
 } from "@touchline/sim-core";
 
 import {
+  assertSupportedSaveVersion,
   createSaveEnvelopeV1,
   CURRENT_SAVE_VERSION,
   deserializeSaveEnvelope,
+  isSupportedSaveVersion,
   SaveLoadError,
   serializeSaveEnvelope,
+  SUPPORTED_SAVE_VERSIONS,
   type SaveGameStateV1
 } from "../src/index.js";
 
@@ -104,6 +107,15 @@ function createSaveStateForWorldState(worldState: SaveGameStateV1["worldState"])
 }
 
 describe("save codec", () => {
+  it("exposes migration-safe schema version guard helpers", () => {
+    expect(SUPPORTED_SAVE_VERSIONS).toContain(CURRENT_SAVE_VERSION);
+    expect(isSupportedSaveVersion(CURRENT_SAVE_VERSION)).toBe(true);
+    expect(isSupportedSaveVersion(CURRENT_SAVE_VERSION + 1)).toBe(false);
+
+    expect(() => assertSupportedSaveVersion(CURRENT_SAVE_VERSION)).not.toThrow();
+    expect(() => assertSupportedSaveVersion(CURRENT_SAVE_VERSION + 1)).toThrowError(SaveLoadError);
+  });
+
   it("serializes and deserializes a save envelope without state drift", () => {
     const state = createSampleState();
     const envelope = createSaveEnvelopeV1(state, "2032-05-01T10:30:00.000Z");
