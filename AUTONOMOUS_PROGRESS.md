@@ -21,11 +21,11 @@
 - Passed: `npm run -w @touchline/sim-core test -- tests/academyIntake.test.ts`, then `npm test`, `npm run typecheck`, `npm run lint`, `npm run build` after Step 4 loan-path fixture scaffolding checks (2026-04-06)
 
 ## Last commit hash
-- pending (next commit will capture Step 4 loan-path fixture scaffolding)
+- 779f4de
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`
 - Inspect git status and recent commits
 - Continue with Step 4 bounded tasks only; do not jump to Step 5+.
 - Next bounded task: integrate academy output summaries into season-level sample artifacts.
-- Last successful pushed commit: fc96950.
+- Last successful pushed commit: 779f4de.
