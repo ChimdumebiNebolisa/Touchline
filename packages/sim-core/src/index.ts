@@ -35,6 +35,13 @@ export type {
   PostMatchPerceptionContext
 } from "./club/types.js";
 export type {
+  AcademyIntakeInput,
+  AcademyIntakeResult,
+  AcademyPathwayRecommendation,
+  AcademyProspect,
+  AcademyProspectTier
+} from "./academy/types.js";
+export type {
   BoardExpectationContext,
   BoardExpectationEvaluation,
   SackRiskPressureLevel,
@@ -101,6 +108,7 @@ export { evaluateBoardExpectationContext } from "./club/board.js";
 export { computeTeamMoraleDelta } from "./club/morale.js";
 export { computeManagerReputationDelta, deriveManagerCareerLeverageSnapshot } from "./club/reputation.js";
 export { applyPostMatchFallout } from "./club/postMatchFallout.js";
+export { generateAcademyIntake } from "./academy/intake.js";
 export { buildTransferFollowUpEvent, evaluateTransferDecision } from "./transfers/transferEngine.js";
 export {
   advanceSeasonState,
