@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { generateAcademyIntake } from "../src/index.js";
 import {
+  buildLoanPathwayProgressionArtifact,
   buildLoanPathFixtureWindow,
   buildSeasonAcademyOutputSummaryArtifact
 } from "./fixtures/academyPathwayFixtures.js";
@@ -273,5 +274,25 @@ describe("academy intake", () => {
     expect(firstArtifact.rows).toHaveLength(8);
     expect(firstArtifact.conciseSummary[0]).toContain("Seasons sampled");
     expect(firstArtifact.totalLoanRecommendations).toBeGreaterThan(0);
+  });
+
+  it("builds deterministic intake-to-loan-pathway progression artifacts across seasons", () => {
+    const fixtures = buildLoanPathFixtureWindow({
+      clubId: "club-loan-progression",
+      seed: 1001,
+      startSeasonYear: 2098,
+      seasons: 10,
+      academyQuality: 0.71,
+      pathwayBias: 0.62,
+      intakeSize: 10
+    });
+
+    const firstArtifact = buildLoanPathwayProgressionArtifact(fixtures);
+    const secondArtifact = buildLoanPathwayProgressionArtifact(fixtures);
+
+    expect(secondArtifact).toEqual(firstArtifact);
+    expect(firstArtifact.rows).toHaveLength(10);
+    expect(firstArtifact.totalLoanRecommendations).toBeGreaterThan(0);
+    expect(firstArtifact.conciseSummary[0]).toContain("Loan-pathway progression sampled");
   });
 });

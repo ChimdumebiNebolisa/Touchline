@@ -26,6 +26,19 @@ export interface AcademySeasonOutputSummaryArtifact {
   conciseSummary: string[];
 }
 
+export interface AcademyLoanPathwayProgressionArtifact {
+  rows: Array<{
+    seasonYear: number;
+    loanRecommendationCount: number;
+    blockageScore: number;
+    blockageRisk: AcademyPathwayBlockageRisk;
+  }>;
+  firstSeasonLoanRecommendations: number;
+  finalSeasonLoanRecommendations: number;
+  totalLoanRecommendations: number;
+  conciseSummary: string[];
+}
+
 function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
 }
@@ -135,4 +148,31 @@ export function deriveBoardFinancialPressureFromAcademySummary(
     0,
     1
   );
+}
+
+export function buildLoanPathwayProgressionArtifact(
+  fixtures: AcademyIntakeInput[]
+): AcademyLoanPathwayProgressionArtifact {
+  const summary = buildSeasonAcademyOutputSummaryArtifact(fixtures);
+  const rows = summary.rows.map((row) => ({
+    seasonYear: row.seasonYear,
+    loanRecommendationCount: row.loanRecommendationCount,
+    blockageScore: row.blockageScore,
+    blockageRisk: row.blockageRisk
+  }));
+
+  const firstSeasonLoanRecommendations = rows[0].loanRecommendationCount;
+  const finalSeasonLoanRecommendations = rows[rows.length - 1].loanRecommendationCount;
+
+  return {
+    rows,
+    firstSeasonLoanRecommendations,
+    finalSeasonLoanRecommendations,
+    totalLoanRecommendations: summary.totalLoanRecommendations,
+    conciseSummary: [
+      `Loan-pathway progression sampled across ${rows.length} seasons.`,
+      `First season loan recommendations ${firstSeasonLoanRecommendations}, final season ${finalSeasonLoanRecommendations}.`,
+      `Total loan-pathway recommendations across window: ${summary.totalLoanRecommendations}.`
+    ]
+  };
 }
