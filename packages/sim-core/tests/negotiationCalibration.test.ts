@@ -860,6 +860,45 @@ describe("transfer negotiation calibration samples", () => {
     expect(parseReputations(baseline.outcomeSummary)).toEqual(expectedReputationOrder);
   });
 
+  it("keeps concise outcome-summary metric labels consistent across reputation bands", () => {
+    const buildOutcomeSummary = () =>
+      summarizeTransferOutcomesByReputationBand(
+        calibrationTarget,
+        {
+          clubWageBudget: calibrationBaseContext.clubWageBudget,
+          clubStature: calibrationBaseContext.clubStature,
+          boardWageDiscipline: calibrationBaseContext.boardWageDiscipline
+        },
+        calibrationReputationBands,
+        calibrationOutcomeVariants
+      ).conciseSummary;
+
+    const runs = Array.from({ length: 6 }, () => buildOutcomeSummary());
+    const baseline = runs[0];
+    const expectedClauses = [
+      "accepted",
+      "average score",
+      "board blocks",
+      "sporting-director blocks",
+      "player blocks"
+    ];
+
+    for (const run of runs.slice(1)) {
+      expect(run).toEqual(baseline);
+    }
+
+    expect(baseline).toHaveLength(calibrationReputationBands.length);
+
+    for (const line of baseline) {
+      let cursor = -1;
+      for (const clause of expectedClauses) {
+        const nextCursor = line.indexOf(clause);
+        expect(nextCursor).toBeGreaterThan(cursor);
+        cursor = nextCursor;
+      }
+    }
+  });
+
   it("keeps reputation-band transfer outcome artifacts invariant under fixed fixture reordering", () => {
     const forwardSummary = summarizeTransferOutcomesByReputationBand(
       calibrationTarget,
