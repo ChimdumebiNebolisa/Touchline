@@ -267,7 +267,7 @@ export function buildBoardPressureRationaleFromAcademySummaries(
     conciseSummary: [
       `Baseline board financial pressure ${baselineFinancialPressure.toFixed(2)}.`,
       `Low-pathway academy window maps to board pressure ${lowPathwayDerivedFinancialPressure.toFixed(2)}; high-pathway window maps to ${highPathwayDerivedFinancialPressure.toFixed(2)}.`,
-      `Academy pathway pressure delta ${(highPathwayDerivedFinancialPressure - lowPathwayDerivedFinancialPressure).toFixed(2)}.`
+      `Academy pathway pressure delta ${(highPathwayDerivedFinancialPressure - lowPathwayDerivedFinancialPressure).toFixed(2)} with blockage score ${lowPathwaySummary.averageBlockageScore.toFixed(2)} -> ${highPathwaySummary.averageBlockageScore.toFixed(2)} and loan recommendations ${lowPathwaySummary.totalLoanRecommendations} -> ${highPathwaySummary.totalLoanRecommendations}.`
     ]
   };
 }

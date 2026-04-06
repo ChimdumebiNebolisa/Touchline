@@ -65,6 +65,36 @@ describe("transfer negotiation calibration samples", () => {
     expect(highPathwayOutcome.bands[0].attempts).toBe(comparisonArtifact.highPathwaySummary.rows.length);
     expect(lowPathwayOutcome.bands[0].averageScore).not.toBe(highPathwayOutcome.bands[0].averageScore);
     expect(comparisonArtifact.conciseSummary[0]).toContain("matched wage context");
+
+    const averagePathwayClarity = (values: Array<{ pathwayClarity: number }>) =>
+      values.reduce((sum, value) => sum + value.pathwayClarity, 0) / values.length;
+    const averageCompetition = (values: Array<{ squadCompetition: number }>) =>
+      values.reduce((sum, value) => sum + value.squadCompetition, 0) / values.length;
+
+    const lowBlockage = comparisonArtifact.lowPathwaySummary.averageBlockageScore;
+    const highBlockage = comparisonArtifact.highPathwaySummary.averageBlockageScore;
+    const lowAveragePathwayClarity = averagePathwayClarity(comparisonArtifact.lowPathwayVariants);
+    const highAveragePathwayClarity = averagePathwayClarity(comparisonArtifact.highPathwayVariants);
+    const lowAverageCompetition = averageCompetition(comparisonArtifact.lowPathwayVariants);
+    const highAverageCompetition = averageCompetition(comparisonArtifact.highPathwayVariants);
+
+    expect(highBlockage).not.toBe(lowBlockage);
+
+    if (highBlockage > lowBlockage) {
+      expect(highAveragePathwayClarity).toBeLessThan(lowAveragePathwayClarity);
+      expect(highAverageCompetition).toBeGreaterThan(lowAverageCompetition);
+    } else {
+      expect(highAveragePathwayClarity).toBeGreaterThan(lowAveragePathwayClarity);
+      expect(highAverageCompetition).toBeLessThan(lowAverageCompetition);
+    }
+
+    expect(comparisonArtifact.conciseSummary).toMatchInlineSnapshot(`
+      [
+        "Transfer-pressure comparison uses matched wage context and pathway-bias windows 0.35 vs 0.75.",
+        "Loan recommendations: low-bias 0, high-bias 3.",
+        "Average blockage score: low-bias 0.01, high-bias 0.66.",
+      ]
+    `);
   });
 
   it("wires academy pathway-pressure summaries into transfer calibration sample variants", () => {

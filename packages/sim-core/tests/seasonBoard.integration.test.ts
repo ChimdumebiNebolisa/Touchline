@@ -311,6 +311,13 @@ describe("season board integration", () => {
       lowDerivedPressure
     );
     expect(boardPressureRationale.conciseSummary[1]).toContain("Low-pathway academy window");
+    expect(boardPressureRationale.conciseSummary).toMatchInlineSnapshot(`
+      [
+        "Baseline board financial pressure 0.35.",
+        "Low-pathway academy window maps to board pressure 0.35; high-pathway window maps to 0.51.",
+        "Academy pathway pressure delta 0.16 with blockage score 0.01 -> 0.79 and loan recommendations 0 -> 5.",
+      ]
+    `);
   });
 
   it("evaluates contextual board outcomes from season standings", () => {
