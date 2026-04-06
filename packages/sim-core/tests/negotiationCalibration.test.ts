@@ -932,6 +932,73 @@ describe("transfer negotiation calibration samples", () => {
     }
   });
 
+  it("keeps concise transfer calibration artifacts serialization-stable across runs", () => {
+    const buildSerializedArtifact = () => {
+      const promiseTrustSummary = summarizePromiseTrustImpactByReputationBand(
+        calibrationTarget,
+        {
+          clubWageBudget: calibrationBaseContext.clubWageBudget,
+          clubStature: calibrationBaseContext.clubStature,
+          boardWageDiscipline: calibrationBaseContext.boardWageDiscipline
+        },
+        calibrationReputationBands,
+        calibrationPromiseVariants
+      ).conciseSummary;
+
+      const outcomeSummary = summarizeTransferOutcomesByReputationBand(
+        calibrationTarget,
+        {
+          clubWageBudget: calibrationBaseContext.clubWageBudget,
+          clubStature: calibrationBaseContext.clubStature,
+          boardWageDiscipline: calibrationBaseContext.boardWageDiscipline
+        },
+        calibrationReputationBands,
+        calibrationOutcomeVariants
+      ).conciseSummary;
+
+      const equalFeeSummary = buildEqualFeeNegotiationExplainabilityArtifact(
+        calibrationTarget,
+        calibrationEqualFeeContexts.first,
+        calibrationEqualFeeContexts.second
+      ).conciseSummary;
+
+      const deltaSummary = buildReputationBandOutcomeDeltaSummary(
+        calibrationTarget,
+        {
+          clubWageBudget: calibrationBaseContext.clubWageBudget,
+          clubStature: calibrationBaseContext.clubStature,
+          boardWageDiscipline: calibrationBaseContext.boardWageDiscipline
+        },
+        82,
+        28,
+        calibrationOutcomeVariants
+      ).conciseSummary;
+
+      return JSON.stringify(
+        {
+          promiseTrustSummary,
+          outcomeSummary,
+          equalFeeSummary,
+          deltaSummary
+        },
+        null,
+        2
+      );
+    };
+
+    const runs = Array.from({ length: 6 }, () => buildSerializedArtifact());
+    const baseline = runs[0];
+
+    for (const run of runs.slice(1)) {
+      expect(run).toBe(baseline);
+    }
+
+    expect(baseline).toContain("\"promiseTrustSummary\"");
+    expect(baseline).toContain("\"outcomeSummary\"");
+    expect(baseline).toContain("\"equalFeeSummary\"");
+    expect(baseline).toContain("\"deltaSummary\"");
+  });
+
   it("keeps reputation-band transfer outcome artifacts invariant under fixed fixture reordering", () => {
     const forwardSummary = summarizeTransferOutcomesByReputationBand(
       calibrationTarget,
