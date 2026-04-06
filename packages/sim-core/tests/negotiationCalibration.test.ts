@@ -1046,6 +1046,32 @@ describe("transfer negotiation calibration samples", () => {
     ]);
   });
 
+  it("keeps per-attempt negotiation reason-summary profiles stable across repeated runs", () => {
+    const buildReasonProfiles = () =>
+      buildTransferNegotiationLogSamples(calibrationTarget, calibrationLogContexts).map((entry) => ({
+        attemptId: entry.attemptId,
+        blockingActor: entry.blockingActor,
+        reasonCount: entry.reasonSummary.length,
+        reasonFingerprint: entry.reasonSummary.join(" | ")
+      }));
+
+    const runs = Array.from({ length: 8 }, () => buildReasonProfiles());
+    const baseline = runs[0];
+
+    for (const run of runs.slice(1)) {
+      expect(run).toEqual(baseline);
+    }
+
+    expect(baseline.map((entry) => entry.attemptId)).toEqual(["attempt-1", "attempt-2", "attempt-3"]);
+    expect(baseline.map((entry) => entry.blockingActor)).toEqual(["none", "none", "player"]);
+    expect(new Set(baseline.map((entry) => entry.reasonFingerprint)).size).toBe(baseline.length);
+
+    for (const entry of baseline) {
+      expect(entry.reasonCount).toBeGreaterThan(0);
+      expect(entry.reasonFingerprint.length).toBeGreaterThan(20);
+    }
+  });
+
   it("keeps reputation-band transfer outcome artifacts invariant under fixed fixture reordering", () => {
     const forwardSummary = summarizeTransferOutcomesByReputationBand(
       calibrationTarget,
