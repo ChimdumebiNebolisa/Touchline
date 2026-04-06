@@ -4,11 +4,10 @@
 
 **Active**
 
-* Step 5: Shadow world and country-pack scaling
+* Step 6: Save/load and career continuity
 
 **Backlog**
 
-* Step 6: Save/load and career continuity
 * Step 7: Calibration and regression gate
 
 **Blocked**
@@ -21,6 +20,7 @@
 * Step 2: Full season loop and board-context model
 * Step 3: Transfer and reputation expansion
 * Step 4: Academy, loans, and pathway pressure
+* Step 5: Shadow world and country-pack scaling
 
 **Dropped**
 
@@ -253,7 +253,7 @@ Each club has academy quality and pathway bias. Youth arrives annually, elite pr
 ## 7. Step 5
 
 **Status**
-Active
+Done
 
 **Objective**
 Add shadow leagues and make content packs scale to additional countries without architecture changes. 
@@ -295,7 +295,7 @@ Other leagues generate believable transfer and loan context without deep simulat
 ## 8. Step 6
 
 **Status**
-Backlog
+Active
 
 **Objective**
 Persist long saves, manager reputation history, sackings, and future job leverage. 
