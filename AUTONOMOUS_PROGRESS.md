@@ -21,11 +21,11 @@
 - Passed: `npm run -w @touchline/sim-core test -- tests/negotiationCalibration.test.ts`, then `npm test`, `npm run typecheck`, `npm run lint`, `npm run build` after Step 4 transfer-pressure comparison artifact implementation (2026-04-06)
 
 ## Last commit hash
-- pending (next commit will capture Step 4 transfer-pressure comparison artifact)
+- 815137f
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`
 - Inspect git status and recent commits
 - Continue with Step 4 bounded tasks only; do not jump to Step 5+.
 - Next bounded task: add a focused Step 4 board-context sample that consumes academy pathway-pressure summaries without crossing role boundaries.
-- Last successful pushed commit: 3cefd8c.
+- Last successful pushed commit: 815137f.
