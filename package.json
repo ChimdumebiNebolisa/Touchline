@@ -12,7 +12,8 @@
     "lint": "npm run -ws lint",
     "test": "npm run -ws test",
     "manual:step1": "node scripts/manual-check-step1.mjs",
-    "manual:step2": "node scripts/manual-check-step2-board-context.mjs"
+    "manual:step2": "node scripts/manual-check-step2-board-context.mjs",
+    "manual:step4": "node scripts/manual-check-step4.mjs"
   },
   "devDependencies": {
     "@types/node": "^22.14.1",

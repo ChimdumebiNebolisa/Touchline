@@ -4,13 +4,13 @@
 - Step 4: Academy, loans, and pathway pressure
 
 ## Last completed verified task
-- Completed the bounded Step 4 artifact hardening set: transfer-link checks, board rationale concise-summary extension, and snapshot stability assertions for transfer-pressure and board-pressure summaries.
+- Added and verified a bounded Step 4 manual-check artifact (`manual:step4`) that validates academy rarity calibration, pathway/loan pressure behavior, and downstream transfer and board-pressure effects from deterministic intake windows.
 
 ## Current subtask in progress
-- Audit Step 4 exit-criteria coverage and identify any remaining bounded artifact gaps before step transition.
+- Audit Step 4 exit-criteria coverage for any remaining bounded gaps before a completion checkpoint update.
 
 ## Next queued subtasks
-- Verify whether additional Step 4 calibration artifacts are required beyond current academy/transfer/board summary evidence.
+- Confirm whether Step 4 completion criteria are fully satisfied after adding `manual:step4` evidence.
 - If no Step 4 gaps remain, prepare a bounded Step 4 completion checkpoint update.
 - Keep Step 4 scope only; do not start Step 5 work until Step 4 completion is explicitly verified.
 
@@ -18,14 +18,14 @@
 - None
 
 ## Last verification run
-- Passed: `npm run -w @touchline/sim-core test -- tests/negotiationCalibration.test.ts tests/seasonBoard.integration.test.ts`, then `npm test`, `npm run typecheck`, `npm run lint`, `npm run build` after Step 4 transfer-link checks and summary snapshot hardening (2026-04-06)
+- Passed: `npm run manual:step4`; `npm run -w @touchline/sim-core test -- tests/academyIntake.test.ts tests/negotiationCalibration.test.ts tests/seasonBoard.integration.test.ts`; `npm test`; `npm run typecheck`; `npm run lint`; `npm run build` (2026-04-06)
 
 ## Last commit hash
-- 085c6f5
+- bf7eef1 (new commit pending)
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`
 - Inspect git status and recent commits
 - Continue with Step 4 bounded tasks only; do not jump to Step 5+.
-- Next bounded task: audit Step 4 exit-criteria coverage and identify any remaining bounded artifact gaps.
-- Last successful pushed commit: 085c6f5.
+- Next bounded task: confirm if any Step 4 exit-criteria artifact gaps remain after `manual:step4`.
+- Last successful pushed commit before this pending checkpoint: bf7eef1.
