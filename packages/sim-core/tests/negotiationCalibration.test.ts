@@ -546,6 +546,50 @@ describe("transfer negotiation calibration samples", () => {
     expect(baseline.deltaTokenCount).toBeGreaterThan(14);
   });
 
+  it("keeps explainability summary delimiters stable across repeated runs", () => {
+    const buildDelimiterProfile = () => {
+      const equalFeeSummary = buildEqualFeeNegotiationExplainabilityArtifact(
+        calibrationTarget,
+        calibrationEqualFeeContexts.first,
+        calibrationEqualFeeContexts.second
+      ).conciseSummary;
+      const deltaSummary = buildReputationBandOutcomeDeltaSummary(
+        calibrationTarget,
+        {
+          clubWageBudget: calibrationBaseContext.clubWageBudget,
+          clubStature: calibrationBaseContext.clubStature,
+          boardWageDiscipline: calibrationBaseContext.boardWageDiscipline
+        },
+        82,
+        28,
+        calibrationOutcomeVariants
+      ).conciseSummary;
+
+      return {
+        equalFeeColonCount: (equalFeeSummary.match(/:/g) ?? []).length,
+        equalFeeCommaCount: (equalFeeSummary.match(/,/g) ?? []).length,
+        equalFeeSemicolonCount: (equalFeeSummary.match(/;/g) ?? []).length,
+        deltaCommaCount: (deltaSummary.match(/,/g) ?? []).length,
+        deltaColonCount: (deltaSummary.match(/:/g) ?? []).length,
+        deltaSemicolonCount: (deltaSummary.match(/;/g) ?? []).length
+      };
+    };
+
+    const runs = Array.from({ length: 6 }, () => buildDelimiterProfile());
+    const baseline = runs[0];
+
+    for (const run of runs.slice(1)) {
+      expect(run).toEqual(baseline);
+    }
+
+    expect(baseline.equalFeeColonCount).toBe(1);
+    expect(baseline.equalFeeSemicolonCount).toBe(1);
+    expect(baseline.equalFeeCommaCount).toBeGreaterThanOrEqual(1);
+    expect(baseline.deltaColonCount).toBe(1);
+    expect(baseline.deltaSemicolonCount).toBe(0);
+    expect(baseline.deltaCommaCount).toBeGreaterThanOrEqual(5);
+  });
+
   it("keeps reputation-band delta artifacts deterministic across repeated fixed fixture evaluations", () => {
     const repeatedRuns = Array.from({ length: 12 }, () =>
       buildReputationBandOutcomeDeltaSummary(
