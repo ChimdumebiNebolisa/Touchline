@@ -21,11 +21,11 @@
 - Passed: `npm run -w @touchline/sim-core test -- tests/reputation.test.ts tests/postMatchFallout.test.ts tests/negotiationCalibration.test.ts tests/negotiation.test.ts tests/transferEngine.test.ts`, `npm test`, `npm run typecheck`, `npm run lint`, `npm run build` after acceptance/block profile determinism regression proof (2026-04-05)
 
 ## Last commit hash
-- 0f423c4
+- 75f27fe
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`
 - Inspect git status and recent commits
 - Continue Step 3 with transfer/reputation bounded tasks only; do not jump to later steps.
 - Next bounded task: add bounded Step 3 calibration checks that preserve concise transfer artifact stability for regression snapshots.
-- Last successful pushed commit: 0f423c4.
+- Last successful pushed commit: 75f27fe.
