@@ -85,6 +85,34 @@ describe("academy intake", () => {
     expect(eliteRate).toBeLessThan(0.06);
   });
 
+  it("keeps elite rarity calibrated across academy-quality bands", () => {
+    const runBand = (academyQuality: number) => {
+      const runs = Array.from({ length: 320 }, (_, seasonOffset) =>
+        generateAcademyIntake({
+          clubId: `club-band-${academyQuality}`,
+          seasonYear: 2100 + seasonOffset,
+          seed: 177,
+          academyQuality,
+          pathwayBias: 0.52,
+          intakeSize: 10
+        })
+      );
+
+      const totalProspects = runs.reduce((sum, run) => sum + run.prospects.length, 0);
+      const eliteCount = runs.reduce((sum, run) => sum + run.eliteCount, 0);
+
+      return eliteCount / totalProspects;
+    };
+
+    const lowBandEliteRate = runBand(0.2);
+    const midBandEliteRate = runBand(0.55);
+    const highBandEliteRate = runBand(0.85);
+
+    expect(lowBandEliteRate).toBeLessThan(midBandEliteRate);
+    expect(midBandEliteRate).toBeLessThan(highBandEliteRate);
+    expect(highBandEliteRate).toBeLessThan(0.07);
+  });
+
   it("increases first-team recommendations with stronger pathway bias", () => {
     const lowBiasRuns = Array.from({ length: 140 }, (_, seasonOffset) =>
       generateAcademyIntake({
