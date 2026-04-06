@@ -67,6 +67,7 @@ function createSampleState(): SaveGameStateV1 {
     managerCareer: {
       managerId: "manager-1",
       currentClubId: "club-a",
+      recentPromiseBreak: false,
       reputationHistory: [53, 57, 60],
       careerLeverageHistory: [leverageSnapshot],
       sackHistory: [sackOutcome]
@@ -99,6 +100,7 @@ function createSaveStateForWorldState(worldState: SaveGameStateV1["worldState"])
     managerCareer: {
       managerId: "manager-2",
       currentClubId: "club-a",
+      recentPromiseBreak: true,
       reputationHistory: [52, 55, 59],
       careerLeverageHistory: [leverageSnapshot],
       sackHistory: [sackOutcome]
@@ -128,6 +130,7 @@ describe("save codec", () => {
     expect(deserialized).toEqual(envelope);
     expect(deserialized.version).toBe(CURRENT_SAVE_VERSION);
     expect(deserialized.state.clubPerceptionState.teamMorale).toBe(61);
+    expect(deserialized.state.managerCareer.recentPromiseBreak).toBe(false);
     expect(deserialized.state.managerCareer.sackHistory).toHaveLength(1);
   });
 

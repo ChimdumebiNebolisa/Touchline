@@ -38,6 +38,7 @@ function createSaveState(worldState: SaveGameStateV1["worldState"]): SaveGameSta
     managerCareer: {
       managerId: "manager-slot-integration",
       currentClubId: "club-a",
+      recentPromiseBreak: false,
       reputationHistory: [51, 56, 60],
       careerLeverageHistory: [
         {
@@ -94,6 +95,7 @@ describe("save slot store integration", () => {
 
       expect(nextFromReloaded).toEqual(nextFromOriginal);
       expect(reloadedEnvelope.state.managerCareer.reputationHistory).toEqual([51, 56, 60]);
+      expect(reloadedEnvelope.state.managerCareer.recentPromiseBreak).toBe(false);
       expect(reloadedEnvelope.state.managerCareer.sackHistory).toHaveLength(1);
     } finally {
       await rm(rootDirectory, { recursive: true, force: true });
@@ -174,6 +176,7 @@ describe("save slot store integration", () => {
       ]);
 
       const saveState = createSaveState(seasonState);
+      saveState.managerCareer.recentPromiseBreak = true;
       saveState.managerCareer.reputationHistory = [48, 53, 59, 66];
 
       await writeSaveSlot({
@@ -200,6 +203,7 @@ describe("save slot store integration", () => {
       });
 
       expect(restored.state.managerCareer.reputationHistory).toEqual([48, 53, 59, 66]);
+      expect(restored.state.managerCareer.recentPromiseBreak).toBe(true);
       expect(restored.state.managerCareer.sackHistory).toEqual(saveState.managerCareer.sackHistory);
       expect(latestLeverage.score).toBeGreaterThan(earliestLeverage.score);
       expect(bandRank(latestLeverage.band)).toBeGreaterThanOrEqual(bandRank(earliestLeverage.band));

@@ -46,6 +46,10 @@ function isString(value: unknown): value is string {
   return typeof value === "string";
 }
 
+function isBoolean(value: unknown): value is boolean {
+  return typeof value === "boolean";
+}
+
 function isStringArray(value: unknown): value is string[] {
   return Array.isArray(value) && value.every(isString);
 }
@@ -111,6 +115,7 @@ function isManagerCareerSaveState(value: unknown): value is ManagerCareerSaveSta
   return (
     isString(value.managerId) &&
     isString(value.currentClubId) &&
+    isBoolean(value.recentPromiseBreak) &&
     Array.isArray(value.reputationHistory) &&
     value.reputationHistory.every(isNumber) &&
     Array.isArray(value.careerLeverageHistory) &&

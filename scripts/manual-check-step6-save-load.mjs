@@ -49,6 +49,7 @@ async function main() {
     managerCareer: {
       managerId: "manager-step6",
       currentClubId: "club-a",
+      recentPromiseBreak: true,
       reputationHistory: [54, 58, 61],
       careerLeverageHistory: [
         {
@@ -96,6 +97,7 @@ async function main() {
 
   const postReloadState = restoredEnvelope.state;
   const savesFullCareerState =
+    postReloadState.managerCareer.recentPromiseBreak === saveState.managerCareer.recentPromiseBreak &&
     postReloadState.managerCareer.reputationHistory.length === saveState.managerCareer.reputationHistory.length &&
     postReloadState.managerCareer.careerLeverageHistory.length ===
       saveState.managerCareer.careerLeverageHistory.length &&

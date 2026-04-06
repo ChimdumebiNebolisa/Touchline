@@ -35,6 +35,7 @@ function buildSaveState(worldState, seasonIndex) {
     managerCareer: {
       managerId: "manager-step6-multi",
       currentClubId: "club-a",
+      recentPromiseBreak: seasonIndex % 2 === 0,
       reputationHistory: [54, 58, 61, 63 + seasonIndex],
       careerLeverageHistory: [
         {
@@ -173,7 +174,8 @@ async function main() {
       restoredCareerHistoryPersists:
         restored.state.managerCareer.reputationHistory.length === 5 &&
         restored.state.managerCareer.careerLeverageHistory.length === 2 &&
-        restored.state.managerCareer.sackHistory.length === 1,
+        restored.state.managerCareer.sackHistory.length === 1 &&
+        restored.state.managerCareer.recentPromiseBreak === true,
       deterministicContinuationAfterMultiSeasonReload:
         JSON.stringify(continuedFromReload) === JSON.stringify(continuedFromMemory),
       reputationHistorySupportsHigherFutureLeverage:

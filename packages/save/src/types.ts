@@ -18,6 +18,7 @@ export type SaveLoadErrorCode =
 export interface ManagerCareerSaveState {
   managerId: string;
   currentClubId: string;
+  recentPromiseBreak: boolean;
   reputationHistory: number[];
   careerLeverageHistory: ManagerCareerLeverageSnapshot[];
   sackHistory: SeasonSackOutcome[];

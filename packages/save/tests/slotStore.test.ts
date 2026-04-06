@@ -32,6 +32,7 @@ function createSampleState(): SaveGameStateV1 {
     managerCareer: {
       managerId: "manager-slot-store",
       currentClubId: "club-a",
+      recentPromiseBreak: false,
       reputationHistory: [54, 58, 61],
       careerLeverageHistory: [
         {
