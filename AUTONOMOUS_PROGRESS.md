@@ -21,11 +21,11 @@
 - Passed: `npm run -w @touchline/sim-core test -- tests/academyIntake.test.ts tests/transferEngine.test.ts tests/negotiation.test.ts tests/reputation.test.ts`, then `npm test`, `npm run typecheck`, `npm run lint`, `npm run build` after Step 4 quality-band rarity calibration checks (2026-04-06)
 
 ## Last commit hash
-- f727f35
+- 268dbc7
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`
 - Inspect git status and recent commits
 - Continue with Step 4 bounded tasks only; do not jump to Step 5+.
 - Next bounded task: add Step 4 loan-path fixture scaffolding for pathway progression checks.
-- Last successful pushed commit: f727f35.
+- Last successful pushed commit: 268dbc7.
