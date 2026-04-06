@@ -26,6 +26,7 @@ export interface CountryPackValidationError {
     | "MISSING_DIVISIONS"
     | "MISSING_TOP_TWO_TIERS"
     | "TOP_TWO_NOT_DEEP"
+    | "NON_TOP_TWO_NOT_SHADOW"
     | "NO_PLAYABLE_CLUB"
     | "DUPLICATE_CLUB_ID"
     | "MALFORMED_DIVISION";

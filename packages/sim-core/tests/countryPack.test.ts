@@ -60,6 +60,33 @@ describe("validateCountryPack", () => {
     expect(result.errors.some((error) => error.code === "TOP_TWO_NOT_DEEP")).toBe(true);
   });
 
+  it("rejects a pack when non-top-two divisions are not shadow simulated", () => {
+    const invalidPack: CountryPack = {
+      ...basePack,
+      divisions: [
+        ...basePack.divisions,
+        {
+          id: "div-3",
+          name: "Division 3",
+          tier: 3,
+          simulationDepth: "deep",
+          clubs: [
+            {
+              id: "club-c",
+              name: "Club C",
+              shortName: "C",
+              isPlayable: false
+            }
+          ]
+        }
+      ]
+    };
+
+    const result = validateCountryPack(invalidPack);
+    expect(result.valid).toBe(false);
+    expect(result.errors.some((error) => error.code === "NON_TOP_TWO_NOT_SHADOW")).toBe(true);
+  });
+
   it("rejects a pack with no playable clubs", () => {
     const invalidPack: CountryPack = {
       ...basePack,

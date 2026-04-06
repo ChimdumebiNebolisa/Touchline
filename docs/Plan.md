@@ -162,7 +162,7 @@ A full season can run with contextual board judgment based on club stature, fina
 ## 5. Step 3
 
 **Status**
-Active
+Done
 
 **Objective**
 Make transfers human and multi-factor, and wire manager reputation into trust, board patience, transfer pull, and career leverage. 
@@ -208,7 +208,7 @@ Players and clubs accept or reject based on wages, role, club stature, manager r
 ## 6. Step 4
 
 **Status**
-Backlog
+Done
 
 **Objective**
 Add light but real academy behavior, rare meaningful youth intake, loans, and pathway friction with first-team pressure. 
@@ -253,7 +253,7 @@ Each club has academy quality and pathway bias. Youth arrives annually, elite pr
 ## 7. Step 5
 
 **Status**
-Backlog
+Active
 
 **Objective**
 Add shadow leagues and make content packs scale to additional countries without architecture changes. 

@@ -90,6 +90,11 @@ export type {
   WorldClub
 } from "./world/season.js";
 export type {
+  ShadowLeagueContextSnapshot,
+  ShadowLeagueContinuityLink,
+  SimulationDepthContractEvaluation
+} from "./world/shadowLeagues.js";
+export type {
   SeasonBoardActionCounts,
   CompletedSeasonBoardSummary,
   SeasonBoardResolutionStatus,
@@ -123,6 +128,7 @@ export {
   resolvePromotionRelegation,
   summarizeCompletedSeason
 } from "./world/season.js";
+export { buildShadowLeagueContextSnapshot, evaluateSimulationDepthContract } from "./world/shadowLeagues.js";
 export {
   deriveSeasonSackDecisionFromPressureSummary,
   deriveSeasonBoardContextFromSeasonState,

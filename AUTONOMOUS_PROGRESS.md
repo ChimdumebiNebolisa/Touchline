@@ -4,28 +4,28 @@
 - Step 5: Shadow world and country-pack scaling
 
 ## Last completed verified task
-- Completed the Step 4 verification closure set: academy congestion-pathway integration in sim-core, focused congestion regression tests, and expanded `manual:step4` evidence with explicit congestion windows.
+- Implemented the first bounded Step 5 foundation: `world/shadowLeagues` contract evaluation and context snapshot artifact, tightened country-pack validation to enforce top-two-deep/rest-shadow, and added shadow-world tests including a second-country content smoke case.
 
 ## Current subtask in progress
-- Select the smallest valid Step 5 subtask (shadow league output artifact) without crossing into Step 6+.
+- Audit Step 5 gaps after shadow-league foundation and choose the next smallest bounded subtask.
 
 ## Next queued subtasks
-- Add a minimal Step 5 shadow-league module artifact with deterministic sample output.
-- Add targeted Step 5 tests proving top-two-deep and rest-shadow contract behavior.
+- Add a Step 5 sample world-state artifact script for shadow transfer/loan continuity evidence.
+- Expand Step 5 integration coverage to prove shadow context hooks into season/world outputs.
 - Keep Step 5 scope only; do not start Step 6+ until Step 5 verification is explicit.
 
 ## Known blockers
 - None
 
 ## Last verification run
-- Passed: `npm run manual:step4`; `npm run -w @touchline/sim-core test -- tests/academyIntake.test.ts tests/negotiationCalibration.test.ts tests/seasonBoard.integration.test.ts`; `npm test`; `npm run typecheck`; `npm run lint`; `npm run build` (2026-04-06)
+- Passed: `npm run -w @touchline/sim-core test -- tests/shadowLeagues.test.ts tests/countryPack.test.ts tests/seasonWorld.test.ts`; `npm test`; `npm run typecheck`; `npm run lint`; `npm run build` (2026-04-06)
 
 ## Last commit hash
-- 8a2ae03 (new commit pending)
+- fd9cbe1 (new commit pending)
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`
 - Inspect git status and recent commits
 - Continue with Step 5 bounded tasks only; do not jump to Step 6+.
-- Next bounded task: implement the smallest deterministic shadow-league artifact and verify contract coverage.
-- Last successful pushed commit before this pending checkpoint: 8a2ae03.
+- Next bounded task: add a deterministic Step 5 sample world-state artifact showing shadow transfer/loan continuity output.
+- Last successful pushed commit before this pending checkpoint: fd9cbe1.

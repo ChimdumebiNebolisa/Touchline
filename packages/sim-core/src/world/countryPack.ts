@@ -45,6 +45,14 @@ export function validateCountryPack(pack: CountryPack): CountryPackValidationRes
         message: `Division ${division.id} must be deep simulated.`
       });
     }
+
+    const shouldBeShadow = division.tier > 2;
+    if (shouldBeShadow && division.simulationDepth !== "shadow") {
+      errors.push({
+        code: "NON_TOP_TWO_NOT_SHADOW",
+        message: `Division ${division.id} must be shadow simulated.`
+      });
+    }
   }
 
   const clubIds = new Set<string>();
