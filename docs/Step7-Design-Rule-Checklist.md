@@ -38,11 +38,12 @@ Implemented in this step:
 
 1. Calibration suite entrypoint: `scripts/manual-check-step7-calibration.mjs` (run via `npm run manual:step7:calibration`).
    - Tracks goal rates, upset rates, red-card impact, late-goal distribution, and youth rarity with deterministic threshold checks.
+2. Regression suite entrypoint: `scripts/manual-check-step7-regression.mjs` (run via `npm run manual:step7:regression`).
+   - Re-runs bounded manual checks from Steps 1, 2, 4, 5, 6 and Step 7 calibration.
 
 Still required by `docs/Plan.md` before Step 7 completion:
 
-1. Regression suite artifact that can be rerun after balancing passes.
-2. Final verification report artifact that summarizes all must-have flows and evidence.
+1. Final verification report artifact that summarizes all must-have flows and evidence.
 
 ## Gate Rule
 
