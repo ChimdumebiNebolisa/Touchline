@@ -809,6 +809,57 @@ describe("transfer negotiation calibration samples", () => {
     }
   });
 
+  it("keeps concise transfer-summary ordering consistent by reputation band", () => {
+    const buildSummaryLines = () => {
+      const promiseTrust = summarizePromiseTrustImpactByReputationBand(
+        calibrationTarget,
+        {
+          clubWageBudget: calibrationBaseContext.clubWageBudget,
+          clubStature: calibrationBaseContext.clubStature,
+          boardWageDiscipline: calibrationBaseContext.boardWageDiscipline
+        },
+        calibrationReputationBands,
+        calibrationPromiseVariants
+      ).conciseSummary;
+
+      const outcomeSummary = summarizeTransferOutcomesByReputationBand(
+        calibrationTarget,
+        {
+          clubWageBudget: calibrationBaseContext.clubWageBudget,
+          clubStature: calibrationBaseContext.clubStature,
+          boardWageDiscipline: calibrationBaseContext.boardWageDiscipline
+        },
+        calibrationReputationBands,
+        calibrationOutcomeVariants
+      ).conciseSummary;
+
+      return {
+        promiseTrust,
+        outcomeSummary
+      };
+    };
+
+    const runs = Array.from({ length: 6 }, () => buildSummaryLines());
+    const baseline = runs[0];
+    const expectedReputationOrder = [...calibrationReputationBands];
+
+    for (const run of runs.slice(1)) {
+      expect(run).toEqual(baseline);
+    }
+
+    const parseReputations = (lines: string[]) =>
+      lines.map((line) => {
+        const match = line.match(/^Manager reputation (\d+):/);
+        expect(match).not.toBeNull();
+        return Number(match![1]);
+      });
+
+    expect(baseline.promiseTrust).toHaveLength(expectedReputationOrder.length);
+    expect(baseline.outcomeSummary).toHaveLength(expectedReputationOrder.length);
+    expect(parseReputations(baseline.promiseTrust)).toEqual(expectedReputationOrder);
+    expect(parseReputations(baseline.outcomeSummary)).toEqual(expectedReputationOrder);
+  });
+
   it("keeps reputation-band transfer outcome artifacts invariant under fixed fixture reordering", () => {
     const forwardSummary = summarizeTransferOutcomesByReputationBand(
       calibrationTarget,

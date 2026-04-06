@@ -4,10 +4,10 @@
 - Step 3: Transfer and reputation expansion
 
 ## Last completed verified task
-- Added deterministic calibration proof that negotiation sample outputs stay stable for repeated Step 3 regression snapshots.
+- Added deterministic calibration proof that concise transfer-summary lines remain ordered by reputation band across repeated Step 3 runs.
 
 ## Current subtask in progress
-- Add bounded Step 3 calibration checks that preserve concise transfer-summary artifact consistency by reputation band.
+- Add bounded Step 3 calibration checks that preserve concise transfer-summary metric-label consistency in regression snapshots.
 
 ## Next queued subtasks
 - Keep Step 3 scope constrained to transfer/reputation logic without Step 4 academy drift.
@@ -18,14 +18,14 @@
 - None
 
 ## Last verification run
-- Passed: `npm run -w @touchline/sim-core test -- tests/reputation.test.ts tests/postMatchFallout.test.ts tests/negotiationCalibration.test.ts tests/negotiation.test.ts tests/transferEngine.test.ts`, `npm test`, `npm run typecheck`, `npm run lint`, `npm run build` after negotiation sample-output determinism regression proof (2026-04-05)
+- Passed: `npm run -w @touchline/sim-core test -- tests/reputation.test.ts tests/postMatchFallout.test.ts tests/negotiationCalibration.test.ts tests/negotiation.test.ts tests/transferEngine.test.ts`, `npm test`, `npm run typecheck`, `npm run lint`, `npm run build` after concise transfer-summary ordering determinism regression proof (2026-04-05)
 
 ## Last commit hash
-- 35c239c
+- 1a6c29a
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`
 - Inspect git status and recent commits
 - Continue Step 3 with transfer/reputation bounded tasks only; do not jump to later steps.
-- Next bounded task: add bounded Step 3 calibration checks that preserve concise transfer-summary artifact consistency by reputation band.
-- Last successful pushed commit: 35c239c.
+- Next bounded task: add bounded Step 3 calibration checks that preserve concise transfer-summary metric-label consistency in regression snapshots.
+- Last successful pushed commit: 1a6c29a.
