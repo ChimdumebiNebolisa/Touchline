@@ -999,6 +999,53 @@ describe("transfer negotiation calibration samples", () => {
     expect(baseline).toContain("\"deltaSummary\"");
   });
 
+  it("keeps reputation-band acceptance and block profiles stable across repeated runs", () => {
+    const buildBandProfile = () =>
+      summarizeTransferOutcomesByReputationBand(
+        calibrationTarget,
+        {
+          clubWageBudget: calibrationBaseContext.clubWageBudget,
+          clubStature: calibrationBaseContext.clubStature,
+          boardWageDiscipline: calibrationBaseContext.boardWageDiscipline
+        },
+        calibrationReputationBands,
+        calibrationOutcomeVariants
+      ).bands.map((band) => ({
+        managerReputation: band.managerReputation,
+        acceptedCount: band.acceptedCount,
+        sportingDirectorBlockCount: band.sportingDirectorBlockCount,
+        playerBlockCount: band.playerBlockCount
+      }));
+
+    const runs = Array.from({ length: 8 }, () => buildBandProfile());
+    const baseline = runs[0];
+
+    for (const run of runs.slice(1)) {
+      expect(run).toEqual(baseline);
+    }
+
+    expect(baseline).toEqual([
+      {
+        managerReputation: 82,
+        acceptedCount: 2,
+        sportingDirectorBlockCount: 2,
+        playerBlockCount: 0
+      },
+      {
+        managerReputation: 62,
+        acceptedCount: 2,
+        sportingDirectorBlockCount: 2,
+        playerBlockCount: 0
+      },
+      {
+        managerReputation: 28,
+        acceptedCount: 0,
+        sportingDirectorBlockCount: 0,
+        playerBlockCount: 4
+      }
+    ]);
+  });
+
   it("keeps reputation-band transfer outcome artifacts invariant under fixed fixture reordering", () => {
     const forwardSummary = summarizeTransferOutcomesByReputationBand(
       calibrationTarget,
