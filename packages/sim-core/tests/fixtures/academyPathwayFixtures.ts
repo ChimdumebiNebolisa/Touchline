@@ -49,6 +49,13 @@ export interface AcademyTransferPressureComparisonArtifact {
   conciseSummary: string[];
 }
 
+export interface AcademyBoardPressureRationaleArtifact {
+  baselineFinancialPressure: number;
+  lowPathwayDerivedFinancialPressure: number;
+  highPathwayDerivedFinancialPressure: number;
+  conciseSummary: string[];
+}
+
 function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
 }
@@ -235,6 +242,32 @@ export function buildTransferPressureComparisonArtifact(options: {
       `Transfer-pressure comparison uses matched wage context and pathway-bias windows ${options.lowPathwayBias.toFixed(2)} vs ${options.highPathwayBias.toFixed(2)}.`,
       `Loan recommendations: low-bias ${lowPathwaySummary.totalLoanRecommendations}, high-bias ${highPathwaySummary.totalLoanRecommendations}.`,
       `Average blockage score: low-bias ${lowPathwaySummary.averageBlockageScore.toFixed(2)}, high-bias ${highPathwaySummary.averageBlockageScore.toFixed(2)}.`
+    ]
+  };
+}
+
+export function buildBoardPressureRationaleFromAcademySummaries(
+  lowPathwaySummary: AcademySeasonOutputSummaryArtifact,
+  highPathwaySummary: AcademySeasonOutputSummaryArtifact,
+  baselineFinancialPressure: number
+): AcademyBoardPressureRationaleArtifact {
+  const lowPathwayDerivedFinancialPressure = deriveBoardFinancialPressureFromAcademySummary(
+    lowPathwaySummary,
+    baselineFinancialPressure
+  );
+  const highPathwayDerivedFinancialPressure = deriveBoardFinancialPressureFromAcademySummary(
+    highPathwaySummary,
+    baselineFinancialPressure
+  );
+
+  return {
+    baselineFinancialPressure,
+    lowPathwayDerivedFinancialPressure,
+    highPathwayDerivedFinancialPressure,
+    conciseSummary: [
+      `Baseline board financial pressure ${baselineFinancialPressure.toFixed(2)}.`,
+      `Low-pathway academy window maps to board pressure ${lowPathwayDerivedFinancialPressure.toFixed(2)}; high-pathway window maps to ${highPathwayDerivedFinancialPressure.toFixed(2)}.`,
+      `Academy pathway pressure delta ${(highPathwayDerivedFinancialPressure - lowPathwayDerivedFinancialPressure).toFixed(2)}.`
     ]
   };
 }

@@ -18,6 +18,7 @@ import {
   summarizeSeasonSackRiskPressureTimeline
 } from "../src/index.js";
 import {
+  buildBoardPressureRationaleFromAcademySummaries,
   buildLoanPathFixtureWindow,
   buildSeasonAcademyOutputSummaryArtifact,
   deriveBoardFinancialPressureFromAcademySummary
@@ -265,6 +266,11 @@ describe("season board integration", () => {
     );
 
     const baselineFinancialPressure = 0.35;
+    const boardPressureRationale = buildBoardPressureRationaleFromAcademySummaries(
+      lowPathwayBiasSummary,
+      highPathwayBiasSummary,
+      baselineFinancialPressure
+    );
     const lowDerivedPressure = deriveBoardFinancialPressureFromAcademySummary(
       lowPathwayBiasSummary,
       baselineFinancialPressure
@@ -298,6 +304,13 @@ describe("season board integration", () => {
     expect(highPressureEvaluation.boardDelta).toBeLessThan(lowPressureEvaluation.boardDelta);
     expect(lowPressureEvaluation.reasonSummary.length).toBeGreaterThan(0);
     expect(highPressureEvaluation.reasonSummary.length).toBeGreaterThan(0);
+    expect(boardPressureRationale.highPathwayDerivedFinancialPressure).toBe(
+      highDerivedPressure
+    );
+    expect(boardPressureRationale.lowPathwayDerivedFinancialPressure).toBe(
+      lowDerivedPressure
+    );
+    expect(boardPressureRationale.conciseSummary[1]).toContain("Low-pathway academy window");
   });
 
   it("evaluates contextual board outcomes from season standings", () => {
