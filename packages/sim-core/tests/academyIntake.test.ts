@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { generateAcademyIntake } from "../src/index.js";
+import { buildLoanPathFixtureWindow } from "./fixtures/academyPathwayFixtures.js";
 
 describe("academy intake", () => {
   it("produces deterministic intake output for identical inputs", () => {
@@ -213,5 +214,41 @@ describe("academy intake", () => {
         intakeSize: 0
       })
     ).toThrow("Academy intake size must be greater than zero.");
+  });
+
+  it("supports deterministic loan-path fixture scaffolding for pathway progression checks", () => {
+    const lowBiasFixtures = buildLoanPathFixtureWindow({
+      clubId: "club-loan-path",
+      seed: 414,
+      startSeasonYear: 2080,
+      seasons: 20,
+      academyQuality: 0.72,
+      pathwayBias: 0.3,
+      intakeSize: 10
+    });
+    const highBiasFixtures = buildLoanPathFixtureWindow({
+      clubId: "club-loan-path",
+      seed: 414,
+      startSeasonYear: 2080,
+      seasons: 20,
+      academyQuality: 0.72,
+      pathwayBias: 0.7,
+      intakeSize: 10
+    });
+
+    const countLoanRecommendations = (fixtures: ReturnType<typeof buildLoanPathFixtureWindow>) =>
+      fixtures
+        .map((fixture) => generateAcademyIntake(fixture))
+        .reduce(
+          (sum, result) =>
+            sum +
+            result.prospects.filter((prospect) => prospect.pathwayRecommendation === "loan-pathway").length,
+          0
+        );
+
+    const lowBiasLoanCount = countLoanRecommendations(lowBiasFixtures);
+    const highBiasLoanCount = countLoanRecommendations(highBiasFixtures);
+
+    expect(highBiasLoanCount).toBeGreaterThan(lowBiasLoanCount);
   });
 });
