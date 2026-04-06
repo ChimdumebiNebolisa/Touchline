@@ -21,11 +21,11 @@
 - Passed: `npm run -w @touchline/sim-core test -- tests/seasonBoard.integration.test.ts`, then `npm test`, `npm run typecheck`, `npm run lint`, `npm run build` after Step 4 board-context rationale artifact implementation (2026-04-06)
 
 ## Last commit hash
-- pending (next commit will capture Step 4 board-context rationale artifact)
+- 0c285aa
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`
 - Inspect git status and recent commits
 - Continue with Step 4 bounded tasks only; do not jump to Step 5+.
 - Next bounded task: add bounded Step 4 checks that link academy outputs to transfer-pressure sample contexts.
-- Last successful pushed commit: d942757.
+- Last successful pushed commit: 0c285aa.
