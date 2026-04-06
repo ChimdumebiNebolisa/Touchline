@@ -510,6 +510,42 @@ describe("transfer negotiation calibration samples", () => {
     expect((baseline.delta.match(/,/g) ?? []).length).toBeGreaterThanOrEqual(5);
   });
 
+  it("keeps explainability summary token counts stable across repeated runs", () => {
+    const buildSummaryTokenCounts = () => {
+      const equalFeeSummary = buildEqualFeeNegotiationExplainabilityArtifact(
+        calibrationTarget,
+        calibrationEqualFeeContexts.first,
+        calibrationEqualFeeContexts.second
+      ).conciseSummary;
+      const deltaSummary = buildReputationBandOutcomeDeltaSummary(
+        calibrationTarget,
+        {
+          clubWageBudget: calibrationBaseContext.clubWageBudget,
+          clubStature: calibrationBaseContext.clubStature,
+          boardWageDiscipline: calibrationBaseContext.boardWageDiscipline
+        },
+        82,
+        28,
+        calibrationOutcomeVariants
+      ).conciseSummary;
+
+      return {
+        equalFeeTokenCount: equalFeeSummary.split(/\s+/).filter(Boolean).length,
+        deltaTokenCount: deltaSummary.split(/\s+/).filter(Boolean).length
+      };
+    };
+
+    const runs = Array.from({ length: 6 }, () => buildSummaryTokenCounts());
+    const baseline = runs[0];
+
+    for (const run of runs.slice(1)) {
+      expect(run).toEqual(baseline);
+    }
+
+    expect(baseline.equalFeeTokenCount).toBeGreaterThan(8);
+    expect(baseline.deltaTokenCount).toBeGreaterThan(14);
+  });
+
   it("keeps reputation-band delta artifacts deterministic across repeated fixed fixture evaluations", () => {
     const repeatedRuns = Array.from({ length: 12 }, () =>
       buildReputationBandOutcomeDeltaSummary(
