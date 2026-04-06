@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 
 import { generateAcademyIntake } from "../src/index.js";
-import { buildLoanPathFixtureWindow } from "./fixtures/academyPathwayFixtures.js";
+import {
+  buildLoanPathFixtureWindow,
+  buildSeasonAcademyOutputSummaryArtifact
+} from "./fixtures/academyPathwayFixtures.js";
 
 describe("academy intake", () => {
   it("produces deterministic intake output for identical inputs", () => {
@@ -250,5 +253,25 @@ describe("academy intake", () => {
     const highBiasLoanCount = countLoanRecommendations(highBiasFixtures);
 
     expect(highBiasLoanCount).toBeGreaterThan(lowBiasLoanCount);
+  });
+
+  it("integrates academy output summaries into deterministic season-level sample artifacts", () => {
+    const fixtures = buildLoanPathFixtureWindow({
+      clubId: "club-season-artifact",
+      seed: 622,
+      startSeasonYear: 2092,
+      seasons: 8,
+      academyQuality: 0.67,
+      pathwayBias: 0.6,
+      intakeSize: 9
+    });
+
+    const firstArtifact = buildSeasonAcademyOutputSummaryArtifact(fixtures);
+    const secondArtifact = buildSeasonAcademyOutputSummaryArtifact(fixtures);
+
+    expect(secondArtifact).toEqual(firstArtifact);
+    expect(firstArtifact.rows).toHaveLength(8);
+    expect(firstArtifact.conciseSummary[0]).toContain("Seasons sampled");
+    expect(firstArtifact.totalLoanRecommendations).toBeGreaterThan(0);
   });
 });
