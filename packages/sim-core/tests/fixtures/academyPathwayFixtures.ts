@@ -39,6 +39,16 @@ export interface AcademyLoanPathwayProgressionArtifact {
   conciseSummary: string[];
 }
 
+export interface AcademyTransferPressureComparisonArtifact {
+  lowPathwayBias: number;
+  highPathwayBias: number;
+  lowPathwaySummary: AcademySeasonOutputSummaryArtifact;
+  highPathwaySummary: AcademySeasonOutputSummaryArtifact;
+  lowPathwayVariants: NegotiationScenarioVariant[];
+  highPathwayVariants: NegotiationScenarioVariant[];
+  conciseSummary: string[];
+}
+
 function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
 }
@@ -173,6 +183,58 @@ export function buildLoanPathwayProgressionArtifact(
       `Loan-pathway progression sampled across ${rows.length} seasons.`,
       `First season loan recommendations ${firstSeasonLoanRecommendations}, final season ${finalSeasonLoanRecommendations}.`,
       `Total loan-pathway recommendations across window: ${summary.totalLoanRecommendations}.`
+    ]
+  };
+}
+
+export function buildTransferPressureComparisonArtifact(options: {
+  clubId: string;
+  seed: number;
+  startSeasonYear: number;
+  seasons: number;
+  academyQuality: number;
+  intakeSize: number;
+  lowPathwayBias: number;
+  highPathwayBias: number;
+}): AcademyTransferPressureComparisonArtifact {
+  const lowPathwaySummary = buildSeasonAcademyOutputSummaryArtifact(
+    buildLoanPathFixtureWindow({
+      clubId: options.clubId,
+      seed: options.seed,
+      startSeasonYear: options.startSeasonYear,
+      seasons: options.seasons,
+      academyQuality: options.academyQuality,
+      pathwayBias: options.lowPathwayBias,
+      intakeSize: options.intakeSize
+    })
+  );
+
+  const highPathwaySummary = buildSeasonAcademyOutputSummaryArtifact(
+    buildLoanPathFixtureWindow({
+      clubId: options.clubId,
+      seed: options.seed,
+      startSeasonYear: options.startSeasonYear,
+      seasons: options.seasons,
+      academyQuality: options.academyQuality,
+      pathwayBias: options.highPathwayBias,
+      intakeSize: options.intakeSize
+    })
+  );
+
+  const lowPathwayVariants = buildTransferVariantsFromAcademySummary(lowPathwaySummary);
+  const highPathwayVariants = buildTransferVariantsFromAcademySummary(highPathwaySummary);
+
+  return {
+    lowPathwayBias: options.lowPathwayBias,
+    highPathwayBias: options.highPathwayBias,
+    lowPathwaySummary,
+    highPathwaySummary,
+    lowPathwayVariants,
+    highPathwayVariants,
+    conciseSummary: [
+      `Transfer-pressure comparison uses matched wage context and pathway-bias windows ${options.lowPathwayBias.toFixed(2)} vs ${options.highPathwayBias.toFixed(2)}.`,
+      `Loan recommendations: low-bias ${lowPathwaySummary.totalLoanRecommendations}, high-bias ${highPathwaySummary.totalLoanRecommendations}.`,
+      `Average blockage score: low-bias ${lowPathwaySummary.averageBlockageScore.toFixed(2)}, high-bias ${highPathwaySummary.averageBlockageScore.toFixed(2)}.`
     ]
   };
 }

@@ -19,10 +19,54 @@ import {
 import {
   buildLoanPathFixtureWindow,
   buildSeasonAcademyOutputSummaryArtifact,
+  buildTransferPressureComparisonArtifact,
   buildTransferVariantsFromAcademySummary
 } from "./fixtures/academyPathwayFixtures.js";
 
 describe("transfer negotiation calibration samples", () => {
+  it("builds a focused transfer-pressure comparison artifact from matched-wage pathway-bias windows", () => {
+    const comparisonArtifact = buildTransferPressureComparisonArtifact({
+      clubId: "club-transfer-pressure-comparison",
+      seed: 844,
+      startSeasonYear: 2096,
+      seasons: 8,
+      academyQuality: 0.69,
+      intakeSize: 10,
+      lowPathwayBias: 0.35,
+      highPathwayBias: 0.75
+    });
+
+    const lowPathwayOutcome = summarizeTransferOutcomesByReputationBand(
+      calibrationTarget,
+      {
+        clubWageBudget: calibrationBaseContext.clubWageBudget,
+        clubStature: calibrationBaseContext.clubStature,
+        boardWageDiscipline: calibrationBaseContext.boardWageDiscipline
+      },
+      [62],
+      comparisonArtifact.lowPathwayVariants
+    );
+
+    const highPathwayOutcome = summarizeTransferOutcomesByReputationBand(
+      calibrationTarget,
+      {
+        clubWageBudget: calibrationBaseContext.clubWageBudget,
+        clubStature: calibrationBaseContext.clubStature,
+        boardWageDiscipline: calibrationBaseContext.boardWageDiscipline
+      },
+      [62],
+      comparisonArtifact.highPathwayVariants
+    );
+
+    expect(comparisonArtifact.highPathwaySummary.totalLoanRecommendations).toBeGreaterThan(
+      comparisonArtifact.lowPathwaySummary.totalLoanRecommendations
+    );
+    expect(lowPathwayOutcome.bands[0].attempts).toBe(comparisonArtifact.lowPathwaySummary.rows.length);
+    expect(highPathwayOutcome.bands[0].attempts).toBe(comparisonArtifact.highPathwaySummary.rows.length);
+    expect(lowPathwayOutcome.bands[0].averageScore).not.toBe(highPathwayOutcome.bands[0].averageScore);
+    expect(comparisonArtifact.conciseSummary[0]).toContain("matched wage context");
+  });
+
   it("wires academy pathway-pressure summaries into transfer calibration sample variants", () => {
     const lowPathwayBiasSummary = buildSeasonAcademyOutputSummaryArtifact(
       buildLoanPathFixtureWindow({
