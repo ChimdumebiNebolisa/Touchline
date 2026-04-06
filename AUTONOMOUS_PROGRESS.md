@@ -4,14 +4,14 @@
 - Step 6: Save/load and career continuity
 
 ## Last completed verified task
-- Added and verified slot-store integration coverage proving deterministic continuation after loading a pre-event save slot with preserved manager reputation and sack history.
+- Extended and verified `manual:step6` to include slot-based save/load continuity checks (write/read/list slot flow plus deterministic post-reload continuation parity).
 
 ## Current subtask in progress
-- Extend Step 6 manual evidence with slot-based continuity checks.
+- Audit remaining Step 6 persistence gaps after slot-backed manual evidence.
 
 ## Next queued subtasks
-- Add a Step 6 manual artifact extension that validates slot-based save/load continuity.
-- Audit remaining Step 6 persistence gaps after slot integration evidence.
+- Evaluate whether Step 6 exit criteria are now met or identify the smallest remaining persistence gap.
+- If needed, add bounded save-slot metadata/manual artifact coverage for multi-save continuity.
 - Keep Step 6 scope only; do not start Step 7 until Step 6 verification is explicit.
 
 ## Known blockers
@@ -21,11 +21,11 @@
 - Passed: `npm run -w @touchline/save test`; `npm run -w @touchline/save typecheck`; `npm run -w @touchline/save lint`; `npm run -w @touchline/save build`; `npm test`; `npm run typecheck`; `npm run lint`; `npm run build` (2026-04-06)
 
 ## Last commit hash
-- a4e06f1 (new commit pending)
+- e70a5c1 (new commit pending)
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`
 - Inspect git status and recent commits
 - Continue with Step 6 bounded tasks only; do not jump to Step 7.
-- Next bounded task: extend manual Step 6 artifact to include slot-based continuity evidence.
-- Last successful pushed commit before this pending checkpoint: a4e06f1.
+- Next bounded task: run a Step 6 completion audit and select the smallest remaining persistence artifact gap if any.
+- Last successful pushed commit before this pending checkpoint: e70a5c1.
