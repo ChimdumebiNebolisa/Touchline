@@ -71,6 +71,38 @@ function createSampleState(): SaveGameStateV1 {
   };
 }
 
+function createSaveStateForWorldState(worldState: SaveGameStateV1["worldState"]): SaveGameStateV1 {
+  const leverageSnapshot: ManagerCareerLeverageSnapshot = {
+    score: 0.58,
+    band: "credible",
+    reasonSummary: "Reputation trend stayed stable before major event boundary."
+  };
+
+  const sackOutcome: SeasonSackOutcome = {
+    clubId: "legacy-club",
+    leaguePosition: 17,
+    reasonSummary: ["Board review closed with dismissal in prior season."],
+    sackRisk: 0.79
+  };
+
+  return {
+    worldState,
+    clubPerceptionState: {
+      boardConfidence: 54,
+      fanSentiment: 55,
+      teamMorale: 57,
+      managerReputation: 59
+    },
+    managerCareer: {
+      managerId: "manager-2",
+      currentClubId: "club-a",
+      reputationHistory: [52, 55, 59],
+      careerLeverageHistory: [leverageSnapshot],
+      sackHistory: [sackOutcome]
+    }
+  };
+}
+
 describe("save codec", () => {
   it("serializes and deserializes a save envelope without state drift", () => {
     const state = createSampleState();
@@ -145,5 +177,36 @@ describe("save codec", () => {
         expect(error.code).toBe("MALFORMED_PAYLOAD");
       }
     }
+  });
+
+  it("continues deterministically after loading a save created before a major event", () => {
+    const preEventSeasonState = createSeasonState([
+      { id: "club-a", name: "Club A", strength: 74 },
+      { id: "club-b", name: "Club B", strength: 71 },
+      { id: "club-c", name: "Club C", strength: 69 },
+      { id: "club-d", name: "Club D", strength: 67 }
+    ]);
+
+    const preEventSaveState = createSaveStateForWorldState(preEventSeasonState);
+    const preEventEnvelope = createSaveEnvelopeV1(preEventSaveState, "2032-07-20T08:00:00.000Z");
+    const restoredPreEventEnvelope = deserializeSaveEnvelope(serializeSaveEnvelope(preEventEnvelope));
+
+    const fixtureResults = Object.fromEntries(
+      getFixturesForMatchday(preEventSeasonState, preEventSeasonState.currentMatchday).map(
+        (fixture, index) => [
+          fixture.id,
+          {
+            homeGoals: (index + 2) % 3,
+            awayGoals: (index + 1) % 3
+          }
+        ]
+      )
+    );
+
+    const continuedFromOriginal = advanceSeasonState(preEventSeasonState, fixtureResults);
+    const continuedFromRestored = advanceSeasonState(restoredPreEventEnvelope.state.worldState, fixtureResults);
+
+    expect(continuedFromRestored).toEqual(continuedFromOriginal);
+    expect(restoredPreEventEnvelope.state.managerCareer.reputationHistory).toEqual([52, 55, 59]);
   });
 });
