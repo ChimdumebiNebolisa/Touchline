@@ -4,28 +4,28 @@
 - Step 6: Save/load and career continuity
 
 ## Last completed verified task
-- Added and verified long-save slot overwrite continuity coverage, ensuring latest saved timeline state preserves reputation history, leverage progression, sack history, and world progression.
+- Added and verified a multi-season save-slot manual continuity artifact that preserves reputation history, career leverage progression, sack history, and deterministic post-reload continuation.
 
 ## Current subtask in progress
-- Run Step 6 completion audit against exit criteria and identify final gap(s), if any.
+- Commit and push the bounded Step 6 multi-season manual evidence artifact.
 
 ## Next queued subtasks
-- Evaluate whether Step 6 exit criteria are met with current serialization, slot persistence, integration tests, and manual artifacts.
-- If any gap remains, add the smallest bounded persistence/manual evidence artifact to close it.
-- Keep Step 6 scope only; do not start Step 7 until Step 6 verification is explicit.
+- Re-run Step 6 completion audit against exit criteria and confirm if any persistence gap remains.
+- If Step 6 is fully satisfied, record explicit completion checkpoint and prepare Step 7 calibration gate intake only.
+- Keep scope within active step boundaries until completion is explicit in docs and progress state.
 
 ## Known blockers
 - None
 
 ## Last verification run
-- Passed: `npm run -w @touchline/save test`; `npm run -w @touchline/save typecheck`; `npm run -w @touchline/save lint`; `npm run -w @touchline/save build`; `npm test`; `npm run typecheck`; `npm run lint`; `npm run build` (2026-04-06)
+- Passed: `npm run -w @touchline/sim-core build`; `npm run -w @touchline/save build`; `npm run manual:step6`; `npm run manual:step6:multiseason`; `npm test`; `npm run typecheck`; `npm run lint`; `npm run build` (2026-04-06)
 
 ## Last commit hash
-- fff0980 (new commit pending)
+- pending (last pushed commit: 2afa630)
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`
 - Inspect git status and recent commits
-- Continue with Step 6 bounded tasks only; do not jump to Step 7.
-- Next bounded task: complete Step 6 exit-criteria audit and either checkpoint completion or implement the smallest remaining artifact.
-- Last successful pushed commit before this pending checkpoint: fff0980.
+- Continue with Step 6 bounded tasks only until completion is explicit.
+- Next bounded task: run Step 6 exit-criteria audit and decide if further bounded persistence evidence is still required.
+- If Step 6 is complete, update progress status cleanly before beginning any Step 7 intake.

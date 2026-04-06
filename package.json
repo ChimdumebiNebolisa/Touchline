@@ -15,7 +15,8 @@
     "manual:step2": "node scripts/manual-check-step2-board-context.mjs",
     "manual:step4": "node scripts/manual-check-step4.mjs",
     "manual:step5": "node scripts/manual-check-step5-shadow-world.mjs",
-    "manual:step6": "node scripts/manual-check-step6-save-load.mjs"
+    "manual:step6": "node scripts/manual-check-step6-save-load.mjs",
+    "manual:step6:multiseason": "node scripts/manual-check-step6-multiseason.mjs"
   },
   "devDependencies": {
     "@types/node": "^22.14.1",
