@@ -726,6 +726,30 @@ describe("transfer negotiation calibration samples", () => {
     }
   });
 
+  it("keeps negotiation sample outputs deterministic for calibration snapshots", () => {
+    const buildNegotiationSampleOutput = () =>
+      buildTransferNegotiationLogSamples(calibrationTarget, calibrationLogContexts).map((entry) => ({
+        attemptId: entry.attemptId,
+        accepted: entry.accepted,
+        blockingActor: entry.blockingActor,
+        reasonCount: entry.reasonSummary.length,
+        scoreBand: entry.score >= 0 ? "non-negative" : "negative"
+      }));
+
+    const runs = Array.from({ length: 8 }, () => buildNegotiationSampleOutput());
+    const baseline = runs[0];
+
+    for (const run of runs.slice(1)) {
+      expect(run).toEqual(baseline);
+    }
+
+    expect(baseline).toHaveLength(3);
+    expect(baseline.map((entry) => entry.attemptId)).toEqual(["attempt-1", "attempt-2", "attempt-3"]);
+    expect(baseline.map((entry) => entry.blockingActor)).toEqual(["none", "none", "player"]);
+    expect(baseline.map((entry) => entry.reasonCount)).toEqual([6, 6, 8]);
+    expect(baseline.map((entry) => entry.scoreBand)).toEqual(["non-negative", "non-negative", "negative"]);
+  });
+
   it("keeps concise transfer summaries deterministic and regression-friendly", () => {
     const firstPromiseTrust = summarizePromiseTrustImpactByReputationBand(
       calibrationTarget,
