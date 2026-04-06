@@ -4,24 +4,24 @@
 - Step 7: Calibration and regression gate
 
 ## Last completed verified task
-- Closed Step 6 by updating plan/progress status artifacts to mark save/load continuity complete and activate Step 7.
+- Added the first Step 7 artifact (`docs/Step7-Design-Rule-Checklist.md`) that maps design rules to concrete existing tests/manual evidence and explicitly lists remaining Step 7 deliverables.
 
 ## Current subtask in progress
-- Run Step 7 intake to choose the smallest calibration/regression artifact that can be implemented and verified next.
+- Commit and push the Step 7 design-rule checklist artifact.
 
 ## Next queued subtasks
-- Inventory current calibration/regression evidence against Step 7 required outputs.
-- Implement the smallest missing Step 7 artifact (likely one checklist/report artifact before new simulation code).
-- Verify with strongest relevant checks, then commit and push.
+- Add the first calibration suite artifact for Step 7 metric tracking (goal rates, upset rates, red-card impact, late-goal distribution, youth rarity).
+- Add a rerunnable regression suite entrypoint that can be executed after balancing passes.
+- Produce an initial final verification report draft once calibration and regression artifacts exist.
 
 ## Known blockers
 - None
 
 ## Last verification run
-- Passed: `npm test`; `npm run typecheck`; `npm run lint`; `npm run build` (2026-04-06)
+- Passed: `npm test`; `npm run typecheck`; `npm run lint`; `npm run build` (2026-04-06, post-Step-7-checklist)
 
 ## Last commit hash
-- pending (last pushed commit: 62d71aa)
+- pending (last pushed commit: 948fa17)
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`
