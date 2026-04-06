@@ -4,11 +4,11 @@
 
 **Active**
 
-* Step 6: Save/load and career continuity
+* Step 7: Calibration and regression gate
 
 **Backlog**
 
-* Step 7: Calibration and regression gate
+* None
 
 **Blocked**
 
@@ -21,6 +21,7 @@
 * Step 3: Transfer and reputation expansion
 * Step 4: Academy, loans, and pathway pressure
 * Step 5: Shadow world and country-pack scaling
+* Step 6: Save/load and career continuity
 
 **Dropped**
 
@@ -295,7 +296,7 @@ Other leagues generate believable transfer and loan context without deep simulat
 ## 8. Step 6
 
 **Status**
-Active
+Done
 
 **Objective**
 Persist long saves, manager reputation history, sackings, and future job leverage. 
@@ -336,7 +337,7 @@ The player can save, reload, continue career, and carry reputation and relations
 ## 9. Step 7
 
 **Status**
-Backlog
+Active
 
 **Objective**
 Lock the game against drift, random-feeling outcomes, and scope creep. The workflow explicitly requires the plan to end with a calibration and regression gate.  

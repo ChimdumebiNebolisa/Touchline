@@ -1,32 +1,31 @@
 # Autonomous Progress
 
 ## Current active Plan step
-- Step 6: Save/load and career continuity
+- Step 7: Calibration and regression gate
 
 ## Last completed verified task
-- Added and verified persistence for promise-trust continuity (`recentPromiseBreak`) across codec, slot store, and Step 6 manual multi-season save/load checks.
+- Closed Step 6 by updating plan/progress status artifacts to mark save/load continuity complete and activate Step 7.
 
 ## Current subtask in progress
-- Blocked: Step 6 completion audit finished; awaiting human decision to activate Step 7.
+- Run Step 7 intake to choose the smallest calibration/regression artifact that can be implemented and verified next.
 
 ## Next queued subtasks
-- If approved, update plan/progress status to mark Step 6 complete and Step 7 active.
-- Begin Step 7 with the smallest calibration/regression gate intake task only.
-- Keep scope constrained to Step 7 artifacts once formally activated.
+- Inventory current calibration/regression evidence against Step 7 required outputs.
+- Implement the smallest missing Step 7 artifact (likely one checklist/report artifact before new simulation code).
+- Verify with strongest relevant checks, then commit and push.
 
 ## Known blockers
-- Active-step boundary blocker: Step 6 exit criteria now have verified evidence, but `docs/Plan.md` still marks Step 6 as active and Step 7 as backlog.
-- Smallest human decision needed: confirm Step 6 is complete and authorize activation of Step 7 work.
+- None
 
 ## Last verification run
-- Passed: `npm run -w @touchline/save test`; `npm run -w @touchline/save typecheck`; `npm run -w @touchline/save lint`; `npm run -w @touchline/save build`; `npm run -w @touchline/sim-core build`; `npm run manual:step6`; `npm run manual:step6:multiseason`; `npm test`; `npm run typecheck`; `npm run lint`; `npm run build` (2026-04-06)
+- Passed: `npm test`; `npm run typecheck`; `npm run lint`; `npm run build` (2026-04-06)
 
 ## Last commit hash
-- b738157
+- pending (last pushed commit: 62d71aa)
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`
 - Inspect git status and recent commits
-- Confirm human decision on Step 6 completion and Step 7 activation.
-- If approved, update status artifacts first, then start the smallest Step 7 calibration task.
-- If not approved, remain in Step 6 scope and address the specific requested gap only.
+- Continue Step 7 only.
+- Pick the smallest calibration/regression artifact required by `docs/Plan.md` and verify it with concrete evidence.
+- Commit and push after each meaningful verified Step 7 increment.
