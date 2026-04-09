@@ -1,27 +1,30 @@
 # Autonomous Progress
 
 ## Current active Plan step
-- None. Foundational plan complete.
+- Step 12: Establish the visual system.
 
 ## Last completed verified task
-- Step 11 verified: local save/load now persists the current career shell and reloads it through the menu flow.
+- Extended the source-of-truth plan beyond the foundation and activated Step 12 for shared visual-system work.
 
 ## Current subtask in progress
-- None.
+- Create the first shared theme resources and wire them into the Godot shell.
 
 ## Next queued subtasks
-- No further subtasks queued under the current foundational plan.
+- Apply the shared theme to the main menu and career setup shell.
+- Apply the shared theme to the club dashboard shell.
+- Define reusable panel, button, and label treatments for later screen redesign steps.
 
 ## Known blockers
-- No active blockers. Manual Godot runtime save/load exercise remains a follow-up validation gap because no Godot executable surfaced quickly from the shell environment.
+- No active blockers.
+- Manual Godot runtime verification remains limited because no Godot executable has surfaced in the shell environment for direct launch testing.
 
 ## Last verification run
-- Passed: dotnet build game/Touchline.sln; npm test; npm run typecheck; npm run lint; npm run build (2026-04-09).
+- Passed doc consistency review across `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md` on 2026-04-09.
 
 ## Last commit hash
-- Pending commit for verified Step 11 save/load flow.
+- 84d69fb
 
 ## Resume instructions
-- Re-read docs/PRD.md, docs/Architecture.md, docs/Guardrails.md, and docs/Plan.md.
-- Re-read AUTONOMOUS_PROGRESS.md and confirm the foundational plan is complete.
-- Resume from the next approved plan extension or from runtime validation if a Godot executable is provided in the shell environment.
+- Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`.
+- Confirm Step 12 is the only active step.
+- Continue with the smallest valid Step 12 subtask: shared theme resource creation and shell wiring.
