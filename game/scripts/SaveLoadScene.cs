@@ -7,28 +7,30 @@ public partial class SaveLoadScene : Control
 
     public override void _Ready()
     {
-        var slotSummaryLabel = GetNode<Label>("Center/Panel/Padding/Content/SlotSummaryLabel");
-        var statusLabel = GetNode<Label>("Center/Panel/Padding/Content/StatusLabel");
+        var slotSummaryLabel = GetNode<Label>("Center/Panel/Padding/Content/SlotCard/SlotPadding/SlotContent/SlotSummaryLabel");
+        var statusLabel = GetNode<Label>("Center/Panel/Padding/Content/SlotCard/SlotPadding/SlotContent/StatusLabel");
         var loadButton = GetNode<Button>("Center/Panel/Padding/Content/LoadButton");
 
         if (SaveSystem.Instance == null)
         {
             slotSummaryLabel.Text = "Save system unavailable.";
             statusLabel.Text = "Load is unavailable until the save singleton is active.";
+            loadButton.Text = "Continue Career";
             loadButton.Disabled = true;
             return;
         }
 
         slotSummaryLabel.Text = SaveSystem.Instance.GetSlotSummary();
         statusLabel.Text = SaveSystem.Instance.HasSaveFile()
-            ? "Load the local slot to continue your career."
+            ? "This career is ready to continue from the latest local save."
             : "No local save found yet. Start a career and save from the dashboard.";
+        loadButton.Text = "Continue Career";
         loadButton.Disabled = !SaveSystem.Instance.HasSaveFile();
     }
 
     private void OnLoadPressed()
     {
-        var statusLabel = GetNode<Label>("Center/Panel/Padding/Content/StatusLabel");
+        var statusLabel = GetNode<Label>("Center/Panel/Padding/Content/SlotCard/SlotPadding/SlotContent/StatusLabel");
 
         if (SaveSystem.Instance == null)
         {

@@ -64,13 +64,38 @@ text = "Load Game"
 horizontal_alignment = 1
 theme_override_font_sizes/font_size = 34
 
-[node name="SlotSummaryLabel" type="Label" parent="Center/Panel/Padding/Content"]
+[node name="IntroLabel" type="Label" parent="Center/Panel/Padding/Content"]
+layout_mode = 2
+text = "Review the local save slot before stepping back into the dugout."
+autowrap_mode = 3
+horizontal_alignment = 1
+
+[node name="SlotCard" type="PanelContainer" parent="Center/Panel/Padding/Content"]
+layout_mode = 2
+
+[node name="SlotPadding" type="MarginContainer" parent="Center/Panel/Padding/Content/SlotCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 16
+
+[node name="SlotContent" type="VBoxContainer" parent="Center/Panel/Padding/Content/SlotCard/SlotPadding"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="SlotHeading" type="Label" parent="Center/Panel/Padding/Content/SlotCard/SlotPadding/SlotContent"]
+layout_mode = 2
+text = "Slot 1"
+horizontal_alignment = 1
+
+[node name="SlotSummaryLabel" type="Label" parent="Center/Panel/Padding/Content/SlotCard/SlotPadding/SlotContent"]
 layout_mode = 2
 text = "No local save found."
 autowrap_mode = 3
 horizontal_alignment = 1
 
-[node name="StatusLabel" type="Label" parent="Center/Panel/Padding/Content"]
+[node name="StatusLabel" type="Label" parent="Center/Panel/Padding/Content/SlotCard/SlotPadding/SlotContent"]
 layout_mode = 2
 text = "Load is unavailable."
 autowrap_mode = 3
