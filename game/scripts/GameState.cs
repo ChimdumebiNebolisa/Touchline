@@ -68,6 +68,7 @@ public partial class GameState : Node
     public string[] RecentResults => _recentResults.ToArray();
     public string SeasonLabel => $"{SeasonStartYear}/{((SeasonStartYear + 1) % 100):00}";
     public string CurrentDateLabel => CurrentDate.ToString("ddd d MMM yyyy");
+    public string? SelectedPlayerProfileName { get; private set; }
 
     public override void _EnterTree()
     {
@@ -115,6 +116,7 @@ public partial class GameState : Node
         FormSummary = "Form: season about to begin.";
         _recentResults.Clear();
         LastMatchReport = null;
+        SelectedPlayerProfileName = null;
     }
 
     public void SelectClub(string clubName)
@@ -123,6 +125,7 @@ public partial class GameState : Node
         CompetitionName = "Novara Premier Division";
         CurrentMatchday = 1;
         LastMatchReport = null;
+        SelectedPlayerProfileName = null;
         RefreshFixtureContext();
         SquadStatusSummary = BuildSquadStatusSummary();
 
@@ -264,6 +267,30 @@ public partial class GameState : Node
                 FanDelta = data.LastMatchReport.FanDelta,
                 BoardDelta = data.LastMatchReport.BoardDelta
             };
+        SelectedPlayerProfileName = null;
+    }
+
+    public void SelectPlayerProfile(string playerName)
+    {
+        SelectedPlayerProfileName = playerName;
+    }
+
+    public SquadPlayer? GetSelectedPlayerProfile()
+    {
+        if (string.IsNullOrWhiteSpace(SelectedPlayerProfileName))
+        {
+            return null;
+        }
+
+        foreach (var player in SquadPlayers)
+        {
+            if (player.Name == SelectedPlayerProfileName)
+            {
+                return player;
+            }
+        }
+
+        return null;
     }
 
     public ClubPreview GetClubPreview(string clubName)

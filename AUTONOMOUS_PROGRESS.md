@@ -4,27 +4,27 @@
 - Step 16: Create the player profile scene.
 
 ## Last completed verified task
-- Step 15 complete: the dashboard now operates as a clearer command center with explicit club pulse, tactical readiness, and operational status.
+- Added the missing player-profile scene and wired squad selection into a clean inspection flow.
 
 ## Current subtask in progress
-- Add the missing player-profile scene and wire squad selection into it.
+- Review Step 16 exit criteria and activate Step 17 if satisfied.
 
 ## Next queued subtasks
 - Continue replacing placeholder shell copy with football-native copy in redesigned screens.
-- Wire squad selection into the new player-profile flow once the scene exists.
-- Review Step 16 exit criteria once player inspection works end to end.
+- If Step 16 is complete, activate Step 17 and rebuild squad management into a real workspace.
+- Carry the player-profile link into the broader squad-management redesign.
 
 ## Known blockers
 - No active blockers.
 - Manual Godot runtime verification remains limited because no Godot executable has surfaced in the shell environment for direct launch testing.
 
 ## Last verification run
-- Passed Step 15 exit review against `docs/Plan.md` plus the latest `dotnet build game/Touchline.sln` result on 2026-04-09.
+- Passed `dotnet build game/Touchline.sln` on 2026-04-09 after adding the player-profile scene and squad handoff flow.
 
 ## Last commit hash
-- f5e6e93
+- c4bfa54
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`.
 - Confirm Step 16 is the only active step.
-- Continue with the smallest valid Step 16 subtask: add the player-profile scene and wire squad selection into it.
+- If Step 16 exit criteria are satisfied, activate Step 17 and continue with the squad-workspace rebuild.

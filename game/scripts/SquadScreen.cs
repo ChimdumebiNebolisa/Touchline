@@ -5,12 +5,15 @@ using System.Collections.Generic;
 public partial class SquadScreen : Control
 {
     private const string ClubDashboardScenePath = "res://scenes/ClubDashboard.tscn";
+    private const string PlayerProfileScenePath = "res://scenes/PlayerProfile.tscn";
 
     private Label _clubContextLabel = default!;
     private OptionButton _positionFilter = default!;
     private ItemList _playerList = default!;
     private Label _playerDetailLabel = default!;
+    private Button _openProfileButton = default!;
     private readonly List<int> _visiblePlayerIndexes = new();
+    private int _currentVisibleSelectionIndex = -1;
 
     public override void _Ready()
     {
@@ -18,11 +21,13 @@ public partial class SquadScreen : Control
         _positionFilter = GetNode<OptionButton>("Center/Panel/PositionFilter");
         _playerList = GetNode<ItemList>("Center/Panel/PlayerList");
         _playerDetailLabel = GetNode<Label>("Center/Panel/PlayerDetailLabel");
+        _openProfileButton = GetNode<Button>("Center/Panel/OpenProfileButton");
 
         if (GameState.Instance == null || string.IsNullOrWhiteSpace(GameState.Instance.SelectedClubName))
         {
             _clubContextLabel.Text = "Club context unavailable.";
             _playerDetailLabel.Text = "Select a player to inspect details.";
+            _openProfileButton.Disabled = true;
             return;
         }
 
@@ -68,6 +73,7 @@ public partial class SquadScreen : Control
         else
         {
             _playerDetailLabel.Text = "No players match this filter.";
+            _openProfileButton.Disabled = true;
         }
     }
 
@@ -81,14 +87,19 @@ public partial class SquadScreen : Control
         if (GameState.Instance == null || visibleIndex < 0 || visibleIndex >= _visiblePlayerIndexes.Count)
         {
             _playerDetailLabel.Text = "Player details unavailable.";
+            _openProfileButton.Disabled = true;
+            _currentVisibleSelectionIndex = -1;
             return;
         }
 
+        _currentVisibleSelectionIndex = visibleIndex;
         var index = _visiblePlayerIndexes[visibleIndex];
         var player = GameState.Instance.SquadPlayers[index];
         var lineupTag = player.IsStarting ? "Starting XI" : "Bench";
         _playerDetailLabel.Text =
             $"{player.Name} | {player.Position} | {lineupTag} | Age {player.Age} | Form {player.Form} | Morale {player.Morale} | Fitness {player.Fitness}";
+        _openProfileButton.Disabled = false;
+        _openProfileButton.Text = $"Open {player.Name} Profile";
     }
 
     private static bool MatchesFilter(string position, int filterId)
@@ -107,5 +118,17 @@ public partial class SquadScreen : Control
     private void OnBackPressed()
     {
         GetTree().ChangeSceneToFile(ClubDashboardScenePath);
+    }
+
+    private void OnOpenProfilePressed()
+    {
+        if (GameState.Instance == null || _currentVisibleSelectionIndex < 0 || _currentVisibleSelectionIndex >= _visiblePlayerIndexes.Count)
+        {
+            return;
+        }
+
+        var index = _visiblePlayerIndexes[_currentVisibleSelectionIndex];
+        GameState.Instance.SelectPlayerProfile(GameState.Instance.SquadPlayers[index].Name);
+        GetTree().ChangeSceneToFile(PlayerProfileScenePath);
     }
 }

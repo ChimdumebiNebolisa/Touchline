@@ -64,10 +64,15 @@ text = "Select a player to inspect details."
 autowrap_mode = 3
 horizontal_alignment = 1
 
+[node name="OpenProfileButton" type="Button" parent="Center/Panel"]
+layout_mode = 2
+text = "Open Player Profile"
+
 [node name="BackButton" type="Button" parent="Center/Panel"]
 layout_mode = 2
 text = "Back to Club Dashboard"
 
 [connection signal="item_selected" from="Center/Panel/PositionFilter" to="." method="OnFilterSelected"]
 [connection signal="item_selected" from="Center/Panel/PlayerList" to="." method="OnPlayerSelected"]
+[connection signal="pressed" from="Center/Panel/OpenProfileButton" to="." method="OnOpenProfilePressed"]
 [connection signal="pressed" from="Center/Panel/BackButton" to="." method="OnBackPressed"]
