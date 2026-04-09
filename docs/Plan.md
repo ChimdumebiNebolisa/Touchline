@@ -4,11 +4,10 @@
 
 ### Active
 
-- Step 22: Unify live and instant simulation around one shared engine
+- Step 23: Rebuild post-match into a consequence and explainability screen
 
 ### Backlog
 
-- Step 23: Rebuild post-match into a consequence and explainability screen
 - Step 24: Refactor runtime architecture around clear services
 - Step 25: Add the missing autoload systems from the architecture
 - Step 26: Move hardcoded football content into real data
@@ -45,6 +44,7 @@
 - Step 19: Replace fixtures and standings placeholders with real competition surfaces
 - Step 20: Redesign matchday into an event screen
 - Step 21: Upgrade live match presentation substantially
+- Step 22: Unify live and instant simulation around one shared engine
 
 ## 2. Plan Rules
 
@@ -280,6 +280,13 @@ Satisfy the Architecture requirement that instant and live modes share one match
 
 Make post-match the point where result, causes, and downstream club effects are all legible.
 
+### Allowed Subtasks
+
+- redesign post-match around result summary, key moments, and consequence explanation using the shared match result output
+- surface table movement, club pressure shifts, and tactical/context notes without inventing unsupported systems
+- preserve continue flow into the season timeline while making downstream effects readable
+- keep explanation text grounded in authoritative match and career state rather than scene-local heuristics
+
 ### Verification
 
 - result, key moments, and consequence deltas are presented clearly
@@ -384,8 +391,8 @@ Remove remaining prototype edges and harden the shell for repeated play.
 
 ## 23. Immediate Next Subtask
 
-Step 22 starts with the smallest valid engine-unification slice:
+Step 23 starts with the smallest valid post-match slice:
 
-- create a shared authoritative match result model
-- route both live and instant match flows through that shared model
-- verify the project still builds cleanly before broader runtime refactors continue
+- redesign the post-match scene around shared result and consequence data
+- explain table, morale, fan, and board effects from authoritative state
+- verify the project still builds cleanly before deeper runtime refactors continue
