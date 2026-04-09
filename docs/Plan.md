@@ -4,11 +4,10 @@
 
 ### Active
 
-- Step 23: Rebuild post-match into a consequence and explainability screen
+- Step 24: Refactor runtime architecture around clear services
 
 ### Backlog
 
-- Step 24: Refactor runtime architecture around clear services
 - Step 25: Add the missing autoload systems from the architecture
 - Step 26: Move hardcoded football content into real data
 - Step 27: Integrate the save path with the authoritative domain model
@@ -45,6 +44,7 @@
 - Step 20: Redesign matchday into an event screen
 - Step 21: Upgrade live match presentation substantially
 - Step 22: Unify live and instant simulation around one shared engine
+- Step 23: Rebuild post-match into a consequence and explainability screen
 
 ## 2. Plan Rules
 
@@ -299,6 +299,13 @@ Make post-match the point where result, causes, and downstream club effects are 
 
 Reduce monolithic state handling and align runtime responsibilities with the Architecture.
 
+### Allowed Subtasks
+
+- extract competition, match-resolution, or other domain responsibilities into clearer service classes under the Godot product path
+- keep `GameState` focused on long-lived career state and scene handoff instead of owning every rule path directly
+- preserve save/load and scene behavior while moving rule-heavy logic into reusable services
+- avoid introducing duplicate state owners while the refactor is underway
+
 ### Verification
 
 - scene-facing state responsibilities are split more cleanly
@@ -391,8 +398,8 @@ Remove remaining prototype edges and harden the shell for repeated play.
 
 ## 23. Immediate Next Subtask
 
-Step 23 starts with the smallest valid post-match slice:
+Step 24 starts with the smallest valid service-refactor slice:
 
-- redesign the post-match scene around shared result and consequence data
-- explain table, morale, fan, and board effects from authoritative state
-- verify the project still builds cleanly before deeper runtime refactors continue
+- move a major rule-heavy area out of `GameState.cs` into a dedicated service
+- preserve the existing scene-facing state shape while reducing singleton logic density
+- verify the project still builds cleanly before adding new autoload systems
