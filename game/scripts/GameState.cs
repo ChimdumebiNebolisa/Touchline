@@ -1,8 +1,12 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
 public partial class GameState : Node
 {
+    private const int MatchesPerSeason = 6;
+    private readonly List<string> _recentResults = new();
+
     public sealed class SquadPlayer
     {
         public required string Name { get; init; }
@@ -49,7 +53,12 @@ public partial class GameState : Node
     public int TeamMorale { get; private set; } = 72;
     public int FanSentiment { get; private set; } = 63;
     public int BoardConfidence { get; private set; } = 61;
+    public DateTime CurrentDate { get; private set; } = new(2026, 8, 3);
+    public int SeasonStartYear { get; private set; } = 2026;
+    public string FormSummary { get; private set; } = "Form: season about to begin.";
     public MatchReport? LastMatchReport { get; private set; }
+    public string SeasonLabel => $"{SeasonStartYear}/{((SeasonStartYear + 1) % 100):00}";
+    public string CurrentDateLabel => CurrentDate.ToString("ddd d MMM yyyy");
 
     public override void _EnterTree()
     {
@@ -70,6 +79,8 @@ public partial class GameState : Node
         CareerSeed = seed;
         CareerInitialized = true;
         WorldSeed = seed;
+        CurrentDate = new DateTime(2026, 8, 3);
+        SeasonStartYear = 2026;
         AvailableClubs = new[]
         {
             "Riverton Athletic",
@@ -79,7 +90,7 @@ public partial class GameState : Node
         };
         SelectedClubName = null;
         NextFixtureSummary = "Matchday 1: Riverton Athletic vs Harbor County";
-        SquadStatusSummary = "23 registered players | 20 fit | morale steady";
+        SquadStatusSummary = BuildSquadStatusSummary();
         SquadPlayers = Array.Empty<SquadPlayer>();
         TacticalFormation = "4-3-3";
         PressIntensity = 60;
@@ -92,20 +103,19 @@ public partial class GameState : Node
         TeamMorale = 72;
         FanSentiment = 63;
         BoardConfidence = 61;
+        FormSummary = "Form: season about to begin.";
+        _recentResults.Clear();
         LastMatchReport = null;
     }
 
     public void SelectClub(string clubName)
     {
         SelectedClubName = clubName;
-
-        var opponent = Array.Find(AvailableClubs, candidate => candidate != clubName) ?? "Harbor County";
-        CurrentOpponentName = opponent;
         CompetitionName = "Novara Premier Division";
         CurrentMatchday = 1;
-        NextFixtureSummary = $"Matchday {CurrentMatchday}: {clubName} vs {CurrentOpponentName}";
-        SquadStatusSummary = BuildSquadStatusSummary();
         LastMatchReport = null;
+        RefreshFixtureContext();
+        SquadStatusSummary = BuildSquadStatusSummary();
 
         SquadPlayers = new[]
         {
@@ -136,6 +146,29 @@ public partial class GameState : Node
         Risk = risk;
     }
 
+    public void AdvanceDate()
+    {
+        if (string.IsNullOrWhiteSpace(SelectedClubName))
+        {
+            return;
+        }
+
+        CurrentDate = CurrentDate.AddDays(7);
+        CurrentMatchday++;
+
+        if (CurrentMatchday > MatchesPerSeason)
+        {
+            SeasonStartYear++;
+            CurrentDate = new DateTime(SeasonStartYear, 8, 3);
+            CurrentMatchday = 1;
+            _recentResults.Clear();
+            FormSummary = "Form: new season reset.";
+        }
+
+        LastMatchReport = null;
+        RefreshFixtureContext();
+    }
+
     public void CompleteLiveMatch(LiveMatchPlayback playback)
     {
         var finalEvent = playback.Events[^1];
@@ -148,6 +181,7 @@ public partial class GameState : Node
         FanSentiment = Math.Clamp(FanSentiment + fanDelta, 0, 100);
         BoardConfidence = Math.Clamp(BoardConfidence + boardDelta, 0, 100);
         SquadStatusSummary = BuildSquadStatusSummary();
+        UpdateFormSummary(goalDifference);
 
         LastMatchReport = new MatchReport
         {
@@ -166,6 +200,42 @@ public partial class GameState : Node
     private string BuildSquadStatusSummary()
     {
         return $"23 registered players | morale {DescribeLevel(TeamMorale)} | fans {DescribeLevel(FanSentiment)} | board {DescribeLevel(BoardConfidence)}";
+    }
+
+    private void RefreshFixtureContext()
+    {
+        if (string.IsNullOrWhiteSpace(SelectedClubName))
+        {
+            CurrentOpponentName = "Harbor County";
+            NextFixtureSummary = "Fixture context unavailable.";
+            return;
+        }
+
+        var opponents = Array.FindAll(AvailableClubs, candidate => candidate != SelectedClubName);
+        CurrentOpponentName = opponents.Length == 0
+            ? "Harbor County"
+            : opponents[(CurrentMatchday - 1) % opponents.Length];
+
+        NextFixtureSummary =
+            $"{CurrentDateLabel} | Matchday {CurrentMatchday} | {SelectedClubName} vs {CurrentOpponentName}";
+    }
+
+    private void UpdateFormSummary(int goalDifference)
+    {
+        var resultToken = goalDifference switch
+        {
+            > 0 => "W",
+            0 => "D",
+            _ => "L"
+        };
+
+        _recentResults.Insert(0, resultToken);
+        if (_recentResults.Count > 5)
+        {
+            _recentResults.RemoveAt(5);
+        }
+
+        FormSummary = $"Form: {string.Join(" ", _recentResults)}";
     }
 
     private static string DescribeLevel(int value)

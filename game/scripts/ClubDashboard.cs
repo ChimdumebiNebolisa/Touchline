@@ -12,6 +12,7 @@ public partial class ClubDashboard : Control
     public override void _Ready()
     {
         var contextLabel = GetNode<Label>("Center/Panel/ClubContextLabel");
+        var dateLabel = GetNode<Label>("Center/Panel/DateLabel");
         var fixturePreviewLabel = GetNode<Label>("Center/Panel/FixturePreviewLabel");
         var squadStatusLabel = GetNode<Label>("Center/Panel/SquadStatusLabel");
         var stubMessageLabel = GetNode<Label>("Center/Panel/StubMessage");
@@ -19,6 +20,7 @@ public partial class ClubDashboard : Control
         if (GameState.Instance == null || !GameState.Instance.CareerInitialized)
         {
             contextLabel.Text = "Career context is unavailable.";
+            dateLabel.Text = "Season and date unavailable.";
             fixturePreviewLabel.Text = "Next fixture: unavailable";
             squadStatusLabel.Text = "Squad status: unavailable";
             stubMessageLabel.Text = "Dashboard context is unavailable.";
@@ -28,6 +30,7 @@ public partial class ClubDashboard : Control
         if (string.IsNullOrWhiteSpace(GameState.Instance.SelectedClubName))
         {
             contextLabel.Text = "Club selection is missing.";
+            dateLabel.Text = "Season and date unavailable.";
             fixturePreviewLabel.Text = "Next fixture: unavailable";
             squadStatusLabel.Text = "Squad status: unavailable";
             stubMessageLabel.Text = "Choose a club before using the dashboard.";
@@ -36,11 +39,12 @@ public partial class ClubDashboard : Control
 
         contextLabel.Text =
             $"Manager {GameState.Instance.ManagerName} is now leading {GameState.Instance.SelectedClubName}.";
+        dateLabel.Text = $"Season {GameState.Instance.SeasonLabel} | {GameState.Instance.CurrentDateLabel}";
         fixturePreviewLabel.Text = $"Next fixture: {GameState.Instance.NextFixtureSummary}";
         squadStatusLabel.Text = $"Squad: {GameState.Instance.SquadStatusSummary}";
         stubMessageLabel.Text = GameState.Instance.LastMatchReport == null
-            ? "The dashboard tracks club rhythm, squad context, and the next matchday."
-            : $"Last result: {GameState.Instance.LastMatchReport.Scoreline}. {GameState.Instance.LastMatchReport.ConsequenceSummary}.";
+            ? $"{GameState.Instance.FormSummary} The dashboard tracks club rhythm and the next matchday."
+            : $"Last result: {GameState.Instance.LastMatchReport.Scoreline}. {GameState.Instance.LastMatchReport.ConsequenceSummary}. {GameState.Instance.FormSummary}";
     }
 
     private void OnBackPressed()

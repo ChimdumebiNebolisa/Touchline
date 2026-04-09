@@ -32,6 +32,7 @@ public partial class PostMatchScene : Control
 
     private void OnContinuePressed()
     {
+        GameState.Instance?.AdvanceDate();
         GetTree().ChangeSceneToFile(ClubDashboardScenePath);
     }
 }
