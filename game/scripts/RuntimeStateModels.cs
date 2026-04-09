@@ -26,6 +26,9 @@ public sealed class ClubSelectionState
     public required string ClubName { get; init; }
     public required string CompetitionName { get; init; }
     public required int CurrentMatchday { get; init; }
+    public required int TeamMorale { get; init; }
+    public required int FanSentiment { get; init; }
+    public required int BoardConfidence { get; init; }
     public required GameState.SquadPlayer[] SquadPlayers { get; init; }
     public required GameState.CompetitionRow[] CompetitionTable { get; init; }
     public required GameState.CompetitionFixture[] CompetitionFixtures { get; init; }

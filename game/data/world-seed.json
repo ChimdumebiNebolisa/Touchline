@@ -1,0 +1,118 @@
+{
+  "countryPackId": "country-pack-alpha",
+  "competitionName": "Novara Premier Division",
+  "startDateIso": "2026-08-03",
+  "defaults": {
+    "teamMorale": 72,
+    "fanSentiment": 63,
+    "boardConfidence": 61,
+    "tacticalFormation": "4-3-3",
+    "pressIntensity": 60,
+    "tempo": 58,
+    "width": 55,
+    "risk": 52,
+    "formSummary": "Form: season about to begin."
+  },
+  "clubs": [
+    {
+      "name": "Riverton Athletic",
+      "identitySummary": "A settled senior group that expects proactive football, quick ball circulation, and authority at home.",
+      "expectationSummary": "Board line: finish in the top half, control the rhythm at home, and avoid long dips in form.",
+      "teamMorale": 74,
+      "fanSentiment": 66,
+      "boardConfidence": 62,
+      "players": [
+        { "name": "Mateo Silva", "position": "GK", "age": 27, "form": 72, "morale": 73, "fitness": 91, "isStarting": true },
+        { "name": "Liam Ofori", "position": "RB", "age": 24, "form": 68, "morale": 69, "fitness": 88, "isStarting": true },
+        { "name": "Ethan Novak", "position": "CB", "age": 29, "form": 74, "morale": 76, "fitness": 86, "isStarting": true },
+        { "name": "Jonas Petrov", "position": "CB", "age": 22, "form": 71, "morale": 71, "fitness": 90, "isStarting": true },
+        { "name": "Kai Mendes", "position": "LB", "age": 25, "form": 67, "morale": 68, "fitness": 87, "isStarting": true },
+        { "name": "Noah Ibe", "position": "CM", "age": 23, "form": 75, "morale": 74, "fitness": 89, "isStarting": true },
+        { "name": "Adrian Voss", "position": "CM", "age": 30, "form": 69, "morale": 72, "fitness": 82, "isStarting": true },
+        { "name": "Rafael Costa", "position": "AM", "age": 21, "form": 80, "morale": 79, "fitness": 92, "isStarting": true },
+        { "name": "Tariq Balde", "position": "RW", "age": 26, "form": 76, "morale": 77, "fitness": 90, "isStarting": true },
+        { "name": "Milo Renard", "position": "ST", "age": 28, "form": 73, "morale": 75, "fitness": 85, "isStarting": true },
+        { "name": "Kenji Sato", "position": "LW", "age": 24, "form": 70, "morale": 70, "fitness": 88, "isStarting": true },
+        { "name": "Dario Klein", "position": "GK", "age": 20, "form": 64, "morale": 66, "fitness": 84, "isStarting": false },
+        { "name": "Felix Mensah", "position": "CB", "age": 25, "form": 65, "morale": 67, "fitness": 83, "isStarting": false },
+        { "name": "Omar Nadir", "position": "CM", "age": 19, "form": 70, "morale": 72, "fitness": 86, "isStarting": false },
+        { "name": "Lucas Marin", "position": "ST", "age": 23, "form": 68, "morale": 69, "fitness": 87, "isStarting": false }
+      ]
+    },
+    {
+      "name": "Northbridge City",
+      "identitySummary": "Supporters demand the ball back within five seconds and expect the midfield to dictate territory early.",
+      "expectationSummary": "Board line: stay in the title conversation, impose possession, and make rivals chase the match.",
+      "teamMorale": 76,
+      "fanSentiment": 69,
+      "boardConfidence": 68,
+      "players": [
+        { "name": "Ivo Marinovic", "position": "GK", "age": 28, "form": 73, "morale": 75, "fitness": 90, "isStarting": true },
+        { "name": "Luca Bianchi", "position": "RB", "age": 25, "form": 71, "morale": 72, "fitness": 89, "isStarting": true },
+        { "name": "Stefan Iliev", "position": "CB", "age": 30, "form": 75, "morale": 76, "fitness": 85, "isStarting": true },
+        { "name": "Joao Telles", "position": "CB", "age": 24, "form": 73, "morale": 74, "fitness": 88, "isStarting": true },
+        { "name": "Owen Clarke", "position": "LB", "age": 26, "form": 70, "morale": 71, "fitness": 87, "isStarting": true },
+        { "name": "Noah Ibe", "position": "CM", "age": 23, "form": 77, "morale": 76, "fitness": 89, "isStarting": true },
+        { "name": "Adrian Voss", "position": "CM", "age": 30, "form": 71, "morale": 73, "fitness": 82, "isStarting": true },
+        { "name": "Rafael Costa", "position": "AM", "age": 21, "form": 82, "morale": 81, "fitness": 92, "isStarting": true },
+        { "name": "Tariq Balde", "position": "RW", "age": 26, "form": 78, "morale": 79, "fitness": 90, "isStarting": true },
+        { "name": "Milo Renard", "position": "ST", "age": 28, "form": 75, "morale": 77, "fitness": 85, "isStarting": true },
+        { "name": "Kenji Sato", "position": "LW", "age": 24, "form": 72, "morale": 72, "fitness": 88, "isStarting": true },
+        { "name": "Dario Klein", "position": "GK", "age": 20, "form": 64, "morale": 66, "fitness": 84, "isStarting": false },
+        { "name": "Felix Mensah", "position": "CB", "age": 25, "form": 66, "morale": 68, "fitness": 83, "isStarting": false },
+        { "name": "Omar Nadir", "position": "CM", "age": 19, "form": 70, "morale": 72, "fitness": 86, "isStarting": false },
+        { "name": "Lucas Marin", "position": "ST", "age": 23, "form": 69, "morale": 70, "fitness": 87, "isStarting": false }
+      ]
+    },
+    {
+      "name": "Harbor County",
+      "identitySummary": "A combative squad that leans on structure, second balls, and an atmosphere that turns the ground hostile.",
+      "expectationSummary": "Board line: stay clear of the bottom places, turn home matches into wars, and never let the dressing room fracture.",
+      "teamMorale": 69,
+      "fanSentiment": 61,
+      "boardConfidence": 58,
+      "players": [
+        { "name": "Sergio Vale", "position": "GK", "age": 30, "form": 69, "morale": 70, "fitness": 88, "isStarting": true },
+        { "name": "Bastien Kone", "position": "RB", "age": 27, "form": 66, "morale": 68, "fitness": 85, "isStarting": true },
+        { "name": "Marek Duda", "position": "CB", "age": 28, "form": 71, "morale": 72, "fitness": 84, "isStarting": true },
+        { "name": "Caleb Hwang", "position": "CB", "age": 24, "form": 68, "morale": 69, "fitness": 87, "isStarting": true },
+        { "name": "Nuri Demir", "position": "LB", "age": 26, "form": 65, "morale": 67, "fitness": 86, "isStarting": true },
+        { "name": "Joel Aina", "position": "CM", "age": 23, "form": 72, "morale": 73, "fitness": 88, "isStarting": true },
+        { "name": "Rui Esteves", "position": "CM", "age": 29, "form": 67, "morale": 69, "fitness": 81, "isStarting": true },
+        { "name": "Mason Pike", "position": "AM", "age": 22, "form": 74, "morale": 75, "fitness": 89, "isStarting": true },
+        { "name": "Jamal Sarr", "position": "RW", "age": 25, "form": 73, "morale": 74, "fitness": 87, "isStarting": true },
+        { "name": "Ilian Petrescu", "position": "ST", "age": 27, "form": 72, "morale": 73, "fitness": 84, "isStarting": true },
+        { "name": "Timo Larsen", "position": "LW", "age": 23, "form": 69, "morale": 70, "fitness": 86, "isStarting": true },
+        { "name": "Arlo Finch", "position": "GK", "age": 19, "form": 62, "morale": 64, "fitness": 82, "isStarting": false },
+        { "name": "Matias Gori", "position": "CB", "age": 24, "form": 64, "morale": 66, "fitness": 81, "isStarting": false },
+        { "name": "Yonas Bekele", "position": "CM", "age": 20, "form": 68, "morale": 69, "fitness": 85, "isStarting": false },
+        { "name": "Danilo Viera", "position": "ST", "age": 22, "form": 67, "morale": 68, "fitness": 85, "isStarting": false }
+      ]
+    },
+    {
+      "name": "Eastvale Rovers",
+      "identitySummary": "A youth-heavy side built on brave wide play, fast overlaps, and supporters who reward visible courage.",
+      "expectationSummary": "Board line: make the season feel upward, keep the tempo high, and turn potential into visible progress quickly.",
+      "teamMorale": 73,
+      "fanSentiment": 65,
+      "boardConfidence": 60,
+      "players": [
+        { "name": "Riku Tanaka", "position": "GK", "age": 25, "form": 68, "morale": 69, "fitness": 89, "isStarting": true },
+        { "name": "Theo March", "position": "RB", "age": 21, "form": 70, "morale": 71, "fitness": 90, "isStarting": true },
+        { "name": "Nils Bauer", "position": "CB", "age": 24, "form": 69, "morale": 70, "fitness": 88, "isStarting": true },
+        { "name": "Pietro Leone", "position": "CB", "age": 22, "form": 68, "morale": 69, "fitness": 89, "isStarting": true },
+        { "name": "Ayden Okoro", "position": "LB", "age": 20, "form": 71, "morale": 72, "fitness": 91, "isStarting": true },
+        { "name": "Sami Halme", "position": "CM", "age": 22, "form": 73, "morale": 74, "fitness": 90, "isStarting": true },
+        { "name": "Diego Armas", "position": "CM", "age": 24, "form": 70, "morale": 71, "fitness": 87, "isStarting": true },
+        { "name": "Mikel Duarte", "position": "AM", "age": 19, "form": 77, "morale": 78, "fitness": 92, "isStarting": true },
+        { "name": "Cian Murphy", "position": "RW", "age": 21, "form": 74, "morale": 75, "fitness": 91, "isStarting": true },
+        { "name": "Tiago Freitas", "position": "ST", "age": 22, "form": 72, "morale": 73, "fitness": 88, "isStarting": true },
+        { "name": "Luca Neri", "position": "LW", "age": 20, "form": 75, "morale": 76, "fitness": 90, "isStarting": true },
+        { "name": "Pavel Cech", "position": "GK", "age": 18, "form": 61, "morale": 64, "fitness": 83, "isStarting": false },
+        { "name": "Eli Grant", "position": "CB", "age": 19, "form": 65, "morale": 67, "fitness": 84, "isStarting": false },
+        { "name": "Moussa Faye", "position": "CM", "age": 18, "form": 69, "morale": 71, "fitness": 87, "isStarting": false },
+        { "name": "Nico Serra", "position": "ST", "age": 19, "form": 68, "morale": 69, "fitness": 86, "isStarting": false }
+      ]
+    }
+  ]
+}

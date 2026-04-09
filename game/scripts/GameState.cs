@@ -160,6 +160,9 @@ public partial class GameState : Node
         SelectedClubName = selection.ClubName;
         CompetitionName = selection.CompetitionName;
         CurrentMatchday = selection.CurrentMatchday;
+        TeamMorale = selection.TeamMorale;
+        FanSentiment = selection.FanSentiment;
+        BoardConfidence = selection.BoardConfidence;
         LastMatchReport = null;
         SelectedPlayerProfileName = null;
         CurrentMatchResult = null;
