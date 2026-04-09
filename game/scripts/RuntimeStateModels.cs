@@ -43,6 +43,7 @@ public sealed class CalendarAdvanceState
     public required int CurrentMatchday { get; init; }
     public required string FormSummary { get; init; }
     public required bool ResetRecentResults { get; init; }
+    public required GameState.SquadPlayer[] SquadPlayers { get; init; }
     public required GameState.CompetitionRow[] CompetitionTable { get; init; }
     public required GameState.CompetitionFixture[] CompetitionFixtures { get; init; }
     public required string CurrentOpponentName { get; init; }

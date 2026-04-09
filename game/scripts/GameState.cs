@@ -194,6 +194,7 @@ public partial class GameState : Node
         SeasonStartYear = advance.SeasonStartYear;
         CurrentMatchday = advance.CurrentMatchday;
         FormSummary = advance.FormSummary;
+        SquadPlayers = advance.SquadPlayers;
         CompetitionTable = advance.CompetitionTable;
         CompetitionFixtures = advance.CompetitionFixtures;
         CurrentOpponentName = advance.CurrentOpponentName;

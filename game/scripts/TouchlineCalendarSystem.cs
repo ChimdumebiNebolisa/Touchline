@@ -41,6 +41,7 @@ public partial class TouchlineCalendarSystem : Node
         var nextSeasonStartYear = GameState.Instance.SeasonStartYear;
         var formSummary = GameState.Instance.FormSummary;
         var resetRecentResults = false;
+        var squadPlayers = GameState.Instance.SquadPlayers;
         var competitionTable = GameState.Instance.CompetitionTable;
         var competitionFixtures = GameState.Instance.CompetitionFixtures;
         var seasonLength = CompetitionRuntimeService.GetSeasonMatchdayCount(GameState.Instance.CompetitionFixtures);
@@ -52,6 +53,10 @@ public partial class TouchlineCalendarSystem : Node
             nextMatchday = 1;
             formSummary = "Form: new season reset.";
             resetRecentResults = true;
+            squadPlayers = DevelopmentSystem.ApplySeasonRollover(
+                GameState.Instance.SquadPlayers,
+                GameState.Instance.WorldSeed,
+                nextSeasonStartYear);
 
             var newCompetitionState = CompetitionRuntimeService.BuildInitialState(
                 GameState.Instance.AvailableClubs,
@@ -74,6 +79,7 @@ public partial class TouchlineCalendarSystem : Node
                 CurrentMatchday = nextMatchday,
                 FormSummary = formSummary,
                 ResetRecentResults = resetRecentResults,
+                SquadPlayers = squadPlayers,
                 CompetitionTable = competitionTable,
                 CompetitionFixtures = competitionFixtures,
                 CurrentOpponentName = fixtureContext.currentOpponentName,
