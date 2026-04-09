@@ -11,6 +11,25 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1")
 
+[node name="Backdrop" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0352941, 0.054902, 0.0705882, 1)
+
+[node name="AccentBand" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 0.24
+grow_horizontal = 2
+color = Color(0.0705882, 0.117647, 0.152941, 1)
+
 [node name="Center" type="CenterContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
@@ -19,48 +38,71 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Panel" type="VBoxContainer" parent="Center"]
+[node name="Panel" type="PanelContainer" parent="Center"]
+custom_minimum_size = Vector2(620, 0)
+layout_mode = 2
+
+[node name="Padding" type="MarginContainer" parent="Center/Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 30
+theme_override_constants/margin_top = 26
+theme_override_constants/margin_right = 30
+theme_override_constants/margin_bottom = 26
+
+[node name="Content" type="VBoxContainer" parent="Center/Panel/Padding"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Heading" type="Label" parent="Center/Panel"]
+[node name="Eyebrow" type="Label" parent="Center/Panel/Padding/Content"]
+layout_mode = 2
+text = "NEW CAREER"
+horizontal_alignment = 1
+
+[node name="Heading" type="Label" parent="Center/Panel/Padding/Content"]
 layout_mode = 2
 text = "Career Setup"
 horizontal_alignment = 1
+theme_override_font_sizes/font_size = 34
 
-[node name="ManagerNameLabel" type="Label" parent="Center/Panel"]
+[node name="IntroLabel" type="Label" parent="Center/Panel/Padding/Content"]
+layout_mode = 2
+text = "Set your identity, lock the seed, and enter a persistent football world."
+autowrap_mode = 3
+horizontal_alignment = 1
+
+[node name="ManagerNameLabel" type="Label" parent="Center/Panel/Padding/Content"]
 layout_mode = 2
 text = "Manager Name"
 
-[node name="ManagerNameInput" type="LineEdit" parent="Center/Panel"]
+[node name="ManagerNameInput" type="LineEdit" parent="Center/Panel/Padding/Content"]
 layout_mode = 2
 placeholder_text = "Enter manager name"
 text = "Alex Mercer"
 
-[node name="SeedLabel" type="Label" parent="Center/Panel"]
+[node name="SeedLabel" type="Label" parent="Center/Panel/Padding/Content"]
 layout_mode = 2
 text = "Career Seed"
 
-[node name="SeedInput" type="SpinBox" parent="Center/Panel"]
+[node name="SeedInput" type="SpinBox" parent="Center/Panel/Padding/Content"]
 layout_mode = 2
 min_value = 1.0
 max_value = 999999.0
 step = 1.0
 value = 20260408.0
 
-[node name="StartCareerButton" type="Button" parent="Center/Panel"]
+[node name="StartCareerButton" type="Button" parent="Center/Panel/Padding/Content"]
 layout_mode = 2
 text = "Start Career"
 
-[node name="StatusLabel" type="Label" parent="Center/Panel"]
+[node name="StatusLabel" type="Label" parent="Center/Panel/Padding/Content"]
 layout_mode = 2
 text = "Career state will initialize here before club selection."
 autowrap_mode = 3
 horizontal_alignment = 1
 
-[node name="BackButton" type="Button" parent="Center/Panel"]
+[node name="BackButton" type="Button" parent="Center/Panel/Padding/Content"]
 layout_mode = 2
 text = "Back to Main Menu"
 
-[connection signal="pressed" from="Center/Panel/StartCareerButton" to="." method="OnStartCareerPressed"]
-[connection signal="pressed" from="Center/Panel/BackButton" to="." method="OnBackPressed"]
+[connection signal="pressed" from="Center/Panel/Padding/Content/StartCareerButton" to="." method="OnStartCareerPressed"]
+[connection signal="pressed" from="Center/Panel/Padding/Content/BackButton" to="." method="OnBackPressed"]

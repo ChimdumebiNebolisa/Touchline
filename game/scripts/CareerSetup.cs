@@ -11,9 +11,9 @@ public partial class CareerSetup : Control
 
     public override void _Ready()
     {
-        _managerNameInput = GetNode<LineEdit>("Center/Panel/ManagerNameInput");
-        _seedInput = GetNode<SpinBox>("Center/Panel/SeedInput");
-        _statusLabel = GetNode<Label>("Center/Panel/StatusLabel");
+        _managerNameInput = GetNode<LineEdit>("Center/Panel/Padding/Content/ManagerNameInput");
+        _seedInput = GetNode<SpinBox>("Center/Panel/Padding/Content/SeedInput");
+        _statusLabel = GetNode<Label>("Center/Panel/Padding/Content/StatusLabel");
     }
 
     private void OnStartCareerPressed()
