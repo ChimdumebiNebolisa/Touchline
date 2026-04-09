@@ -4,11 +4,10 @@
 
 ### Active
 
-- Step 18: Redesign tactics as a tactical board
+- Step 19: Replace fixtures and standings placeholders with real competition surfaces
 
 ### Backlog
 
-- Step 19: Replace fixtures and standings placeholders with real competition surfaces
 - Step 20: Redesign matchday into an event screen
 - Step 21: Upgrade live match presentation substantially
 - Step 22: Unify live and instant simulation around one shared engine
@@ -45,6 +44,7 @@
 - Step 15: Rebuild the club dashboard as the real command center
 - Step 16: Create the player profile scene
 - Step 17: Rebuild squad management into a football workspace
+- Step 18: Redesign tactics as a tactical board
 
 ## 2. Plan Rules
 
@@ -203,6 +203,13 @@ Turn tactics into an interpretable football setup surface rather than a bare con
 ### Objective
 
 Make season context visible and credible through full fixtures and standings presentation.
+
+### Allowed Subtasks
+
+- replace the standings stub with a state-driven competition screen under the Godot path
+- enrich fixtures with chronology, current-club context, and clearer season framing using existing state
+- preserve navigation back to the dashboard and avoid inventing unsupported league systems
+- keep competition presentation explainable from the active runtime state rather than duplicating season logic in scene scripts
 
 ### Verification
 
