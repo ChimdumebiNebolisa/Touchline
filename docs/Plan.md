@@ -4,11 +4,10 @@
 
 ### Active
 
-- Step 19: Replace fixtures and standings placeholders with real competition surfaces
+- Step 20: Redesign matchday into an event screen
 
 ### Backlog
 
-- Step 20: Redesign matchday into an event screen
 - Step 21: Upgrade live match presentation substantially
 - Step 22: Unify live and instant simulation around one shared engine
 - Step 23: Rebuild post-match into a consequence and explainability screen
@@ -45,6 +44,7 @@
 - Step 16: Create the player profile scene
 - Step 17: Rebuild squad management into a football workspace
 - Step 18: Redesign tactics as a tactical board
+- Step 19: Replace fixtures and standings placeholders with real competition surfaces
 
 ## 2. Plan Rules
 
@@ -222,6 +222,13 @@ Make season context visible and credible through full fixtures and standings pre
 ### Objective
 
 Make match entry feel consequential, readable, and football-native.
+
+### Allowed Subtasks
+
+- restructure matchday into a fuller event surface using existing lineup, tactics, pressure, and competition state
+- present opponent, kickoff context, squad readiness, and tactical intent before launch
+- preserve the live-match launch path and back navigation without inventing unsupported pre-match systems
+- keep the screen explainable from authoritative runtime state rather than scene-local football rules
 
 ### Verification
 

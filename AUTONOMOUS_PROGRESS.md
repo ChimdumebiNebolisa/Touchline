@@ -1,30 +1,30 @@
 # Autonomous Progress
 
 ## Current active Plan step
-- Step 19: Replace fixtures and standings placeholders with real competition surfaces.
+- Step 20: Redesign matchday into an event screen.
 
 ## Last completed verified task
 - Step 19 complete: fixtures and standings now consume persistent competition state instead of stubbed presentation.
 
 ## Current subtask in progress
-- Review Step 19 exit criteria and promote the next plan step after the verified competition-surface commit.
+- Activate Step 20 cleanly, then rebuild matchday into a fuller event surface without breaking live-match launch.
 
 ## Next queued subtasks
-- Activate Step 20 in `docs/Plan.md`.
-- Redesign the matchday screen into a fuller event surface.
-- Keep live-match launch and post-match return flow intact through the redesign.
+- Implement the Step 20 matchday scene and script pass.
+- Verify the live-match launch path still works off current runtime state.
+- Review Step 20 exit criteria before moving into live-match presentation upgrades.
 
 ## Known blockers
 - No active blockers.
 - Manual Godot runtime verification remains limited because no Godot executable has surfaced in the shell environment for direct launch testing.
 
 ## Last verification run
-- Passed `dotnet build game/Touchline.sln` on 2026-04-09 after the Step 19 competition-surface implementation.
+- Passed `dotnet build game/Touchline.sln` on 2026-04-09 before promoting Step 20 to active.
 
 ## Last commit hash
-- 36c8bf6
+- fc11c30
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`.
-- Confirm Step 19 is the only active step.
-- Commit and push the verified competition-surface work, then activate Step 20 before redesigning matchday.
+- Confirm Step 20 is the only active step.
+- Continue with the smallest valid Step 20 subtask: redesign the matchday scene around the current fixture, lineup, tactics, and pressure context.
