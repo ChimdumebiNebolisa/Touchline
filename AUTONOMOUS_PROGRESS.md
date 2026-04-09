@@ -1,18 +1,18 @@
 # Autonomous Progress
 
 ## Current active Plan step
-- Step 9: Post-Match Scene
+- Step 10: Advance Date
 
 ## Last completed verified task
-- Step 8 verified: LiveMatchScene now shows a pitch, moving player markers, live score, clock, and key events.
+- Step 9 verified: PostMatchScene now shows result, key moments, and persistent club consequence deltas.
 
 ## Current subtask in progress
-- Step 9 subtask: add a PostMatchScene that applies and displays consequence deltas from the played match.
+- Step 10 subtask: add date advancement that updates fixture context and carries the latest club state into the next cycle.
 
 ## Next queued subtasks
-- Persist the latest match result and consequence summaries in GameState.
-- Transition from LiveMatchScene into PostMatchScene after full time.
-- Reflect updated consequence state when returning to the club dashboard.
+- Advance the stored calendar date and matchday after returning from post-match.
+- Refresh the next fixture summary and opponent for the following round.
+- Surface the updated date on the dashboard and fixtures-facing screens.
 
 ## Known blockers
 - None currently.
@@ -21,10 +21,10 @@
 - Passed: dotnet build game/Touchline.sln; npm test; npm run typecheck; npm run lint; npm run build (2026-04-09).
 
 ## Last commit hash
-- Pending commit for verified Step 8 live match scene implementation.
+- Pending commit for verified Step 9 post-match consequence flow.
 
 ## Resume instructions
 - Re-read docs/PRD.md, docs/Architecture.md, docs/Guardrails.md, and docs/Plan.md.
-- Re-read AUTONOMOUS_PROGRESS.md and confirm Step 9 is active.
-- Implement the smallest valid Step 9 subtask in PostMatchScene.
-- Verify before commit and keep scope inside Step 9 only.
+- Re-read AUTONOMOUS_PROGRESS.md and confirm Step 10 is active.
+- Implement the smallest valid Step 10 subtask in GameState and scene flow.
+- Verify before commit and keep scope inside Step 10 only.

@@ -4,11 +4,10 @@
 
 ### Active
 
-- Step 9: Post-Match Scene
+- Step 10: Advance Date
 
 ### Backlog
 
-- Step 10: Advance Date
 - Step 11: Save Game
 
 ### Blocked
@@ -25,6 +24,7 @@
 - Step 6: Tactics Screen
 - Step 7: Matchday Scene
 - Step 8: Live Match Scene with visible player movement
+- Step 9: Post-Match Scene
 
 ## 2. Plan Rules
 
@@ -173,6 +173,6 @@ Persist full game state to local save slot and reload safely.
 
 ## 14. Immediate Next Subtask
 
-For active Step 9, smallest valid next subtask is:
+For active Step 10, smallest valid next subtask is:
 
-- add a PostMatchScene that receives the played result, lists key events, and applies visible consequence deltas into runtime career state.
+- add calendar advancement that rolls the career date forward, updates fixture context, and carries the latest consequence state back into the next match cycle.

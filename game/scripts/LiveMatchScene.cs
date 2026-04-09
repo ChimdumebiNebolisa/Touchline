@@ -5,6 +5,7 @@ using System.Collections.Generic;
 public partial class LiveMatchScene : Control
 {
     private const string MatchdayScenePath = "res://scenes/MatchdayScene.tscn";
+    private const string PostMatchScenePath = "res://scenes/PostMatchScene.tscn";
     private const float SimulatedMinutesPerSecond = 6.0f;
     private const float MarkerSize = 30.0f;
 
@@ -13,6 +14,7 @@ public partial class LiveMatchScene : Control
     private float _elapsedSeconds;
     private int _currentMinute = 1;
     private int _appliedEventCount;
+    private bool _matchComplete;
 
     private Label? _fixtureLabel;
     private Label? _scoreLabel;
@@ -21,6 +23,7 @@ public partial class LiveMatchScene : Control
     private Label? _statusLabel;
     private Label? _eventFeedLabel;
     private Control? _markersLayer;
+    private Button? _backButton;
 
     public override void _Ready()
     {
@@ -31,6 +34,7 @@ public partial class LiveMatchScene : Control
         _statusLabel = GetNode<Label>("Margin/Root/Content/Sidebar/StatusLabel");
         _eventFeedLabel = GetNode<Label>("Margin/Root/Content/Sidebar/EventFeedLabel");
         _markersLayer = GetNode<Control>("Margin/Root/Content/PitchFrame/Pitch/MarkersLayer");
+        _backButton = GetNode<Button>("Margin/Root/Content/Sidebar/BackButton");
 
         if (GameState.Instance == null || string.IsNullOrWhiteSpace(GameState.Instance.SelectedClubName))
         {
@@ -76,14 +80,14 @@ public partial class LiveMatchScene : Control
 
         if (_currentMinute >= 90)
         {
-            _statusLabel!.Text = "Full time. The post-match consequence layer is the next active step.";
+            FinalizeMatch();
             SetProcess(false);
         }
     }
 
     private void OnBackPressed()
     {
-        GetTree().ChangeSceneToFile(MatchdayScenePath);
+        GetTree().ChangeSceneToFile(_matchComplete ? PostMatchScenePath : MatchdayScenePath);
     }
 
     private void CreateMarkers()
@@ -221,5 +225,18 @@ public partial class LiveMatchScene : Control
         };
 
         return style;
+    }
+
+    private void FinalizeMatch()
+    {
+        if (_matchComplete || _playback == null)
+        {
+            return;
+        }
+
+        GameState.Instance?.CompleteLiveMatch(_playback);
+        _statusLabel!.Text = "Full time. Review the result and consequence deltas in post-match.";
+        _backButton!.Text = "Continue to Post-Match";
+        _matchComplete = true;
     }
 }

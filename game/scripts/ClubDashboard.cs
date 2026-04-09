@@ -14,12 +14,14 @@ public partial class ClubDashboard : Control
         var contextLabel = GetNode<Label>("Center/Panel/ClubContextLabel");
         var fixturePreviewLabel = GetNode<Label>("Center/Panel/FixturePreviewLabel");
         var squadStatusLabel = GetNode<Label>("Center/Panel/SquadStatusLabel");
+        var stubMessageLabel = GetNode<Label>("Center/Panel/StubMessage");
 
         if (GameState.Instance == null || !GameState.Instance.CareerInitialized)
         {
             contextLabel.Text = "Career context is unavailable.";
             fixturePreviewLabel.Text = "Next fixture: unavailable";
             squadStatusLabel.Text = "Squad status: unavailable";
+            stubMessageLabel.Text = "Dashboard context is unavailable.";
             return;
         }
 
@@ -28,6 +30,7 @@ public partial class ClubDashboard : Control
             contextLabel.Text = "Club selection is missing.";
             fixturePreviewLabel.Text = "Next fixture: unavailable";
             squadStatusLabel.Text = "Squad status: unavailable";
+            stubMessageLabel.Text = "Choose a club before using the dashboard.";
             return;
         }
 
@@ -35,6 +38,9 @@ public partial class ClubDashboard : Control
             $"Manager {GameState.Instance.ManagerName} is now leading {GameState.Instance.SelectedClubName}.";
         fixturePreviewLabel.Text = $"Next fixture: {GameState.Instance.NextFixtureSummary}";
         squadStatusLabel.Text = $"Squad: {GameState.Instance.SquadStatusSummary}";
+        stubMessageLabel.Text = GameState.Instance.LastMatchReport == null
+            ? "The dashboard tracks club rhythm, squad context, and the next matchday."
+            : $"Last result: {GameState.Instance.LastMatchReport.Scoreline}. {GameState.Instance.LastMatchReport.ConsequenceSummary}.";
     }
 
     private void OnBackPressed()

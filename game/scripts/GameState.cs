@@ -14,6 +14,18 @@ public partial class GameState : Node
         public required bool IsStarting { get; init; }
     }
 
+    public sealed class MatchReport
+    {
+        public required string FixtureLabel { get; init; }
+        public required string Scoreline { get; init; }
+        public required string ResultLabel { get; init; }
+        public required string ConsequenceSummary { get; init; }
+        public required string[] KeyEvents { get; init; }
+        public required int MoraleDelta { get; init; }
+        public required int FanDelta { get; init; }
+        public required int BoardDelta { get; init; }
+    }
+
     public static GameState? Instance { get; private set; }
 
     public string ManagerName { get; private set; } = "Manager";
@@ -34,6 +46,10 @@ public partial class GameState : Node
     public string CompetitionName { get; private set; } = "Novara Premier Division";
     public int CurrentMatchday { get; private set; } = 1;
     public string CurrentOpponentName { get; private set; } = "Harbor County";
+    public int TeamMorale { get; private set; } = 72;
+    public int FanSentiment { get; private set; } = 63;
+    public int BoardConfidence { get; private set; } = 61;
+    public MatchReport? LastMatchReport { get; private set; }
 
     public override void _EnterTree()
     {
@@ -73,6 +89,10 @@ public partial class GameState : Node
         CompetitionName = "Novara Premier Division";
         CurrentMatchday = 1;
         CurrentOpponentName = "Harbor County";
+        TeamMorale = 72;
+        FanSentiment = 63;
+        BoardConfidence = 61;
+        LastMatchReport = null;
     }
 
     public void SelectClub(string clubName)
@@ -84,6 +104,8 @@ public partial class GameState : Node
         CompetitionName = "Novara Premier Division";
         CurrentMatchday = 1;
         NextFixtureSummary = $"Matchday {CurrentMatchday}: {clubName} vs {CurrentOpponentName}";
+        SquadStatusSummary = BuildSquadStatusSummary();
+        LastMatchReport = null;
 
         SquadPlayers = new[]
         {
@@ -112,5 +134,76 @@ public partial class GameState : Node
         Tempo = tempo;
         Width = width;
         Risk = risk;
+    }
+
+    public void CompleteLiveMatch(LiveMatchPlayback playback)
+    {
+        var finalEvent = playback.Events[^1];
+        var goalDifference = finalEvent.HomeScore - finalEvent.AwayScore;
+        var moraleDelta = goalDifference > 0 ? 4 : goalDifference == 0 ? 1 : -4;
+        var fanDelta = goalDifference > 0 ? 5 : goalDifference == 0 ? 0 : -5;
+        var boardDelta = goalDifference > 0 ? 3 : goalDifference == 0 ? -1 : -4;
+
+        TeamMorale = Math.Clamp(TeamMorale + moraleDelta, 0, 100);
+        FanSentiment = Math.Clamp(FanSentiment + fanDelta, 0, 100);
+        BoardConfidence = Math.Clamp(BoardConfidence + boardDelta, 0, 100);
+        SquadStatusSummary = BuildSquadStatusSummary();
+
+        LastMatchReport = new MatchReport
+        {
+            FixtureLabel = $"{playback.HomeClubName} vs {playback.AwayClubName}",
+            Scoreline = $"{finalEvent.HomeScore} - {finalEvent.AwayScore}",
+            ResultLabel = BuildResultLabel(goalDifference, playback.AwayClubName),
+            ConsequenceSummary =
+                $"Morale {FormatSignedDelta(moraleDelta)} | Fans {FormatSignedDelta(fanDelta)} | Board {FormatSignedDelta(boardDelta)}",
+            KeyEvents = ExtractRecentEvents(playback),
+            MoraleDelta = moraleDelta,
+            FanDelta = fanDelta,
+            BoardDelta = boardDelta
+        };
+    }
+
+    private string BuildSquadStatusSummary()
+    {
+        return $"23 registered players | morale {DescribeLevel(TeamMorale)} | fans {DescribeLevel(FanSentiment)} | board {DescribeLevel(BoardConfidence)}";
+    }
+
+    private static string DescribeLevel(int value)
+    {
+        return value switch
+        {
+            >= 75 => "surging",
+            >= 60 => "steady",
+            >= 45 => "uneasy",
+            _ => "under pressure"
+        };
+    }
+
+    private static string BuildResultLabel(int goalDifference, string opponentName)
+    {
+        return goalDifference switch
+        {
+            > 0 => $"Winning over {opponentName} lifts the mood around the club.",
+            0 => $"The draw with {opponentName} leaves the dressing room asking for more control.",
+            _ => $"{opponentName} leave with the points and the pressure tightens."
+        };
+    }
+
+    private static string FormatSignedDelta(int delta)
+    {
+        return delta >= 0 ? $"+{delta}" : delta.ToString();
+    }
+
+    private static string[] ExtractRecentEvents(LiveMatchPlayback playback)
+    {
+        var count = Math.Min(4, playback.Events.Length);
+        var recentEvents = new string[count];
+
+        for (var index = 0; index < count; index++)
+        {
+            recentEvents[index] = playback.Events[playback.Events.Length - count + index].Summary;
+        }
+
+        return recentEvents;
     }
 }

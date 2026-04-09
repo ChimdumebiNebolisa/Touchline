@@ -1,0 +1,71 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/PostMatchScene.cs" id="1"]
+
+[node name="PostMatchScene" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="Center" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="VBoxContainer" parent="Center"]
+custom_minimum_size = Vector2(620, 430)
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Heading" type="Label" parent="Center/Panel"]
+layout_mode = 2
+text = "Post-Match"
+horizontal_alignment = 1
+
+[node name="FixtureLabel" type="Label" parent="Center/Panel"]
+layout_mode = 2
+text = "Post-match context unavailable"
+horizontal_alignment = 1
+
+[node name="ScoreLabel" type="Label" parent="Center/Panel"]
+layout_mode = 2
+text = "0 - 0"
+horizontal_alignment = 1
+
+[node name="ResultLabel" type="Label" parent="Center/Panel"]
+layout_mode = 2
+text = "No completed result is ready to review."
+autowrap_mode = 3
+horizontal_alignment = 1
+
+[node name="DeltasLabel" type="Label" parent="Center/Panel"]
+layout_mode = 2
+text = "Morale +0 | Fans +0 | Board +0"
+autowrap_mode = 3
+horizontal_alignment = 1
+
+[node name="EventsHeading" type="Label" parent="Center/Panel"]
+layout_mode = 2
+text = "Key Match Moments"
+horizontal_alignment = 1
+
+[node name="EventsLabel" type="Label" parent="Center/Panel"]
+custom_minimum_size = Vector2(620, 180)
+layout_mode = 2
+size_flags_vertical = 3
+text = "No key events recorded."
+autowrap_mode = 3
+vertical_alignment = 0
+
+[node name="ContinueButton" type="Button" parent="Center/Panel"]
+layout_mode = 2
+text = "Return to Club Dashboard"
+
+[connection signal="pressed" from="Center/Panel/ContinueButton" to="." method="OnContinuePressed"]
