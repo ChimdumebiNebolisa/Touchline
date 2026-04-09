@@ -30,6 +30,14 @@ public partial class GameState : Node
         public required int BoardDelta { get; init; }
     }
 
+    public sealed class ClubPreview
+    {
+        public required string ClubName { get; init; }
+        public required string IdentitySummary { get; init; }
+        public required string ExpectationSummary { get; init; }
+        public required string OpeningFixtureSummary { get; init; }
+    }
+
     public static GameState? Instance { get; private set; }
 
     public string ManagerName { get; private set; } = "Manager";
@@ -258,9 +266,65 @@ public partial class GameState : Node
             };
     }
 
+    public ClubPreview GetClubPreview(string clubName)
+    {
+        var openingOpponent = GetOpeningOpponent(clubName);
+        return clubName switch
+        {
+            "Riverton Athletic" => new ClubPreview
+            {
+                ClubName = clubName,
+                IdentitySummary = "A stable dressing room with supporters who expect assertive front-foot football.",
+                ExpectationSummary = "Board line: stay in the upper half and keep home form dependable.",
+                OpeningFixtureSummary = $"Opening fixture: {clubName} vs {openingOpponent}"
+            },
+            "Northbridge City" => new ClubPreview
+            {
+                ClubName = clubName,
+                IdentitySummary = "A possession-leaning side with little patience for passive matchdays.",
+                ExpectationSummary = "Board line: push for the top positions and set the tempo early in the season.",
+                OpeningFixtureSummary = $"Opening fixture: {clubName} vs {openingOpponent}"
+            },
+            "Harbor County" => new ClubPreview
+            {
+                ClubName = clubName,
+                IdentitySummary = "A resilient squad expected to scrap for points and stay emotionally together under pressure.",
+                ExpectationSummary = "Board line: keep the club clear of trouble and make the ground difficult to visit.",
+                OpeningFixtureSummary = $"Opening fixture: {clubName} vs {openingOpponent}"
+            },
+            "Eastvale Rovers" => new ClubPreview
+            {
+                ClubName = clubName,
+                IdentitySummary = "A younger side with energy, pace, and supporters hungry for visible progress.",
+                ExpectationSummary = "Board line: outperform pre-season caution and build belief quickly.",
+                OpeningFixtureSummary = $"Opening fixture: {clubName} vs {openingOpponent}"
+            },
+            _ => new ClubPreview
+            {
+                ClubName = clubName,
+                IdentitySummary = "Club identity context is still being assembled.",
+                ExpectationSummary = "Board line: establish a stable start and manage the opening weeks cleanly.",
+                OpeningFixtureSummary = $"Opening fixture: {clubName} vs {openingOpponent}"
+            }
+        };
+    }
+
     private string BuildSquadStatusSummary()
     {
         return $"23 registered players | morale {DescribeLevel(TeamMorale)} | fans {DescribeLevel(FanSentiment)} | board {DescribeLevel(BoardConfidence)}";
+    }
+
+    private string GetOpeningOpponent(string clubName)
+    {
+        foreach (var candidate in AvailableClubs)
+        {
+            if (candidate != clubName)
+            {
+                return candidate;
+            }
+        }
+
+        return "Harbor County";
     }
 
     private void RefreshFixtureContext()

@@ -80,6 +80,43 @@ horizontal_alignment = 1
 layout_mode = 2
 custom_minimum_size = Vector2(620, 220)
 
+[node name="PreviewCard" type="PanelContainer" parent="Center/Panel/Padding/Content"]
+layout_mode = 2
+
+[node name="PreviewPadding" type="MarginContainer" parent="Center/Panel/Padding/Content/PreviewCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 16
+
+[node name="PreviewContent" type="VBoxContainer" parent="Center/Panel/Padding/Content/PreviewCard/PreviewPadding"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="PreviewHeading" type="Label" parent="Center/Panel/Padding/Content/PreviewCard/PreviewPadding/PreviewContent"]
+layout_mode = 2
+text = "Club Snapshot"
+horizontal_alignment = 1
+
+[node name="IdentityLabel" type="Label" parent="Center/Panel/Padding/Content/PreviewCard/PreviewPadding/PreviewContent"]
+layout_mode = 2
+text = "Identity context unavailable."
+autowrap_mode = 3
+horizontal_alignment = 0
+
+[node name="ExpectationLabel" type="Label" parent="Center/Panel/Padding/Content/PreviewCard/PreviewPadding/PreviewContent"]
+layout_mode = 2
+text = "Expectation context unavailable."
+autowrap_mode = 3
+horizontal_alignment = 0
+
+[node name="OpeningFixtureLabel" type="Label" parent="Center/Panel/Padding/Content/PreviewCard/PreviewPadding/PreviewContent"]
+layout_mode = 2
+text = "Opening fixture unavailable."
+autowrap_mode = 3
+horizontal_alignment = 0
+
 [node name="ConfirmSelectionButton" type="Button" parent="Center/Panel/Padding/Content"]
 layout_mode = 2
 text = "Confirm Club Selection"
@@ -94,5 +131,6 @@ horizontal_alignment = 1
 layout_mode = 2
 text = "Back to Career Setup"
 
+[connection signal="item_selected" from="Center/Panel/Padding/Content/ClubList" to="." method="OnClubSelected"]
 [connection signal="pressed" from="Center/Panel/Padding/Content/ConfirmSelectionButton" to="." method="OnConfirmSelectionPressed"]
 [connection signal="pressed" from="Center/Panel/Padding/Content/BackButton" to="." method="OnBackPressed"]
