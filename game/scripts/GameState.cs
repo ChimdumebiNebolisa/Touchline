@@ -7,6 +7,8 @@ public partial class GameState : Node
     public string ManagerName { get; private set; } = "Manager";
     public int CareerSeed { get; private set; }
     public bool CareerInitialized { get; private set; }
+    public int WorldSeed { get; private set; }
+    public string CountryPackId { get; private set; } = "country-pack-alpha";
 
     public override void _EnterTree()
     {
@@ -26,5 +28,6 @@ public partial class GameState : Node
         ManagerName = managerName;
         CareerSeed = seed;
         CareerInitialized = true;
+        WorldSeed = seed;
     }
 }

@@ -52,6 +52,14 @@ func _process(_delta: float) -> bool:
             _fail("CareerSeed was not stored correctly")
             return false
 
+        if int(game_state.WorldSeed) != 424242:
+            _fail("WorldSeed was not stored correctly")
+            return false
+
+        if str(game_state.CountryPackId) != "country-pack-alpha":
+            _fail("CountryPackId was not stored correctly")
+            return false
+
         var summary_label := current_scene.get_node("Center/Panel/CareerSummaryLabel") as Label
         if summary_label == null:
             _fail("ChooseClub summary label is missing")
@@ -59,6 +67,10 @@ func _process(_delta: float) -> bool:
 
         if summary_label.text.find("Casey Doyle") == -1:
             _fail("ChooseClub summary did not render manager context")
+            return false
+
+        if summary_label.text.find("country-pack-alpha") == -1:
+            _fail("ChooseClub summary did not render world seed context")
             return false
 
         print("STEP2_SUBTASK_PASS")

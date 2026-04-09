@@ -4,15 +4,15 @@
 - Step 2: New Career
 
 ## Last completed verified task
-- Step 2 subtask complete: Start Career now hands off from CareerSetup to ChooseClub placeholder while preserving GameState manager context.
+- Step 2 subtask complete: GameState now carries script-visible world seed and country-pack context, and ChooseClub renders that context after Start Career handoff.
 
 ## Current subtask in progress
-- Step 2 subtask: define minimal world-seed container state in GameState for club selection intake.
+- Step 2 subtask: add placeholder club list data source to ChooseClub for Step 3 readiness.
 
 ## Next queued subtasks
 - Prepare Step 3 club-selection stub scene contract.
-- Define minimal world-seed container object in GameState.
 - Add club list placeholder data source for ChooseClub.
+- Close Step 2 and activate Step 3 once placeholder data handoff is verified.
 
 ## Known blockers
 - None currently.
@@ -21,7 +21,7 @@
 - Passed: dotnet build game/Touchline.csproj; Godot headless runtime check (`res://scripts/step2_career_setup_check.gd` => STEP2_SUBTASK_PASS); npm test; npm run typecheck; npm run lint; npm run build (2026-04-09).
 
 ## Last commit hash
-- Pending Step 2 handoff subtask commit.
+- Pending Step 2 world-seed subtask commit.
 
 ## Resume instructions
 - Re-read docs/PRD.md, docs/Architecture.md, docs/Guardrails.md, and docs/Plan.md.

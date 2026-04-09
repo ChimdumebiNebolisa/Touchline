@@ -14,8 +14,14 @@ public partial class ChooseClub : Control
             return;
         }
 
+        if (GameState.Instance.WorldSeed <= 0)
+        {
+            summaryLabel.Text = "Career world seed context is missing.";
+            return;
+        }
+
         summaryLabel.Text =
-            $"Manager: {GameState.Instance.ManagerName} | Seed: {GameState.Instance.CareerSeed}";
+            $"Manager: {GameState.Instance.ManagerName} | Seed: {GameState.Instance.WorldSeed} | Pack: {GameState.Instance.CountryPackId}";
     }
 
     private void OnBackPressed()
