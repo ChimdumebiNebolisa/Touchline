@@ -482,235 +482,24 @@ public partial class GameState : Node
 
     private void InitializeCompetitionState()
     {
-        if (AvailableClubs.Length == 0)
-        {
-            CompetitionTable = Array.Empty<CompetitionRow>();
-            CompetitionFixtures = Array.Empty<CompetitionFixture>();
-            return;
-        }
-
-        CompetitionTable = Array.ConvertAll(
-            AvailableClubs,
-            clubName => new CompetitionRow
-            {
-                ClubName = clubName,
-                Played = 0,
-                Won = 0,
-                Drawn = 0,
-                Lost = 0,
-                GoalsFor = 0,
-                GoalsAgainst = 0,
-                Points = 0
-            });
-        CompetitionFixtures = BuildCompetitionFixtures();
-    }
-
-    private CompetitionFixture[] BuildCompetitionFixtures()
-    {
-        if (string.IsNullOrWhiteSpace(SelectedClubName))
-        {
-            return Array.Empty<CompetitionFixture>();
-        }
-
-        var rivals = Array.FindAll(AvailableClubs, clubName => clubName != SelectedClubName);
-        if (rivals.Length < 3)
-        {
-            return Array.Empty<CompetitionFixture>();
-        }
-
-        return new[]
-        {
-            CreateCompetitionFixture(1, SelectedClubName, rivals[0]),
-            CreateCompetitionFixture(1, rivals[1], rivals[2]),
-            CreateCompetitionFixture(2, SelectedClubName, rivals[1]),
-            CreateCompetitionFixture(2, rivals[0], rivals[2]),
-            CreateCompetitionFixture(3, SelectedClubName, rivals[2]),
-            CreateCompetitionFixture(3, rivals[0], rivals[1]),
-            CreateCompetitionFixture(4, SelectedClubName, rivals[0]),
-            CreateCompetitionFixture(4, rivals[2], rivals[1]),
-            CreateCompetitionFixture(5, SelectedClubName, rivals[1]),
-            CreateCompetitionFixture(5, rivals[2], rivals[0]),
-            CreateCompetitionFixture(6, SelectedClubName, rivals[2]),
-            CreateCompetitionFixture(6, rivals[1], rivals[0])
-        };
-    }
-
-    private static CompetitionFixture CreateCompetitionFixture(int matchday, string homeClubName, string awayClubName)
-    {
-        return new CompetitionFixture
-        {
-            Matchday = matchday,
-            HomeClubName = homeClubName,
-            AwayClubName = awayClubName,
-            IsComplete = false,
-            Scoreline = "vs",
-            ResultSummary = $"{homeClubName} vs {awayClubName}"
-        };
+        var competitionState = CompetitionRuntimeService.BuildInitialState(AvailableClubs, SelectedClubName);
+        CompetitionTable = competitionState.table;
+        CompetitionFixtures = competitionState.fixtures;
     }
 
     private void RecordCompetitionResults(int homeGoals, int awayGoals)
     {
-        if (string.IsNullOrWhiteSpace(SelectedClubName))
-        {
-            return;
-        }
-
-        for (var index = 0; index < CompetitionFixtures.Length; index++)
-        {
-            var fixture = CompetitionFixtures[index];
-            if (fixture.Matchday != CurrentMatchday)
-            {
-                continue;
-            }
-
-            if (fixture.HomeClubName == SelectedClubName || fixture.AwayClubName == SelectedClubName)
-            {
-                CompetitionFixtures[index] = BuildCompletedFixture(fixture, homeGoals, awayGoals);
-                continue;
-            }
-
-            if (!fixture.IsComplete)
-            {
-                var shadowResult = BuildShadowFixtureResult(fixture);
-                CompetitionFixtures[index] = BuildCompletedFixture(fixture, shadowResult.homeGoals, shadowResult.awayGoals);
-            }
-        }
-
-        RecalculateCompetitionTable();
-    }
-
-    private CompetitionFixture BuildCompletedFixture(CompetitionFixture fixture, int homeGoals, int awayGoals)
-    {
-        return new CompetitionFixture
-        {
-            Matchday = fixture.Matchday,
-            HomeClubName = fixture.HomeClubName,
-            AwayClubName = fixture.AwayClubName,
-            IsComplete = true,
-            Scoreline = $"{homeGoals} - {awayGoals}",
-            ResultSummary = $"{fixture.HomeClubName} {homeGoals} - {awayGoals} {fixture.AwayClubName}"
-        };
-    }
-
-    private (int homeGoals, int awayGoals) BuildShadowFixtureResult(CompetitionFixture fixture)
-    {
-        var seed = Math.Abs(HashCode.Combine(WorldSeed, SeasonStartYear, fixture.Matchday, fixture.HomeClubName, fixture.AwayClubName));
-        var rng = new Random(seed);
-        var homeGoals = rng.Next(0, 3);
-        var awayGoals = rng.Next(0, 3);
-
-        if (homeGoals == 0 && awayGoals == 0 && fixture.Matchday % 2 == 0)
-        {
-            homeGoals = 1;
-        }
-
-        return (homeGoals, awayGoals);
-    }
-
-    private void RecalculateCompetitionTable()
-    {
-        var rows = Array.ConvertAll(
+        var competitionState = CompetitionRuntimeService.ApplyMatchdayResult(
             AvailableClubs,
-            clubName => new CompetitionRow
-            {
-                ClubName = clubName,
-                Played = 0,
-                Won = 0,
-                Drawn = 0,
-                Lost = 0,
-                GoalsFor = 0,
-                GoalsAgainst = 0,
-                Points = 0
-            });
-
-        foreach (var fixture in CompetitionFixtures)
-        {
-            if (!fixture.IsComplete)
-            {
-                continue;
-            }
-
-            var goals = ParseScoreline(fixture.Scoreline);
-            var homeIndex = FindCompetitionRowIndex(rows, fixture.HomeClubName);
-            var awayIndex = FindCompetitionRowIndex(rows, fixture.AwayClubName);
-            if (homeIndex < 0 || awayIndex < 0)
-            {
-                continue;
-            }
-
-            rows[homeIndex] = UpdateCompetitionRow(rows[homeIndex], goals.homeGoals, goals.awayGoals);
-            rows[awayIndex] = UpdateCompetitionRow(rows[awayIndex], goals.awayGoals, goals.homeGoals);
-        }
-
-        Array.Sort(
-            rows,
-            (left, right) =>
-            {
-                var pointComparison = right.Points.CompareTo(left.Points);
-                if (pointComparison != 0)
-                {
-                    return pointComparison;
-                }
-
-                var goalDifferenceComparison = right.GoalDifference.CompareTo(left.GoalDifference);
-                if (goalDifferenceComparison != 0)
-                {
-                    return goalDifferenceComparison;
-                }
-
-                var goalsForComparison = right.GoalsFor.CompareTo(left.GoalsFor);
-                if (goalsForComparison != 0)
-                {
-                    return goalsForComparison;
-                }
-
-                return string.Compare(left.ClubName, right.ClubName, StringComparison.Ordinal);
-            });
-
-        CompetitionTable = rows;
-    }
-
-    private static (int homeGoals, int awayGoals) ParseScoreline(string scoreline)
-    {
-        var tokens = scoreline.Split(" - ", StringSplitOptions.RemoveEmptyEntries);
-        if (tokens.Length != 2 || !int.TryParse(tokens[0], out var homeGoals) || !int.TryParse(tokens[1], out var awayGoals))
-        {
-            return (0, 0);
-        }
-
-        return (homeGoals, awayGoals);
-    }
-
-    private static int FindCompetitionRowIndex(CompetitionRow[] rows, string clubName)
-    {
-        for (var index = 0; index < rows.Length; index++)
-        {
-            if (rows[index].ClubName == clubName)
-            {
-                return index;
-            }
-        }
-
-        return -1;
-    }
-
-    private static CompetitionRow UpdateCompetitionRow(CompetitionRow row, int goalsFor, int goalsAgainst)
-    {
-        var win = goalsFor > goalsAgainst ? 1 : 0;
-        var draw = goalsFor == goalsAgainst ? 1 : 0;
-        var loss = goalsFor < goalsAgainst ? 1 : 0;
-
-        return new CompetitionRow
-        {
-            ClubName = row.ClubName,
-            Played = row.Played + 1,
-            Won = row.Won + win,
-            Drawn = row.Drawn + draw,
-            Lost = row.Lost + loss,
-            GoalsFor = row.GoalsFor + goalsFor,
-            GoalsAgainst = row.GoalsAgainst + goalsAgainst,
-            Points = row.Points + (win * 3) + draw
-        };
+            CompetitionFixtures,
+            CurrentMatchday,
+            SelectedClubName,
+            homeGoals,
+            awayGoals,
+            WorldSeed,
+            SeasonStartYear);
+        CompetitionTable = competitionState.table;
+        CompetitionFixtures = competitionState.fixtures;
     }
 
     private int CountStartingPlayers()
@@ -812,28 +601,13 @@ public partial class GameState : Node
 
     private void RefreshFixtureContext()
     {
-        if (string.IsNullOrWhiteSpace(SelectedClubName))
-        {
-            CurrentOpponentName = "Harbor County";
-            NextFixtureSummary = "Fixture context unavailable.";
-            return;
-        }
-
-        var currentFixture = GetCurrentClubFixture();
-        if (currentFixture == null)
-        {
-            CurrentOpponentName = "Harbor County";
-            NextFixtureSummary = "Fixture context unavailable.";
-            return;
-        }
-
-        CurrentOpponentName = currentFixture.HomeClubName == SelectedClubName
-            ? currentFixture.AwayClubName
-            : currentFixture.HomeClubName;
-
-        NextFixtureSummary = currentFixture.IsComplete
-            ? $"{CurrentDateLabel} | Matchday {CurrentMatchday} complete | {currentFixture.ResultSummary}"
-            : $"{CurrentDateLabel} | Matchday {CurrentMatchday} | {currentFixture.HomeClubName} vs {currentFixture.AwayClubName}";
+        var fixtureContext = CompetitionRuntimeService.ResolveFixtureContext(
+            CompetitionFixtures,
+            CurrentMatchday,
+            SelectedClubName,
+            CurrentDateLabel);
+        CurrentOpponentName = fixtureContext.currentOpponentName;
+        NextFixtureSummary = fixtureContext.nextFixtureSummary;
     }
 
     private void UpdateFormSummary(int goalDifference)
@@ -895,82 +669,25 @@ public partial class GameState : Node
 
     private int GetClubTablePosition(string clubName)
     {
-        if (string.IsNullOrWhiteSpace(clubName))
-        {
-            return -1;
-        }
-
-        for (var index = 0; index < CompetitionTable.Length; index++)
-        {
-            if (CompetitionTable[index].ClubName == clubName)
-            {
-                return index + 1;
-            }
-        }
-
-        return -1;
+        return CompetitionRuntimeService.GetClubTablePosition(CompetitionTable, clubName);
     }
 
     private string BuildTableImpactSummary(int previousPosition, int currentPosition)
     {
-        if (string.IsNullOrWhiteSpace(SelectedClubName))
-        {
-            return "Table impact unavailable.";
-        }
-
-        var currentRow = GetCompetitionRow(SelectedClubName);
-        if (currentRow == null)
-        {
-            return "Table impact unavailable.";
-        }
-
-        if (previousPosition < 0 || currentPosition < 0)
-        {
-            return $"{SelectedClubName} now sit on {currentRow.Points} points with goal difference {FormatSignedDelta(currentRow.GoalDifference)}.";
-        }
-
-        if (currentPosition < previousPosition)
-        {
-            return $"{SelectedClubName} climb from {previousPosition} to {currentPosition} with {currentRow.Points} points.";
-        }
-
-        if (currentPosition > previousPosition)
-        {
-            return $"{SelectedClubName} slip from {previousPosition} to {currentPosition} despite reaching {currentRow.Points} points.";
-        }
-
-        return $"{SelectedClubName} hold position {currentPosition} on {currentRow.Points} points and goal difference {FormatSignedDelta(currentRow.GoalDifference)}.";
+        return CompetitionRuntimeService.BuildTableImpactSummary(
+            CompetitionTable,
+            SelectedClubName,
+            previousPosition,
+            currentPosition);
     }
 
     private CompetitionFixture? GetCurrentClubFixture()
     {
-        if (string.IsNullOrWhiteSpace(SelectedClubName))
-        {
-            return null;
-        }
-
-        foreach (var fixture in CompetitionFixtures)
-        {
-            if (fixture.Matchday == CurrentMatchday &&
-                (fixture.HomeClubName == SelectedClubName || fixture.AwayClubName == SelectedClubName))
-            {
-                return fixture;
-            }
-        }
-
-        return null;
+        return CompetitionRuntimeService.GetCurrentClubFixture(CompetitionFixtures, CurrentMatchday, SelectedClubName);
     }
 
     private CompetitionRow? GetCompetitionRow(string clubName)
     {
-        foreach (var row in CompetitionTable)
-        {
-            if (row.ClubName == clubName)
-            {
-                return row;
-            }
-        }
-
-        return null;
+        return CompetitionRuntimeService.GetCompetitionRow(CompetitionTable, clubName);
     }
 }
