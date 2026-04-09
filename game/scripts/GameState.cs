@@ -26,6 +26,11 @@ public partial class GameState : Node
     public string NextFixtureSummary { get; private set; } = "Fixture context unavailable.";
     public string SquadStatusSummary { get; private set; } = "Squad status unavailable.";
     public SquadPlayer[] SquadPlayers { get; private set; } = Array.Empty<SquadPlayer>();
+    public string TacticalFormation { get; private set; } = "4-3-3";
+    public int PressIntensity { get; private set; } = 60;
+    public int Tempo { get; private set; } = 58;
+    public int Width { get; private set; } = 55;
+    public int Risk { get; private set; } = 52;
 
     public override void _EnterTree()
     {
@@ -57,6 +62,11 @@ public partial class GameState : Node
         NextFixtureSummary = "Matchday 1: Riverton Athletic vs Harbor County";
         SquadStatusSummary = "23 registered players | 20 fit | morale steady";
         SquadPlayers = Array.Empty<SquadPlayer>();
+        TacticalFormation = "4-3-3";
+        PressIntensity = 60;
+        Tempo = 58;
+        Width = 55;
+        Risk = 52;
     }
 
     public void SelectClub(string clubName)
@@ -81,5 +91,14 @@ public partial class GameState : Node
             new SquadPlayer { Name = "Omar Nadir", Position = "CM", Age = 19, Form = 70, Morale = 72, Fitness = 86, IsStarting = false },
             new SquadPlayer { Name = "Lucas Marin", Position = "ST", Age = 23, Form = 68, Morale = 69, Fitness = 87, IsStarting = false }
         };
+    }
+
+    public void UpdateTactics(string formation, int pressIntensity, int tempo, int width, int risk)
+    {
+        TacticalFormation = formation;
+        PressIntensity = pressIntensity;
+        Tempo = tempo;
+        Width = width;
+        Risk = risk;
     }
 }

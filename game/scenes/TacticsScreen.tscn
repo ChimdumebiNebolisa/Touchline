@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://scripts/HubStubScreen.cs" id="1"]
+[ext_resource type="Script" path="res://scripts/TacticsScreen.cs" id="1"]
 
 [node name="TacticsScreen" type="Control"]
 layout_mode = 3
@@ -10,7 +10,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1")
-ScreenTitle = "Tactics Screen"
 
 [node name="Center" type="CenterContainer" parent="."]
 layout_mode = 1
@@ -22,6 +21,7 @@ grow_vertical = 2
 
 [node name="Panel" type="VBoxContainer" parent="Center"]
 layout_mode = 2
+custom_minimum_size = Vector2(520, 440)
 theme_override_constants/separation = 10
 
 [node name="Heading" type="Label" parent="Center/Panel"]
@@ -29,9 +29,74 @@ layout_mode = 2
 text = "Tactics Screen"
 horizontal_alignment = 1
 
-[node name="Message" type="Label" parent="Center/Panel"]
+[node name="ClubContextLabel" type="Label" parent="Center/Panel"]
 layout_mode = 2
-text = ""
+text = "Club context unavailable."
+autowrap_mode = 3
+horizontal_alignment = 1
+
+[node name="FormationLabel" type="Label" parent="Center/Panel"]
+layout_mode = 2
+text = "Formation"
+
+[node name="FormationOption" type="OptionButton" parent="Center/Panel"]
+layout_mode = 2
+item_count = 3
+selected = 0
+popup/item_0/text = "4-3-3"
+popup/item_0/id = 0
+popup/item_1/text = "4-2-3-1"
+popup/item_1/id = 1
+popup/item_2/text = "3-5-2"
+popup/item_2/id = 2
+
+[node name="PressLabel" type="Label" parent="Center/Panel"]
+layout_mode = 2
+text = "Press Intensity"
+
+[node name="PressSpin" type="SpinBox" parent="Center/Panel"]
+layout_mode = 2
+min_value = 0.0
+max_value = 100.0
+step = 1.0
+
+[node name="TempoLabel" type="Label" parent="Center/Panel"]
+layout_mode = 2
+text = "Tempo"
+
+[node name="TempoSpin" type="SpinBox" parent="Center/Panel"]
+layout_mode = 2
+min_value = 0.0
+max_value = 100.0
+step = 1.0
+
+[node name="WidthLabel" type="Label" parent="Center/Panel"]
+layout_mode = 2
+text = "Width"
+
+[node name="WidthSpin" type="SpinBox" parent="Center/Panel"]
+layout_mode = 2
+min_value = 0.0
+max_value = 100.0
+step = 1.0
+
+[node name="RiskLabel" type="Label" parent="Center/Panel"]
+layout_mode = 2
+text = "Risk"
+
+[node name="RiskSpin" type="SpinBox" parent="Center/Panel"]
+layout_mode = 2
+min_value = 0.0
+max_value = 100.0
+step = 1.0
+
+[node name="SaveButton" type="Button" parent="Center/Panel"]
+layout_mode = 2
+text = "Save Tactics"
+
+[node name="StatusLabel" type="Label" parent="Center/Panel"]
+layout_mode = 2
+text = "Adjust tactical profile and save."
 autowrap_mode = 3
 horizontal_alignment = 1
 
@@ -39,4 +104,5 @@ horizontal_alignment = 1
 layout_mode = 2
 text = "Back to Club Dashboard"
 
+[connection signal="pressed" from="Center/Panel/SaveButton" to="." method="OnSavePressed"]
 [connection signal="pressed" from="Center/Panel/BackButton" to="." method="OnBackPressed"]
