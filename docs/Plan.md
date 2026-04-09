@@ -4,11 +4,10 @@
 
 ### Active
 
-- Step 21: Upgrade live match presentation substantially
+- Step 22: Unify live and instant simulation around one shared engine
 
 ### Backlog
 
-- Step 22: Unify live and instant simulation around one shared engine
 - Step 23: Rebuild post-match into a consequence and explainability screen
 - Step 24: Refactor runtime architecture around clear services
 - Step 25: Add the missing autoload systems from the architecture
@@ -45,6 +44,7 @@
 - Step 18: Redesign tactics as a tactical board
 - Step 19: Replace fixtures and standings placeholders with real competition surfaces
 - Step 20: Redesign matchday into an event screen
+- Step 21: Upgrade live match presentation substantially
 
 ## 2. Plan Rules
 
@@ -261,6 +261,13 @@ Elevate the 2D live match renderer into a readable, dramatic football broadcast 
 
 Satisfy the Architecture requirement that instant and live modes share one match engine.
 
+### Allowed Subtasks
+
+- introduce one authoritative match result model that both live and instant paths consume
+- move match-outcome generation behind a shared domain entry point rather than scene-specific creation
+- preserve live-match playback presentation while allowing an instant-result path to resolve through the same engine
+- keep downstream post-match consequences driven by shared match outputs instead of duplicated score logic
+
 ### Verification
 
 - live and instant match flows consume one authoritative match result model
@@ -377,8 +384,8 @@ Remove remaining prototype edges and harden the shell for repeated play.
 
 ## 23. Immediate Next Subtask
 
-Step 17 starts with the smallest valid squad-workspace slice:
+Step 22 starts with the smallest valid engine-unification slice:
 
-- turn squad selection into explicit XI-or-bench management
-- keep the player-profile inspection path intact
-- verify the project still builds cleanly before broader squad-workspace changes continue
+- create a shared authoritative match result model
+- route both live and instant match flows through that shared model
+- verify the project still builds cleanly before broader runtime refactors continue
