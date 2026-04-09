@@ -4,11 +4,10 @@
 
 ### Active
 
-- Step 20: Redesign matchday into an event screen
+- Step 21: Upgrade live match presentation substantially
 
 ### Backlog
 
-- Step 21: Upgrade live match presentation substantially
 - Step 22: Unify live and instant simulation around one shared engine
 - Step 23: Rebuild post-match into a consequence and explainability screen
 - Step 24: Refactor runtime architecture around clear services
@@ -45,6 +44,7 @@
 - Step 17: Rebuild squad management into a football workspace
 - Step 18: Redesign tactics as a tactical board
 - Step 19: Replace fixtures and standings placeholders with real competition surfaces
+- Step 20: Redesign matchday into an event screen
 
 ## 2. Plan Rules
 
@@ -241,6 +241,13 @@ Make match entry feel consequential, readable, and football-native.
 ### Objective
 
 Elevate the 2D live match renderer into a readable, dramatic football broadcast surface.
+
+### Allowed Subtasks
+
+- improve the live-match HUD hierarchy, status messaging, and event readability around the existing playback
+- add clearer presentation of momentum, score, clock, and tactical context without changing the underlying match rules
+- preserve marker movement, playback timing, and post-match handoff while upgrading the visual shell
+- keep live presentation as a renderer/controller of simulation playback rather than a second rules engine
 
 ### Verification
 
