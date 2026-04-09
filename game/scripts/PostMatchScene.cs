@@ -6,11 +6,15 @@ public partial class PostMatchScene : Control
 
     public override void _Ready()
     {
-        var fixtureLabel = GetNode<Label>("Center/Panel/FixtureLabel");
-        var scoreLabel = GetNode<Label>("Center/Panel/ScoreLabel");
-        var resultLabel = GetNode<Label>("Center/Panel/ResultLabel");
-        var deltasLabel = GetNode<Label>("Center/Panel/DeltasLabel");
-        var eventsLabel = GetNode<Label>("Center/Panel/EventsLabel");
+        var fixtureLabel = GetNode<Label>("Center/Shell/Padding/Content/Header/FixtureLabel");
+        var scoreLabel = GetNode<Label>("Center/Shell/Padding/Content/Header/ScoreLabel");
+        var resultLabel = GetNode<Label>("Center/Shell/Padding/Content/Header/ResultLabel");
+        var deltasLabel = GetNode<Label>("Center/Shell/Padding/Content/BodyRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/DeltasLabel");
+        var tableImpactLabel = GetNode<Label>("Center/Shell/Padding/Content/BodyRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/TableImpactLabel");
+        var tacticalLabel = GetNode<Label>("Center/Shell/Padding/Content/BodyRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/TacticalLabel");
+        var pressureLabel = GetNode<Label>("Center/Shell/Padding/Content/BodyRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/PressureLabel");
+        var eventsLabel = GetNode<Label>("Center/Shell/Padding/Content/BodyRow/EventsCard/EventsPadding/EventsContent/EventsLabel");
+        var continueHintLabel = GetNode<Label>("Center/Shell/Padding/Content/ContinueHintLabel");
 
         if (GameState.Instance?.LastMatchReport == null)
         {
@@ -18,7 +22,11 @@ public partial class PostMatchScene : Control
             scoreLabel.Text = "0 - 0";
             resultLabel.Text = "No completed result is ready to review.";
             deltasLabel.Text = "Morale +0 | Fans +0 | Board +0";
+            tableImpactLabel.Text = "Table impact unavailable.";
+            tacticalLabel.Text = "Tactical summary unavailable.";
+            pressureLabel.Text = "Pressure summary unavailable.";
             eventsLabel.Text = "No key events recorded.";
+            continueHintLabel.Text = "Complete a match before reviewing the aftermath.";
             return;
         }
 
@@ -27,7 +35,11 @@ public partial class PostMatchScene : Control
         scoreLabel.Text = report.Scoreline;
         resultLabel.Text = report.ResultLabel;
         deltasLabel.Text = report.ConsequenceSummary;
+        tableImpactLabel.Text = report.TableImpactSummary;
+        tacticalLabel.Text = report.TacticalSummary;
+        pressureLabel.Text = report.PressureSummary;
         eventsLabel.Text = string.Join("\n", report.KeyEvents);
+        continueHintLabel.Text = "Continue to roll the calendar forward and carry these consequences back into the dashboard.";
     }
 
     private void OnContinuePressed()

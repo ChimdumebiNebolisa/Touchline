@@ -51,6 +51,9 @@ public sealed class SaveSlotMatchReportData
     public string Scoreline { get; set; } = "0 - 0";
     public string ResultLabel { get; set; } = string.Empty;
     public string ConsequenceSummary { get; set; } = string.Empty;
+    public string TableImpactSummary { get; set; } = string.Empty;
+    public string TacticalSummary { get; set; } = string.Empty;
+    public string PressureSummary { get; set; } = string.Empty;
     public string[]? KeyEvents { get; set; }
     public int MoraleDelta { get; set; }
     public int FanDelta { get; set; }
@@ -170,6 +173,9 @@ public partial class SaveSystem : Node
                         Scoreline = GameState.Instance.LastMatchReport.Scoreline,
                         ResultLabel = GameState.Instance.LastMatchReport.ResultLabel,
                         ConsequenceSummary = GameState.Instance.LastMatchReport.ConsequenceSummary,
+                        TableImpactSummary = GameState.Instance.LastMatchReport.TableImpactSummary,
+                        TacticalSummary = GameState.Instance.LastMatchReport.TacticalSummary,
+                        PressureSummary = GameState.Instance.LastMatchReport.PressureSummary,
                         KeyEvents = GameState.Instance.LastMatchReport.KeyEvents,
                         MoraleDelta = GameState.Instance.LastMatchReport.MoraleDelta,
                         FanDelta = GameState.Instance.LastMatchReport.FanDelta,

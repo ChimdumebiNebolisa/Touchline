@@ -24,6 +24,9 @@ public partial class GameState : Node
         public required string Scoreline { get; init; }
         public required string ResultLabel { get; init; }
         public required string ConsequenceSummary { get; init; }
+        public required string TableImpactSummary { get; init; }
+        public required string TacticalSummary { get; init; }
+        public required string PressureSummary { get; init; }
         public required string[] KeyEvents { get; init; }
         public required int MoraleDelta { get; init; }
         public required int FanDelta { get; init; }
@@ -237,6 +240,7 @@ public partial class GameState : Node
         CurrentMatchResult = result;
         var finalEvent = result.Events[^1];
         var goalDifference = finalEvent.HomeScore - finalEvent.AwayScore;
+        var previousPosition = GetClubTablePosition(SelectedClubName ?? string.Empty);
         var moraleDelta = goalDifference > 0 ? 4 : goalDifference == 0 ? 1 : -4;
         var fanDelta = goalDifference > 0 ? 5 : goalDifference == 0 ? 0 : -5;
         var boardDelta = goalDifference > 0 ? 3 : goalDifference == 0 ? -1 : -4;
@@ -247,6 +251,13 @@ public partial class GameState : Node
         SquadStatusSummary = BuildSquadStatusSummary();
         UpdateFormSummary(goalDifference);
 
+        RecordCompetitionResults(finalEvent.HomeScore, finalEvent.AwayScore);
+        RefreshFixtureContext();
+        var currentPosition = GetClubTablePosition(SelectedClubName ?? string.Empty);
+        var tableImpactSummary = BuildTableImpactSummary(previousPosition, currentPosition);
+        var pressureSummary =
+            $"Club pressure now sits at morale {TeamMorale}, fan trust {FanSentiment}, and board confidence {BoardConfidence}.";
+
         LastMatchReport = new MatchReport
         {
             FixtureLabel = $"{result.HomeClubName} vs {result.AwayClubName}",
@@ -254,14 +265,14 @@ public partial class GameState : Node
             ResultLabel = BuildResultLabel(goalDifference, result.AwayClubName),
             ConsequenceSummary =
                 $"Morale {FormatSignedDelta(moraleDelta)} | Fans {FormatSignedDelta(fanDelta)} | Board {FormatSignedDelta(boardDelta)}",
+            TableImpactSummary = tableImpactSummary,
+            TacticalSummary = result.TacticalSummary,
+            PressureSummary = pressureSummary,
             KeyEvents = ExtractRecentEvents(result),
             MoraleDelta = moraleDelta,
             FanDelta = fanDelta,
             BoardDelta = boardDelta
         };
-
-        RecordCompetitionResults(finalEvent.HomeScore, finalEvent.AwayScore);
-        RefreshFixtureContext();
         CurrentMatchResult = null;
     }
 
@@ -318,6 +329,9 @@ public partial class GameState : Node
                 Scoreline = data.LastMatchReport.Scoreline,
                 ResultLabel = data.LastMatchReport.ResultLabel,
                 ConsequenceSummary = data.LastMatchReport.ConsequenceSummary,
+                TableImpactSummary = data.LastMatchReport.TableImpactSummary,
+                TacticalSummary = data.LastMatchReport.TacticalSummary,
+                PressureSummary = data.LastMatchReport.PressureSummary,
                 KeyEvents = data.LastMatchReport.KeyEvents ?? Array.Empty<string>(),
                 MoraleDelta = data.LastMatchReport.MoraleDelta,
                 FanDelta = data.LastMatchReport.FanDelta,
@@ -879,6 +893,55 @@ public partial class GameState : Node
         return recentEvents;
     }
 
+    private int GetClubTablePosition(string clubName)
+    {
+        if (string.IsNullOrWhiteSpace(clubName))
+        {
+            return -1;
+        }
+
+        for (var index = 0; index < CompetitionTable.Length; index++)
+        {
+            if (CompetitionTable[index].ClubName == clubName)
+            {
+                return index + 1;
+            }
+        }
+
+        return -1;
+    }
+
+    private string BuildTableImpactSummary(int previousPosition, int currentPosition)
+    {
+        if (string.IsNullOrWhiteSpace(SelectedClubName))
+        {
+            return "Table impact unavailable.";
+        }
+
+        var currentRow = GetCompetitionRow(SelectedClubName);
+        if (currentRow == null)
+        {
+            return "Table impact unavailable.";
+        }
+
+        if (previousPosition < 0 || currentPosition < 0)
+        {
+            return $"{SelectedClubName} now sit on {currentRow.Points} points with goal difference {FormatSignedDelta(currentRow.GoalDifference)}.";
+        }
+
+        if (currentPosition < previousPosition)
+        {
+            return $"{SelectedClubName} climb from {previousPosition} to {currentPosition} with {currentRow.Points} points.";
+        }
+
+        if (currentPosition > previousPosition)
+        {
+            return $"{SelectedClubName} slip from {previousPosition} to {currentPosition} despite reaching {currentRow.Points} points.";
+        }
+
+        return $"{SelectedClubName} hold position {currentPosition} on {currentRow.Points} points and goal difference {FormatSignedDelta(currentRow.GoalDifference)}.";
+    }
+
     private CompetitionFixture? GetCurrentClubFixture()
     {
         if (string.IsNullOrWhiteSpace(SelectedClubName))
@@ -892,6 +955,19 @@ public partial class GameState : Node
                 (fixture.HomeClubName == SelectedClubName || fixture.AwayClubName == SelectedClubName))
             {
                 return fixture;
+            }
+        }
+
+        return null;
+    }
+
+    private CompetitionRow? GetCompetitionRow(string clubName)
+    {
+        foreach (var row in CompetitionTable)
+        {
+            if (row.ClubName == clubName)
+            {
+                return row;
             }
         }
 
