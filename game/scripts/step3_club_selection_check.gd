@@ -52,6 +52,10 @@ func _process(_delta: float) -> bool:
         _ticks = 0
 
     elif _stage == 2 and _ticks > 2:
+        if current_scene == null or current_scene.name != "ClubDashboard":
+            _fail("Club confirmation did not open ClubDashboard")
+            return false
+
         var game_state := root.get_node("GameState")
         if game_state == null:
             _fail("GameState singleton was not autoloaded")
@@ -61,9 +65,9 @@ func _process(_delta: float) -> bool:
             _fail("SelectedClubName was not persisted correctly")
             return false
 
-        var status_label := current_scene.get_node("Center/Panel/SelectionStatusLabel") as Label
-        if status_label == null or status_label.text.find("Northbridge City") == -1:
-            _fail("Selection status label did not update")
+        var dashboard_label := current_scene.get_node("Center/Panel/ClubContextLabel") as Label
+        if dashboard_label == null or dashboard_label.text.find("Northbridge City") == -1:
+            _fail("ClubDashboard context did not include selected club")
             return false
 
         print("STEP3_SUBTASK_PASS")

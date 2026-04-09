@@ -3,6 +3,7 @@ using Godot;
 public partial class ChooseClub : Control
 {
     private const string CareerSetupScenePath = "res://scenes/CareerSetup.tscn";
+    private const string ClubDashboardScenePath = "res://scenes/ClubDashboard.tscn";
 
     private ItemList _clubList = default!;
     private Label _selectionStatusLabel = default!;
@@ -66,6 +67,7 @@ public partial class ChooseClub : Control
         var selectedClubName = _clubList.GetItemText(selectedIndex);
         GameState.Instance.SelectClub(selectedClubName);
         _selectionStatusLabel.Text = $"Selected club: {selectedClubName}";
+        GetTree().ChangeSceneToFile(ClubDashboardScenePath);
     }
 
     private void OnBackPressed()
