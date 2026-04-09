@@ -4,11 +4,10 @@
 
 ### Active
 
-- Step 24: Refactor runtime architecture around clear services
+- Step 25: Add the missing autoload systems from the architecture
 
 ### Backlog
 
-- Step 25: Add the missing autoload systems from the architecture
 - Step 26: Move hardcoded football content into real data
 - Step 27: Integrate the save path with the authoritative domain model
 - Step 28: Complete season continuity and progression
@@ -45,6 +44,7 @@
 - Step 21: Upgrade live match presentation substantially
 - Step 22: Unify live and instant simulation around one shared engine
 - Step 23: Rebuild post-match into a consequence and explainability screen
+- Step 24: Refactor runtime architecture around clear services
 
 ## 2. Plan Rules
 
@@ -398,8 +398,8 @@ Remove remaining prototype edges and harden the shell for repeated play.
 
 ## 23. Immediate Next Subtask
 
-Step 24 starts with the smallest valid service-refactor slice:
+Step 25 starts with the smallest valid runtime-system slice:
 
-- move a major rule-heavy area out of `GameState.cs` into a dedicated service
-- preserve the existing scene-facing state shape while reducing singleton logic density
-- verify the project still builds cleanly before adding new autoload systems
+- add first-class `CalendarSystem` and `WorldGenerator` autoloads under the Godot product path
+- move scene-facing date advancement and world bootstrapping calls behind those dedicated runtime systems
+- preserve existing career flow and verify the project still builds cleanly before moving hardcoded football content into data
