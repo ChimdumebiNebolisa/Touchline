@@ -12,11 +12,11 @@ public partial class ClubDashboard : Control
 
     public override void _Ready()
     {
-        var contextLabel = GetNode<Label>("Center/Panel/ClubContextLabel");
-        var dateLabel = GetNode<Label>("Center/Panel/DateLabel");
-        var fixturePreviewLabel = GetNode<Label>("Center/Panel/FixturePreviewLabel");
-        var squadStatusLabel = GetNode<Label>("Center/Panel/SquadStatusLabel");
-        _stubMessageLabel = GetNode<Label>("Center/Panel/StubMessage");
+        var contextLabel = GetNode<Label>("Center/Shell/Padding/Content/Header/ClubContextLabel");
+        var dateLabel = GetNode<Label>("Center/Shell/Padding/Content/Header/DateLabel");
+        var fixturePreviewLabel = GetNode<Label>("Center/Shell/Padding/Content/SnapshotCard/SnapshotPadding/SnapshotContent/FixturePreviewLabel");
+        var squadStatusLabel = GetNode<Label>("Center/Shell/Padding/Content/SnapshotCard/SnapshotPadding/SnapshotContent/SquadStatusLabel");
+        _stubMessageLabel = GetNode<Label>("Center/Shell/Padding/Content/SnapshotCard/SnapshotPadding/SnapshotContent/StubMessage");
 
         if (GameState.Instance == null || !GameState.Instance.CareerInitialized)
         {
