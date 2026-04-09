@@ -38,6 +38,29 @@ public partial class GameState : Node
         public required string OpeningFixtureSummary { get; init; }
     }
 
+    public sealed class CompetitionRow
+    {
+        public required string ClubName { get; init; }
+        public required int Played { get; init; }
+        public required int Won { get; init; }
+        public required int Drawn { get; init; }
+        public required int Lost { get; init; }
+        public required int GoalsFor { get; init; }
+        public required int GoalsAgainst { get; init; }
+        public int GoalDifference => GoalsFor - GoalsAgainst;
+        public required int Points { get; init; }
+    }
+
+    public sealed class CompetitionFixture
+    {
+        public required int Matchday { get; init; }
+        public required string HomeClubName { get; init; }
+        public required string AwayClubName { get; init; }
+        public required bool IsComplete { get; init; }
+        public required string Scoreline { get; init; }
+        public required string ResultSummary { get; init; }
+    }
+
     public static GameState? Instance { get; private set; }
 
     public string ManagerName { get; private set; } = "Manager";
@@ -69,6 +92,8 @@ public partial class GameState : Node
     public string SeasonLabel => $"{SeasonStartYear}/{((SeasonStartYear + 1) % 100):00}";
     public string CurrentDateLabel => CurrentDate.ToString("ddd d MMM yyyy");
     public string? SelectedPlayerProfileName { get; private set; }
+    public CompetitionRow[] CompetitionTable { get; private set; } = Array.Empty<CompetitionRow>();
+    public CompetitionFixture[] CompetitionFixtures { get; private set; } = Array.Empty<CompetitionFixture>();
 
     public override void _EnterTree()
     {
@@ -117,6 +142,8 @@ public partial class GameState : Node
         _recentResults.Clear();
         LastMatchReport = null;
         SelectedPlayerProfileName = null;
+        CompetitionTable = Array.Empty<CompetitionRow>();
+        CompetitionFixtures = Array.Empty<CompetitionFixture>();
     }
 
     public void SelectClub(string clubName)
@@ -126,8 +153,6 @@ public partial class GameState : Node
         CurrentMatchday = 1;
         LastMatchReport = null;
         SelectedPlayerProfileName = null;
-        RefreshFixtureContext();
-        SquadStatusSummary = BuildSquadStatusSummary();
 
         SquadPlayers = new[]
         {
@@ -147,6 +172,10 @@ public partial class GameState : Node
             new SquadPlayer { Name = "Omar Nadir", Position = "CM", Age = 19, Form = 70, Morale = 72, Fitness = 86, IsStarting = false },
             new SquadPlayer { Name = "Lucas Marin", Position = "ST", Age = 23, Form = 68, Morale = 69, Fitness = 87, IsStarting = false }
         };
+
+        InitializeCompetitionState();
+        RefreshFixtureContext();
+        SquadStatusSummary = BuildSquadStatusSummary();
     }
 
     public void UpdateTactics(string formation, int pressIntensity, int tempo, int width, int risk)
@@ -175,6 +204,7 @@ public partial class GameState : Node
             CurrentMatchday = 1;
             _recentResults.Clear();
             FormSummary = "Form: new season reset.";
+            InitializeCompetitionState();
         }
 
         LastMatchReport = null;
@@ -207,6 +237,9 @@ public partial class GameState : Node
             FanDelta = fanDelta,
             BoardDelta = boardDelta
         };
+
+        RecordCompetitionResults(finalEvent.HomeScore, finalEvent.AwayScore);
+        RefreshFixtureContext();
     }
 
     public void RestoreFromSave(SaveSlotData data)
@@ -267,7 +300,32 @@ public partial class GameState : Node
                 FanDelta = data.LastMatchReport.FanDelta,
                 BoardDelta = data.LastMatchReport.BoardDelta
             };
+        CompetitionTable = Array.ConvertAll(
+            data.CompetitionTable ?? Array.Empty<SaveSlotCompetitionRowData>(),
+            row => new CompetitionRow
+            {
+                ClubName = row.ClubName,
+                Played = row.Played,
+                Won = row.Won,
+                Drawn = row.Drawn,
+                Lost = row.Lost,
+                GoalsFor = row.GoalsFor,
+                GoalsAgainst = row.GoalsAgainst,
+                Points = row.Points
+            });
+        CompetitionFixtures = Array.ConvertAll(
+            data.CompetitionFixtures ?? Array.Empty<SaveSlotCompetitionFixtureData>(),
+            fixture => new CompetitionFixture
+            {
+                Matchday = fixture.Matchday,
+                HomeClubName = fixture.HomeClubName,
+                AwayClubName = fixture.AwayClubName,
+                IsComplete = fixture.IsComplete,
+                Scoreline = fixture.Scoreline,
+                ResultSummary = fixture.ResultSummary
+            });
         SelectedPlayerProfileName = null;
+        RefreshFixtureContext();
     }
 
     public void SelectPlayerProfile(string playerName)
@@ -384,6 +442,239 @@ public partial class GameState : Node
         return $"23 registered players | morale {DescribeLevel(TeamMorale)} | fans {DescribeLevel(FanSentiment)} | board {DescribeLevel(BoardConfidence)}";
     }
 
+    private void InitializeCompetitionState()
+    {
+        if (AvailableClubs.Length == 0)
+        {
+            CompetitionTable = Array.Empty<CompetitionRow>();
+            CompetitionFixtures = Array.Empty<CompetitionFixture>();
+            return;
+        }
+
+        CompetitionTable = Array.ConvertAll(
+            AvailableClubs,
+            clubName => new CompetitionRow
+            {
+                ClubName = clubName,
+                Played = 0,
+                Won = 0,
+                Drawn = 0,
+                Lost = 0,
+                GoalsFor = 0,
+                GoalsAgainst = 0,
+                Points = 0
+            });
+        CompetitionFixtures = BuildCompetitionFixtures();
+    }
+
+    private CompetitionFixture[] BuildCompetitionFixtures()
+    {
+        if (string.IsNullOrWhiteSpace(SelectedClubName))
+        {
+            return Array.Empty<CompetitionFixture>();
+        }
+
+        var rivals = Array.FindAll(AvailableClubs, clubName => clubName != SelectedClubName);
+        if (rivals.Length < 3)
+        {
+            return Array.Empty<CompetitionFixture>();
+        }
+
+        return new[]
+        {
+            CreateCompetitionFixture(1, SelectedClubName, rivals[0]),
+            CreateCompetitionFixture(1, rivals[1], rivals[2]),
+            CreateCompetitionFixture(2, SelectedClubName, rivals[1]),
+            CreateCompetitionFixture(2, rivals[0], rivals[2]),
+            CreateCompetitionFixture(3, SelectedClubName, rivals[2]),
+            CreateCompetitionFixture(3, rivals[0], rivals[1]),
+            CreateCompetitionFixture(4, SelectedClubName, rivals[0]),
+            CreateCompetitionFixture(4, rivals[2], rivals[1]),
+            CreateCompetitionFixture(5, SelectedClubName, rivals[1]),
+            CreateCompetitionFixture(5, rivals[2], rivals[0]),
+            CreateCompetitionFixture(6, SelectedClubName, rivals[2]),
+            CreateCompetitionFixture(6, rivals[1], rivals[0])
+        };
+    }
+
+    private static CompetitionFixture CreateCompetitionFixture(int matchday, string homeClubName, string awayClubName)
+    {
+        return new CompetitionFixture
+        {
+            Matchday = matchday,
+            HomeClubName = homeClubName,
+            AwayClubName = awayClubName,
+            IsComplete = false,
+            Scoreline = "vs",
+            ResultSummary = $"{homeClubName} vs {awayClubName}"
+        };
+    }
+
+    private void RecordCompetitionResults(int homeGoals, int awayGoals)
+    {
+        if (string.IsNullOrWhiteSpace(SelectedClubName))
+        {
+            return;
+        }
+
+        for (var index = 0; index < CompetitionFixtures.Length; index++)
+        {
+            var fixture = CompetitionFixtures[index];
+            if (fixture.Matchday != CurrentMatchday)
+            {
+                continue;
+            }
+
+            if (fixture.HomeClubName == SelectedClubName || fixture.AwayClubName == SelectedClubName)
+            {
+                CompetitionFixtures[index] = BuildCompletedFixture(fixture, homeGoals, awayGoals);
+                continue;
+            }
+
+            if (!fixture.IsComplete)
+            {
+                var shadowResult = BuildShadowFixtureResult(fixture);
+                CompetitionFixtures[index] = BuildCompletedFixture(fixture, shadowResult.homeGoals, shadowResult.awayGoals);
+            }
+        }
+
+        RecalculateCompetitionTable();
+    }
+
+    private CompetitionFixture BuildCompletedFixture(CompetitionFixture fixture, int homeGoals, int awayGoals)
+    {
+        return new CompetitionFixture
+        {
+            Matchday = fixture.Matchday,
+            HomeClubName = fixture.HomeClubName,
+            AwayClubName = fixture.AwayClubName,
+            IsComplete = true,
+            Scoreline = $"{homeGoals} - {awayGoals}",
+            ResultSummary = $"{fixture.HomeClubName} {homeGoals} - {awayGoals} {fixture.AwayClubName}"
+        };
+    }
+
+    private (int homeGoals, int awayGoals) BuildShadowFixtureResult(CompetitionFixture fixture)
+    {
+        var seed = Math.Abs(HashCode.Combine(WorldSeed, SeasonStartYear, fixture.Matchday, fixture.HomeClubName, fixture.AwayClubName));
+        var rng = new Random(seed);
+        var homeGoals = rng.Next(0, 3);
+        var awayGoals = rng.Next(0, 3);
+
+        if (homeGoals == 0 && awayGoals == 0 && fixture.Matchday % 2 == 0)
+        {
+            homeGoals = 1;
+        }
+
+        return (homeGoals, awayGoals);
+    }
+
+    private void RecalculateCompetitionTable()
+    {
+        var rows = Array.ConvertAll(
+            AvailableClubs,
+            clubName => new CompetitionRow
+            {
+                ClubName = clubName,
+                Played = 0,
+                Won = 0,
+                Drawn = 0,
+                Lost = 0,
+                GoalsFor = 0,
+                GoalsAgainst = 0,
+                Points = 0
+            });
+
+        foreach (var fixture in CompetitionFixtures)
+        {
+            if (!fixture.IsComplete)
+            {
+                continue;
+            }
+
+            var goals = ParseScoreline(fixture.Scoreline);
+            var homeIndex = FindCompetitionRowIndex(rows, fixture.HomeClubName);
+            var awayIndex = FindCompetitionRowIndex(rows, fixture.AwayClubName);
+            if (homeIndex < 0 || awayIndex < 0)
+            {
+                continue;
+            }
+
+            rows[homeIndex] = UpdateCompetitionRow(rows[homeIndex], goals.homeGoals, goals.awayGoals);
+            rows[awayIndex] = UpdateCompetitionRow(rows[awayIndex], goals.awayGoals, goals.homeGoals);
+        }
+
+        Array.Sort(
+            rows,
+            (left, right) =>
+            {
+                var pointComparison = right.Points.CompareTo(left.Points);
+                if (pointComparison != 0)
+                {
+                    return pointComparison;
+                }
+
+                var goalDifferenceComparison = right.GoalDifference.CompareTo(left.GoalDifference);
+                if (goalDifferenceComparison != 0)
+                {
+                    return goalDifferenceComparison;
+                }
+
+                var goalsForComparison = right.GoalsFor.CompareTo(left.GoalsFor);
+                if (goalsForComparison != 0)
+                {
+                    return goalsForComparison;
+                }
+
+                return string.Compare(left.ClubName, right.ClubName, StringComparison.Ordinal);
+            });
+
+        CompetitionTable = rows;
+    }
+
+    private static (int homeGoals, int awayGoals) ParseScoreline(string scoreline)
+    {
+        var tokens = scoreline.Split(" - ", StringSplitOptions.RemoveEmptyEntries);
+        if (tokens.Length != 2 || !int.TryParse(tokens[0], out var homeGoals) || !int.TryParse(tokens[1], out var awayGoals))
+        {
+            return (0, 0);
+        }
+
+        return (homeGoals, awayGoals);
+    }
+
+    private static int FindCompetitionRowIndex(CompetitionRow[] rows, string clubName)
+    {
+        for (var index = 0; index < rows.Length; index++)
+        {
+            if (rows[index].ClubName == clubName)
+            {
+                return index;
+            }
+        }
+
+        return -1;
+    }
+
+    private static CompetitionRow UpdateCompetitionRow(CompetitionRow row, int goalsFor, int goalsAgainst)
+    {
+        var win = goalsFor > goalsAgainst ? 1 : 0;
+        var draw = goalsFor == goalsAgainst ? 1 : 0;
+        var loss = goalsFor < goalsAgainst ? 1 : 0;
+
+        return new CompetitionRow
+        {
+            ClubName = row.ClubName,
+            Played = row.Played + 1,
+            Won = row.Won + win,
+            Drawn = row.Drawn + draw,
+            Lost = row.Lost + loss,
+            GoalsFor = row.GoalsFor + goalsFor,
+            GoalsAgainst = row.GoalsAgainst + goalsAgainst,
+            Points = row.Points + (win * 3) + draw
+        };
+    }
+
     private int CountStartingPlayers()
     {
         var count = 0;
@@ -490,13 +781,21 @@ public partial class GameState : Node
             return;
         }
 
-        var opponents = Array.FindAll(AvailableClubs, candidate => candidate != SelectedClubName);
-        CurrentOpponentName = opponents.Length == 0
-            ? "Harbor County"
-            : opponents[(CurrentMatchday - 1) % opponents.Length];
+        var currentFixture = GetCurrentClubFixture();
+        if (currentFixture == null)
+        {
+            CurrentOpponentName = "Harbor County";
+            NextFixtureSummary = "Fixture context unavailable.";
+            return;
+        }
 
-        NextFixtureSummary =
-            $"{CurrentDateLabel} | Matchday {CurrentMatchday} | {SelectedClubName} vs {CurrentOpponentName}";
+        CurrentOpponentName = currentFixture.HomeClubName == SelectedClubName
+            ? currentFixture.AwayClubName
+            : currentFixture.HomeClubName;
+
+        NextFixtureSummary = currentFixture.IsComplete
+            ? $"{CurrentDateLabel} | Matchday {CurrentMatchday} complete | {currentFixture.ResultSummary}"
+            : $"{CurrentDateLabel} | Matchday {CurrentMatchday} | {currentFixture.HomeClubName} vs {currentFixture.AwayClubName}";
     }
 
     private void UpdateFormSummary(int goalDifference)
@@ -554,5 +853,24 @@ public partial class GameState : Node
         }
 
         return recentEvents;
+    }
+
+    private CompetitionFixture? GetCurrentClubFixture()
+    {
+        if (string.IsNullOrWhiteSpace(SelectedClubName))
+        {
+            return null;
+        }
+
+        foreach (var fixture in CompetitionFixtures)
+        {
+            if (fixture.Matchday == CurrentMatchday &&
+                (fixture.HomeClubName == SelectedClubName || fixture.AwayClubName == SelectedClubName))
+            {
+                return fixture;
+            }
+        }
+
+        return null;
     }
 }

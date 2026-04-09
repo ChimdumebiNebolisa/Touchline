@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://scripts/HubStubScreen.cs" id="1"]
+[ext_resource type="Script" path="res://scripts/StandingsScreen.cs" id="1"]
 
 [node name="StandingsScreen" type="Control"]
 layout_mode = 3
@@ -10,7 +10,25 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1")
-ScreenTitle = "Standings Screen"
+
+[node name="Backdrop" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0352941, 0.054902, 0.0705882, 1)
+
+[node name="AccentBand" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 0.18
+grow_horizontal = 2
+color = Color(0.0705882, 0.117647, 0.152941, 1)
 
 [node name="Center" type="CenterContainer" parent="."]
 layout_mode = 1
@@ -20,23 +38,111 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Panel" type="VBoxContainer" parent="Center"]
+[node name="Shell" type="PanelContainer" parent="Center"]
+custom_minimum_size = Vector2(980, 0)
 layout_mode = 2
-theme_override_constants/separation = 10
 
-[node name="Heading" type="Label" parent="Center/Panel"]
+[node name="Padding" type="MarginContainer" parent="Center/Shell"]
 layout_mode = 2
-text = "Standings Screen"
+theme_override_constants/margin_left = 30
+theme_override_constants/margin_top = 28
+theme_override_constants/margin_right = 30
+theme_override_constants/margin_bottom = 28
+
+[node name="Content" type="VBoxContainer" parent="Center/Shell/Padding"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Header" type="VBoxContainer" parent="Center/Shell/Padding/Content"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Heading" type="Label" parent="Center/Shell/Padding/Content/Header"]
+layout_mode = 2
+text = "Standings"
 horizontal_alignment = 1
+theme_override_font_sizes/font_size = 34
 
-[node name="Message" type="Label" parent="Center/Panel"]
+[node name="CompetitionLabel" type="Label" parent="Center/Shell/Padding/Content/Header"]
 layout_mode = 2
-text = ""
+text = "Competition unavailable"
 autowrap_mode = 3
 horizontal_alignment = 1
 
-[node name="BackButton" type="Button" parent="Center/Panel"]
+[node name="TableContextLabel" type="Label" parent="Center/Shell/Padding/Content/Header"]
+layout_mode = 2
+text = "Table context unavailable."
+autowrap_mode = 3
+horizontal_alignment = 1
+
+[node name="BodyRow" type="HBoxContainer" parent="Center/Shell/Padding/Content"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="TableCard" type="PanelContainer" parent="Center/Shell/Padding/Content/BodyRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TablePadding" type="MarginContainer" parent="Center/Shell/Padding/Content/BodyRow/TableCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 18
+
+[node name="TableContent" type="VBoxContainer" parent="Center/Shell/Padding/Content/BodyRow/TableCard/TablePadding"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="TableHeading" type="Label" parent="Center/Shell/Padding/Content/BodyRow/TableCard/TablePadding/TableContent"]
+layout_mode = 2
+text = "League Table"
+
+[node name="TableHintLabel" type="Label" parent="Center/Shell/Padding/Content/BodyRow/TableCard/TablePadding/TableContent"]
+layout_mode = 2
+text = "Rows update from completed matchdays already carried in career state."
+autowrap_mode = 3
+
+[node name="TableList" type="ItemList" parent="Center/Shell/Padding/Content/BodyRow/TableCard/TablePadding/TableContent"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 360)
+
+[node name="ContextCard" type="PanelContainer" parent="Center/Shell/Padding/Content/BodyRow"]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+
+[node name="ContextPadding" type="MarginContainer" parent="Center/Shell/Padding/Content/BodyRow/ContextCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 18
+
+[node name="ContextContent" type="VBoxContainer" parent="Center/Shell/Padding/Content/BodyRow/ContextCard/ContextPadding"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ContextHeading" type="Label" parent="Center/Shell/Padding/Content/BodyRow/ContextCard/ContextPadding/ContextContent"]
+layout_mode = 2
+text = "Club Position"
+
+[node name="ClubSummaryLabel" type="Label" parent="Center/Shell/Padding/Content/BodyRow/ContextCard/ContextPadding/ContextContent"]
+layout_mode = 2
+text = "Club summary unavailable."
+autowrap_mode = 3
+
+[node name="FormLabel" type="Label" parent="Center/Shell/Padding/Content/BodyRow/ContextCard/ContextPadding/ContextContent"]
+layout_mode = 2
+text = "Form unavailable."
+autowrap_mode = 3
+
+[node name="NextFixtureLabel" type="Label" parent="Center/Shell/Padding/Content/BodyRow/ContextCard/ContextPadding/ContextContent"]
+layout_mode = 2
+text = "Next fixture unavailable."
+autowrap_mode = 3
+
+[node name="BackButton" type="Button" parent="Center/Shell/Padding/Content"]
 layout_mode = 2
 text = "Back to Club Dashboard"
 
-[connection signal="pressed" from="Center/Panel/BackButton" to="." method="OnBackPressed"]
+[connection signal="pressed" from="Center/Shell/Padding/Content/BackButton" to="." method="OnBackPressed"]

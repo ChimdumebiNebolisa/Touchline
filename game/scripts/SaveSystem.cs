@@ -30,6 +30,8 @@ public sealed class SaveSlotData
     public string FormSummary { get; set; } = "Form: season about to begin.";
     public string[]? RecentResults { get; set; }
     public SaveSlotMatchReportData? LastMatchReport { get; set; }
+    public SaveSlotCompetitionRowData[]? CompetitionTable { get; set; }
+    public SaveSlotCompetitionFixtureData[]? CompetitionFixtures { get; set; }
 }
 
 public sealed class SaveSlotPlayerData
@@ -53,6 +55,28 @@ public sealed class SaveSlotMatchReportData
     public int MoraleDelta { get; set; }
     public int FanDelta { get; set; }
     public int BoardDelta { get; set; }
+}
+
+public sealed class SaveSlotCompetitionRowData
+{
+    public string ClubName { get; set; } = string.Empty;
+    public int Played { get; set; }
+    public int Won { get; set; }
+    public int Drawn { get; set; }
+    public int Lost { get; set; }
+    public int GoalsFor { get; set; }
+    public int GoalsAgainst { get; set; }
+    public int Points { get; set; }
+}
+
+public sealed class SaveSlotCompetitionFixtureData
+{
+    public int Matchday { get; set; }
+    public string HomeClubName { get; set; } = string.Empty;
+    public string AwayClubName { get; set; } = string.Empty;
+    public bool IsComplete { get; set; }
+    public string Scoreline { get; set; } = "vs";
+    public string ResultSummary { get; set; } = string.Empty;
 }
 
 public partial class SaveSystem : Node
@@ -150,7 +174,31 @@ public partial class SaveSystem : Node
                         MoraleDelta = GameState.Instance.LastMatchReport.MoraleDelta,
                         FanDelta = GameState.Instance.LastMatchReport.FanDelta,
                         BoardDelta = GameState.Instance.LastMatchReport.BoardDelta
-                    }
+                    },
+                CompetitionTable = Array.ConvertAll(
+                    GameState.Instance.CompetitionTable,
+                    row => new SaveSlotCompetitionRowData
+                    {
+                        ClubName = row.ClubName,
+                        Played = row.Played,
+                        Won = row.Won,
+                        Drawn = row.Drawn,
+                        Lost = row.Lost,
+                        GoalsFor = row.GoalsFor,
+                        GoalsAgainst = row.GoalsAgainst,
+                        Points = row.Points
+                    }),
+                CompetitionFixtures = Array.ConvertAll(
+                    GameState.Instance.CompetitionFixtures,
+                    fixture => new SaveSlotCompetitionFixtureData
+                    {
+                        Matchday = fixture.Matchday,
+                        HomeClubName = fixture.HomeClubName,
+                        AwayClubName = fixture.AwayClubName,
+                        IsComplete = fixture.IsComplete,
+                        Scoreline = fixture.Scoreline,
+                        ResultSummary = fixture.ResultSummary
+                    })
             };
 
             using var saveFile = FileAccess.Open(SaveSlotPath, FileAccess.ModeFlags.Write);
@@ -202,6 +250,12 @@ public partial class SaveSystem : Node
             if (payload == null || !payload.CareerInitialized || string.IsNullOrWhiteSpace(payload.SelectedClubName))
             {
                 statusMessage = "Save file is missing career-critical state.";
+                return false;
+            }
+
+            if (payload.CompetitionTable == null || payload.CompetitionFixtures == null)
+            {
+                statusMessage = "Save file is missing competition state required by the current build.";
                 return false;
             }
 
