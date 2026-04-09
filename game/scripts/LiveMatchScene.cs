@@ -20,21 +20,31 @@ public partial class LiveMatchScene : Control
     private Label? _scoreLabel;
     private Label? _clockLabel;
     private Label? _tacticalLabel;
+    private Label? _momentumLabel;
     private Label? _statusLabel;
+    private Label? _controlLabel;
     private Label? _eventFeedLabel;
+    private Label? _homeTagLabel;
+    private Label? _awayTagLabel;
+    private Label? _pitchNoteLabel;
     private Control? _markersLayer;
     private Button? _backButton;
 
     public override void _Ready()
     {
-        _fixtureLabel = GetNode<Label>("Margin/Root/ScoreStrip/FixtureLabel");
-        _scoreLabel = GetNode<Label>("Margin/Root/ScoreStrip/ScoreLabel");
-        _clockLabel = GetNode<Label>("Margin/Root/ScoreStrip/ClockLabel");
-        _tacticalLabel = GetNode<Label>("Margin/Root/Content/Sidebar/TacticalLabel");
-        _statusLabel = GetNode<Label>("Margin/Root/Content/Sidebar/StatusLabel");
-        _eventFeedLabel = GetNode<Label>("Margin/Root/Content/Sidebar/EventFeedLabel");
-        _markersLayer = GetNode<Control>("Margin/Root/Content/PitchFrame/Pitch/MarkersLayer");
-        _backButton = GetNode<Button>("Margin/Root/Content/Sidebar/BackButton");
+        _fixtureLabel = GetNode<Label>("Margin/Root/BroadcastBar/BarPadding/BarContent/FixtureBlock/FixtureLabel");
+        _scoreLabel = GetNode<Label>("Margin/Root/BroadcastBar/BarPadding/BarContent/ScoreBlock/ScoreLabel");
+        _clockLabel = GetNode<Label>("Margin/Root/BroadcastBar/BarPadding/BarContent/ScoreBlock/ClockLabel");
+        _tacticalLabel = GetNode<Label>("Margin/Root/BroadcastBar/BarPadding/BarContent/FixtureBlock/TacticalLabel");
+        _momentumLabel = GetNode<Label>("Margin/Root/BroadcastBar/BarPadding/BarContent/MomentumLabel");
+        _statusLabel = GetNode<Label>("Margin/Root/ContentRow/SidebarCard/SidebarPadding/SidebarContent/StatusLabel");
+        _controlLabel = GetNode<Label>("Margin/Root/ContentRow/SidebarCard/SidebarPadding/SidebarContent/ControlLabel");
+        _eventFeedLabel = GetNode<Label>("Margin/Root/ContentRow/SidebarCard/SidebarPadding/SidebarContent/EventFeedLabel");
+        _homeTagLabel = GetNode<Label>("Margin/Root/ContentRow/PitchColumn/PitchFrame/Pitch/PitchHeader/HomeTagLabel");
+        _awayTagLabel = GetNode<Label>("Margin/Root/ContentRow/PitchColumn/PitchFrame/Pitch/PitchHeader/AwayTagLabel");
+        _pitchNoteLabel = GetNode<Label>("Margin/Root/ContentRow/PitchColumn/PitchNoteLabel");
+        _markersLayer = GetNode<Control>("Margin/Root/ContentRow/PitchColumn/PitchFrame/Pitch/MarkersLayer");
+        _backButton = GetNode<Button>("Margin/Root/ContentRow/SidebarCard/SidebarPadding/SidebarContent/BackButton");
 
         if (GameState.Instance == null || string.IsNullOrWhiteSpace(GameState.Instance.SelectedClubName))
         {
@@ -42,8 +52,13 @@ public partial class LiveMatchScene : Control
             _scoreLabel.Text = "0 - 0";
             _clockLabel.Text = "01'";
             _tacticalLabel.Text = "Tactics unavailable";
+            _momentumLabel.Text = "Momentum unavailable";
             _statusLabel.Text = "Live context unavailable.";
+            _controlLabel.Text = "Broadcast focus unavailable.";
             _eventFeedLabel.Text = "No live events yet.";
+            _homeTagLabel.Text = "HOME";
+            _awayTagLabel.Text = "AWAY";
+            _pitchNoteLabel.Text = "Pitch presentation unavailable.";
             return;
         }
 
@@ -52,9 +67,14 @@ public partial class LiveMatchScene : Control
         _scoreLabel.Text = "0 - 0";
         _clockLabel.Text = "01'";
         _tacticalLabel.Text = _playback.TacticalSummary;
+        _momentumLabel.Text = "Momentum: balanced opening";
         _statusLabel.Text =
             $"{_playback.HomeClubName} settle into possession while {_playback.AwayClubName} hold a compact shape.";
+        _controlLabel.Text = "Broadcast focus: opening exchanges and shape recognition.";
         _eventFeedLabel.Text = "1' Kick-off.";
+        _homeTagLabel.Text = _playback.HomeClubName;
+        _awayTagLabel.Text = _playback.AwayClubName;
+        _pitchNoteLabel.Text = "The pitch view tracks marker movement while the sidebar surfaces decisive moments.";
 
         CreateMarkers();
         ApplyEventsUpToMinute(_currentMinute);
@@ -163,7 +183,10 @@ public partial class LiveMatchScene : Control
         _scoreLabel!.Text = $"{latestEvent.HomeScore} - {latestEvent.AwayScore}";
         _clockLabel!.Text = $"{minute:00}'";
         _statusLabel!.Text = BuildStatus(latestEvent, minute);
+        _controlLabel!.Text = BuildControlLabel(latestEvent, minute);
+        _momentumLabel!.Text = BuildMomentumLabel(latestEvent, minute);
         _eventFeedLabel!.Text = BuildEventFeed(_appliedEventCount);
+        _pitchNoteLabel!.Text = BuildPitchNote(latestEvent, minute);
     }
 
     private string BuildEventFeed(int appliedEventCount)
@@ -208,11 +231,100 @@ public partial class LiveMatchScene : Control
         return $"{_playback.HomeClubName} probe for openings while the clock ticks toward {minute:00}'.";
     }
 
+    private string BuildControlLabel(LiveMatchPlayback.MatchEvent latestEvent, int minute)
+    {
+        if (_playback == null)
+        {
+            return "Broadcast focus unavailable.";
+        }
+
+        var scoreDifference = latestEvent.HomeScore - latestEvent.AwayScore;
+        if (minute >= 90)
+        {
+            return "Broadcast focus: full-time whistle and handoff to consequence review.";
+        }
+
+        if (latestEvent.Minute == minute)
+        {
+            return "Broadcast focus: decisive action just landed in the feed.";
+        }
+
+        return scoreDifference switch
+        {
+            > 0 => $"Broadcast focus: {_playback.AwayClubName} are chasing the match while {_playback.HomeClubName} manage territory.",
+            < 0 => $"Broadcast focus: {_playback.HomeClubName} need a response while {_playback.AwayClubName} protect the lead.",
+            _ => "Broadcast focus: the match is level and both midfields are fighting for control."
+        };
+    }
+
+    private string BuildMomentumLabel(LiveMatchPlayback.MatchEvent latestEvent, int minute)
+    {
+        if (_playback == null)
+        {
+            return "Momentum unavailable";
+        }
+
+        var scoreDifference = latestEvent.HomeScore - latestEvent.AwayScore;
+        if (minute >= 90)
+        {
+            return "Momentum: full time";
+        }
+
+        if (latestEvent.Minute == minute && latestEvent.Summary.Contains("Goal", StringComparison.Ordinal))
+        {
+            return scoreDifference >= 0
+                ? $"Momentum: {_playback.HomeClubName} surge after the latest goal"
+                : $"Momentum: {_playback.AwayClubName} seize the latest swing";
+        }
+
+        if (minute < 25)
+        {
+            return "Momentum: balanced opening";
+        }
+
+        if (minute < 60)
+        {
+            return scoreDifference switch
+            {
+                > 0 => $"Momentum: {_playback.HomeClubName} control the middle phase",
+                < 0 => $"Momentum: {_playback.AwayClubName} are dictating transitions",
+                _ => "Momentum: midfield battle tightening"
+            };
+        }
+
+        return scoreDifference switch
+        {
+            > 0 => $"Momentum: {_playback.HomeClubName} managing the closing phase",
+            < 0 => $"Momentum: {_playback.AwayClubName} protecting the edge",
+            _ => "Momentum: match hanging on one moment"
+        };
+    }
+
+    private string BuildPitchNote(LiveMatchPlayback.MatchEvent latestEvent, int minute)
+    {
+        if (_playback == null)
+        {
+            return "Pitch presentation unavailable.";
+        }
+
+        if (minute >= 90)
+        {
+            return "The final whistle has gone. Continue to post-match for the consequence breakdown.";
+        }
+
+        if (latestEvent.Minute == minute)
+        {
+            return latestEvent.Summary;
+        }
+
+        return $"{minute:00}' on the clock. Marker movement reflects the current phase while the feed tracks the most decisive actions.";
+    }
+
     private static StyleBoxFlat BuildMarkerStyle(bool isHome)
     {
         var style = new StyleBoxFlat
         {
-            BgColor = isHome ? new Color(0.086f, 0.204f, 0.502f) : new Color(0.541f, 0.125f, 0.149f),
+            BgColor = isHome ? new Color(0.129f, 0.424f, 0.690f) : new Color(0.698f, 0.204f, 0.251f),
             CornerRadiusTopLeft = 15,
             CornerRadiusTopRight = 15,
             CornerRadiusBottomRight = 15,
@@ -236,6 +348,9 @@ public partial class LiveMatchScene : Control
 
         GameState.Instance?.CompleteLiveMatch(_playback);
         _statusLabel!.Text = "Full time. Review the result and consequence deltas in post-match.";
+        _controlLabel!.Text = "Broadcast focus: match complete.";
+        _momentumLabel!.Text = "Momentum: full time";
+        _pitchNoteLabel!.Text = "Playback complete. Continue to the post-match screen for the aftermath.";
         _backButton!.Text = "Continue to Post-Match";
         _matchComplete = true;
     }

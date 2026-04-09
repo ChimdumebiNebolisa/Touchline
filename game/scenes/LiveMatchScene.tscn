@@ -11,6 +11,15 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1")
 
+[node name="Backdrop" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0313726, 0.0470588, 0.0666667, 1)
+
 [node name="Margin" type="MarginContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
@@ -31,53 +40,145 @@ theme_override_constants/separation = 16
 layout_mode = 2
 text = "Live Match"
 horizontal_alignment = 1
+theme_override_font_sizes/font_size = 32
 
-[node name="ScoreStrip" type="HBoxContainer" parent="Margin/Root"]
+[node name="BroadcastBar" type="PanelContainer" parent="Margin/Root"]
 layout_mode = 2
-theme_override_constants/separation = 24
 
-[node name="FixtureLabel" type="Label" parent="Margin/Root/ScoreStrip"]
+[node name="BarPadding" type="MarginContainer" parent="Margin/Root/BroadcastBar"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 16
+
+[node name="BarContent" type="HBoxContainer" parent="Margin/Root/BroadcastBar/BarPadding"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="FixtureBlock" type="VBoxContainer" parent="Margin/Root/BroadcastBar/BarPadding/BarContent"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Fixture unavailable"
+theme_override_constants/separation = 8
 
-[node name="ScoreLabel" type="Label" parent="Margin/Root/ScoreStrip"]
+[node name="FixtureLabel" type="Label" parent="Margin/Root/BroadcastBar/BarPadding/BarContent/FixtureBlock"]
+layout_mode = 2
+text = "Fixture unavailable"
+theme_override_font_sizes/font_size = 24
+
+[node name="TacticalLabel" type="Label" parent="Margin/Root/BroadcastBar/BarPadding/BarContent/FixtureBlock"]
+layout_mode = 2
+text = "Tactics unavailable"
+autowrap_mode = 3
+
+[node name="ScoreBlock" type="VBoxContainer" parent="Margin/Root/BroadcastBar/BarPadding/BarContent"]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="ScoreLabel" type="Label" parent="Margin/Root/BroadcastBar/BarPadding/BarContent/ScoreBlock"]
 layout_mode = 2
 text = "0 - 0"
 horizontal_alignment = 1
+theme_override_font_sizes/font_size = 36
 
-[node name="ClockLabel" type="Label" parent="Margin/Root/ScoreStrip"]
+[node name="ClockLabel" type="Label" parent="Margin/Root/BroadcastBar/BarPadding/BarContent/ScoreBlock"]
 layout_mode = 2
 text = "01'"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 22
+
+[node name="MomentumLabel" type="Label" parent="Margin/Root/BroadcastBar/BarPadding/BarContent"]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+text = "Momentum unavailable"
+autowrap_mode = 3
 horizontal_alignment = 2
 
-[node name="Content" type="HBoxContainer" parent="Margin/Root"]
+[node name="ContentRow" type="HBoxContainer" parent="Margin/Root"]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 16
 
-[node name="PitchFrame" type="PanelContainer" parent="Margin/Root/Content"]
+[node name="PitchColumn" type="VBoxContainer" parent="Margin/Root/ContentRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="PitchFrame" type="PanelContainer" parent="Margin/Root/ContentRow/PitchColumn"]
 custom_minimum_size = Vector2(760, 520)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Pitch" type="Control" parent="Margin/Root/Content/PitchFrame"]
+[node name="Pitch" type="Control" parent="Margin/Root/ContentRow/PitchColumn/PitchFrame"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 clip_contents = true
 
-[node name="Grass" type="ColorRect" parent="Margin/Root/Content/PitchFrame/Pitch"]
+[node name="Grass" type="ColorRect" parent="Margin/Root/ContentRow/PitchColumn/PitchFrame/Pitch"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.0823529, 0.341176, 0.14902, 1)
+color = Color(0.0705882, 0.305882, 0.129412, 1)
 
-[node name="CenterLine" type="ColorRect" parent="Margin/Root/Content/PitchFrame/Pitch"]
+[node name="StripeA" type="ColorRect" parent="Margin/Root/ContentRow/PitchColumn/PitchFrame/Pitch"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 0.2
+grow_horizontal = 2
+color = Color(0.0901961, 0.352941, 0.152941, 0.55)
+
+[node name="StripeB" type="ColorRect" parent="Margin/Root/ContentRow/PitchColumn/PitchFrame/Pitch"]
+layout_mode = 1
+anchors_preset = 10
+anchor_left = 0.0
+anchor_top = 0.2
+anchor_right = 1.0
+anchor_bottom = 0.4
+grow_horizontal = 2
+color = Color(0.0431373, 0.258824, 0.105882, 0.4)
+
+[node name="StripeC" type="ColorRect" parent="Margin/Root/ContentRow/PitchColumn/PitchFrame/Pitch"]
+layout_mode = 1
+anchors_preset = 10
+anchor_left = 0.0
+anchor_top = 0.4
+anchor_right = 1.0
+anchor_bottom = 0.6
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0901961, 0.352941, 0.152941, 0.55)
+
+[node name="StripeD" type="ColorRect" parent="Margin/Root/ContentRow/PitchColumn/PitchFrame/Pitch"]
+layout_mode = 1
+anchors_preset = 10
+anchor_left = 0.0
+anchor_top = 0.6
+anchor_right = 1.0
+anchor_bottom = 0.8
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0431373, 0.258824, 0.105882, 0.4)
+
+[node name="StripeE" type="ColorRect" parent="Margin/Root/ContentRow/PitchColumn/PitchFrame/Pitch"]
+layout_mode = 1
+anchors_preset = 10
+anchor_left = 0.0
+anchor_top = 0.8
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0901961, 0.352941, 0.152941, 0.55)
+
+[node name="CenterLine" type="ColorRect" parent="Margin/Root/ContentRow/PitchColumn/PitchFrame/Pitch"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -90,7 +191,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.913725, 0.94902, 0.901961, 1)
 
-[node name="TopBoundary" type="ColorRect" parent="Margin/Root/Content/PitchFrame/Pitch"]
+[node name="TopBoundary" type="ColorRect" parent="Margin/Root/ContentRow/PitchColumn/PitchFrame/Pitch"]
 layout_mode = 1
 anchors_preset = 10
 anchor_left = 0.06
@@ -102,7 +203,7 @@ offset_bottom = 1.5
 grow_horizontal = 2
 color = Color(0.913725, 0.94902, 0.901961, 1)
 
-[node name="BottomBoundary" type="ColorRect" parent="Margin/Root/Content/PitchFrame/Pitch"]
+[node name="BottomBoundary" type="ColorRect" parent="Margin/Root/ContentRow/PitchColumn/PitchFrame/Pitch"]
 layout_mode = 1
 anchors_preset = 10
 anchor_left = 0.06
@@ -115,7 +216,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.913725, 0.94902, 0.901961, 1)
 
-[node name="LeftBoundary" type="ColorRect" parent="Margin/Root/Content/PitchFrame/Pitch"]
+[node name="LeftBoundary" type="ColorRect" parent="Margin/Root/ContentRow/PitchColumn/PitchFrame/Pitch"]
 layout_mode = 1
 anchors_preset = 9
 anchor_left = 0.06
@@ -127,7 +228,7 @@ offset_right = 1.5
 grow_vertical = 2
 color = Color(0.913725, 0.94902, 0.901961, 1)
 
-[node name="RightBoundary" type="ColorRect" parent="Margin/Root/Content/PitchFrame/Pitch"]
+[node name="RightBoundary" type="ColorRect" parent="Margin/Root/ContentRow/PitchColumn/PitchFrame/Pitch"]
 layout_mode = 1
 anchors_preset = 9
 anchor_left = 0.94
@@ -140,7 +241,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.913725, 0.94902, 0.901961, 1)
 
-[node name="CenterCircle" type="ColorRect" parent="Margin/Root/Content/PitchFrame/Pitch"]
+[node name="CenterCircle" type="ColorRect" parent="Margin/Root/ContentRow/PitchColumn/PitchFrame/Pitch"]
 custom_minimum_size = Vector2(110, 110)
 layout_mode = 1
 anchors_preset = 8
@@ -156,7 +257,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.913725, 0.94902, 0.901961, 0.12)
 
-[node name="LeftBox" type="ColorRect" parent="Margin/Root/Content/PitchFrame/Pitch"]
+[node name="LeftBox" type="ColorRect" parent="Margin/Root/ContentRow/PitchColumn/PitchFrame/Pitch"]
 layout_mode = 1
 anchors_preset = 0
 anchor_left = 0.06
@@ -166,7 +267,7 @@ anchor_bottom = 0.73
 grow_vertical = 2
 color = Color(0.913725, 0.94902, 0.901961, 0.1)
 
-[node name="RightBox" type="ColorRect" parent="Margin/Root/Content/PitchFrame/Pitch"]
+[node name="RightBox" type="ColorRect" parent="Margin/Root/ContentRow/PitchColumn/PitchFrame/Pitch"]
 layout_mode = 1
 anchors_preset = 0
 anchor_left = 0.77
@@ -177,7 +278,34 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.913725, 0.94902, 0.901961, 0.1)
 
-[node name="MarkersLayer" type="Control" parent="Margin/Root/Content/PitchFrame/Pitch"]
+[node name="PitchHeader" type="HBoxContainer" parent="Margin/Root/ContentRow/PitchColumn/PitchFrame/Pitch"]
+layout_mode = 1
+anchors_preset = 10
+anchor_left = 0.08
+anchor_top = 0.03
+anchor_right = 0.92
+anchor_bottom = 0.03
+offset_bottom = 28.0
+grow_horizontal = 2
+theme_override_constants/separation = 12
+
+[node name="HomeTagLabel" type="Label" parent="Margin/Root/ContentRow/PitchColumn/PitchFrame/Pitch/PitchHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "HOME"
+
+[node name="PitchStateLabel" type="Label" parent="Margin/Root/ContentRow/PitchColumn/PitchFrame/Pitch/PitchHeader"]
+layout_mode = 2
+text = "Live Phase"
+horizontal_alignment = 1
+
+[node name="AwayTagLabel" type="Label" parent="Margin/Root/ContentRow/PitchColumn/PitchFrame/Pitch/PitchHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "AWAY"
+horizontal_alignment = 2
+
+[node name="MarkersLayer" type="Control" parent="Margin/Root/ContentRow/PitchColumn/PitchFrame/Pitch"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -186,35 +314,54 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="Sidebar" type="VBoxContainer" parent="Margin/Root/Content"]
-custom_minimum_size = Vector2(280, 520)
+[node name="PitchNoteLabel" type="Label" parent="Margin/Root/ContentRow/PitchColumn"]
+layout_mode = 2
+text = "Pitch presentation unavailable."
+autowrap_mode = 3
+
+[node name="SidebarCard" type="PanelContainer" parent="Margin/Root/ContentRow"]
+custom_minimum_size = Vector2(320, 520)
+layout_mode = 2
+
+[node name="SidebarPadding" type="MarginContainer" parent="Margin/Root/ContentRow/SidebarCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 18
+
+[node name="SidebarContent" type="VBoxContainer" parent="Margin/Root/ContentRow/SidebarCard/SidebarPadding"]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="TacticalLabel" type="Label" parent="Margin/Root/Content/Sidebar"]
+[node name="StatusHeading" type="Label" parent="Margin/Root/ContentRow/SidebarCard/SidebarPadding/SidebarContent"]
 layout_mode = 2
-text = "Tactics unavailable"
-autowrap_mode = 3
+text = "Broadcast Status"
 
-[node name="StatusLabel" type="Label" parent="Margin/Root/Content/Sidebar"]
+[node name="StatusLabel" type="Label" parent="Margin/Root/ContentRow/SidebarCard/SidebarPadding/SidebarContent"]
 layout_mode = 2
 text = "Live context unavailable."
 autowrap_mode = 3
 
-[node name="EventHeading" type="Label" parent="Margin/Root/Content/Sidebar"]
+[node name="ControlLabel" type="Label" parent="Margin/Root/ContentRow/SidebarCard/SidebarPadding/SidebarContent"]
+layout_mode = 2
+text = "Broadcast focus unavailable."
+autowrap_mode = 3
+
+[node name="EventHeading" type="Label" parent="Margin/Root/ContentRow/SidebarCard/SidebarPadding/SidebarContent"]
 layout_mode = 2
 text = "Key Events"
 
-[node name="EventFeedLabel" type="Label" parent="Margin/Root/Content/Sidebar"]
-custom_minimum_size = Vector2(280, 220)
+[node name="EventFeedLabel" type="Label" parent="Margin/Root/ContentRow/SidebarCard/SidebarPadding/SidebarContent"]
+custom_minimum_size = Vector2(280, 260)
 layout_mode = 2
 size_flags_vertical = 3
 text = "No live events yet."
 autowrap_mode = 3
 vertical_alignment = 0
 
-[node name="BackButton" type="Button" parent="Margin/Root/Content/Sidebar"]
+[node name="BackButton" type="Button" parent="Margin/Root/ContentRow/SidebarCard/SidebarPadding/SidebarContent"]
 layout_mode = 2
 text = "Back to Matchday"
 
-[connection signal="pressed" from="Margin/Root/Content/Sidebar/BackButton" to="." method="OnBackPressed"]
+[connection signal="pressed" from="Margin/Root/ContentRow/SidebarCard/SidebarPadding/SidebarContent/BackButton" to="." method="OnBackPressed"]
