@@ -4,11 +4,10 @@
 
 ### Active
 
-- Step 2: New Career
+- Step 3: Choose Club
 
 ### Backlog
 
-- Step 3: Choose Club
 - Step 4: Club Dashboard
 - Step 5: Squad Screen with named players
 - Step 6: Tactics Screen
@@ -25,6 +24,7 @@
 ### Done
 
 - Step 1: Main Menu
+- Step 2: New Career
 
 ## 2. Plan Rules
 
@@ -173,6 +173,6 @@ Persist full game state to local save slot and reload safely.
 
 ## 14. Immediate Next Subtask
 
-For active Step 2, smallest valid next subtask is:
+For active Step 3, smallest valid next subtask is:
 
-- create CareerSetup scene state fields for manager name and profile seed with runtime GameState handoff stub.
+- populate ChooseClub with seeded club options and persist selected club in GameState.
