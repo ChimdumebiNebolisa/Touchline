@@ -1,0 +1,12 @@
+; Engine configuration file.
+; Edit using the editor when possible.
+
+config_version=5
+
+[application]
+config/name="Touchline"
+run/main_scene="res://scenes/MainMenu.tscn"
+config/features=PackedStringArray("4.2", "C#")
+
+[dotnet]
+project/assembly_name="Touchline"

@@ -4,31 +4,27 @@
 - Step 1: Main Menu
 
 ## Last completed verified task
-- Phase 3 isolation complete: archived the old web client under legacy/web-prototype and removed it from active workspace routing.
+- Step 1 scaffold increment complete: created game foundation, startup MainMenu scene, New Career and Load Game target scene stubs, C# scripts, and Touchline solution/project wiring.
 
 ## Current subtask in progress
-- Blocked on Step 1 subtask: scaffold Godot project foundation and wire MainMenu as startup scene.
+- Step 1 subtask: verify MainMenu navigation flow behavior and close Step 1 exit criteria.
 
 ## Next queued subtasks
-- Add New Career and Load Game target scene stubs for menu navigation.
-- Verify scene transition flow for MainMenu buttons.
-- Add initial GameState, SaveSystem, and CalendarSystem singleton stubs.
+- Add initial GameState, SaveSystem, and CalendarSystem singleton stubs once Step 2 starts.
+- Begin Step 2 New Career manager profile flow after Step 1 closure.
+- Add club selection handoff stub for Step 3 readiness.
 
 ## Known blockers
-- Environment blocker: dotnet CLI is not installed, so Godot plus C# solution scaffolding and verification cannot run.
-- Failing command: `dotnet --version`
-- Exact output: `dotnet : The term 'dotnet' is not recognized as the name of a cmdlet, function, script file, or operable program.`
-- Smallest human decision needed: install and expose .NET SDK (or provide approved local path) so Step 1 Godot foundation work can be verified.
+- None currently.
 
 ## Last verification run
-- Failed blocker check: dotnet --version; dotnet new sln --name Touchline --output game (2026-04-08).
+- Passed: dotnet build game/Touchline.csproj; Godot headless project load (`--headless --path game --quit`); npm test; npm run typecheck; npm run lint; npm run build (2026-04-08).
 
 ## Last commit hash
-- Pending new revamp commit.
+- Pending new Step 1 scaffold commit.
 
 ## Resume instructions
 - Re-read docs/PRD.md, docs/Architecture.md, docs/Guardrails.md, and docs/Plan.md.
 - Re-read AUTONOMOUS_PROGRESS.md and confirm Step 1 remains active.
-- Resolve the dotnet environment blocker first.
-- Re-run: dotnet --version and dotnet new sln --name Touchline --output game.
-- Only after dotnet is available, implement the smallest valid Step 1 subtask and verify.
+- Confirm MainMenu transition behavior to CareerSetup and SaveLoadScene and close Step 1.
+- Verify before commit, then activate Step 2.
