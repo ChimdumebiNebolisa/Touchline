@@ -8,15 +8,19 @@ public partial class ClubDashboard : Control
     private const string FixturesScreenScenePath = "res://scenes/FixturesScreen.tscn";
     private const string StandingsScreenScenePath = "res://scenes/StandingsScreen.tscn";
     private const string MatchdayScenePath = "res://scenes/MatchdayScene.tscn";
-    private Label? _stubMessageLabel;
+    private Label? _statusLabel;
+    private Label? _saveHintLabel;
 
     public override void _Ready()
     {
         var contextLabel = GetNode<Label>("Center/Shell/Padding/Content/Header/ClubContextLabel");
         var dateLabel = GetNode<Label>("Center/Shell/Padding/Content/Header/DateLabel");
-        var fixturePreviewLabel = GetNode<Label>("Center/Shell/Padding/Content/SnapshotCard/SnapshotPadding/SnapshotContent/FixturePreviewLabel");
-        var squadStatusLabel = GetNode<Label>("Center/Shell/Padding/Content/SnapshotCard/SnapshotPadding/SnapshotContent/SquadStatusLabel");
-        _stubMessageLabel = GetNode<Label>("Center/Shell/Padding/Content/SnapshotCard/SnapshotPadding/SnapshotContent/StubMessage");
+        var fixturePreviewLabel = GetNode<Label>("Center/Shell/Padding/Content/DashboardRow/SnapshotCard/SnapshotPadding/SnapshotContent/FixturePreviewLabel");
+        var squadStatusLabel = GetNode<Label>("Center/Shell/Padding/Content/DashboardRow/SnapshotCard/SnapshotPadding/SnapshotContent/SquadStatusLabel");
+        var formLabel = GetNode<Label>("Center/Shell/Padding/Content/DashboardRow/SnapshotCard/SnapshotPadding/SnapshotContent/FormLabel");
+        var pressureLabel = GetNode<Label>("Center/Shell/Padding/Content/DashboardRow/SnapshotCard/SnapshotPadding/SnapshotContent/PressureLabel");
+        _statusLabel = GetNode<Label>("Center/Shell/Padding/Content/DashboardRow/SnapshotCard/SnapshotPadding/SnapshotContent/StatusLabel");
+        _saveHintLabel = GetNode<Label>("Center/Shell/Padding/Content/DashboardRow/OperationsCard/OperationsPadding/OperationsContent/SaveHintLabel");
 
         if (GameState.Instance == null || !GameState.Instance.CareerInitialized)
         {
@@ -24,7 +28,10 @@ public partial class ClubDashboard : Control
             dateLabel.Text = "Season and date unavailable.";
             fixturePreviewLabel.Text = "Next fixture: unavailable";
             squadStatusLabel.Text = "Squad status: unavailable";
-            _stubMessageLabel.Text = "Dashboard context is unavailable.";
+            formLabel.Text = "Form unavailable.";
+            pressureLabel.Text = "Pressure unavailable.";
+            _statusLabel.Text = "Dashboard context is unavailable.";
+            _saveHintLabel.Text = "Save is unavailable until a career is active.";
             return;
         }
 
@@ -34,7 +41,10 @@ public partial class ClubDashboard : Control
             dateLabel.Text = "Season and date unavailable.";
             fixturePreviewLabel.Text = "Next fixture: unavailable";
             squadStatusLabel.Text = "Squad status: unavailable";
-            _stubMessageLabel.Text = "Choose a club before using the dashboard.";
+            formLabel.Text = "Form unavailable.";
+            pressureLabel.Text = "Pressure unavailable.";
+            _statusLabel.Text = "Choose a club before using the dashboard.";
+            _saveHintLabel.Text = "Save is unavailable until a club is selected.";
             return;
         }
 
@@ -43,9 +53,15 @@ public partial class ClubDashboard : Control
         dateLabel.Text = $"Season {GameState.Instance.SeasonLabel} | {GameState.Instance.CurrentDateLabel}";
         fixturePreviewLabel.Text = $"Next fixture: {GameState.Instance.NextFixtureSummary}";
         squadStatusLabel.Text = $"Squad: {GameState.Instance.SquadStatusSummary}";
-        _stubMessageLabel.Text = GameState.Instance.LastMatchReport == null
-            ? $"{GameState.Instance.FormSummary} The dashboard tracks club rhythm and the next matchday."
-            : $"Last result: {GameState.Instance.LastMatchReport.Scoreline}. {GameState.Instance.LastMatchReport.ConsequenceSummary}. {GameState.Instance.FormSummary}";
+        formLabel.Text = GameState.Instance.FormSummary;
+        pressureLabel.Text =
+            $"Club pressure: morale {GameState.Instance.TeamMorale} | fans {GameState.Instance.FanSentiment} | board {GameState.Instance.BoardConfidence}";
+        _statusLabel.Text = GameState.Instance.LastMatchReport == null
+            ? "No completed result yet. Use the hub to prepare for the opening run of fixtures."
+            : $"Last result: {GameState.Instance.LastMatchReport.Scoreline}. {GameState.Instance.LastMatchReport.ConsequenceSummary}";
+        _saveHintLabel.Text = SaveSystem.Instance == null
+            ? "Save system unavailable."
+            : "Save the current club state before leaving the session.";
     }
 
     private void OnBackPressed()
@@ -80,18 +96,20 @@ public partial class ClubDashboard : Control
 
     private void OnSavePressed()
     {
-        if (_stubMessageLabel == null)
+        if (_statusLabel == null || _saveHintLabel == null)
         {
             return;
         }
 
         if (SaveSystem.Instance == null)
         {
-            _stubMessageLabel.Text = "Save system unavailable.";
+            _statusLabel.Text = "Save system unavailable.";
+            _saveHintLabel.Text = "Save system unavailable.";
             return;
         }
 
         SaveSystem.Instance.SaveGame(out var statusMessage);
-        _stubMessageLabel.Text = statusMessage;
+        _statusLabel.Text = statusMessage;
+        _saveHintLabel.Text = statusMessage;
     }
 }

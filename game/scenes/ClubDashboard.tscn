@@ -39,7 +39,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Shell" type="PanelContainer" parent="Center"]
-custom_minimum_size = Vector2(820, 0)
+custom_minimum_size = Vector2(920, 0)
 layout_mode = 2
 
 [node name="Padding" type="MarginContainer" parent="Center/Shell"]
@@ -75,74 +75,128 @@ text = "Season and date unavailable."
 autowrap_mode = 3
 horizontal_alignment = 1
 
-[node name="SnapshotCard" type="PanelContainer" parent="Center/Shell/Padding/Content"]
+[node name="DashboardRow" type="HBoxContainer" parent="Center/Shell/Padding/Content"]
 layout_mode = 2
+theme_override_constants/separation = 16
 
-[node name="SnapshotPadding" type="MarginContainer" parent="Center/Shell/Padding/Content/SnapshotCard"]
+[node name="SnapshotCard" type="PanelContainer" parent="Center/Shell/Padding/Content/DashboardRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SnapshotPadding" type="MarginContainer" parent="Center/Shell/Padding/Content/DashboardRow/SnapshotCard"]
 layout_mode = 2
 theme_override_constants/margin_left = 20
 theme_override_constants/margin_top = 18
 theme_override_constants/margin_right = 20
 theme_override_constants/margin_bottom = 18
 
-[node name="SnapshotContent" type="VBoxContainer" parent="Center/Shell/Padding/Content/SnapshotCard/SnapshotPadding"]
+[node name="SnapshotContent" type="VBoxContainer" parent="Center/Shell/Padding/Content/DashboardRow/SnapshotCard/SnapshotPadding"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="FixturePreviewLabel" type="Label" parent="Center/Shell/Padding/Content/SnapshotCard/SnapshotPadding/SnapshotContent"]
+[node name="SnapshotHeading" type="Label" parent="Center/Shell/Padding/Content/DashboardRow/SnapshotCard/SnapshotPadding/SnapshotContent"]
+layout_mode = 2
+text = "Club Pulse"
+horizontal_alignment = 0
+
+[node name="FixturePreviewLabel" type="Label" parent="Center/Shell/Padding/Content/DashboardRow/SnapshotCard/SnapshotPadding/SnapshotContent"]
 layout_mode = 2
 text = "Next fixture: unavailable"
 autowrap_mode = 3
 horizontal_alignment = 0
 
-[node name="SquadStatusLabel" type="Label" parent="Center/Shell/Padding/Content/SnapshotCard/SnapshotPadding/SnapshotContent"]
+[node name="SquadStatusLabel" type="Label" parent="Center/Shell/Padding/Content/DashboardRow/SnapshotCard/SnapshotPadding/SnapshotContent"]
 layout_mode = 2
 text = "Squad status: unavailable"
 autowrap_mode = 3
 horizontal_alignment = 0
 
-[node name="StubMessage" type="Label" parent="Center/Shell/Padding/Content/SnapshotCard/SnapshotPadding/SnapshotContent"]
+[node name="FormLabel" type="Label" parent="Center/Shell/Padding/Content/DashboardRow/SnapshotCard/SnapshotPadding/SnapshotContent"]
 layout_mode = 2
-text = "Step 4 will expand this dashboard with squad, fixtures, standings, and matchday context."
+text = "Form unavailable."
 autowrap_mode = 3
 horizontal_alignment = 0
 
-[node name="ActionsGrid" type="GridContainer" parent="Center/Shell/Padding/Content"]
+[node name="PressureLabel" type="Label" parent="Center/Shell/Padding/Content/DashboardRow/SnapshotCard/SnapshotPadding/SnapshotContent"]
+layout_mode = 2
+text = "Pressure unavailable."
+autowrap_mode = 3
+horizontal_alignment = 0
+
+[node name="StatusLabel" type="Label" parent="Center/Shell/Padding/Content/DashboardRow/SnapshotCard/SnapshotPadding/SnapshotContent"]
+layout_mode = 2
+text = "Dashboard context unavailable."
+autowrap_mode = 3
+horizontal_alignment = 0
+
+[node name="OperationsCard" type="PanelContainer" parent="Center/Shell/Padding/Content/DashboardRow"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+
+[node name="OperationsPadding" type="MarginContainer" parent="Center/Shell/Padding/Content/DashboardRow/OperationsCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 18
+
+[node name="OperationsContent" type="VBoxContainer" parent="Center/Shell/Padding/Content/DashboardRow/OperationsCard/OperationsPadding"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="OperationsHeading" type="Label" parent="Center/Shell/Padding/Content/DashboardRow/OperationsCard/OperationsPadding/OperationsContent"]
+layout_mode = 2
+text = "Next Decisions"
+horizontal_alignment = 0
+
+[node name="OperationsHintLabel" type="Label" parent="Center/Shell/Padding/Content/DashboardRow/OperationsCard/OperationsPadding/OperationsContent"]
+layout_mode = 2
+text = "Choose the next football task before returning to matchday."
+autowrap_mode = 3
+horizontal_alignment = 0
+
+[node name="ActionsGrid" type="GridContainer" parent="Center/Shell/Padding/Content/DashboardRow/OperationsCard/OperationsPadding/OperationsContent"]
 layout_mode = 2
 columns = 2
 
-[node name="SquadButton" type="Button" parent="Center/Shell/Padding/Content/ActionsGrid"]
+[node name="SquadButton" type="Button" parent="Center/Shell/Padding/Content/DashboardRow/OperationsCard/OperationsPadding/OperationsContent/ActionsGrid"]
 layout_mode = 2
 text = "Squad"
 
-[node name="TacticsButton" type="Button" parent="Center/Shell/Padding/Content/ActionsGrid"]
+[node name="TacticsButton" type="Button" parent="Center/Shell/Padding/Content/DashboardRow/OperationsCard/OperationsPadding/OperationsContent/ActionsGrid"]
 layout_mode = 2
 text = "Tactics"
 
-[node name="FixturesButton" type="Button" parent="Center/Shell/Padding/Content/ActionsGrid"]
+[node name="FixturesButton" type="Button" parent="Center/Shell/Padding/Content/DashboardRow/OperationsCard/OperationsPadding/OperationsContent/ActionsGrid"]
 layout_mode = 2
 text = "Fixtures"
 
-[node name="StandingsButton" type="Button" parent="Center/Shell/Padding/Content/ActionsGrid"]
+[node name="StandingsButton" type="Button" parent="Center/Shell/Padding/Content/DashboardRow/OperationsCard/OperationsPadding/OperationsContent/ActionsGrid"]
 layout_mode = 2
 text = "Standings"
 
-[node name="MatchdayButton" type="Button" parent="Center/Shell/Padding/Content/ActionsGrid"]
+[node name="MatchdayButton" type="Button" parent="Center/Shell/Padding/Content/DashboardRow/OperationsCard/OperationsPadding/OperationsContent/ActionsGrid"]
 layout_mode = 2
 text = "Matchday"
 
-[node name="SaveButton" type="Button" parent="Center/Shell/Padding/Content/ActionsGrid"]
+[node name="SaveButton" type="Button" parent="Center/Shell/Padding/Content/DashboardRow/OperationsCard/OperationsPadding/OperationsContent/ActionsGrid"]
 layout_mode = 2
 text = "Save Game"
+
+[node name="SaveHintLabel" type="Label" parent="Center/Shell/Padding/Content/DashboardRow/OperationsCard/OperationsPadding/OperationsContent"]
+layout_mode = 2
+text = "Save status unavailable."
+autowrap_mode = 3
+horizontal_alignment = 0
 
 [node name="BackButton" type="Button" parent="Center/Shell/Padding/Content"]
 layout_mode = 2
 text = "Back to Choose Club"
 
-[connection signal="pressed" from="Center/Shell/Padding/Content/ActionsGrid/SquadButton" to="." method="OnSquadPressed"]
-[connection signal="pressed" from="Center/Shell/Padding/Content/ActionsGrid/TacticsButton" to="." method="OnTacticsPressed"]
-[connection signal="pressed" from="Center/Shell/Padding/Content/ActionsGrid/FixturesButton" to="." method="OnFixturesPressed"]
-[connection signal="pressed" from="Center/Shell/Padding/Content/ActionsGrid/StandingsButton" to="." method="OnStandingsPressed"]
-[connection signal="pressed" from="Center/Shell/Padding/Content/ActionsGrid/MatchdayButton" to="." method="OnMatchdayPressed"]
-[connection signal="pressed" from="Center/Shell/Padding/Content/ActionsGrid/SaveButton" to="." method="OnSavePressed"]
+[connection signal="pressed" from="Center/Shell/Padding/Content/DashboardRow/OperationsCard/OperationsPadding/OperationsContent/ActionsGrid/SquadButton" to="." method="OnSquadPressed"]
+[connection signal="pressed" from="Center/Shell/Padding/Content/DashboardRow/OperationsCard/OperationsPadding/OperationsContent/ActionsGrid/TacticsButton" to="." method="OnTacticsPressed"]
+[connection signal="pressed" from="Center/Shell/Padding/Content/DashboardRow/OperationsCard/OperationsPadding/OperationsContent/ActionsGrid/FixturesButton" to="." method="OnFixturesPressed"]
+[connection signal="pressed" from="Center/Shell/Padding/Content/DashboardRow/OperationsCard/OperationsPadding/OperationsContent/ActionsGrid/StandingsButton" to="." method="OnStandingsPressed"]
+[connection signal="pressed" from="Center/Shell/Padding/Content/DashboardRow/OperationsCard/OperationsPadding/OperationsContent/ActionsGrid/MatchdayButton" to="." method="OnMatchdayPressed"]
+[connection signal="pressed" from="Center/Shell/Padding/Content/DashboardRow/OperationsCard/OperationsPadding/OperationsContent/ActionsGrid/SaveButton" to="." method="OnSavePressed"]
 [connection signal="pressed" from="Center/Shell/Padding/Content/BackButton" to="." method="OnBackPressed"]
