@@ -4,11 +4,10 @@
 
 ### Active
 
-- Step 16: Create the player profile scene
+- Step 17: Rebuild squad management into a football workspace
 
 ### Backlog
 
-- Step 17: Rebuild squad management into a football workspace
 - Step 18: Redesign tactics as a tactical board
 - Step 19: Replace fixtures and standings placeholders with real competition surfaces
 - Step 20: Redesign matchday into an event screen
@@ -45,6 +44,7 @@
 - Step 13: Rebuild main menu and shell framing
 - Step 14: Redesign career setup and club selection
 - Step 15: Rebuild the club dashboard as the real command center
+- Step 16: Create the player profile scene
 
 ## 2. Plan Rules
 
@@ -165,6 +165,13 @@ Add the missing player profile scene so named players feel like persistent ident
 ### Objective
 
 Convert squad management from filtered list browsing into a real lineup and selection workspace.
+
+### Allowed Subtasks
+
+- add clearer squad-workspace structure and selection context
+- allow explicit lineup-state changes that persist into upcoming match preparation
+- connect squad inspection and player profile flow without duplicating player logic
+- preserve football-native language and avoid placeholder management affordances
 
 ### Verification
 
@@ -342,8 +349,8 @@ Remove remaining prototype edges and harden the shell for repeated play.
 
 ## 23. Immediate Next Subtask
 
-Step 16 starts with the smallest valid missing-screen slice:
+Step 17 starts with the smallest valid squad-workspace slice:
 
-- add a PlayerProfile scene and script
-- wire the squad screen into player inspection
-- verify the project still builds cleanly before deeper squad-workspace changes continue
+- turn squad selection into explicit XI-or-bench management
+- keep the player-profile inspection path intact
+- verify the project still builds cleanly before broader squad-workspace changes continue
