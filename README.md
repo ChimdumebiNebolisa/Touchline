@@ -39,3 +39,7 @@ Before implementing any subtask, read in order:
 5. AUTONOMOUS_PROGRESS.md
 
 Only execute the smallest valid subtask in the active Plan step, verify it, then commit and push.
+
+## License
+
+This project is licensed under the MIT License.
