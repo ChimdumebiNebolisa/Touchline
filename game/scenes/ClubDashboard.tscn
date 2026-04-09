@@ -40,8 +40,33 @@ text = "Step 4 will expand this dashboard with squad, fixtures, standings, and m
 autowrap_mode = 3
 horizontal_alignment = 1
 
+[node name="SquadButton" type="Button" parent="Center/Panel"]
+layout_mode = 2
+text = "Squad"
+
+[node name="TacticsButton" type="Button" parent="Center/Panel"]
+layout_mode = 2
+text = "Tactics"
+
+[node name="FixturesButton" type="Button" parent="Center/Panel"]
+layout_mode = 2
+text = "Fixtures"
+
+[node name="StandingsButton" type="Button" parent="Center/Panel"]
+layout_mode = 2
+text = "Standings"
+
+[node name="MatchdayButton" type="Button" parent="Center/Panel"]
+layout_mode = 2
+text = "Matchday"
+
 [node name="BackButton" type="Button" parent="Center/Panel"]
 layout_mode = 2
 text = "Back to Choose Club"
 
+[connection signal="pressed" from="Center/Panel/SquadButton" to="." method="OnSquadPressed"]
+[connection signal="pressed" from="Center/Panel/TacticsButton" to="." method="OnTacticsPressed"]
+[connection signal="pressed" from="Center/Panel/FixturesButton" to="." method="OnFixturesPressed"]
+[connection signal="pressed" from="Center/Panel/StandingsButton" to="." method="OnStandingsPressed"]
+[connection signal="pressed" from="Center/Panel/MatchdayButton" to="." method="OnMatchdayPressed"]
 [connection signal="pressed" from="Center/Panel/BackButton" to="." method="OnBackPressed"]

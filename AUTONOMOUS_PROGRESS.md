@@ -4,24 +4,24 @@
 - Step 4: Club Dashboard
 
 ## Last completed verified task
-- Step 3 complete: seeded club options are selectable, selected club persists in GameState, and confirmation hands off into ClubDashboard placeholder.
+- Step 4 subtask complete: ClubDashboard now routes to Squad, Tactics, Fixtures, Standings, and Matchday stubs with verified return-to-dashboard navigation.
 
 ## Current subtask in progress
-- Step 4 subtask: expand ClubDashboard with core club context and navigation stubs.
+- Step 4 subtask: enrich ClubDashboard context summary for selected club and next fixture placeholder.
 
 ## Next queued subtasks
-- Add dashboard buttons for Squad, Tactics, Fixtures, Standings, and Matchday scene stubs.
 - Add selected-club context panel with manager, seed, and next-action summary.
-- Verify dashboard navigation stubs via headless runtime check.
+- Add fixture-preview placeholder data block on dashboard.
+- Close Step 4 and activate Step 5 after context-panel verification.
 
 ## Known blockers
 - None currently.
 
 ## Last verification run
-- Passed: dotnet build game/Touchline.csproj; Godot headless runtime check (`res://scripts/step3_club_selection_check.gd` => STEP3_SUBTASK_PASS); npm test; npm run typecheck; npm run lint; npm run build (2026-04-09).
+- Passed: dotnet build game/Touchline.csproj; Godot headless runtime check (`res://scripts/step4_dashboard_nav_check.gd` => STEP4_SUBTASK_PASS); npm test; npm run typecheck; npm run lint; npm run build (2026-04-09).
 
 ## Last commit hash
-- Pending Step 3 closure and Step 4 activation commit.
+- Pending Step 4 dashboard-navigation subtask commit.
 
 ## Resume instructions
 - Re-read docs/PRD.md, docs/Architecture.md, docs/Guardrails.md, and docs/Plan.md.

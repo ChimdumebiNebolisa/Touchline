@@ -3,6 +3,11 @@ using Godot;
 public partial class ClubDashboard : Control
 {
     private const string ChooseClubScenePath = "res://scenes/ChooseClub.tscn";
+    private const string SquadScreenScenePath = "res://scenes/SquadScreen.tscn";
+    private const string TacticsScreenScenePath = "res://scenes/TacticsScreen.tscn";
+    private const string FixturesScreenScenePath = "res://scenes/FixturesScreen.tscn";
+    private const string StandingsScreenScenePath = "res://scenes/StandingsScreen.tscn";
+    private const string MatchdayScenePath = "res://scenes/MatchdayScene.tscn";
 
     public override void _Ready()
     {
@@ -27,5 +32,30 @@ public partial class ClubDashboard : Control
     private void OnBackPressed()
     {
         GetTree().ChangeSceneToFile(ChooseClubScenePath);
+    }
+
+    private void OnSquadPressed()
+    {
+        GetTree().ChangeSceneToFile(SquadScreenScenePath);
+    }
+
+    private void OnTacticsPressed()
+    {
+        GetTree().ChangeSceneToFile(TacticsScreenScenePath);
+    }
+
+    private void OnFixturesPressed()
+    {
+        GetTree().ChangeSceneToFile(FixturesScreenScenePath);
+    }
+
+    private void OnStandingsPressed()
+    {
+        GetTree().ChangeSceneToFile(StandingsScreenScenePath);
+    }
+
+    private void OnMatchdayPressed()
+    {
+        GetTree().ChangeSceneToFile(MatchdayScenePath);
     }
 }
