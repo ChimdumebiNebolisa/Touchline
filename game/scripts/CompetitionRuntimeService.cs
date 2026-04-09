@@ -196,6 +196,20 @@ public static class CompetitionRuntimeService
         return null;
     }
 
+    public static int GetSeasonMatchdayCount(GameState.CompetitionFixture[] fixtures)
+    {
+        var maxMatchday = 0;
+        foreach (var fixture in fixtures)
+        {
+            if (fixture.Matchday > maxMatchday)
+            {
+                maxMatchday = fixture.Matchday;
+            }
+        }
+
+        return maxMatchday == 0 ? 6 : maxMatchday;
+    }
+
     private static GameState.CompetitionFixture[] BuildCompetitionFixtures(string[] availableClubs, string selectedClubName)
     {
         var rivals = Array.FindAll(availableClubs, clubName => clubName != selectedClubName);

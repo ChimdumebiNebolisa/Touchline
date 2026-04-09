@@ -12,6 +12,8 @@ config/features=PackedStringArray("4.2", "C#")
 TouchlineTheme="*res://scripts/TouchlineTheme.cs"
 GameState="*res://scripts/GameState.cs"
 SaveSystem="*res://scripts/SaveSystem.cs"
+CalendarSystem="*res://scripts/TouchlineCalendarSystem.cs"
+WorldGenerator="*res://scripts/TouchlineWorldGenerator.cs"
 
 [dotnet]
 project/assembly_name="Touchline"

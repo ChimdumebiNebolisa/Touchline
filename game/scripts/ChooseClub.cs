@@ -65,9 +65,9 @@ public partial class ChooseClub : Control
 
     private void OnConfirmSelectionPressed()
     {
-        if (GameState.Instance == null)
+        if (TouchlineWorldGenerator.Instance == null)
         {
-            _selectionStatusLabel.Text = "GameState singleton is unavailable.";
+            _selectionStatusLabel.Text = "WorldGenerator singleton is unavailable.";
             return;
         }
 
@@ -80,8 +80,13 @@ public partial class ChooseClub : Control
 
         var selectedIndex = selectedItems[0];
         var selectedClubName = _clubList.GetItemText(selectedIndex);
-        GameState.Instance.SelectClub(selectedClubName);
-        _selectionStatusLabel.Text = $"Selected club: {selectedClubName}";
+        if (!TouchlineWorldGenerator.Instance.SelectClub(selectedClubName))
+        {
+            _selectionStatusLabel.Text = TouchlineWorldGenerator.Instance.LastStatusMessage;
+            return;
+        }
+
+        _selectionStatusLabel.Text = TouchlineWorldGenerator.Instance.LastStatusMessage;
         GetTree().ChangeSceneToFile(ClubDashboardScenePath);
     }
 
@@ -93,7 +98,13 @@ public partial class ChooseClub : Control
             return;
         }
 
-        var preview = GameState.Instance.GetClubPreview(_clubList.GetItemText(index));
+        if (TouchlineWorldGenerator.Instance == null)
+        {
+            RenderFallbackPreview();
+            return;
+        }
+
+        var preview = TouchlineWorldGenerator.Instance.GetClubPreview(_clubList.GetItemText(index));
         _identityLabel.Text = $"Identity: {preview.IdentitySummary}";
         _expectationLabel.Text = $"Expectation: {preview.ExpectationSummary}";
         _openingFixtureLabel.Text = preview.OpeningFixtureSummary;

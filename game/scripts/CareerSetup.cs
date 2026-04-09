@@ -26,14 +26,19 @@ public partial class CareerSetup : Control
 
         var seed = (int)_seedInput.Value;
 
-        if (GameState.Instance == null)
+        if (TouchlineWorldGenerator.Instance == null)
         {
-            _statusLabel.Text = "GameState singleton is unavailable.";
+            _statusLabel.Text = "WorldGenerator singleton is unavailable.";
             return;
         }
 
-        GameState.Instance.StartNewCareer(managerName, seed);
-        _statusLabel.Text = $"Career initialized for {managerName} (Seed {seed}).";
+        if (!TouchlineWorldGenerator.Instance.BeginNewCareer(managerName, seed))
+        {
+            _statusLabel.Text = TouchlineWorldGenerator.Instance.LastStatusMessage;
+            return;
+        }
+
+        _statusLabel.Text = TouchlineWorldGenerator.Instance.LastStatusMessage;
         GetTree().ChangeSceneToFile(ChooseClubScenePath);
     }
 

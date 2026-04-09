@@ -4,7 +4,6 @@ using System.Collections.Generic;
 
 public partial class GameState : Node
 {
-    private const int MatchesPerSeason = 6;
     private readonly List<string> _recentResults = new();
 
     public sealed class SquadPlayer
@@ -114,73 +113,61 @@ public partial class GameState : Node
 
     public void StartNewCareer(string managerName, int seed)
     {
-        ManagerName = managerName;
-        CareerSeed = seed;
+        TouchlineWorldGenerator.Instance?.BeginNewCareer(managerName, seed);
+    }
+
+    public void ApplyCareerBootstrap(CareerBootstrapState bootstrap)
+    {
+        ManagerName = bootstrap.ManagerName;
+        CareerSeed = bootstrap.CareerSeed;
         CareerInitialized = true;
-        WorldSeed = seed;
-        CurrentDate = new DateTime(2026, 8, 3);
-        SeasonStartYear = 2026;
-        AvailableClubs = new[]
-        {
-            "Riverton Athletic",
-            "Northbridge City",
-            "Harbor County",
-            "Eastvale Rovers"
-        };
+        WorldSeed = bootstrap.WorldSeed;
+        CountryPackId = bootstrap.CountryPackId;
+        AvailableClubs = bootstrap.AvailableClubs;
         SelectedClubName = null;
-        NextFixtureSummary = "Matchday 1: Riverton Athletic vs Harbor County";
-        SquadStatusSummary = BuildSquadStatusSummary();
+        NextFixtureSummary = "Select a club to view the opening fixture.";
         SquadPlayers = Array.Empty<SquadPlayer>();
-        TacticalFormation = "4-3-3";
-        PressIntensity = 60;
-        Tempo = 58;
-        Width = 55;
-        Risk = 52;
-        CompetitionName = "Novara Premier Division";
+        TacticalFormation = bootstrap.TacticalFormation;
+        PressIntensity = bootstrap.PressIntensity;
+        Tempo = bootstrap.Tempo;
+        Width = bootstrap.Width;
+        Risk = bootstrap.Risk;
+        CompetitionName = bootstrap.CompetitionName;
         CurrentMatchday = 1;
-        CurrentOpponentName = "Harbor County";
-        TeamMorale = 72;
-        FanSentiment = 63;
-        BoardConfidence = 61;
-        FormSummary = "Form: season about to begin.";
+        CurrentOpponentName = "Opponent unavailable";
+        TeamMorale = bootstrap.TeamMorale;
+        FanSentiment = bootstrap.FanSentiment;
+        BoardConfidence = bootstrap.BoardConfidence;
+        CurrentDate = bootstrap.CurrentDate;
+        SeasonStartYear = bootstrap.SeasonStartYear;
+        FormSummary = bootstrap.FormSummary;
         _recentResults.Clear();
         LastMatchReport = null;
         SelectedPlayerProfileName = null;
         CompetitionTable = Array.Empty<CompetitionRow>();
         CompetitionFixtures = Array.Empty<CompetitionFixture>();
         CurrentMatchResult = null;
+        SquadStatusSummary = BuildSquadStatusSummary();
     }
 
     public void SelectClub(string clubName)
     {
-        SelectedClubName = clubName;
-        CompetitionName = "Novara Premier Division";
-        CurrentMatchday = 1;
+        TouchlineWorldGenerator.Instance?.SelectClub(clubName);
+    }
+
+    public void ApplyClubSelection(ClubSelectionState selection)
+    {
+        SelectedClubName = selection.ClubName;
+        CompetitionName = selection.CompetitionName;
+        CurrentMatchday = selection.CurrentMatchday;
         LastMatchReport = null;
         SelectedPlayerProfileName = null;
         CurrentMatchResult = null;
-
-        SquadPlayers = new[]
-        {
-            new SquadPlayer { Name = "Mateo Silva", Position = "GK", Age = 27, Form = 72, Morale = 73, Fitness = 91, IsStarting = true },
-            new SquadPlayer { Name = "Liam Ofori", Position = "RB", Age = 24, Form = 68, Morale = 69, Fitness = 88, IsStarting = true },
-            new SquadPlayer { Name = "Ethan Novak", Position = "CB", Age = 29, Form = 74, Morale = 76, Fitness = 86, IsStarting = true },
-            new SquadPlayer { Name = "Jonas Petrov", Position = "CB", Age = 22, Form = 71, Morale = 71, Fitness = 90, IsStarting = true },
-            new SquadPlayer { Name = "Kai Mendes", Position = "LB", Age = 25, Form = 67, Morale = 68, Fitness = 87, IsStarting = true },
-            new SquadPlayer { Name = "Noah Ibe", Position = "CM", Age = 23, Form = 75, Morale = 74, Fitness = 89, IsStarting = true },
-            new SquadPlayer { Name = "Adrian Voss", Position = "CM", Age = 30, Form = 69, Morale = 72, Fitness = 82, IsStarting = true },
-            new SquadPlayer { Name = "Rafael Costa", Position = "AM", Age = 21, Form = 80, Morale = 79, Fitness = 92, IsStarting = true },
-            new SquadPlayer { Name = "Tariq Balde", Position = "RW", Age = 26, Form = 76, Morale = 77, Fitness = 90, IsStarting = true },
-            new SquadPlayer { Name = "Milo Renard", Position = "ST", Age = 28, Form = 73, Morale = 75, Fitness = 85, IsStarting = true },
-            new SquadPlayer { Name = "Kenji Sato", Position = "LW", Age = 24, Form = 70, Morale = 70, Fitness = 88, IsStarting = true },
-            new SquadPlayer { Name = "Dario Klein", Position = "GK", Age = 20, Form = 64, Morale = 66, Fitness = 84, IsStarting = false },
-            new SquadPlayer { Name = "Felix Mensah", Position = "CB", Age = 25, Form = 65, Morale = 67, Fitness = 83, IsStarting = false },
-            new SquadPlayer { Name = "Omar Nadir", Position = "CM", Age = 19, Form = 70, Morale = 72, Fitness = 86, IsStarting = false },
-            new SquadPlayer { Name = "Lucas Marin", Position = "ST", Age = 23, Form = 68, Morale = 69, Fitness = 87, IsStarting = false }
-        };
-
-        InitializeCompetitionState();
-        RefreshFixtureContext();
+        SquadPlayers = selection.SquadPlayers;
+        CompetitionTable = selection.CompetitionTable;
+        CompetitionFixtures = selection.CompetitionFixtures;
+        CurrentOpponentName = selection.CurrentOpponentName;
+        NextFixtureSummary = selection.NextFixtureSummary;
         SquadStatusSummary = BuildSquadStatusSummary();
     }
 
@@ -195,27 +182,27 @@ public partial class GameState : Node
 
     public void AdvanceDate()
     {
-        if (string.IsNullOrWhiteSpace(SelectedClubName))
-        {
-            return;
-        }
+        TouchlineCalendarSystem.Instance?.AdvanceCareerDate();
+    }
 
-        CurrentDate = CurrentDate.AddDays(7);
-        CurrentMatchday++;
+    public void ApplyCalendarAdvance(CalendarAdvanceState advance)
+    {
+        CurrentDate = advance.CurrentDate;
+        SeasonStartYear = advance.SeasonStartYear;
+        CurrentMatchday = advance.CurrentMatchday;
+        FormSummary = advance.FormSummary;
+        CompetitionTable = advance.CompetitionTable;
+        CompetitionFixtures = advance.CompetitionFixtures;
+        CurrentOpponentName = advance.CurrentOpponentName;
+        NextFixtureSummary = advance.NextFixtureSummary;
 
-        if (CurrentMatchday > MatchesPerSeason)
+        if (advance.ResetRecentResults)
         {
-            SeasonStartYear++;
-            CurrentDate = new DateTime(SeasonStartYear, 8, 3);
-            CurrentMatchday = 1;
             _recentResults.Clear();
-            FormSummary = "Form: new season reset.";
-            InitializeCompetitionState();
         }
 
         LastMatchReport = null;
         CurrentMatchResult = null;
-        RefreshFixtureContext();
     }
 
     public MatchSimulationResult PrepareCurrentMatchResult(bool forceNew = false)
@@ -432,59 +419,9 @@ public partial class GameState : Node
         return $"{targetPlayer.Name} enters the XI for {benchPlayer.Name}.";
     }
 
-    public ClubPreview GetClubPreview(string clubName)
-    {
-        var openingOpponent = GetOpeningOpponent(clubName);
-        return clubName switch
-        {
-            "Riverton Athletic" => new ClubPreview
-            {
-                ClubName = clubName,
-                IdentitySummary = "A stable dressing room with supporters who expect assertive front-foot football.",
-                ExpectationSummary = "Board line: stay in the upper half and keep home form dependable.",
-                OpeningFixtureSummary = $"Opening fixture: {clubName} vs {openingOpponent}"
-            },
-            "Northbridge City" => new ClubPreview
-            {
-                ClubName = clubName,
-                IdentitySummary = "A possession-leaning side with little patience for passive matchdays.",
-                ExpectationSummary = "Board line: push for the top positions and set the tempo early in the season.",
-                OpeningFixtureSummary = $"Opening fixture: {clubName} vs {openingOpponent}"
-            },
-            "Harbor County" => new ClubPreview
-            {
-                ClubName = clubName,
-                IdentitySummary = "A resilient squad expected to scrap for points and stay emotionally together under pressure.",
-                ExpectationSummary = "Board line: keep the club clear of trouble and make the ground difficult to visit.",
-                OpeningFixtureSummary = $"Opening fixture: {clubName} vs {openingOpponent}"
-            },
-            "Eastvale Rovers" => new ClubPreview
-            {
-                ClubName = clubName,
-                IdentitySummary = "A younger side with energy, pace, and supporters hungry for visible progress.",
-                ExpectationSummary = "Board line: outperform pre-season caution and build belief quickly.",
-                OpeningFixtureSummary = $"Opening fixture: {clubName} vs {openingOpponent}"
-            },
-            _ => new ClubPreview
-            {
-                ClubName = clubName,
-                IdentitySummary = "Club identity context is still being assembled.",
-                ExpectationSummary = "Board line: establish a stable start and manage the opening weeks cleanly.",
-                OpeningFixtureSummary = $"Opening fixture: {clubName} vs {openingOpponent}"
-            }
-        };
-    }
-
     private string BuildSquadStatusSummary()
     {
         return $"23 registered players | morale {DescribeLevel(TeamMorale)} | fans {DescribeLevel(FanSentiment)} | board {DescribeLevel(BoardConfidence)}";
-    }
-
-    private void InitializeCompetitionState()
-    {
-        var competitionState = CompetitionRuntimeService.BuildInitialState(AvailableClubs, SelectedClubName);
-        CompetitionTable = competitionState.table;
-        CompetitionFixtures = competitionState.fixtures;
     }
 
     private void RecordCompetitionResults(int homeGoals, int awayGoals)
@@ -584,19 +521,6 @@ public partial class GameState : Node
             "CM" or "AM" => "MID",
             _ => "ATT"
         };
-    }
-
-    private string GetOpeningOpponent(string clubName)
-    {
-        foreach (var candidate in AvailableClubs)
-        {
-            if (candidate != clubName)
-            {
-                return candidate;
-            }
-        }
-
-        return "Harbor County";
     }
 
     private void RefreshFixtureContext()

@@ -3,6 +3,7 @@ using Godot;
 public partial class PostMatchScene : Control
 {
     private const string ClubDashboardScenePath = "res://scenes/ClubDashboard.tscn";
+    private Label _continueHintLabel = default!;
 
     public override void _Ready()
     {
@@ -14,7 +15,7 @@ public partial class PostMatchScene : Control
         var tacticalLabel = GetNode<Label>("Center/Shell/Padding/Content/BodyRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/TacticalLabel");
         var pressureLabel = GetNode<Label>("Center/Shell/Padding/Content/BodyRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/PressureLabel");
         var eventsLabel = GetNode<Label>("Center/Shell/Padding/Content/BodyRow/EventsCard/EventsPadding/EventsContent/EventsLabel");
-        var continueHintLabel = GetNode<Label>("Center/Shell/Padding/Content/ContinueHintLabel");
+        _continueHintLabel = GetNode<Label>("Center/Shell/Padding/Content/ContinueHintLabel");
 
         if (GameState.Instance?.LastMatchReport == null)
         {
@@ -26,7 +27,7 @@ public partial class PostMatchScene : Control
             tacticalLabel.Text = "Tactical summary unavailable.";
             pressureLabel.Text = "Pressure summary unavailable.";
             eventsLabel.Text = "No key events recorded.";
-            continueHintLabel.Text = "Complete a match before reviewing the aftermath.";
+            _continueHintLabel.Text = "Complete a match before reviewing the aftermath.";
             return;
         }
 
@@ -39,12 +40,23 @@ public partial class PostMatchScene : Control
         tacticalLabel.Text = report.TacticalSummary;
         pressureLabel.Text = report.PressureSummary;
         eventsLabel.Text = string.Join("\n", report.KeyEvents);
-        continueHintLabel.Text = "Continue to roll the calendar forward and carry these consequences back into the dashboard.";
+        _continueHintLabel.Text = "Continue to roll the calendar forward and carry these consequences back into the dashboard.";
     }
 
     private void OnContinuePressed()
     {
-        GameState.Instance?.AdvanceDate();
+        if (TouchlineCalendarSystem.Instance == null)
+        {
+            _continueHintLabel.Text = "CalendarSystem singleton is unavailable.";
+            return;
+        }
+
+        if (!TouchlineCalendarSystem.Instance.AdvanceCareerDate())
+        {
+            _continueHintLabel.Text = TouchlineCalendarSystem.Instance.LastStatusMessage;
+            return;
+        }
+
         GetTree().ChangeSceneToFile(ClubDashboardScenePath);
     }
 }
