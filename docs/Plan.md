@@ -4,11 +4,10 @@
 
 ### Active
 
-- Step 14: Redesign career setup and club selection
+- Step 15: Rebuild the club dashboard as the real command center
 
 ### Backlog
 
-- Step 15: Rebuild the club dashboard as the real command center
 - Step 16: Create the player profile scene
 - Step 17: Rebuild squad management into a football workspace
 - Step 18: Redesign tactics as a tactical board
@@ -45,6 +44,7 @@
 - Step 11: Save Game
 - Step 12: Establish the visual system
 - Step 13: Rebuild main menu and shell framing
+- Step 14: Redesign career setup and club selection
 
 ## 2. Plan Rules
 
@@ -127,6 +127,13 @@ Turn setup and club selection into a football-native onboarding flow with meanin
 ### Objective
 
 Make the dashboard the central football hub required by the PRD.
+
+### Allowed Subtasks
+
+- reorganize dashboard information into clearer command-center modules
+- surface next fixture, form, pressure, and save context more clearly using existing state
+- improve action hierarchy so the player can decide the next football task at a glance
+- preserve navigation behavior while making the hub more informative and less placeholder-like
 
 ### Verification
 
@@ -328,8 +335,8 @@ Remove remaining prototype edges and harden the shell for repeated play.
 
 ## 23. Immediate Next Subtask
 
-Step 14 starts with the smallest valid onboarding-context slice:
+Step 15 starts with the smallest valid dashboard command-center slice:
 
-- improve career setup and club-selection copy and hierarchy
-- add lightweight club identity context to selection
-- verify the project still builds cleanly before broader onboarding work continues
+- reorganize the dashboard into clearer context and action modules
+- surface form, fixture, and club-pressure context more explicitly
+- verify the project still builds cleanly before deeper dashboard expansion continues

@@ -1,30 +1,30 @@
 # Autonomous Progress
 
 ## Current active Plan step
-- Step 14: Redesign career setup and club selection.
+- Step 15: Rebuild the club dashboard as the real command center.
 
 ## Last completed verified task
-- Improved career setup framing so the onboarding flow explains manager identity, seed meaning, and the immediate club-selection handoff.
+- Step 14 complete: career setup and club selection now read like football onboarding and provide lightweight club decision context.
 
 ## Current subtask in progress
-- Review Step 14 exit criteria and activate Step 15 if satisfied.
+- Reorganize the dashboard into clearer context and action modules.
 
 ## Next queued subtasks
-- Review Step 14 exit criteria once onboarding context is materially improved.
-- If Step 14 is complete, activate Step 15 and move into the dashboard command-center pass.
 - Continue replacing placeholder shell copy with football-native copy in redesigned screens.
+- Surface form, fixture, and club-pressure context more explicitly on the dashboard.
+- Review Step 15 exit criteria once the hub feels like a real command center.
 
 ## Known blockers
 - No active blockers.
 - Manual Godot runtime verification remains limited because no Godot executable has surfaced in the shell environment for direct launch testing.
 
 ## Last verification run
-- Passed `dotnet build game/Touchline.sln` on 2026-04-09 after improving career-setup onboarding framing.
+- Passed Step 14 exit review against `docs/Plan.md` plus the latest `dotnet build game/Touchline.sln` result on 2026-04-09.
 
 ## Last commit hash
-- 1d35e77
+- 5b128ad
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`.
-- Confirm Step 14 is the only active step.
-- If Step 14 exit criteria are satisfied, activate Step 15 and continue with the dashboard command-center pass.
+- Confirm Step 15 is the only active step.
+- Continue with the smallest valid Step 15 subtask: reorganize the dashboard into clearer context and action modules.
