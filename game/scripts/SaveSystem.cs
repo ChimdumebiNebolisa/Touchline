@@ -4,6 +4,7 @@ using System.Text.Json;
 
 public sealed class SaveSlotData
 {
+    public int SaveVersion { get; set; }
     public string ManagerName { get; set; } = "Manager";
     public int CareerSeed { get; set; }
     public bool CareerInitialized { get; set; }
@@ -30,6 +31,7 @@ public sealed class SaveSlotData
     public string FormSummary { get; set; } = "Form: season about to begin.";
     public string[]? RecentResults { get; set; }
     public SaveSlotMatchReportData? LastMatchReport { get; set; }
+    public string? SelectedPlayerProfileName { get; set; }
     public SaveSlotCompetitionRowData[]? CompetitionTable { get; set; }
     public SaveSlotCompetitionFixtureData[]? CompetitionFixtures { get; set; }
 }
@@ -85,9 +87,15 @@ public sealed class SaveSlotCompetitionFixtureData
 public partial class SaveSystem : Node
 {
     private const string SaveSlotPath = "user://slot-1.json";
-    private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        WriteIndented = true,
+        PropertyNameCaseInsensitive = true
+    };
+    public const int CurrentSaveVersion = 2;
 
     public static SaveSystem? Instance { get; private set; }
+    public string LastStatusMessage { get; private set; } = "Save system idle.";
 
     public override void _EnterTree()
     {
@@ -109,7 +117,7 @@ public partial class SaveSystem : Node
 
     public string GetSlotSummary()
     {
-        if (!TryReadSave(out var saveData, out var errorMessage))
+        if (!TryReadSave(out var saveData, out var errorMessage, out _))
         {
             return errorMessage;
         }
@@ -122,101 +130,29 @@ public partial class SaveSystem : Node
         if (GameState.Instance == null || !GameState.Instance.CareerInitialized || string.IsNullOrWhiteSpace(GameState.Instance.SelectedClubName))
         {
             statusMessage = "No active career is ready to save.";
+            LastStatusMessage = statusMessage;
             return false;
         }
 
         try
         {
-            var payload = new SaveSlotData
-            {
-                ManagerName = GameState.Instance.ManagerName,
-                CareerSeed = GameState.Instance.CareerSeed,
-                CareerInitialized = GameState.Instance.CareerInitialized,
-                WorldSeed = GameState.Instance.WorldSeed,
-                CountryPackId = GameState.Instance.CountryPackId,
-                AvailableClubs = GameState.Instance.AvailableClubs,
-                SelectedClubName = GameState.Instance.SelectedClubName,
-                NextFixtureSummary = GameState.Instance.NextFixtureSummary,
-                SquadStatusSummary = GameState.Instance.SquadStatusSummary,
-                SquadPlayers = Array.ConvertAll(
-                    GameState.Instance.SquadPlayers,
-                    player => new SaveSlotPlayerData
-                    {
-                        Name = player.Name,
-                        Position = player.Position,
-                        Age = player.Age,
-                        Form = player.Form,
-                        Morale = player.Morale,
-                        Fitness = player.Fitness,
-                        IsStarting = player.IsStarting
-                    }),
-                TacticalFormation = GameState.Instance.TacticalFormation,
-                PressIntensity = GameState.Instance.PressIntensity,
-                Tempo = GameState.Instance.Tempo,
-                Width = GameState.Instance.Width,
-                Risk = GameState.Instance.Risk,
-                CompetitionName = GameState.Instance.CompetitionName,
-                CurrentMatchday = GameState.Instance.CurrentMatchday,
-                CurrentOpponentName = GameState.Instance.CurrentOpponentName,
-                TeamMorale = GameState.Instance.TeamMorale,
-                FanSentiment = GameState.Instance.FanSentiment,
-                BoardConfidence = GameState.Instance.BoardConfidence,
-                CurrentDateIso = GameState.Instance.CurrentDate.ToString("yyyy-MM-dd"),
-                SeasonStartYear = GameState.Instance.SeasonStartYear,
-                FormSummary = GameState.Instance.FormSummary,
-                RecentResults = GameState.Instance.RecentResults,
-                LastMatchReport = GameState.Instance.LastMatchReport == null
-                    ? null
-                    : new SaveSlotMatchReportData
-                    {
-                        FixtureLabel = GameState.Instance.LastMatchReport.FixtureLabel,
-                        Scoreline = GameState.Instance.LastMatchReport.Scoreline,
-                        ResultLabel = GameState.Instance.LastMatchReport.ResultLabel,
-                        ConsequenceSummary = GameState.Instance.LastMatchReport.ConsequenceSummary,
-                        TableImpactSummary = GameState.Instance.LastMatchReport.TableImpactSummary,
-                        TacticalSummary = GameState.Instance.LastMatchReport.TacticalSummary,
-                        PressureSummary = GameState.Instance.LastMatchReport.PressureSummary,
-                        KeyEvents = GameState.Instance.LastMatchReport.KeyEvents,
-                        MoraleDelta = GameState.Instance.LastMatchReport.MoraleDelta,
-                        FanDelta = GameState.Instance.LastMatchReport.FanDelta,
-                        BoardDelta = GameState.Instance.LastMatchReport.BoardDelta
-                    },
-                CompetitionTable = Array.ConvertAll(
-                    GameState.Instance.CompetitionTable,
-                    row => new SaveSlotCompetitionRowData
-                    {
-                        ClubName = row.ClubName,
-                        Played = row.Played,
-                        Won = row.Won,
-                        Drawn = row.Drawn,
-                        Lost = row.Lost,
-                        GoalsFor = row.GoalsFor,
-                        GoalsAgainst = row.GoalsAgainst,
-                        Points = row.Points
-                    }),
-                CompetitionFixtures = Array.ConvertAll(
-                    GameState.Instance.CompetitionFixtures,
-                    fixture => new SaveSlotCompetitionFixtureData
-                    {
-                        Matchday = fixture.Matchday,
-                        HomeClubName = fixture.HomeClubName,
-                        AwayClubName = fixture.AwayClubName,
-                        IsComplete = fixture.IsComplete,
-                        Scoreline = fixture.Scoreline,
-                        ResultSummary = fixture.ResultSummary
-                    })
-            };
-
-            using var saveFile = FileAccess.Open(SaveSlotPath, FileAccess.ModeFlags.Write);
-            saveFile.StoreString(JsonSerializer.Serialize(payload, JsonOptions));
+            var payload = BuildSavePayload(GameState.Instance);
+            WriteSavePayload(payload);
             statusMessage = $"Career saved to Slot 1 for {payload.SelectedClubName}.";
+            LastStatusMessage = statusMessage;
             return true;
         }
         catch (Exception ex)
         {
             statusMessage = $"Save failed: {ex.Message}";
+            LastStatusMessage = statusMessage;
             return false;
         }
+    }
+
+    public bool TrySaveGame()
+    {
+        return SaveGame(out _);
     }
 
     public bool LoadGame(out string statusMessage)
@@ -224,22 +160,36 @@ public partial class SaveSystem : Node
         if (GameState.Instance == null)
         {
             statusMessage = "Game state singleton unavailable.";
+            LastStatusMessage = statusMessage;
             return false;
         }
 
-        if (!TryReadSave(out var saveData, out statusMessage))
+        if (!TryReadSave(out var saveData, out statusMessage, out var migratedLegacySave))
         {
+            LastStatusMessage = statusMessage;
             return false;
         }
 
         GameState.Instance.RestoreFromSave(saveData);
+        if (migratedLegacySave)
+        {
+            WriteSavePayload(saveData);
+        }
+
         statusMessage = $"Loaded Slot 1 for {saveData.SelectedClubName}.";
+        LastStatusMessage = statusMessage;
         return true;
     }
 
-    private bool TryReadSave(out SaveSlotData saveData, out string statusMessage)
+    public bool TryLoadGame()
+    {
+        return LoadGame(out _);
+    }
+
+    private bool TryReadSave(out SaveSlotData saveData, out string statusMessage, out bool migratedLegacySave)
     {
         saveData = new SaveSlotData();
+        migratedLegacySave = false;
 
         if (!HasSaveFile())
         {
@@ -253,19 +203,35 @@ public partial class SaveSystem : Node
             var json = saveFile.GetAsText();
             var payload = JsonSerializer.Deserialize<SaveSlotData>(json, JsonOptions);
 
-            if (payload == null || !payload.CareerInitialized || string.IsNullOrWhiteSpace(payload.SelectedClubName))
+            if (payload == null)
             {
-                statusMessage = "Save file is missing career-critical state.";
+                statusMessage = "Save file could not be deserialized into a career payload.";
                 return false;
             }
 
-            if (payload.CompetitionTable == null || payload.CompetitionFixtures == null)
+            if (!payload.CareerInitialized)
             {
-                statusMessage = "Save file is missing competition state required by the current build.";
+                statusMessage = "Save file is missing the career initialization flag.";
                 return false;
             }
 
-            saveData = payload;
+            if (string.IsNullOrWhiteSpace(payload.SelectedClubName))
+            {
+                statusMessage = "Save file is missing the selected club.";
+                return false;
+            }
+
+            if (payload.SaveVersion > CurrentSaveVersion)
+            {
+                statusMessage = $"Save file requires a newer build. Save version {payload.SaveVersion} is not supported by this client.";
+                return false;
+            }
+
+            if (!TryNormalizeSavePayload(payload, out saveData, out statusMessage, out migratedLegacySave))
+            {
+                return false;
+            }
+
             statusMessage = "Save ready.";
             return true;
         }
@@ -274,5 +240,214 @@ public partial class SaveSystem : Node
             statusMessage = $"Load failed: {ex.Message}";
             return false;
         }
+    }
+
+    private static bool TryNormalizeSavePayload(
+        SaveSlotData payload,
+        out SaveSlotData normalizedPayload,
+        out string statusMessage,
+        out bool migratedLegacySave)
+    {
+        normalizedPayload = payload;
+        migratedLegacySave = false;
+
+        if (payload.CompetitionTable != null && payload.CompetitionFixtures != null)
+        {
+            normalizedPayload = BuildSaveCopy(payload);
+            normalizedPayload.SaveVersion = CurrentSaveVersion;
+            migratedLegacySave = payload.SaveVersion < CurrentSaveVersion;
+            statusMessage = "Save ready.";
+            return true;
+        }
+
+        if (!SaveMigrationService.TryUpgradeLegacyPayload(payload, out normalizedPayload, out statusMessage))
+        {
+            return false;
+        }
+
+        migratedLegacySave = true;
+        return true;
+    }
+
+    private static SaveSlotData BuildSavePayload(GameState state)
+    {
+        return new SaveSlotData
+        {
+            SaveVersion = CurrentSaveVersion,
+            ManagerName = state.ManagerName,
+            CareerSeed = state.CareerSeed,
+            CareerInitialized = state.CareerInitialized,
+            WorldSeed = state.WorldSeed,
+            CountryPackId = state.CountryPackId,
+            AvailableClubs = state.AvailableClubs,
+            SelectedClubName = state.SelectedClubName,
+            NextFixtureSummary = state.NextFixtureSummary,
+            SquadStatusSummary = state.SquadStatusSummary,
+            SquadPlayers = Array.ConvertAll(
+                state.SquadPlayers,
+                player => new SaveSlotPlayerData
+                {
+                    Name = player.Name,
+                    Position = player.Position,
+                    Age = player.Age,
+                    Form = player.Form,
+                    Morale = player.Morale,
+                    Fitness = player.Fitness,
+                    IsStarting = player.IsStarting
+                }),
+            TacticalFormation = state.TacticalFormation,
+            PressIntensity = state.PressIntensity,
+            Tempo = state.Tempo,
+            Width = state.Width,
+            Risk = state.Risk,
+            CompetitionName = state.CompetitionName,
+            CurrentMatchday = state.CurrentMatchday,
+            CurrentOpponentName = state.CurrentOpponentName,
+            TeamMorale = state.TeamMorale,
+            FanSentiment = state.FanSentiment,
+            BoardConfidence = state.BoardConfidence,
+            CurrentDateIso = state.CurrentDate.ToString("yyyy-MM-dd"),
+            SeasonStartYear = state.SeasonStartYear,
+            FormSummary = state.FormSummary,
+            RecentResults = state.RecentResults,
+            LastMatchReport = state.LastMatchReport == null
+                ? null
+                : new SaveSlotMatchReportData
+                {
+                    FixtureLabel = state.LastMatchReport.FixtureLabel,
+                    Scoreline = state.LastMatchReport.Scoreline,
+                    ResultLabel = state.LastMatchReport.ResultLabel,
+                    ConsequenceSummary = state.LastMatchReport.ConsequenceSummary,
+                    TableImpactSummary = state.LastMatchReport.TableImpactSummary,
+                    TacticalSummary = state.LastMatchReport.TacticalSummary,
+                    PressureSummary = state.LastMatchReport.PressureSummary,
+                    KeyEvents = state.LastMatchReport.KeyEvents,
+                    MoraleDelta = state.LastMatchReport.MoraleDelta,
+                    FanDelta = state.LastMatchReport.FanDelta,
+                    BoardDelta = state.LastMatchReport.BoardDelta
+                },
+            SelectedPlayerProfileName = state.SelectedPlayerProfileName,
+            CompetitionTable = Array.ConvertAll(
+                state.CompetitionTable,
+                row => new SaveSlotCompetitionRowData
+                {
+                    ClubName = row.ClubName,
+                    Played = row.Played,
+                    Won = row.Won,
+                    Drawn = row.Drawn,
+                    Lost = row.Lost,
+                    GoalsFor = row.GoalsFor,
+                    GoalsAgainst = row.GoalsAgainst,
+                    Points = row.Points
+                }),
+            CompetitionFixtures = Array.ConvertAll(
+                state.CompetitionFixtures,
+                fixture => new SaveSlotCompetitionFixtureData
+                {
+                    Matchday = fixture.Matchday,
+                    HomeClubName = fixture.HomeClubName,
+                    AwayClubName = fixture.AwayClubName,
+                    IsComplete = fixture.IsComplete,
+                    Scoreline = fixture.Scoreline,
+                    ResultSummary = fixture.ResultSummary
+                })
+        };
+    }
+
+    internal static SaveSlotData BuildSaveCopy(SaveSlotData source)
+    {
+        return new SaveSlotData
+        {
+            SaveVersion = source.SaveVersion,
+            ManagerName = source.ManagerName,
+            CareerSeed = source.CareerSeed,
+            CareerInitialized = source.CareerInitialized,
+            WorldSeed = source.WorldSeed,
+            CountryPackId = source.CountryPackId,
+            AvailableClubs = source.AvailableClubs == null ? null : (string[])source.AvailableClubs.Clone(),
+            SelectedClubName = source.SelectedClubName,
+            NextFixtureSummary = source.NextFixtureSummary,
+            SquadStatusSummary = source.SquadStatusSummary,
+            SquadPlayers = source.SquadPlayers == null
+                ? null
+                : Array.ConvertAll(
+                    source.SquadPlayers,
+                    player => new SaveSlotPlayerData
+                    {
+                        Name = player.Name,
+                        Position = player.Position,
+                        Age = player.Age,
+                        Form = player.Form,
+                        Morale = player.Morale,
+                        Fitness = player.Fitness,
+                        IsStarting = player.IsStarting
+                    }),
+            TacticalFormation = source.TacticalFormation,
+            PressIntensity = source.PressIntensity,
+            Tempo = source.Tempo,
+            Width = source.Width,
+            Risk = source.Risk,
+            CompetitionName = source.CompetitionName,
+            CurrentMatchday = source.CurrentMatchday,
+            CurrentOpponentName = source.CurrentOpponentName,
+            TeamMorale = source.TeamMorale,
+            FanSentiment = source.FanSentiment,
+            BoardConfidence = source.BoardConfidence,
+            CurrentDateIso = source.CurrentDateIso,
+            SeasonStartYear = source.SeasonStartYear,
+            FormSummary = source.FormSummary,
+            RecentResults = source.RecentResults == null ? null : (string[])source.RecentResults.Clone(),
+            LastMatchReport = source.LastMatchReport == null
+                ? null
+                : new SaveSlotMatchReportData
+                {
+                    FixtureLabel = source.LastMatchReport.FixtureLabel,
+                    Scoreline = source.LastMatchReport.Scoreline,
+                    ResultLabel = source.LastMatchReport.ResultLabel,
+                    ConsequenceSummary = source.LastMatchReport.ConsequenceSummary,
+                    TableImpactSummary = source.LastMatchReport.TableImpactSummary,
+                    TacticalSummary = source.LastMatchReport.TacticalSummary,
+                    PressureSummary = source.LastMatchReport.PressureSummary,
+                    KeyEvents = source.LastMatchReport.KeyEvents == null ? null : (string[])source.LastMatchReport.KeyEvents.Clone(),
+                    MoraleDelta = source.LastMatchReport.MoraleDelta,
+                    FanDelta = source.LastMatchReport.FanDelta,
+                    BoardDelta = source.LastMatchReport.BoardDelta
+                },
+            SelectedPlayerProfileName = source.SelectedPlayerProfileName,
+            CompetitionTable = source.CompetitionTable == null
+                ? null
+                : Array.ConvertAll(
+                    source.CompetitionTable,
+                    row => new SaveSlotCompetitionRowData
+                    {
+                        ClubName = row.ClubName,
+                        Played = row.Played,
+                        Won = row.Won,
+                        Drawn = row.Drawn,
+                        Lost = row.Lost,
+                        GoalsFor = row.GoalsFor,
+                        GoalsAgainst = row.GoalsAgainst,
+                        Points = row.Points
+                    }),
+            CompetitionFixtures = source.CompetitionFixtures == null
+                ? null
+                : Array.ConvertAll(
+                    source.CompetitionFixtures,
+                    fixture => new SaveSlotCompetitionFixtureData
+                    {
+                        Matchday = fixture.Matchday,
+                        HomeClubName = fixture.HomeClubName,
+                        AwayClubName = fixture.AwayClubName,
+                        IsComplete = fixture.IsComplete,
+                        Scoreline = fixture.Scoreline,
+                        ResultSummary = fixture.ResultSummary
+                    })
+        };
+    }
+
+    private static void WriteSavePayload(SaveSlotData payload)
+    {
+        using var saveFile = FileAccess.Open(SaveSlotPath, FileAccess.ModeFlags.Write);
+        saveFile.StoreString(JsonSerializer.Serialize(payload, JsonOptions));
     }
 }

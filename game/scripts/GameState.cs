@@ -351,7 +351,7 @@ public partial class GameState : Node
                 Scoreline = fixture.Scoreline,
                 ResultSummary = fixture.ResultSummary
             });
-        SelectedPlayerProfileName = null;
+        SelectedPlayerProfileName = data.SelectedPlayerProfileName;
         CurrentMatchResult = null;
         RefreshFixtureContext();
     }
