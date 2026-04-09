@@ -10,9 +10,9 @@ public partial class ChooseClub : Control
 
     public override void _Ready()
     {
-        var summaryLabel = GetNode<Label>("Center/Panel/CareerSummaryLabel");
-        _clubList = GetNode<ItemList>("Center/Panel/ClubList");
-        _selectionStatusLabel = GetNode<Label>("Center/Panel/SelectionStatusLabel");
+        var summaryLabel = GetNode<Label>("Center/Panel/Padding/Content/CareerSummaryLabel");
+        _clubList = GetNode<ItemList>("Center/Panel/Padding/Content/ClubList");
+        _selectionStatusLabel = GetNode<Label>("Center/Panel/Padding/Content/SelectionStatusLabel");
 
         if (GameState.Instance == null || !GameState.Instance.CareerInitialized)
         {

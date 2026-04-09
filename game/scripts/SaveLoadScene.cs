@@ -7,9 +7,9 @@ public partial class SaveLoadScene : Control
 
     public override void _Ready()
     {
-        var slotSummaryLabel = GetNode<Label>("Center/Panel/SlotSummaryLabel");
-        var statusLabel = GetNode<Label>("Center/Panel/StatusLabel");
-        var loadButton = GetNode<Button>("Center/Panel/LoadButton");
+        var slotSummaryLabel = GetNode<Label>("Center/Panel/Padding/Content/SlotSummaryLabel");
+        var statusLabel = GetNode<Label>("Center/Panel/Padding/Content/StatusLabel");
+        var loadButton = GetNode<Button>("Center/Panel/Padding/Content/LoadButton");
 
         if (SaveSystem.Instance == null)
         {
@@ -28,7 +28,7 @@ public partial class SaveLoadScene : Control
 
     private void OnLoadPressed()
     {
-        var statusLabel = GetNode<Label>("Center/Panel/StatusLabel");
+        var statusLabel = GetNode<Label>("Center/Panel/Padding/Content/StatusLabel");
 
         if (SaveSystem.Instance == null)
         {
