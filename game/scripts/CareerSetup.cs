@@ -3,6 +3,7 @@ using Godot;
 public partial class CareerSetup : Control
 {
     private const string MainMenuScenePath = "res://scenes/MainMenu.tscn";
+    private const string ChooseClubScenePath = "res://scenes/ChooseClub.tscn";
 
     private LineEdit _managerNameInput = default!;
     private SpinBox _seedInput = default!;
@@ -33,6 +34,7 @@ public partial class CareerSetup : Control
 
         GameState.Instance.StartNewCareer(managerName, seed);
         _statusLabel.Text = $"Career initialized for {managerName} (Seed {seed}).";
+        GetTree().ChangeSceneToFile(ChooseClubScenePath);
     }
 
     private void OnBackPressed()

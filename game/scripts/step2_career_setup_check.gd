@@ -31,6 +31,10 @@ func _process(_delta: float) -> bool:
         _ticks = 0
 
     elif _stage == 1 and _ticks > 2:
+        if current_scene == null or current_scene.name != "ChooseClub":
+            _fail("Start Career did not hand off to ChooseClub")
+            return false
+
         var game_state := root.get_node("GameState")
         if game_state == null:
             _fail("GameState singleton was not autoloaded")
@@ -46,6 +50,15 @@ func _process(_delta: float) -> bool:
 
         if int(game_state.CareerSeed) != 424242:
             _fail("CareerSeed was not stored correctly")
+            return false
+
+        var summary_label := current_scene.get_node("Center/Panel/CareerSummaryLabel") as Label
+        if summary_label == null:
+            _fail("ChooseClub summary label is missing")
+            return false
+
+        if summary_label.text.find("Casey Doyle") == -1:
+            _fail("ChooseClub summary did not render manager context")
             return false
 
         print("STEP2_SUBTASK_PASS")
