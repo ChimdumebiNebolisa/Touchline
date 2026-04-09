@@ -12,6 +12,8 @@ public partial class GameState : Node
     public string CountryPackId { get; private set; } = "country-pack-alpha";
     public string[] AvailableClubs { get; private set; } = Array.Empty<string>();
     public string? SelectedClubName { get; private set; }
+    public string NextFixtureSummary { get; private set; } = "Fixture context unavailable.";
+    public string SquadStatusSummary { get; private set; } = "Squad status unavailable.";
 
     public override void _EnterTree()
     {
@@ -40,6 +42,8 @@ public partial class GameState : Node
             "Eastvale Rovers"
         };
         SelectedClubName = null;
+        NextFixtureSummary = "Matchday 1: Riverton Athletic vs Harbor County";
+        SquadStatusSummary = "23 registered players | 20 fit | morale steady";
     }
 
     public void SelectClub(string clubName)

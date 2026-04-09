@@ -12,21 +12,29 @@ public partial class ClubDashboard : Control
     public override void _Ready()
     {
         var contextLabel = GetNode<Label>("Center/Panel/ClubContextLabel");
+        var fixturePreviewLabel = GetNode<Label>("Center/Panel/FixturePreviewLabel");
+        var squadStatusLabel = GetNode<Label>("Center/Panel/SquadStatusLabel");
 
         if (GameState.Instance == null || !GameState.Instance.CareerInitialized)
         {
             contextLabel.Text = "Career context is unavailable.";
+            fixturePreviewLabel.Text = "Next fixture: unavailable";
+            squadStatusLabel.Text = "Squad status: unavailable";
             return;
         }
 
         if (string.IsNullOrWhiteSpace(GameState.Instance.SelectedClubName))
         {
             contextLabel.Text = "Club selection is missing.";
+            fixturePreviewLabel.Text = "Next fixture: unavailable";
+            squadStatusLabel.Text = "Squad status: unavailable";
             return;
         }
 
         contextLabel.Text =
             $"Manager {GameState.Instance.ManagerName} is now leading {GameState.Instance.SelectedClubName}.";
+        fixturePreviewLabel.Text = $"Next fixture: {GameState.Instance.NextFixtureSummary}";
+        squadStatusLabel.Text = $"Squad: {GameState.Instance.SquadStatusSummary}";
     }
 
     private void OnBackPressed()

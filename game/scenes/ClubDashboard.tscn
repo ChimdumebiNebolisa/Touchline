@@ -34,6 +34,18 @@ text = "No club selected yet."
 autowrap_mode = 3
 horizontal_alignment = 1
 
+[node name="FixturePreviewLabel" type="Label" parent="Center/Panel"]
+layout_mode = 2
+text = "Next fixture: unavailable"
+autowrap_mode = 3
+horizontal_alignment = 1
+
+[node name="SquadStatusLabel" type="Label" parent="Center/Panel"]
+layout_mode = 2
+text = "Squad status: unavailable"
+autowrap_mode = 3
+horizontal_alignment = 1
+
 [node name="StubMessage" type="Label" parent="Center/Panel"]
 layout_mode = 2
 text = "Step 4 will expand this dashboard with squad, fixtures, standings, and matchday context."

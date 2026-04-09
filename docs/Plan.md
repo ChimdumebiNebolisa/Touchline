@@ -4,11 +4,10 @@
 
 ### Active
 
-- Step 4: Club Dashboard
+- Step 5: Squad Screen with named players
 
 ### Backlog
 
-- Step 5: Squad Screen with named players
 - Step 6: Tactics Screen
 - Step 7: Matchday Scene
 - Step 8: Live Match Scene with visible player movement
@@ -25,6 +24,7 @@
 - Step 1: Main Menu
 - Step 2: New Career
 - Step 3: Choose Club
+- Step 4: Club Dashboard
 
 ## 2. Plan Rules
 
@@ -173,6 +173,6 @@ Persist full game state to local save slot and reload safely.
 
 ## 14. Immediate Next Subtask
 
-For active Step 4, smallest valid next subtask is:
+For active Step 5, smallest valid next subtask is:
 
-- expand ClubDashboard with core club context and navigation stubs to Squad, Tactics, Fixtures, Standings, and Matchday.
+- replace SquadScreen stub with a named-player list sourced from GameState seeded squad data.

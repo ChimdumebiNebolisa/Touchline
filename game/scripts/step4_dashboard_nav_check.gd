@@ -61,6 +61,22 @@ func _process(_delta: float) -> bool:
             _fail("ClubDashboard did not load")
             return false
 
+        var context_label := current_scene.get_node("Center/Panel/ClubContextLabel") as Label
+        var fixture_label := current_scene.get_node("Center/Panel/FixturePreviewLabel") as Label
+        var squad_label := current_scene.get_node("Center/Panel/SquadStatusLabel") as Label
+
+        if context_label == null or context_label.text.find("Jordan Miles") == -1:
+            _fail("ClubDashboard context label missing manager data")
+            return false
+
+        if fixture_label == null or fixture_label.text.find("Matchday 1") == -1:
+            _fail("Fixture preview label missing expected context")
+            return false
+
+        if squad_label == null or squad_label.text.find("23 registered players") == -1:
+            _fail("Squad status label missing expected context")
+            return false
+
         _stage = 3
         _ticks = 0
 
