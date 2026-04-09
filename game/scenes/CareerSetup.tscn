@@ -70,6 +70,37 @@ text = "Set your identity, lock the seed, and enter a persistent football world.
 autowrap_mode = 3
 horizontal_alignment = 1
 
+[node name="OnboardingCard" type="PanelContainer" parent="Center/Panel/Padding/Content"]
+layout_mode = 2
+
+[node name="OnboardingPadding" type="MarginContainer" parent="Center/Panel/Padding/Content/OnboardingCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 16
+
+[node name="OnboardingContent" type="VBoxContainer" parent="Center/Panel/Padding/Content/OnboardingCard/OnboardingPadding"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="OnboardingHeading" type="Label" parent="Center/Panel/Padding/Content/OnboardingCard/OnboardingPadding/OnboardingContent"]
+layout_mode = 2
+text = "What This Sets"
+horizontal_alignment = 1
+
+[node name="OnboardingSummary" type="Label" parent="Center/Panel/Padding/Content/OnboardingCard/OnboardingPadding/OnboardingContent"]
+layout_mode = 2
+text = "Your manager name anchors the career. The seed fixes the world start so club choice, fixtures, and future saves stay coherent."
+autowrap_mode = 3
+horizontal_alignment = 0
+
+[node name="OnboardingNextStep" type="Label" parent="Center/Panel/Padding/Content/OnboardingCard/OnboardingPadding/OnboardingContent"]
+layout_mode = 2
+text = "Next step: choose the club whose pressure and identity you want to own."
+autowrap_mode = 3
+horizontal_alignment = 0
+
 [node name="ManagerNameLabel" type="Label" parent="Center/Panel/Padding/Content"]
 layout_mode = 2
 text = "Manager Name"
@@ -92,11 +123,11 @@ value = 20260408.0
 
 [node name="StartCareerButton" type="Button" parent="Center/Panel/Padding/Content"]
 layout_mode = 2
-text = "Start Career"
+text = "Begin Career and Choose Club"
 
 [node name="StatusLabel" type="Label" parent="Center/Panel/Padding/Content"]
 layout_mode = 2
-text = "Career state will initialize here before club selection."
+text = "Career state will initialize, then the club-selection step will open."
 autowrap_mode = 3
 horizontal_alignment = 1
 
