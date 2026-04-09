@@ -9,8 +9,11 @@ public partial class SquadScreen : Control
 
     private Label _clubContextLabel = default!;
     private OptionButton _positionFilter = default!;
+    private Label _lineupSummaryLabel = default!;
     private ItemList _playerList = default!;
     private Label _playerDetailLabel = default!;
+    private Button _lineupActionButton = default!;
+    private Label _lineupStatusLabel = default!;
     private Button _openProfileButton = default!;
     private readonly List<int> _visiblePlayerIndexes = new();
     private int _currentVisibleSelectionIndex = -1;
@@ -19,14 +22,20 @@ public partial class SquadScreen : Control
     {
         _clubContextLabel = GetNode<Label>("Center/Panel/ClubContextLabel");
         _positionFilter = GetNode<OptionButton>("Center/Panel/PositionFilter");
+        _lineupSummaryLabel = GetNode<Label>("Center/Panel/LineupSummaryLabel");
         _playerList = GetNode<ItemList>("Center/Panel/PlayerList");
         _playerDetailLabel = GetNode<Label>("Center/Panel/PlayerDetailLabel");
+        _lineupActionButton = GetNode<Button>("Center/Panel/LineupActionButton");
+        _lineupStatusLabel = GetNode<Label>("Center/Panel/LineupStatusLabel");
         _openProfileButton = GetNode<Button>("Center/Panel/OpenProfileButton");
 
         if (GameState.Instance == null || string.IsNullOrWhiteSpace(GameState.Instance.SelectedClubName))
         {
             _clubContextLabel.Text = "Club context unavailable.";
+            _lineupSummaryLabel.Text = "Lineup summary unavailable.";
             _playerDetailLabel.Text = "Select a player to inspect details.";
+            _lineupActionButton.Disabled = true;
+            _lineupStatusLabel.Text = "Lineup changes unavailable.";
             _openProfileButton.Disabled = true;
             return;
         }
@@ -48,6 +57,8 @@ public partial class SquadScreen : Control
         {
             return;
         }
+
+        RenderLineupSummary();
 
         _playerList.Clear();
         _visiblePlayerIndexes.Clear();
@@ -73,7 +84,9 @@ public partial class SquadScreen : Control
         else
         {
             _playerDetailLabel.Text = "No players match this filter.";
+            _lineupActionButton.Disabled = true;
             _openProfileButton.Disabled = true;
+            _lineupStatusLabel.Text = "No players match this filter.";
         }
     }
 
@@ -87,6 +100,7 @@ public partial class SquadScreen : Control
         if (GameState.Instance == null || visibleIndex < 0 || visibleIndex >= _visiblePlayerIndexes.Count)
         {
             _playerDetailLabel.Text = "Player details unavailable.";
+            _lineupActionButton.Disabled = true;
             _openProfileButton.Disabled = true;
             _currentVisibleSelectionIndex = -1;
             return;
@@ -98,6 +112,8 @@ public partial class SquadScreen : Control
         var lineupTag = player.IsStarting ? "Starting XI" : "Bench";
         _playerDetailLabel.Text =
             $"{player.Name} | {player.Position} | {lineupTag} | Age {player.Age} | Form {player.Form} | Morale {player.Morale} | Fitness {player.Fitness}";
+        _lineupActionButton.Disabled = false;
+        _lineupActionButton.Text = player.IsStarting ? $"Move {player.Name} to Bench" : $"Promote {player.Name} to XI";
         _openProfileButton.Disabled = false;
         _openProfileButton.Text = $"Open {player.Name} Profile";
     }
@@ -130,5 +146,51 @@ public partial class SquadScreen : Control
         var index = _visiblePlayerIndexes[_currentVisibleSelectionIndex];
         GameState.Instance.SelectPlayerProfile(GameState.Instance.SquadPlayers[index].Name);
         GetTree().ChangeSceneToFile(PlayerProfileScenePath);
+    }
+
+    private void OnLineupActionPressed()
+    {
+        if (GameState.Instance == null || _currentVisibleSelectionIndex < 0 || _currentVisibleSelectionIndex >= _visiblePlayerIndexes.Count)
+        {
+            return;
+        }
+
+        var selectedIndex = _visiblePlayerIndexes[_currentVisibleSelectionIndex];
+        var selectedPlayerName = GameState.Instance.SquadPlayers[selectedIndex].Name;
+        _lineupStatusLabel.Text = GameState.Instance.TogglePlayerLineupStatus(selectedPlayerName);
+        PopulatePlayerList((int)_positionFilter.GetSelectedId());
+
+        for (var visibleIndex = 0; visibleIndex < _visiblePlayerIndexes.Count; visibleIndex++)
+        {
+            var playerIndex = _visiblePlayerIndexes[visibleIndex];
+            if (GameState.Instance.SquadPlayers[playerIndex].Name == selectedPlayerName)
+            {
+                _playerList.Select(visibleIndex);
+                RenderPlayerDetailByVisibleIndex(visibleIndex);
+                return;
+            }
+        }
+    }
+
+    private void RenderLineupSummary()
+    {
+        if (GameState.Instance == null)
+        {
+            _lineupSummaryLabel.Text = "Lineup summary unavailable.";
+            return;
+        }
+
+        var starters = 0;
+        foreach (var player in GameState.Instance.SquadPlayers)
+        {
+            if (player.IsStarting)
+            {
+                starters++;
+            }
+        }
+
+        var bench = GameState.Instance.SquadPlayers.Length - starters;
+        _lineupSummaryLabel.Text =
+            $"Current selection: {starters} in the XI | {bench} on the bench. Lineup changes flow directly into upcoming match preparation.";
     }
 }

@@ -293,6 +293,49 @@ public partial class GameState : Node
         return null;
     }
 
+    public string TogglePlayerLineupStatus(string playerName)
+    {
+        var targetIndex = Array.FindIndex(SquadPlayers, player => player.Name == playerName);
+        if (targetIndex < 0)
+        {
+            return "Selected player is unavailable for lineup changes.";
+        }
+
+        var targetPlayer = SquadPlayers[targetIndex];
+        var startingCount = CountStartingPlayers();
+
+        if (targetPlayer.IsStarting)
+        {
+            var replacementIndex = FindReplacementBenchIndex(targetPlayer.Position);
+            if (replacementIndex < 0)
+            {
+                return "No bench player is available to keep the XI balanced.";
+            }
+
+            var replacementPlayer = SquadPlayers[replacementIndex];
+            SetPlayerStartingStatus(targetIndex, false);
+            SetPlayerStartingStatus(replacementIndex, true);
+            return $"{targetPlayer.Name} moves to the bench. {replacementPlayer.Name} steps into the XI.";
+        }
+
+        if (startingCount < 11)
+        {
+            SetPlayerStartingStatus(targetIndex, true);
+            return $"{targetPlayer.Name} is promoted into the XI.";
+        }
+
+        var playerToBenchIndex = FindStarterToBenchIndex(targetPlayer.Position, targetIndex);
+        if (playerToBenchIndex < 0)
+        {
+            return "A balanced swap could not be found for this lineup move.";
+        }
+
+        var benchPlayer = SquadPlayers[playerToBenchIndex];
+        SetPlayerStartingStatus(playerToBenchIndex, false);
+        SetPlayerStartingStatus(targetIndex, true);
+        return $"{targetPlayer.Name} enters the XI for {benchPlayer.Name}.";
+    }
+
     public ClubPreview GetClubPreview(string clubName)
     {
         var openingOpponent = GetOpeningOpponent(clubName);
@@ -339,6 +382,90 @@ public partial class GameState : Node
     private string BuildSquadStatusSummary()
     {
         return $"23 registered players | morale {DescribeLevel(TeamMorale)} | fans {DescribeLevel(FanSentiment)} | board {DescribeLevel(BoardConfidence)}";
+    }
+
+    private int CountStartingPlayers()
+    {
+        var count = 0;
+        foreach (var player in SquadPlayers)
+        {
+            if (player.IsStarting)
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    private void SetPlayerStartingStatus(int index, bool isStarting)
+    {
+        var player = SquadPlayers[index];
+        SquadPlayers[index] = new SquadPlayer
+        {
+            Name = player.Name,
+            Position = player.Position,
+            Age = player.Age,
+            Form = player.Form,
+            Morale = player.Morale,
+            Fitness = player.Fitness,
+            IsStarting = isStarting
+        };
+    }
+
+    private int FindReplacementBenchIndex(string position)
+    {
+        var preferredFamily = GetPositionFamily(position);
+        for (var index = 0; index < SquadPlayers.Length; index++)
+        {
+            if (!SquadPlayers[index].IsStarting && GetPositionFamily(SquadPlayers[index].Position) == preferredFamily)
+            {
+                return index;
+            }
+        }
+
+        for (var index = 0; index < SquadPlayers.Length; index++)
+        {
+            if (!SquadPlayers[index].IsStarting)
+            {
+                return index;
+            }
+        }
+
+        return -1;
+    }
+
+    private int FindStarterToBenchIndex(string position, int excludedIndex)
+    {
+        var preferredFamily = GetPositionFamily(position);
+        for (var index = 0; index < SquadPlayers.Length; index++)
+        {
+            if (index != excludedIndex && SquadPlayers[index].IsStarting && GetPositionFamily(SquadPlayers[index].Position) == preferredFamily)
+            {
+                return index;
+            }
+        }
+
+        for (var index = 0; index < SquadPlayers.Length; index++)
+        {
+            if (index != excludedIndex && SquadPlayers[index].IsStarting)
+            {
+                return index;
+            }
+        }
+
+        return -1;
+    }
+
+    private static string GetPositionFamily(string position)
+    {
+        return position switch
+        {
+            "GK" => "GK",
+            "RB" or "CB" or "LB" => "DEF",
+            "CM" or "AM" => "MID",
+            _ => "ATT"
+        };
     }
 
     private string GetOpeningOpponent(string clubName)
