@@ -4,11 +4,10 @@
 
 ### Active
 
-- Step 12: Establish the visual system
+- Step 13: Rebuild main menu and shell framing
 
 ### Backlog
 
-- Step 13: Rebuild main menu and shell framing
 - Step 14: Redesign career setup and club selection
 - Step 15: Rebuild the club dashboard as the real command center
 - Step 16: Create the player profile scene
@@ -45,6 +44,7 @@
 - Step 9: Post-Match Scene
 - Step 10: Advance Date
 - Step 11: Save Game
+- Step 12: Establish the visual system
 
 ## 2. Plan Rules
 
@@ -89,6 +89,13 @@ Create a shared Touchline presentation foundation so the Godot shell no longer r
 ### Objective
 
 Make the game feel like a football title from first boot through resume and load entry points.
+
+### Allowed Subtasks
+
+- enrich the main menu with resume-state context and stronger entry hierarchy
+- improve save-slot preview and continue language in shell entry points
+- tighten shell copy, framing, and first-screen composition without changing product scope
+- preserve the new shared visual system while improving first-boot clarity
 
 ### Verification
 
@@ -314,8 +321,8 @@ Remove remaining prototype edges and harden the shell for repeated play.
 
 ## 23. Immediate Next Subtask
 
-Step 12 starts with the smallest valid foundation slice:
+Step 13 starts with the smallest valid shell-framing slice:
 
-- create the first shared theme resources
-- wire the theme into the active Godot shell
-- verify the project still builds cleanly before broader scene redesign begins
+- enrich the main menu with save-aware resume context
+- tighten first-screen copy and entry hierarchy
+- verify the project still builds cleanly before broader shell framing work continues
