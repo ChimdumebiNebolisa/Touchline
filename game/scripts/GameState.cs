@@ -1,4 +1,5 @@
 using Godot;
+using System;
 
 public partial class GameState : Node
 {
@@ -9,6 +10,8 @@ public partial class GameState : Node
     public bool CareerInitialized { get; private set; }
     public int WorldSeed { get; private set; }
     public string CountryPackId { get; private set; } = "country-pack-alpha";
+    public string[] AvailableClubs { get; private set; } = Array.Empty<string>();
+    public string? SelectedClubName { get; private set; }
 
     public override void _EnterTree()
     {
@@ -29,5 +32,18 @@ public partial class GameState : Node
         CareerSeed = seed;
         CareerInitialized = true;
         WorldSeed = seed;
+        AvailableClubs = new[]
+        {
+            "Riverton Athletic",
+            "Northbridge City",
+            "Harbor County",
+            "Eastvale Rovers"
+        };
+        SelectedClubName = null;
+    }
+
+    public void SelectClub(string clubName)
+    {
+        SelectedClubName = clubName;
     }
 }

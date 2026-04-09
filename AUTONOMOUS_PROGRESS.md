@@ -4,24 +4,24 @@
 - Step 3: Choose Club
 
 ## Last completed verified task
-- Step 2 complete: New Career flow now captures manager profile, initializes world seed context, and hands off into ChooseClub placeholder scene.
+- Step 3 subtask complete: ChooseClub now renders seeded club options and persists confirmed club selection in GameState.
 
 ## Current subtask in progress
-- Step 3 subtask: populate ChooseClub with seeded club options and persist selected club in GameState.
+- Step 3 subtask: add dashboard handoff placeholder route after club confirmation.
 
 ## Next queued subtasks
-- Add confirm-selection action and route selected club into dashboard handoff stub.
 - Prepare Step 4 ClubDashboard scene contract with selected club context.
-- Add Step 3 runtime verification script for club selection persistence.
+- Add dashboard handoff placeholder route after club confirmation.
+- Close Step 3 and activate Step 4 once handoff is verified.
 
 ## Known blockers
 - None currently.
 
 ## Last verification run
-- Passed: dotnet build game/Touchline.csproj; Godot headless runtime check (`res://scripts/step2_career_setup_check.gd` => STEP2_SUBTASK_PASS); npm test; npm run typecheck; npm run lint; npm run build (2026-04-09).
+- Passed: dotnet build game/Touchline.csproj; Godot headless runtime check (`res://scripts/step3_club_selection_check.gd` => STEP3_SUBTASK_PASS); npm test; npm run typecheck; npm run lint; npm run build (2026-04-09).
 
 ## Last commit hash
-- Pending Step 2 closure and Step 3 activation commit.
+- Pending Step 3 club-selection subtask commit.
 
 ## Resume instructions
 - Re-read docs/PRD.md, docs/Architecture.md, docs/Guardrails.md, and docs/Plan.md.

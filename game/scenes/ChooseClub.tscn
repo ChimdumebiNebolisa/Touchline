@@ -40,8 +40,23 @@ text = "Step 3 will implement playable club selection from seeded data."
 autowrap_mode = 3
 horizontal_alignment = 1
 
+[node name="ClubList" type="ItemList" parent="Center/Panel"]
+layout_mode = 2
+custom_minimum_size = Vector2(420, 180)
+
+[node name="ConfirmSelectionButton" type="Button" parent="Center/Panel"]
+layout_mode = 2
+text = "Confirm Club Selection"
+
+[node name="SelectionStatusLabel" type="Label" parent="Center/Panel"]
+layout_mode = 2
+text = "No club selected yet."
+autowrap_mode = 3
+horizontal_alignment = 1
+
 [node name="BackButton" type="Button" parent="Center/Panel"]
 layout_mode = 2
 text = "Back to Career Setup"
 
+[connection signal="pressed" from="Center/Panel/ConfirmSelectionButton" to="." method="OnConfirmSelectionPressed"]
 [connection signal="pressed" from="Center/Panel/BackButton" to="." method="OnBackPressed"]
