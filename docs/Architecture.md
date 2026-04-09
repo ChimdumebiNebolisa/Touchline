@@ -1,694 +1,158 @@
 # Architecture
 
-## 1. Facts driving structure
+## 1. Technical Direction
 
-The source docs support the same structural conclusions repeatedly: split-responsibility club hierarchy, one shared match engine for instant and live simulation, morale and perception as persistent force multipliers, transfer uncertainty under sporting-director control, and academy pathways driven by club identity, loans, and rare meaningful youth outcomes rather than wonderkid spam. The architecture therefore has to preserve constrained agency, keep deep simulation limited to the shipped country’s top two divisions, and avoid backend-first or service-heavy design.   
+Touchline is implemented as a Godot .NET game with C# domain logic.
 
-## 2. Implementation choice
+Core principles:
 
-Use a single-process, deterministic simulation core with an event log.
+- scene-based UI and flow orchestration in Godot
+- simulation and business rules in C# domain systems
+- autoload singletons for persistent runtime state
+- local save and load for career continuity
+- one project path focused on football game flow, not web UI tooling
 
-Do not:
+## 2. Repository Shape After Revamp
 
-* build services
-* split instant and live match logic
-* start with a backend
-* let UI screens invent rules outside sim-core
+Primary product path:
 
-Build shape:
+- game/project.godot
+- game/Touchline.sln
+- game/scenes
+- game/scripts
+- game/assets
+- game/data
 
-* monorepo
-* local-first
-* one reusable simulation core library
-* one client app that renders and drives the core  
+Optional historical isolation path:
 
-## 3. Major system parts
+- legacy (contains old web prototype and transitional artifacts)
 
-### 3.1 World Simulator
+## 3. Runtime Layers
 
-Owns:
+### 3.1 Presentation Layer (Godot Scenes)
 
-* countries
-* competitions
-* calendars
-* fixtures
-* standings
-* promotion and relegation
-* AI club seasonal cycles
-* shadow leagues
+Owns user flow, navigation, and football-facing visualization.
 
-Inputs:
+Target scenes:
 
-* content data
-* current save state
+- MainMenu
+- CareerSetup
+- ClubDashboard
+- SquadScreen
+- PlayerProfile
+- TacticsScreen
+- FixturesScreen
+- StandingsScreen
+- MatchdayScene
+- LiveMatchScene
+- PostMatchScene
+- SaveLoadScene
 
-Outputs:
+### 3.2 Application State Layer (Autoload Singletons)
 
-* fixtures
-* league context
-* club objectives
-* world events
-* shadow-league results and tables 
+Owns long-lived runtime state and scene handoff context.
 
-### 3.2 Club State Engine
+Expected singletons:
 
-Owns:
+- GameState singleton for current career state
+- SaveSystem singleton for save slot operations
+- CalendarSystem singleton for date progression
+- WorldGenerator singleton for initial world creation
 
-* club finances
-* board profile
-* club identity
-* squad state
-* injuries
-* fatigue
-* promises
-* morale
-* reputation context
-* academy profile
+### 3.3 Domain Layer (C# Models and Systems)
 
-Inputs:
+Owns deterministic game logic.
 
-* match results
-* transfer outcomes
-* media events
-* board events
-* world-state changes
+Core models:
 
-Outputs:
+- Player
+- Club
+- Squad
+- Fixture
+- Competition
+- Season
+- ManagerCareer
+- MatchResult
+- GameState
 
-* updated club state
-* actionable pressures
-* squad availability
-* budget state
-* promise timers and unrest flags 
+Core systems:
 
-### 3.3 Match Engine
+- MatchSimulator
+- DevelopmentSystem
+- TransferSystem
+- PerceptionSystem
+- CalendarSystem
+- SaveSystem
+- WorldGenerator
 
-Owns:
+## 4. Ownership Boundaries
 
-* chance generation
-* xG resolution
-* tactics interaction
-* fatigue updates
-* cards
-* injuries
-* substitutions
-* match event log
+### 4.1 Scene Layer
 
-Inputs:
+- reads and presents state
+- sends commands to domain systems
+- does not contain simulation rules
 
-* two squads
-* tactics
-* player condition
-* morale modifiers
-* match context
-
-Outputs:
+### 4.2 Domain Systems
 
-* result
-* event log
-* stats
-* fatigue deltas
-* injuries
-* disciplinary outcomes  
+- evaluate football outcomes
+- mutate game state through explicit methods
+- return explainable results and reason summaries
 
-### 3.4 Perception Engine
+### 4.3 Save Layer
 
-Owns:
+- serializes and restores complete career state
+- validates payload version and structure
+- never silently drops critical state
 
-* board confidence
-* fan sentiment
-* media tone
-* narrative tags
-* manager reputation updates
-* patience buffers
-* negativity loops
+## 5. Data Strategy
 
-Inputs:
+### 5.1 Seed Data
 
-* results
-* xG delta
-* derby or rivalry context
-* promises
-* public comments
-* disciplinary choices
-* transfers
+- use generated or authored seed files in game/data
+- include clubs, named players, competitions, and season start state
 
-Outputs:
+### 5.2 Runtime State
 
-* pressure updates
-* patience shifts
-* reputation changes
-* narrative effects
-* downstream morale and transfer modifiers 
+- keep mutable career state in memory via GameState singleton
+- persist to local save files on explicit save actions
 
-### 3.5 Transfer Engine
+### 5.3 Determinism
 
-Owns:
+- use seeded random streams where practical for reproducibility
+- keep deterministic logic in domain systems before heuristic tuning
 
-* squad-needs generation
-* target surfacing
-* offer evaluation
-* negotiation states
-* decision outcomes
+## 6. Scene Flow Contract
 
-Inputs:
+Primary user path:
 
-* player profile
-* club state
-* squad competition
-* budgets
-* reputation
-* promises
-* project fit
-* role fit
-* development path
+MainMenu -> CareerSetup -> ClubDashboard -> Squad or Tactics or Fixtures or Standings -> MatchdayScene -> LiveMatchScene -> PostMatchScene -> ClubDashboard -> Advance Date -> SaveLoadScene.
 
-Outputs:
+All transitions must preserve and reflect persistent career state.
 
-* accept or reject decisions
-* wage demands
-* negotiation counters
-* board blocks
-* unrest triggers
-* updated squad plans  
+## 7. Live Match Presentation Contract
 
-### 3.6 Academy and Pathway Engine
+LiveMatchScene presents domain simulation state with visible player movement.
 
-Owns:
+Required outputs:
 
-* academy quality
-* pathway bias
-* youth intake generation
-* development status
-* loan suitability
-* promotion readiness
+- pitch with moving player markers or sprites
+- scoreline and match clock
+- key event feed (chances, goals, cards, injuries, substitutions)
+- tactical context display sufficient to feel football-native
 
-Inputs:
+LiveMatchScene is a renderer and controller of simulation playback, not a rules engine.
 
-* club identity
-* board philosophy
-* squad congestion
-* manager risk tolerance
-* loan opportunities
+## 8. Build and Tooling Assumptions
 
-Outputs:
+- Godot .NET project files are first-class
+- C# source lives under game/scripts
+- no requirement that old web stack remains main entry point
+- legacy stack may remain archived for reference only
 
-* intake players
-* pathway recommendations
-* loan options
-* promotion candidates
-* academy pressure signals   
+## 9. Non-Goals for Current Foundation
 
-### 3.7 Save and Persistence Layer
-
-Owns:
-
-* serialization
-* deserialization
-* local save slots
-* migration-safe save schema
-
-Inputs:
-
-* complete world and club state
-
-Outputs:
-
-* restorable local saves
-* explicit load errors
-* versioned save payloads 
-
-### 3.8 Presentation Client
-
-Owns:
-
-* menus
-* squad screens
-* tactics UI
-* match HUD
-* live 2D renderer
-* event presentation
-* player-facing explanations
-
-Inputs:
-
-* sim-core state and event logs
-
-Outputs:
-
-* rendered screens
-* user commands
-* surfaced explanations
-
-The client renders outcomes. It does not decide outcomes.  
-
-## 4. Ownership boundaries
-
-### 4.1 World Simulator
-
-Owns calendar truth, competition truth, and shadow-league progression.
-Does not own match resolution, transfer acceptance, or club morale.
-
-### 4.2 Club State Engine
-
-Owns persistent club truth.
-Does not decide match events or transfer negotiations directly.
-
-### 4.3 Match Engine
-
-Owns match truth.
-Does not mutate global world structures directly except through returned outcomes.
-
-### 4.4 Perception Engine
-
-Owns pressure and narrative truth.
-Does not decide raw match outcomes or set budgets directly.
-
-### 4.5 Transfer Engine
-
-Owns transfer negotiation logic and acceptance logic.
-Does not let the manager bypass board or sporting-director constraints.
-
-### 4.6 Academy and Pathway Engine
-
-Owns youth generation and readiness logic.
-Does not let academy output ignore squad congestion, identity, or board philosophy.
-
-### 4.7 Presentation Client
-
-Owns rendering and user input only.
-Does not contain business rules for transfers, tactics effects, reputation shifts, or board evaluation.
-
-### 4.8 Role boundary inside the sim
-
-* **Manager/head coach** controls lineups, tactics, substitutions, sporting discipline, media responses, and transfer influence.
-* **Sporting director AI** controls target generation, negotiation flow, wage-structure discipline, and long-term squad planning.
-* **Board AI** controls budgets, strategic expectations, patience, and exceptional approvals or blocks.
-
-This boundary is enforced in sim-core, not in UI convention.   
-
-## 5. Interfaces between parts
-
-### 5.1 `WorldSimulator -> MatchEngine`
-
-Provides:
-
-* fixture context
-* opponent state snapshot
-* competition rules
-* derby or stakes tags
-
-Receives:
-
-* match result package
-* disciplinary events
-* injuries
-* standings deltas
-
-### 5.2 `MatchEngine -> ClubStateEngine`
-
-Provides:
-
-* fatigue deltas
-* injuries
-* cards
-* result
-* tactical event summary
-
-Receives:
-
-* player availability
-* morale modifiers
-* current promises and unrest flags
-
-### 5.3 `MatchEngine -> PerceptionEngine`
-
-Provides:
-
-* result
-* xG summary
-* game-state swings
-* derby context
-* substitutions and discipline summary
-
-Receives:
-
-* none during the match
-* only pre-match pressure modifiers if needed
-
-### 5.4 `ClubStateEngine -> TransferEngine`
-
-Provides:
-
-* budgets
-* squad needs
-* wage structure
-* manager reputation
-* promise state
-* congestion by position
-
-Receives:
-
-* negotiation outcomes
-* signed or lost targets
-* unrest triggers
-* spending commitments
-
-### 5.5 `ClubStateEngine -> AcademyEngine`
-
-Provides:
-
-* club identity
-* squad congestion
-* promotion needs
-* board philosophy
-
-Receives:
-
-* intake players
-* pathway recommendations
-* loan candidates
-* readiness flags
-
-### 5.6 `PerceptionEngine -> ClubStateEngine`
-
-Provides:
-
-* board confidence change
-* fan sentiment change
-* media tone change
-* manager reputation change
-
-Receives:
-
-* promise state
-* current identity and expectations
-* disciplinary actions
-
-### 5.7 `sim-core -> PresentationClient`
-
-Provides:
-
-* immutable snapshots
-* event logs
-* reason summaries
-* command schemas
-
-Receives:
-
-* user intent only, such as set lineup, change press intensity, answer media, shortlist target
-
-No interface may allow the UI to directly mutate protected sim state.  
-
-## 6. Core entities
-
-### 6.1 World entities
-
-* `Country`
-* `Competition`
-* `SeasonCalendar`
-* `Fixture`
-* `LeagueTable`
-* `ShadowLeagueState`
-
-### 6.2 Club entities
-
-* `Club`
-* `BoardProfile`
-* `IdentityProfile`
-* `FinanceState`
-* `ExpectationModel`
-* `ManagerProfile`
-* `ReputationState`
-
-### 6.3 Squad entities
-
-* `Player`
-* `PlayerAttributes`
-* `PlayerCondition`
-* `PlayerMorale`
-* `Promise`
-* `ContractSummary`
-* `InjuryRecord`
-* `CardState`
-* `SquadRole`
-
-### 6.4 Match entities
-
-* `TacticSetup`
-* `MatchContext`
-* `ChanceEvent`
-* `ShotEvent`
-* `SubstitutionEvent`
-* `MatchStatLine`
-* `MatchResult`
-* `MatchEventLog`
-
-### 6.5 Transfer entities
-
-* `SquadNeed`
-* `TransferTarget`
-* `TransferOffer`
-* `NegotiationState`
-* `AcceptanceBreakdown`
-* `BoardDecision`
-
-### 6.6 Academy entities
-
-* `AcademyProfile`
-* `YouthIntakePlayer`
-* `PathwayState`
-* `LoanOption`
-* `PromotionReadiness`
-
-### 6.7 Persistence entities
-
-* `SaveGame`
-* `SaveMeta`
-* `SchemaVersion`  
-
-## 7. Causal contract for every major system
-
-### 7.1 World Simulator
-
-Must affect at least:
-
-* transfers
-* loans
-* expectations
-* career movement
-
-If it only generates fixtures, it is too weak. 
-
-### 7.2 Club State Engine
-
-Must affect at least:
-
-* match availability and morale
-* transfer attractiveness
-* academy pathway pressure
-* board patience
-
-If it is only a storage bucket, it fails. 
-
-### 7.3 Match Engine
-
-Must affect at least:
-
-* results and standings
-* fatigue and injuries
-* morale and trust
-* perception pressure
-
-If it only outputs a scoreline, it fails.  
-
-### 7.4 Perception Engine
-
-Must affect at least:
-
-* board patience
-* transfer pull
-* player trust
-* media pressure loops
-
-If it only changes flavor text, it fails. 
-
-### 7.5 Transfer Engine
-
-Must affect at least:
-
-* squad quality
-* morale
-* finances
-* pathway congestion
-* reputation
-
-If it resolves on fee alone, it fails.  
-
-### 7.6 Academy and Pathway Engine
-
-Must affect at least:
-
-* finances
-* transfer need
-* fan identity
-* squad registration and congestion pressure
-
-If it only spawns random youth players once per year, it fails.  
-
-### 7.7 Finances inside Club State
-
-Must affect at least:
-
-* transfer power
-* board strictness
-* youth reliance
-* expectations
-
-If it only displays numbers, it fails. 
-
-### 7.8 Manager Reputation
-
-Must affect at least:
-
-* board patience
-* player trust
-* transfer pull
-* future job leverage
-
-If it only changes a label, it fails. 
-
-## 8. Folder and file structure
-
-```text
-repo/
-  apps/
-    game-client/
-      src/
-        app/
-        screens/
-        components/
-        hooks/
-        state/
-        render2d/
-  packages/
-    sim-core/
-      src/
-        world/
-          advanceWorld.ts
-          calendar.ts
-          competitions.ts
-          standings.ts
-          shadowLeagues.ts
-        club/
-          clubState.ts
-          finances.ts
-          board.ts
-          identity.ts
-          morale.ts
-          promises.ts
-          reputation.ts
-        match/
-          simulateMatch.ts
-          chanceModel.ts
-          tacticsModel.ts
-          fatigueModel.ts
-          cardModel.ts
-          injuryModel.ts
-          eventLog.ts
-        transfers/
-          transferEngine.ts
-          demandModel.ts
-          negotiation.ts
-          squadNeeds.ts
-        academy/
-          academyEngine.ts
-          youthIntake.ts
-          pathway.ts
-          loans.ts
-        shared/
-          types.ts
-          rng.ts
-          config.ts
-          rules.ts
-    content/
-      countries/
-        <country-slug>/
-          competitions.json
-          clubs.json
-          players.json
-          boardProfiles.json
-          identityProfiles.json
-          academyProfiles.json
-    save/
-      src/
-        serialize.ts
-        deserialize.ts
-        localSave.ts
-    tests/
-      unit/
-      integration/
-      calibration/
-      fixtures/
-```
-
-This layout keeps responsibilities explicit, keeps sim logic reusable, and prevents UI code from becoming the real rule engine.  
-
-## 9. Chosen stack
-
-* **Language:** TypeScript
-* **UI:** React + Vite
-* **2D match rendering:** PixiJS
-* **State management:** Zustand or equivalent light store
-* **Persistence:** local JSON save plus IndexedDB wrapper
-* **Testing:** Vitest for unit and integration, Playwright for UI checks
-* **Build shape:** monorepo, no backend in v1
-
-Why this stack:
-
-* shared TypeScript makes one engine for instant and live mode practical
-* local-first keeps scope down
-* PixiJS is enough for a readable 2D match without pretending to be a physics-heavy action game
-* monorepo keeps the AI coding workflow and module boundaries simpler  
-
-## 10. Rejected complexity
-
-### 10.1 Separate engines for instant sim and live mode
-
-Rejected because it creates drift, balance bugs, and duplicated logic.
-Simpler choice: one engine, two presentations. 
-
-### 10.2 Microservices or backend-first architecture
-
-Rejected because this is single-player and local-first.
-Simpler choice: deterministic core library plus UI shell.  
-
-### 10.3 Full Football Manager style scouting and staff tree
-
-Rejected because the source docs consistently push against scope bloat.
-Simpler choice: sporting director AI plus a short surfaced target list and light staff influence later.  
-
-### 10.4 Detailed finance ledger
-
-Rejected because finances are supposed to constrain decisions, not become bookkeeping.
-Simpler choice: bank balance, wage budget, transfer budget, spending posture. 
-
-### 10.5 Playable youth leagues and deep academy micromanagement
-
-Rejected because the design target is light but real pathways, not youth spam.
-Simpler choice: academy quality, pathway bias, annual intake, loans, promotion readiness.  
-
-### 10.6 Dialogue-tree media system
-
-Rejected because media matters, but long branching dialogue trees are bloat.
-Simpler choice: light event-driven media with persistent consequences. 
-
-### 10.7 God-role club control
-
-Rejected because it breaks the core fantasy of constrained agency and conflicts with real football structures.
-Simpler choice: explicit permission matrix for manager, sporting director, and board.  
-
-### 10.8 Deep shadow-league simulation
-
-Rejected because it burns complexity on areas the player does not directly experience.
-Simpler choice: light shadow leagues that preserve transfers, loans, and world plausibility without deep per-club simulation.  
+- no backend or service split
+- no 3D match renderer requirement
+- no deep contract-law simulation
+- no broad feature expansion beyond active Plan step
