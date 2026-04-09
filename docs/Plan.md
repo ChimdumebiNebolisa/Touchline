@@ -4,11 +4,10 @@
 
 ### Active
 
-- Step 17: Rebuild squad management into a football workspace
+- Step 18: Redesign tactics as a tactical board
 
 ### Backlog
 
-- Step 18: Redesign tactics as a tactical board
 - Step 19: Replace fixtures and standings placeholders with real competition surfaces
 - Step 20: Redesign matchday into an event screen
 - Step 21: Upgrade live match presentation substantially
@@ -45,6 +44,7 @@
 - Step 14: Redesign career setup and club selection
 - Step 15: Rebuild the club dashboard as the real command center
 - Step 16: Create the player profile scene
+- Step 17: Rebuild squad management into a football workspace
 
 ## 2. Plan Rules
 
@@ -184,6 +184,13 @@ Convert squad management from filtered list browsing into a real lineup and sele
 ### Objective
 
 Turn tactics into an interpretable football setup surface rather than a bare control form.
+
+### Allowed Subtasks
+
+- restructure tactics into a clearer board-style workspace using the existing tactical inputs
+- present formation and tactical sliders with football-native role language and immediate context
+- preserve tactic persistence into match preparation without duplicating decision logic in the scene
+- improve screen hierarchy so saved tactical choices read as a coherent match plan
 
 ### Verification
 
