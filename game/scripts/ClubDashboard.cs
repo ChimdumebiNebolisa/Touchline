@@ -19,6 +19,8 @@ public partial class ClubDashboard : Control
         var squadStatusLabel = GetNode<Label>("Center/Shell/Padding/Content/DashboardRow/SnapshotCard/SnapshotPadding/SnapshotContent/SquadStatusLabel");
         var formLabel = GetNode<Label>("Center/Shell/Padding/Content/DashboardRow/SnapshotCard/SnapshotPadding/SnapshotContent/FormLabel");
         var pressureLabel = GetNode<Label>("Center/Shell/Padding/Content/DashboardRow/SnapshotCard/SnapshotPadding/SnapshotContent/PressureLabel");
+        var tacticsSummaryLabel = GetNode<Label>("Center/Shell/Padding/Content/DashboardRow/SnapshotCard/SnapshotPadding/SnapshotContent/TacticsSummaryLabel");
+        var priorityLabel = GetNode<Label>("Center/Shell/Padding/Content/DashboardRow/SnapshotCard/SnapshotPadding/SnapshotContent/PriorityLabel");
         _statusLabel = GetNode<Label>("Center/Shell/Padding/Content/DashboardRow/SnapshotCard/SnapshotPadding/SnapshotContent/StatusLabel");
         _saveHintLabel = GetNode<Label>("Center/Shell/Padding/Content/DashboardRow/OperationsCard/OperationsPadding/OperationsContent/SaveHintLabel");
 
@@ -30,6 +32,8 @@ public partial class ClubDashboard : Control
             squadStatusLabel.Text = "Squad status: unavailable";
             formLabel.Text = "Form unavailable.";
             pressureLabel.Text = "Pressure unavailable.";
+            tacticsSummaryLabel.Text = "Tactical setup unavailable.";
+            priorityLabel.Text = "Recommended next move unavailable.";
             _statusLabel.Text = "Dashboard context is unavailable.";
             _saveHintLabel.Text = "Save is unavailable until a career is active.";
             return;
@@ -43,6 +47,8 @@ public partial class ClubDashboard : Control
             squadStatusLabel.Text = "Squad status: unavailable";
             formLabel.Text = "Form unavailable.";
             pressureLabel.Text = "Pressure unavailable.";
+            tacticsSummaryLabel.Text = "Tactical setup unavailable.";
+            priorityLabel.Text = "Recommended next move unavailable.";
             _statusLabel.Text = "Choose a club before using the dashboard.";
             _saveHintLabel.Text = "Save is unavailable until a club is selected.";
             return;
@@ -56,6 +62,9 @@ public partial class ClubDashboard : Control
         formLabel.Text = GameState.Instance.FormSummary;
         pressureLabel.Text =
             $"Club pressure: morale {GameState.Instance.TeamMorale} | fans {GameState.Instance.FanSentiment} | board {GameState.Instance.BoardConfidence}";
+        tacticsSummaryLabel.Text =
+            $"Tactical setup: {GameState.Instance.TacticalFormation} | Press {GameState.Instance.PressIntensity} | Tempo {GameState.Instance.Tempo} | Width {GameState.Instance.Width} | Risk {GameState.Instance.Risk}";
+        priorityLabel.Text = BuildPrioritySummary(GameState.Instance);
         _statusLabel.Text = GameState.Instance.LastMatchReport == null
             ? "No completed result yet. Use the hub to prepare for the opening run of fixtures."
             : $"Last result: {GameState.Instance.LastMatchReport.Scoreline}. {GameState.Instance.LastMatchReport.ConsequenceSummary}";
@@ -111,5 +120,25 @@ public partial class ClubDashboard : Control
         SaveSystem.Instance.SaveGame(out var statusMessage);
         _statusLabel.Text = statusMessage;
         _saveHintLabel.Text = statusMessage;
+    }
+
+    private static string BuildPrioritySummary(GameState state)
+    {
+        if (state.BoardConfidence < 50)
+        {
+            return "Recommended next move: steady the board by tightening tactics and heading into the next fixture prepared.";
+        }
+
+        if (state.TeamMorale < 60)
+        {
+            return "Recommended next move: check the squad pulse and protect confidence before matchday.";
+        }
+
+        if (state.LastMatchReport == null)
+        {
+            return "Recommended next move: review squad and tactics, then launch into the opening fixture.";
+        }
+
+        return "Recommended next move: use fixtures, standings, and matchday to keep the season rhythm under control.";
     }
 }

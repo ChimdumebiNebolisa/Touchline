@@ -123,6 +123,18 @@ text = "Pressure unavailable."
 autowrap_mode = 3
 horizontal_alignment = 0
 
+[node name="TacticsSummaryLabel" type="Label" parent="Center/Shell/Padding/Content/DashboardRow/SnapshotCard/SnapshotPadding/SnapshotContent"]
+layout_mode = 2
+text = "Tactical setup unavailable."
+autowrap_mode = 3
+horizontal_alignment = 0
+
+[node name="PriorityLabel" type="Label" parent="Center/Shell/Padding/Content/DashboardRow/SnapshotCard/SnapshotPadding/SnapshotContent"]
+layout_mode = 2
+text = "Recommended next move unavailable."
+autowrap_mode = 3
+horizontal_alignment = 0
+
 [node name="StatusLabel" type="Label" parent="Center/Shell/Padding/Content/DashboardRow/SnapshotCard/SnapshotPadding/SnapshotContent"]
 layout_mode = 2
 text = "Dashboard context unavailable."
