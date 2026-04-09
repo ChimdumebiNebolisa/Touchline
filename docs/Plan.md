@@ -4,11 +4,10 @@
 
 ### Active
 
-- Step 27: Integrate the save path with the authoritative domain model
+- Step 28: Complete season continuity and progression
 
 ### Backlog
 
-- Step 28: Complete season continuity and progression
 - Step 29: Expose board, fan, and perception context properly
 - Step 30: Create a navigation and transition pass
 - Step 31: Run a full polish and usability pass
@@ -45,6 +44,7 @@
 - Step 24: Refactor runtime architecture around clear services
 - Step 25: Add the missing autoload systems from the architecture
 - Step 26: Move hardcoded football content into real data
+- Step 27: Integrate the save path with the authoritative domain model
 
 ## 2. Plan Rules
 
@@ -398,8 +398,8 @@ Remove remaining prototype edges and harden the shell for repeated play.
 
 ## 23. Immediate Next Subtask
 
-Step 27 starts with the smallest valid persistence slice:
+Step 28 starts with the smallest valid continuity slice:
 
-- version the save payload and route save serialization through the richer runtime/domain state shape
-- migrate older saves that are missing competition-aware state when deterministic reconstruction is possible
-- reject malformed or non-migratable save payloads explicitly instead of silently defaulting critical fields
+- carry squad, fixture, and date progression cleanly across repeated match cycles
+- apply deterministic season-rollover changes so player age and visible squad state evolve instead of only the calendar resetting
+- verify multi-cycle progression and rollover behavior through headless Godot runtime checks before surfacing additional perception depth
