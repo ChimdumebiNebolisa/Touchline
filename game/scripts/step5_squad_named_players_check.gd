@@ -66,10 +66,11 @@ func _process(_delta: float) -> bool:
             _fail("SquadScreen did not load")
             return false
 
+        var filter := current_scene.get_node("Center/Panel/PositionFilter") as OptionButton
         var player_list := current_scene.get_node("Center/Panel/PlayerList") as ItemList
         var detail_label := current_scene.get_node("Center/Panel/PlayerDetailLabel") as Label
 
-        if player_list == null or detail_label == null:
+        if filter == null or player_list == null or detail_label == null:
             _fail("SquadScreen controls are missing")
             return false
 
@@ -82,12 +83,28 @@ func _process(_delta: float) -> bool:
             _fail("Placeholder player identity detected")
             return false
 
+        if first_item_text.find("[XI]") == -1:
+            _fail("Lineup marker missing from squad list")
+            return false
+
         if first_item_text.find("Mateo Silva") == -1:
             _fail("Expected seeded named player not found")
             return false
 
-        if detail_label.text.find("Age") == -1 or detail_label.text.find("Morale") == -1:
+        if detail_label.text.find("Age") == -1 or detail_label.text.find("Form") == -1 or detail_label.text.find("Morale") == -1:
             _fail("Player detail label missing expected stats")
+            return false
+
+        filter.select(1)
+        filter.emit_signal("item_selected", 1)
+
+        if player_list.item_count < 2:
+            _fail("Goalkeeper filter did not return expected entries")
+            return false
+
+        var filtered_first := player_list.get_item_text(0)
+        if filtered_first.find("GK") == -1:
+            _fail("Goalkeeper filter did not narrow by position")
             return false
 
         print("STEP5_SUBTASK_PASS")
