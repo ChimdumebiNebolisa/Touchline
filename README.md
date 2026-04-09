@@ -42,4 +42,4 @@ Only execute the smallest valid subtask in the active Plan step, verify it, then
 
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License. See [LICENSE](LICENSE).

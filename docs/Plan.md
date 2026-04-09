@@ -4,11 +4,10 @@
 
 ### Active
 
-- Step 7: Matchday Scene
+- Step 8: Live Match Scene with visible player movement
 
 ### Backlog
 
-- Step 8: Live Match Scene with visible player movement
 - Step 9: Post-Match Scene
 - Step 10: Advance Date
 - Step 11: Save Game
@@ -25,6 +24,7 @@
 - Step 4: Club Dashboard
 - Step 5: Squad Screen with named players
 - Step 6: Tactics Screen
+- Step 7: Matchday Scene
 
 ## 2. Plan Rules
 
@@ -173,6 +173,6 @@ Persist full game state to local save slot and reload safely.
 
 ## 14. Immediate Next Subtask
 
-For active Step 7, smallest valid next subtask is:
+For active Step 8, smallest valid next subtask is:
 
-- replace MatchdayScene stub with pre-match context and transition into LiveMatchScene.
+- replace the LiveMatchScene stub with a football pitch view that shows visible player movement and live match context.

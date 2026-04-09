@@ -31,6 +31,9 @@ public partial class GameState : Node
     public int Tempo { get; private set; } = 58;
     public int Width { get; private set; } = 55;
     public int Risk { get; private set; } = 52;
+    public string CompetitionName { get; private set; } = "Novara Premier Division";
+    public int CurrentMatchday { get; private set; } = 1;
+    public string CurrentOpponentName { get; private set; } = "Harbor County";
 
     public override void _EnterTree()
     {
@@ -67,11 +70,20 @@ public partial class GameState : Node
         Tempo = 58;
         Width = 55;
         Risk = 52;
+        CompetitionName = "Novara Premier Division";
+        CurrentMatchday = 1;
+        CurrentOpponentName = "Harbor County";
     }
 
     public void SelectClub(string clubName)
     {
         SelectedClubName = clubName;
+
+        var opponent = Array.Find(AvailableClubs, candidate => candidate != clubName) ?? "Harbor County";
+        CurrentOpponentName = opponent;
+        CompetitionName = "Novara Premier Division";
+        CurrentMatchday = 1;
+        NextFixtureSummary = $"Matchday {CurrentMatchday}: {clubName} vs {CurrentOpponentName}";
 
         SquadPlayers = new[]
         {

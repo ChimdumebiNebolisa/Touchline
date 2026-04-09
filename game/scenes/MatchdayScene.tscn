@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://scripts/HubStubScreen.cs" id="1"]
+[ext_resource type="Script" path="res://scripts/MatchdayScene.cs" id="1"]
 
 [node name="MatchdayScene" type="Control"]
 layout_mode = 3
@@ -10,7 +10,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1")
-ScreenTitle = "Matchday Scene"
 
 [node name="Center" type="CenterContainer" parent="."]
 layout_mode = 1
@@ -22,16 +21,42 @@ grow_vertical = 2
 
 [node name="Panel" type="VBoxContainer" parent="Center"]
 layout_mode = 2
+custom_minimum_size = Vector2(560, 380)
 theme_override_constants/separation = 10
 
 [node name="Heading" type="Label" parent="Center/Panel"]
 layout_mode = 2
-text = "Matchday Scene"
+text = "Matchday"
 horizontal_alignment = 1
 
-[node name="Message" type="Label" parent="Center/Panel"]
+[node name="CompetitionLabel" type="Label" parent="Center/Panel"]
 layout_mode = 2
-text = ""
+text = "Competition: unavailable"
+horizontal_alignment = 1
+
+[node name="FixtureLabel" type="Label" parent="Center/Panel"]
+layout_mode = 2
+text = "Fixture: unavailable"
+horizontal_alignment = 1
+
+[node name="LineupLabel" type="Label" parent="Center/Panel"]
+layout_mode = 2
+text = "Starting lineup ready: unavailable"
+horizontal_alignment = 1
+
+[node name="TacticsLabel" type="Label" parent="Center/Panel"]
+layout_mode = 2
+text = "Tactics: unavailable"
+autowrap_mode = 3
+horizontal_alignment = 1
+
+[node name="StartMatchButton" type="Button" parent="Center/Panel"]
+layout_mode = 2
+text = "Start Match"
+
+[node name="StatusLabel" type="Label" parent="Center/Panel"]
+layout_mode = 2
+text = "Review context, then start the match."
 autowrap_mode = 3
 horizontal_alignment = 1
 
@@ -39,4 +64,5 @@ horizontal_alignment = 1
 layout_mode = 2
 text = "Back to Club Dashboard"
 
+[connection signal="pressed" from="Center/Panel/StartMatchButton" to="." method="OnStartMatchPressed"]
 [connection signal="pressed" from="Center/Panel/BackButton" to="." method="OnBackPressed"]
