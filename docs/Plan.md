@@ -4,11 +4,10 @@
 
 ### Active
 
-- Step 25: Add the missing autoload systems from the architecture
+- Step 26: Move hardcoded football content into real data
 
 ### Backlog
 
-- Step 26: Move hardcoded football content into real data
 - Step 27: Integrate the save path with the authoritative domain model
 - Step 28: Complete season continuity and progression
 - Step 29: Expose board, fan, and perception context properly
@@ -45,6 +44,7 @@
 - Step 22: Unify live and instant simulation around one shared engine
 - Step 23: Rebuild post-match into a consequence and explainability screen
 - Step 24: Refactor runtime architecture around clear services
+- Step 25: Add the missing autoload systems from the architecture
 
 ## 2. Plan Rules
 
@@ -398,8 +398,8 @@ Remove remaining prototype edges and harden the shell for repeated play.
 
 ## 23. Immediate Next Subtask
 
-Step 25 starts with the smallest valid runtime-system slice:
+Step 26 starts with the smallest valid data-loading slice:
 
-- add first-class `CalendarSystem` and `WorldGenerator` autoloads under the Godot product path
-- move scene-facing date advancement and world bootstrapping calls behind those dedicated runtime systems
-- preserve existing career flow and verify the project still builds cleanly before moving hardcoded football content into data
+- author product seed data under `game/data` for clubs, named players, and competition identity
+- load that authored data through the world-generation path instead of embedded literals
+- surface missing or malformed football data as explicit load failures before advancing to save-model integration
