@@ -4,11 +4,10 @@
 
 ### Active
 
-- Step 15: Rebuild the club dashboard as the real command center
+- Step 16: Create the player profile scene
 
 ### Backlog
 
-- Step 16: Create the player profile scene
 - Step 17: Rebuild squad management into a football workspace
 - Step 18: Redesign tactics as a tactical board
 - Step 19: Replace fixtures and standings placeholders with real competition surfaces
@@ -45,6 +44,7 @@
 - Step 12: Establish the visual system
 - Step 13: Rebuild main menu and shell framing
 - Step 14: Redesign career setup and club selection
+- Step 15: Rebuild the club dashboard as the real command center
 
 ## 2. Plan Rules
 
@@ -146,6 +146,13 @@ Make the dashboard the central football hub required by the PRD.
 ### Objective
 
 Add the missing player profile scene so named players feel like persistent identities rather than list entries.
+
+### Allowed Subtasks
+
+- add a dedicated player profile scene and script under the Godot game path
+- create the smallest valid scene handoff from squad management into player inspection
+- present player identity, role, age, form, morale, fitness, and current squad status from existing state
+- preserve navigation back into the squad flow without introducing duplicate business logic
 
 ### Verification
 
@@ -335,8 +342,8 @@ Remove remaining prototype edges and harden the shell for repeated play.
 
 ## 23. Immediate Next Subtask
 
-Step 15 starts with the smallest valid dashboard command-center slice:
+Step 16 starts with the smallest valid missing-screen slice:
 
-- reorganize the dashboard into clearer context and action modules
-- surface form, fixture, and club-pressure context more explicitly
-- verify the project still builds cleanly before deeper dashboard expansion continues
+- add a PlayerProfile scene and script
+- wire the squad screen into player inspection
+- verify the project still builds cleanly before deeper squad-workspace changes continue
