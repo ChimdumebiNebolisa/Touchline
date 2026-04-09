@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://scripts/HubStubScreen.cs" id="1"]
+[ext_resource type="Script" path="res://scripts/SquadScreen.cs" id="1"]
 
 [node name="SquadScreen" type="Control"]
 layout_mode = 3
@@ -10,7 +10,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1")
-ScreenTitle = "Squad Screen"
 
 [node name="Center" type="CenterContainer" parent="."]
 layout_mode = 1
@@ -22,6 +21,7 @@ grow_vertical = 2
 
 [node name="Panel" type="VBoxContainer" parent="Center"]
 layout_mode = 2
+custom_minimum_size = Vector2(560, 440)
 theme_override_constants/separation = 10
 
 [node name="Heading" type="Label" parent="Center/Panel"]
@@ -29,9 +29,19 @@ layout_mode = 2
 text = "Squad Screen"
 horizontal_alignment = 1
 
-[node name="Message" type="Label" parent="Center/Panel"]
+[node name="ClubContextLabel" type="Label" parent="Center/Panel"]
 layout_mode = 2
-text = ""
+text = "Club context unavailable."
+autowrap_mode = 3
+horizontal_alignment = 1
+
+[node name="PlayerList" type="ItemList" parent="Center/Panel"]
+layout_mode = 2
+custom_minimum_size = Vector2(540, 280)
+
+[node name="PlayerDetailLabel" type="Label" parent="Center/Panel"]
+layout_mode = 2
+text = "Select a player to inspect details."
 autowrap_mode = 3
 horizontal_alignment = 1
 
@@ -39,4 +49,5 @@ horizontal_alignment = 1
 layout_mode = 2
 text = "Back to Club Dashboard"
 
+[connection signal="item_selected" from="Center/Panel/PlayerList" to="." method="OnPlayerSelected"]
 [connection signal="pressed" from="Center/Panel/BackButton" to="." method="OnBackPressed"]
