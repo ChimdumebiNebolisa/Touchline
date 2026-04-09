@@ -4,11 +4,10 @@
 
 ### Active
 
-- Step 28: Complete season continuity and progression
+- Step 29: Expose board, fan, and perception context properly
 
 ### Backlog
 
-- Step 29: Expose board, fan, and perception context properly
 - Step 30: Create a navigation and transition pass
 - Step 31: Run a full polish and usability pass
 
@@ -45,6 +44,7 @@
 - Step 25: Add the missing autoload systems from the architecture
 - Step 26: Move hardcoded football content into real data
 - Step 27: Integrate the save path with the authoritative domain model
+- Step 28: Complete season continuity and progression
 
 ## 2. Plan Rules
 
@@ -398,8 +398,8 @@ Remove remaining prototype edges and harden the shell for repeated play.
 
 ## 23. Immediate Next Subtask
 
-Step 28 starts with the smallest valid continuity slice:
+Step 29 starts with the smallest valid perception slice:
 
-- carry squad, fixture, and date progression cleanly across repeated match cycles
-- apply deterministic season-rollover changes so player age and visible squad state evolve instead of only the calendar resetting
-- verify multi-cycle progression and rollover behavior through headless Godot runtime checks before surfacing additional perception depth
+- add explicit board, fan, and dressing-room reason summaries to the primary shell surfaces
+- keep pressure explanations grounded in authoritative state rather than scene-local heuristics
+- verify the richer pressure context appears on the dashboard and matchday before moving on to navigation and final polish

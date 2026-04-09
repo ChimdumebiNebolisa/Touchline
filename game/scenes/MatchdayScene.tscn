@@ -129,6 +129,11 @@ layout_mode = 2
 text = "Pressure context unavailable."
 autowrap_mode = 3
 
+[node name="PressureReasonsLabel" type="Label" parent="Center/Shell/Padding/Content/BodyRow/EventCard/EventPadding/EventContent"]
+layout_mode = 2
+text = "Pressure reasons unavailable."
+autowrap_mode = 3
+
 [node name="PlanCard" type="PanelContainer" parent="Center/Shell/Padding/Content/BodyRow"]
 custom_minimum_size = Vector2(320, 0)
 layout_mode = 2

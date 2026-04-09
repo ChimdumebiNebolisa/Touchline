@@ -13,6 +13,7 @@ public partial class MatchdayScene : Control
     private Label _benchLabel = default!;
     private Label _formLabel = default!;
     private Label _pressureLabel = default!;
+    private Label _pressureReasonsLabel = default!;
     private Label _tacticsLabel = default!;
     private Label _opponentFocusLabel = default!;
     private Label _readinessLabel = default!;
@@ -30,6 +31,7 @@ public partial class MatchdayScene : Control
         _benchLabel = GetNode<Label>("Center/Shell/Padding/Content/BodyRow/EventCard/EventPadding/EventContent/BenchLabel");
         _formLabel = GetNode<Label>("Center/Shell/Padding/Content/BodyRow/EventCard/EventPadding/EventContent/FormLabel");
         _pressureLabel = GetNode<Label>("Center/Shell/Padding/Content/BodyRow/EventCard/EventPadding/EventContent/PressureLabel");
+        _pressureReasonsLabel = GetNode<Label>("Center/Shell/Padding/Content/BodyRow/EventCard/EventPadding/EventContent/PressureReasonsLabel");
         _tacticsLabel = GetNode<Label>("Center/Shell/Padding/Content/BodyRow/PlanCard/PlanPadding/PlanContent/TacticsLabel");
         _opponentFocusLabel = GetNode<Label>("Center/Shell/Padding/Content/BodyRow/PlanCard/PlanPadding/PlanContent/OpponentFocusLabel");
         _readinessLabel = GetNode<Label>("Center/Shell/Padding/Content/BodyRow/PlanCard/PlanPadding/PlanContent/ReadinessLabel");
@@ -47,6 +49,7 @@ public partial class MatchdayScene : Control
             _benchLabel.Text = "Bench context unavailable.";
             _formLabel.Text = "Form unavailable.";
             _pressureLabel.Text = "Pressure context unavailable.";
+            _pressureReasonsLabel.Text = "Pressure reasons unavailable.";
             _tacticsLabel.Text = "Tactics unavailable.";
             _opponentFocusLabel.Text = "Opponent focus unavailable.";
             _readinessLabel.Text = "Readiness unavailable.";
@@ -86,6 +89,7 @@ public partial class MatchdayScene : Control
         _formLabel.Text = GameState.Instance.FormSummary;
         _pressureLabel.Text =
             $"Club pulse: morale {GameState.Instance.TeamMorale} | fans {GameState.Instance.FanSentiment} | board {GameState.Instance.BoardConfidence}.";
+        _pressureReasonsLabel.Text = PerceptionSystem.BuildPressureReasonSummary(GameState.Instance);
         _tacticsLabel.Text =
             $"Tactical board: {GameState.Instance.TacticalFormation} | Press {GameState.Instance.PressIntensity} | Tempo {GameState.Instance.Tempo} | Width {GameState.Instance.Width} | Risk {GameState.Instance.Risk}";
         _opponentFocusLabel.Text = BuildOpponentFocusLabel();

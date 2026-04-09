@@ -123,6 +123,12 @@ text = "Pressure unavailable."
 autowrap_mode = 3
 horizontal_alignment = 0
 
+[node name="PressureReasonsLabel" type="Label" parent="Center/Shell/Padding/Content/DashboardRow/SnapshotCard/SnapshotPadding/SnapshotContent"]
+layout_mode = 2
+text = "Pressure reasons unavailable."
+autowrap_mode = 3
+horizontal_alignment = 0
+
 [node name="TacticsSummaryLabel" type="Label" parent="Center/Shell/Padding/Content/DashboardRow/SnapshotCard/SnapshotPadding/SnapshotContent"]
 layout_mode = 2
 text = "Tactical setup unavailable."

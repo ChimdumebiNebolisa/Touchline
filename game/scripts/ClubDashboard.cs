@@ -19,6 +19,7 @@ public partial class ClubDashboard : Control
         var squadStatusLabel = GetNode<Label>("Center/Shell/Padding/Content/DashboardRow/SnapshotCard/SnapshotPadding/SnapshotContent/SquadStatusLabel");
         var formLabel = GetNode<Label>("Center/Shell/Padding/Content/DashboardRow/SnapshotCard/SnapshotPadding/SnapshotContent/FormLabel");
         var pressureLabel = GetNode<Label>("Center/Shell/Padding/Content/DashboardRow/SnapshotCard/SnapshotPadding/SnapshotContent/PressureLabel");
+        var pressureReasonsLabel = GetNode<Label>("Center/Shell/Padding/Content/DashboardRow/SnapshotCard/SnapshotPadding/SnapshotContent/PressureReasonsLabel");
         var tacticsSummaryLabel = GetNode<Label>("Center/Shell/Padding/Content/DashboardRow/SnapshotCard/SnapshotPadding/SnapshotContent/TacticsSummaryLabel");
         var priorityLabel = GetNode<Label>("Center/Shell/Padding/Content/DashboardRow/SnapshotCard/SnapshotPadding/SnapshotContent/PriorityLabel");
         _statusLabel = GetNode<Label>("Center/Shell/Padding/Content/DashboardRow/SnapshotCard/SnapshotPadding/SnapshotContent/StatusLabel");
@@ -32,6 +33,7 @@ public partial class ClubDashboard : Control
             squadStatusLabel.Text = "Squad status: unavailable";
             formLabel.Text = "Form unavailable.";
             pressureLabel.Text = "Pressure unavailable.";
+            pressureReasonsLabel.Text = "Pressure reasons unavailable.";
             tacticsSummaryLabel.Text = "Tactical setup unavailable.";
             priorityLabel.Text = "Recommended next move unavailable.";
             _statusLabel.Text = "Dashboard context is unavailable.";
@@ -47,6 +49,7 @@ public partial class ClubDashboard : Control
             squadStatusLabel.Text = "Squad status: unavailable";
             formLabel.Text = "Form unavailable.";
             pressureLabel.Text = "Pressure unavailable.";
+            pressureReasonsLabel.Text = "Pressure reasons unavailable.";
             tacticsSummaryLabel.Text = "Tactical setup unavailable.";
             priorityLabel.Text = "Recommended next move unavailable.";
             _statusLabel.Text = "Choose a club before using the dashboard.";
@@ -62,6 +65,7 @@ public partial class ClubDashboard : Control
         formLabel.Text = GameState.Instance.FormSummary;
         pressureLabel.Text =
             $"Club pressure: morale {GameState.Instance.TeamMorale} | fans {GameState.Instance.FanSentiment} | board {GameState.Instance.BoardConfidence}";
+        pressureReasonsLabel.Text = PerceptionSystem.BuildPressureReasonSummary(GameState.Instance);
         tacticsSummaryLabel.Text =
             $"Tactical setup: {GameState.Instance.TacticalFormation} | Press {GameState.Instance.PressIntensity} | Tempo {GameState.Instance.Tempo} | Width {GameState.Instance.Width} | Risk {GameState.Instance.Risk}";
         priorityLabel.Text = BuildPrioritySummary(GameState.Instance);
