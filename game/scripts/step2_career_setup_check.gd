@@ -1,0 +1,59 @@
+extends SceneTree
+
+var _stage := 0
+var _ticks := 0
+
+func _initialize() -> void:
+    var err := change_scene_to_file("res://scenes/CareerSetup.tscn")
+    if err != OK:
+        _fail("unable to load CareerSetup scene")
+
+func _process(_delta: float) -> bool:
+    _ticks += 1
+
+    if _stage == 0 and _ticks > 2:
+        if current_scene == null:
+            _fail("CareerSetup scene did not load")
+            return false
+
+        var name_input := current_scene.get_node("Center/Panel/ManagerNameInput") as LineEdit
+        var seed_input := current_scene.get_node("Center/Panel/SeedInput") as SpinBox
+        var start_button := current_scene.get_node("Center/Panel/StartCareerButton") as Button
+
+        if name_input == null or seed_input == null or start_button == null:
+            _fail("CareerSetup profile controls are missing")
+            return false
+
+        name_input.text = "Casey Doyle"
+        seed_input.value = 424242
+        start_button.emit_signal("pressed")
+        _stage = 1
+        _ticks = 0
+
+    elif _stage == 1 and _ticks > 2:
+        var game_state := root.get_node("GameState")
+        if game_state == null:
+            _fail("GameState singleton was not autoloaded")
+            return false
+
+        if not game_state.CareerInitialized:
+            _fail("Career was not initialized")
+            return false
+
+        if game_state.ManagerName != "Casey Doyle":
+            _fail("ManagerName was not stored correctly")
+            return false
+
+        if int(game_state.CareerSeed) != 424242:
+            _fail("CareerSeed was not stored correctly")
+            return false
+
+        print("STEP2_SUBTASK_PASS")
+        quit()
+
+    return false
+
+func _fail(message: String) -> void:
+    push_error(message)
+    print("STEP2_SUBTASK_FAIL: " + message)
+    quit(1)

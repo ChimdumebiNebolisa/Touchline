@@ -28,9 +28,33 @@ layout_mode = 2
 text = "Career Setup"
 horizontal_alignment = 1
 
-[node name="StubMessage" type="Label" parent="Center/Panel"]
+[node name="ManagerNameLabel" type="Label" parent="Center/Panel"]
 layout_mode = 2
-text = "Step 2 will implement manager profile and club selection flow."
+text = "Manager Name"
+
+[node name="ManagerNameInput" type="LineEdit" parent="Center/Panel"]
+layout_mode = 2
+placeholder_text = "Enter manager name"
+text = "Alex Mercer"
+
+[node name="SeedLabel" type="Label" parent="Center/Panel"]
+layout_mode = 2
+text = "Career Seed"
+
+[node name="SeedInput" type="SpinBox" parent="Center/Panel"]
+layout_mode = 2
+min_value = 1.0
+max_value = 999999.0
+step = 1.0
+value = 20260408.0
+
+[node name="StartCareerButton" type="Button" parent="Center/Panel"]
+layout_mode = 2
+text = "Start Career"
+
+[node name="StatusLabel" type="Label" parent="Center/Panel"]
+layout_mode = 2
+text = "Career state will initialize here before club selection."
 autowrap_mode = 3
 horizontal_alignment = 1
 
@@ -38,4 +62,5 @@ horizontal_alignment = 1
 layout_mode = 2
 text = "Back to Main Menu"
 
+[connection signal="pressed" from="Center/Panel/StartCareerButton" to="." method="OnStartCareerPressed"]
 [connection signal="pressed" from="Center/Panel/BackButton" to="." method="OnBackPressed"]

@@ -8,5 +8,8 @@ config/name="Touchline"
 run/main_scene="res://scenes/MainMenu.tscn"
 config/features=PackedStringArray("4.2", "C#")
 
+[autoload]
+GameState="*res://scripts/GameState.cs"
+
 [dotnet]
 project/assembly_name="Touchline"
