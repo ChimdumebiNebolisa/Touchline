@@ -178,9 +178,14 @@ theme_override_constants/separation = 16
 layout_mode = 2
 text = "Back to Club Dashboard"
 
+[node name="InstantResultButton" type="Button" parent="Center/Shell/Padding/Content/ActionsRow"]
+layout_mode = 2
+text = "Instant Result"
+
 [node name="StartMatchButton" type="Button" parent="Center/Shell/Padding/Content/ActionsRow"]
 layout_mode = 2
 text = "Start Live Match"
 
 [connection signal="pressed" from="Center/Shell/Padding/Content/ActionsRow/BackButton" to="." method="OnBackPressed"]
+[connection signal="pressed" from="Center/Shell/Padding/Content/ActionsRow/InstantResultButton" to="." method="OnInstantResultPressed"]
 [connection signal="pressed" from="Center/Shell/Padding/Content/ActionsRow/StartMatchButton" to="." method="OnStartMatchPressed"]

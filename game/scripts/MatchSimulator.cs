@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public sealed class LiveMatchPlayback
+public sealed class MatchSimulationResult
 {
     public sealed class MarkerState
     {
@@ -29,8 +29,13 @@ public sealed class LiveMatchPlayback
     public required string TacticalSummary { get; init; }
     public required MarkerState[] Markers { get; init; }
     public required MatchEvent[] Events { get; init; }
+    public int HomeGoals => Events.Length == 0 ? 0 : Events[^1].HomeScore;
+    public int AwayGoals => Events.Length == 0 ? 0 : Events[^1].AwayScore;
+}
 
-    public static LiveMatchPlayback Create(GameState state)
+public static class MatchSimulator
+{
+    public static MatchSimulationResult Simulate(GameState state)
     {
         var rng = new Random(state.WorldSeed * 31 + state.CurrentMatchday * 17 + state.PressIntensity + state.Risk);
 
@@ -38,7 +43,7 @@ public sealed class LiveMatchPlayback
         var awayLineup = BuildAwayLineup();
         var homeAnchors = BuildFormationAnchors(false);
         var awayAnchors = BuildFormationAnchors(true);
-        var markers = new List<MarkerState>(22);
+        var markers = new List<MatchSimulationResult.MarkerState>(22);
 
         for (var index = 0; index < homeLineup.Count; index++)
         {
@@ -60,7 +65,7 @@ public sealed class LiveMatchPlayback
 
         var events = BuildEvents(state, homeLineup, awayLineup, homeGoals, awayGoals, rng);
 
-        return new LiveMatchPlayback
+        return new MatchSimulationResult
         {
             HomeClubName = state.SelectedClubName ?? "Home",
             AwayClubName = state.CurrentOpponentName,
@@ -153,9 +158,9 @@ public sealed class LiveMatchPlayback
         return mirrored;
     }
 
-    private static MarkerState CreateMarker(string fullName, bool isHome, Vector2 anchor, Random rng, int index)
+    private static MatchSimulationResult.MarkerState CreateMarker(string fullName, bool isHome, Vector2 anchor, Random rng, int index)
     {
-        return new MarkerState
+        return new MatchSimulationResult.MarkerState
         {
             FullName = fullName,
             Initials = BuildInitials(fullName),
@@ -168,7 +173,7 @@ public sealed class LiveMatchPlayback
         };
     }
 
-    private static List<MatchEvent> BuildEvents(
+    private static List<MatchSimulationResult.MatchEvent> BuildEvents(
         GameState state,
         IReadOnlyList<string> homeLineup,
         IReadOnlyList<string> awayLineup,
@@ -176,11 +181,11 @@ public sealed class LiveMatchPlayback
         int awayGoals,
         Random rng)
     {
-        var events = new List<MatchEvent>();
+        var events = new List<MatchSimulationResult.MatchEvent>();
         var homeScore = 0;
         var awayScore = 0;
 
-        events.Add(new MatchEvent
+        events.Add(new MatchSimulationResult.MatchEvent
         {
             Minute = 1,
             Summary = $"1' Kick-off. {state.SelectedClubName} open in a {state.TacticalFormation} and look to set the tempo.",
@@ -189,7 +194,7 @@ public sealed class LiveMatchPlayback
         });
 
         var openingChanceMinute = 9 + rng.Next(0, 5);
-        events.Add(new MatchEvent
+        events.Add(new MatchSimulationResult.MatchEvent
         {
             Minute = openingChanceMinute,
             Summary = $"{openingChanceMinute}' Early warning. {homeLineup[8]} stretches the back line and forces a hurried clearance.",
@@ -198,7 +203,7 @@ public sealed class LiveMatchPlayback
         });
 
         var bookedMinute = 34 + rng.Next(0, 10);
-        events.Add(new MatchEvent
+        events.Add(new MatchSimulationResult.MatchEvent
         {
             Minute = bookedMinute,
             Summary = $"{bookedMinute}' Midfield collision. {awayLineup[6]} goes into the book after stopping a transition.",
@@ -222,7 +227,7 @@ public sealed class LiveMatchPlayback
                 homeGoals--;
                 homeScore++;
                 var scorer = homeLineup[8 + rng.Next(0, 3)];
-                events.Add(new MatchEvent
+                events.Add(new MatchSimulationResult.MatchEvent
                 {
                     Minute = minute,
                     Summary = $"{minute}' Goal {state.SelectedClubName}. {scorer} finishes a move worked through the right half-space.",
@@ -235,7 +240,7 @@ public sealed class LiveMatchPlayback
                 awayGoals--;
                 awayScore++;
                 var scorer = awayLineup[8 + rng.Next(0, 3)];
-                events.Add(new MatchEvent
+                events.Add(new MatchSimulationResult.MatchEvent
                 {
                     Minute = minute,
                     Summary = $"{minute}' Goal {state.CurrentOpponentName}. {scorer} sneaks in at the far post after sustained pressure.",
@@ -246,7 +251,7 @@ public sealed class LiveMatchPlayback
         }
 
         var lateMinute = 82 + rng.Next(0, 7);
-        events.Add(new MatchEvent
+        events.Add(new MatchSimulationResult.MatchEvent
         {
             Minute = lateMinute,
             Summary = $"{lateMinute}' Late surge. {homeLineup[6]} keeps the ball alive and the crowd sense a final push.",

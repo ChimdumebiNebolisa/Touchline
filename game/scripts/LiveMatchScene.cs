@@ -10,7 +10,7 @@ public partial class LiveMatchScene : Control
     private const float MarkerSize = 30.0f;
 
     private readonly List<Button> _markerNodes = new();
-    private LiveMatchPlayback? _playback;
+    private MatchSimulationResult? _playback;
     private float _elapsedSeconds;
     private int _currentMinute = 1;
     private int _appliedEventCount;
@@ -62,7 +62,7 @@ public partial class LiveMatchScene : Control
             return;
         }
 
-        _playback = LiveMatchPlayback.Create(GameState.Instance);
+        _playback = GameState.Instance.PrepareCurrentMatchResult();
         _fixtureLabel.Text = $"{_playback.HomeClubName} vs {_playback.AwayClubName}";
         _scoreLabel.Text = "0 - 0";
         _clockLabel.Text = "01'";
@@ -211,7 +211,7 @@ public partial class LiveMatchScene : Control
         return string.Join("\n", feedLines);
     }
 
-    private string BuildStatus(LiveMatchPlayback.MatchEvent latestEvent, int minute)
+    private string BuildStatus(MatchSimulationResult.MatchEvent latestEvent, int minute)
     {
         if (_playback == null)
         {
@@ -231,7 +231,7 @@ public partial class LiveMatchScene : Control
         return $"{_playback.HomeClubName} probe for openings while the clock ticks toward {minute:00}'.";
     }
 
-    private string BuildControlLabel(LiveMatchPlayback.MatchEvent latestEvent, int minute)
+    private string BuildControlLabel(MatchSimulationResult.MatchEvent latestEvent, int minute)
     {
         if (_playback == null)
         {
@@ -257,7 +257,7 @@ public partial class LiveMatchScene : Control
         };
     }
 
-    private string BuildMomentumLabel(LiveMatchPlayback.MatchEvent latestEvent, int minute)
+    private string BuildMomentumLabel(MatchSimulationResult.MatchEvent latestEvent, int minute)
     {
         if (_playback == null)
         {
@@ -300,7 +300,7 @@ public partial class LiveMatchScene : Control
         };
     }
 
-    private string BuildPitchNote(LiveMatchPlayback.MatchEvent latestEvent, int minute)
+    private string BuildPitchNote(MatchSimulationResult.MatchEvent latestEvent, int minute)
     {
         if (_playback == null)
         {
@@ -346,7 +346,7 @@ public partial class LiveMatchScene : Control
             return;
         }
 
-        GameState.Instance?.CompleteLiveMatch(_playback);
+        GameState.Instance?.ApplyMatchResult(_playback);
         _statusLabel!.Text = "Full time. Review the result and consequence deltas in post-match.";
         _controlLabel!.Text = "Broadcast focus: match complete.";
         _momentumLabel!.Text = "Momentum: full time";

@@ -17,6 +17,7 @@ public partial class MatchdayScene : Control
     private Label _opponentFocusLabel = default!;
     private Label _readinessLabel = default!;
     private Label _statusLabel = default!;
+    private Button _instantResultButton = default!;
     private Button _startMatchButton = default!;
 
     public override void _Ready()
@@ -33,6 +34,7 @@ public partial class MatchdayScene : Control
         _opponentFocusLabel = GetNode<Label>("Center/Shell/Padding/Content/BodyRow/PlanCard/PlanPadding/PlanContent/OpponentFocusLabel");
         _readinessLabel = GetNode<Label>("Center/Shell/Padding/Content/BodyRow/PlanCard/PlanPadding/PlanContent/ReadinessLabel");
         _statusLabel = GetNode<Label>("Center/Shell/Padding/Content/StatusLabel");
+        _instantResultButton = GetNode<Button>("Center/Shell/Padding/Content/ActionsRow/InstantResultButton");
         _startMatchButton = GetNode<Button>("Center/Shell/Padding/Content/ActionsRow/StartMatchButton");
 
         if (GameState.Instance == null || string.IsNullOrWhiteSpace(GameState.Instance.SelectedClubName))
@@ -49,6 +51,7 @@ public partial class MatchdayScene : Control
             _opponentFocusLabel.Text = "Opponent focus unavailable.";
             _readinessLabel.Text = "Readiness unavailable.";
             _statusLabel.Text = "Set up a career and club before entering matchday.";
+            _instantResultButton.Disabled = true;
             _startMatchButton.Disabled = true;
             return;
         }
@@ -93,12 +96,26 @@ public partial class MatchdayScene : Control
         _statusLabel.Text = fixtureComplete
             ? "This matchday is already recorded. Review the dashboard, then continue the season instead of replaying the same fixture."
             : "Final check complete. Launch the live match when the lineup, shape, and pressure context all feel coherent.";
+        _instantResultButton.Disabled = fixtureComplete;
         _startMatchButton.Disabled = fixtureComplete;
     }
 
     private void OnStartMatchPressed()
     {
+        GameState.Instance?.PrepareCurrentMatchResult(true);
         GetTree().ChangeSceneToFile(LiveMatchScenePath);
+    }
+
+    private void OnInstantResultPressed()
+    {
+        if (GameState.Instance == null)
+        {
+            return;
+        }
+
+        GameState.Instance.PrepareCurrentMatchResult(true);
+        GameState.Instance.ResolveCurrentMatchInstantly();
+        GetTree().ChangeSceneToFile("res://scenes/PostMatchScene.tscn");
     }
 
     private void OnBackPressed()

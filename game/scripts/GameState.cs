@@ -94,6 +94,7 @@ public partial class GameState : Node
     public string? SelectedPlayerProfileName { get; private set; }
     public CompetitionRow[] CompetitionTable { get; private set; } = Array.Empty<CompetitionRow>();
     public CompetitionFixture[] CompetitionFixtures { get; private set; } = Array.Empty<CompetitionFixture>();
+    public MatchSimulationResult? CurrentMatchResult { get; private set; }
 
     public override void _EnterTree()
     {
@@ -144,6 +145,7 @@ public partial class GameState : Node
         SelectedPlayerProfileName = null;
         CompetitionTable = Array.Empty<CompetitionRow>();
         CompetitionFixtures = Array.Empty<CompetitionFixture>();
+        CurrentMatchResult = null;
     }
 
     public void SelectClub(string clubName)
@@ -153,6 +155,7 @@ public partial class GameState : Node
         CurrentMatchday = 1;
         LastMatchReport = null;
         SelectedPlayerProfileName = null;
+        CurrentMatchResult = null;
 
         SquadPlayers = new[]
         {
@@ -208,12 +211,31 @@ public partial class GameState : Node
         }
 
         LastMatchReport = null;
+        CurrentMatchResult = null;
         RefreshFixtureContext();
     }
 
-    public void CompleteLiveMatch(LiveMatchPlayback playback)
+    public MatchSimulationResult PrepareCurrentMatchResult(bool forceNew = false)
     {
-        var finalEvent = playback.Events[^1];
+        if (!forceNew && CurrentMatchResult != null)
+        {
+            return CurrentMatchResult;
+        }
+
+        CurrentMatchResult = MatchSimulator.Simulate(this);
+        return CurrentMatchResult;
+    }
+
+    public void ResolveCurrentMatchInstantly()
+    {
+        var result = PrepareCurrentMatchResult();
+        ApplyMatchResult(result);
+    }
+
+    public void ApplyMatchResult(MatchSimulationResult result)
+    {
+        CurrentMatchResult = result;
+        var finalEvent = result.Events[^1];
         var goalDifference = finalEvent.HomeScore - finalEvent.AwayScore;
         var moraleDelta = goalDifference > 0 ? 4 : goalDifference == 0 ? 1 : -4;
         var fanDelta = goalDifference > 0 ? 5 : goalDifference == 0 ? 0 : -5;
@@ -227,12 +249,12 @@ public partial class GameState : Node
 
         LastMatchReport = new MatchReport
         {
-            FixtureLabel = $"{playback.HomeClubName} vs {playback.AwayClubName}",
+            FixtureLabel = $"{result.HomeClubName} vs {result.AwayClubName}",
             Scoreline = $"{finalEvent.HomeScore} - {finalEvent.AwayScore}",
-            ResultLabel = BuildResultLabel(goalDifference, playback.AwayClubName),
+            ResultLabel = BuildResultLabel(goalDifference, result.AwayClubName),
             ConsequenceSummary =
                 $"Morale {FormatSignedDelta(moraleDelta)} | Fans {FormatSignedDelta(fanDelta)} | Board {FormatSignedDelta(boardDelta)}",
-            KeyEvents = ExtractRecentEvents(playback),
+            KeyEvents = ExtractRecentEvents(result),
             MoraleDelta = moraleDelta,
             FanDelta = fanDelta,
             BoardDelta = boardDelta
@@ -240,6 +262,7 @@ public partial class GameState : Node
 
         RecordCompetitionResults(finalEvent.HomeScore, finalEvent.AwayScore);
         RefreshFixtureContext();
+        CurrentMatchResult = null;
     }
 
     public void RestoreFromSave(SaveSlotData data)
@@ -325,6 +348,7 @@ public partial class GameState : Node
                 ResultSummary = fixture.ResultSummary
             });
         SelectedPlayerProfileName = null;
+        CurrentMatchResult = null;
         RefreshFixtureContext();
     }
 
@@ -842,14 +866,14 @@ public partial class GameState : Node
         return delta >= 0 ? $"+{delta}" : delta.ToString();
     }
 
-    private static string[] ExtractRecentEvents(LiveMatchPlayback playback)
+    private static string[] ExtractRecentEvents(MatchSimulationResult result)
     {
-        var count = Math.Min(4, playback.Events.Length);
+        var count = Math.Min(4, result.Events.Length);
         var recentEvents = new string[count];
 
         for (var index = 0; index < count; index++)
         {
-            recentEvents[index] = playback.Events[playback.Events.Length - count + index].Summary;
+            recentEvents[index] = result.Events[result.Events.Length - count + index].Summary;
         }
 
         return recentEvents;
