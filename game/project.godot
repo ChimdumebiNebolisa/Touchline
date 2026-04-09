@@ -9,6 +9,7 @@ run/main_scene="res://scenes/MainMenu.tscn"
 config/features=PackedStringArray("4.2", "C#")
 
 [autoload]
+TouchlineTheme="*res://scripts/TouchlineTheme.cs"
 GameState="*res://scripts/GameState.cs"
 SaveSystem="*res://scripts/SaveSystem.cs"
 
