@@ -4,7 +4,7 @@
 - Step 1: Main Menu
 
 ## Last completed verified task
-- Step 1 scaffold increment complete: created game foundation, startup MainMenu scene, New Career and Load Game target scene stubs, C# scripts, and Touchline solution/project wiring.
+- Step 1 cleanup increment complete: removed tracked Godot generated artifacts and added ignore rules for game/.godot.
 
 ## Current subtask in progress
 - Step 1 subtask: verify MainMenu navigation flow behavior and close Step 1 exit criteria.
@@ -18,10 +18,10 @@
 - None currently.
 
 ## Last verification run
-- Passed: dotnet build game/Touchline.csproj; Godot headless project load (`--headless --path game --quit`); npm test; npm run typecheck; npm run lint; npm run build (2026-04-08).
+- Passed: npm test; npm run typecheck; npm run lint; npm run build (2026-04-08).
 
 ## Last commit hash
-- Pending new Step 1 scaffold commit.
+- Pending Step 1 cleanup commit.
 
 ## Resume instructions
 - Re-read docs/PRD.md, docs/Architecture.md, docs/Guardrails.md, and docs/Plan.md.
