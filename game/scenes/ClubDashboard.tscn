@@ -78,6 +78,10 @@ text = "Standings"
 layout_mode = 2
 text = "Matchday"
 
+[node name="SaveButton" type="Button" parent="Center/Panel"]
+layout_mode = 2
+text = "Save Game"
+
 [node name="BackButton" type="Button" parent="Center/Panel"]
 layout_mode = 2
 text = "Back to Choose Club"
@@ -87,4 +91,5 @@ text = "Back to Choose Club"
 [connection signal="pressed" from="Center/Panel/FixturesButton" to="." method="OnFixturesPressed"]
 [connection signal="pressed" from="Center/Panel/StandingsButton" to="." method="OnStandingsPressed"]
 [connection signal="pressed" from="Center/Panel/MatchdayButton" to="." method="OnMatchdayPressed"]
+[connection signal="pressed" from="Center/Panel/SaveButton" to="." method="OnSavePressed"]
 [connection signal="pressed" from="Center/Panel/BackButton" to="." method="OnBackPressed"]

@@ -57,6 +57,7 @@ public partial class GameState : Node
     public int SeasonStartYear { get; private set; } = 2026;
     public string FormSummary { get; private set; } = "Form: season about to begin.";
     public MatchReport? LastMatchReport { get; private set; }
+    public string[] RecentResults => _recentResults.ToArray();
     public string SeasonLabel => $"{SeasonStartYear}/{((SeasonStartYear + 1) % 100):00}";
     public string CurrentDateLabel => CurrentDate.ToString("ddd d MMM yyyy");
 
@@ -195,6 +196,66 @@ public partial class GameState : Node
             FanDelta = fanDelta,
             BoardDelta = boardDelta
         };
+    }
+
+    public void RestoreFromSave(SaveSlotData data)
+    {
+        ManagerName = data.ManagerName;
+        CareerSeed = data.CareerSeed;
+        CareerInitialized = data.CareerInitialized;
+        WorldSeed = data.WorldSeed;
+        CountryPackId = data.CountryPackId;
+        AvailableClubs = data.AvailableClubs ?? Array.Empty<string>();
+        SelectedClubName = data.SelectedClubName;
+        NextFixtureSummary = data.NextFixtureSummary;
+        SquadStatusSummary = data.SquadStatusSummary;
+        TacticalFormation = data.TacticalFormation;
+        PressIntensity = data.PressIntensity;
+        Tempo = data.Tempo;
+        Width = data.Width;
+        Risk = data.Risk;
+        CompetitionName = data.CompetitionName;
+        CurrentMatchday = data.CurrentMatchday;
+        CurrentOpponentName = data.CurrentOpponentName;
+        TeamMorale = data.TeamMorale;
+        FanSentiment = data.FanSentiment;
+        BoardConfidence = data.BoardConfidence;
+        CurrentDate = DateTime.Parse(data.CurrentDateIso);
+        SeasonStartYear = data.SeasonStartYear;
+        FormSummary = data.FormSummary;
+
+        _recentResults.Clear();
+        if (data.RecentResults != null)
+        {
+            _recentResults.AddRange(data.RecentResults);
+        }
+
+        SquadPlayers = Array.ConvertAll(
+            data.SquadPlayers ?? Array.Empty<SaveSlotPlayerData>(),
+            player => new SquadPlayer
+            {
+                Name = player.Name,
+                Position = player.Position,
+                Age = player.Age,
+                Form = player.Form,
+                Morale = player.Morale,
+                Fitness = player.Fitness,
+                IsStarting = player.IsStarting
+            });
+
+        LastMatchReport = data.LastMatchReport == null
+            ? null
+            : new MatchReport
+            {
+                FixtureLabel = data.LastMatchReport.FixtureLabel,
+                Scoreline = data.LastMatchReport.Scoreline,
+                ResultLabel = data.LastMatchReport.ResultLabel,
+                ConsequenceSummary = data.LastMatchReport.ConsequenceSummary,
+                KeyEvents = data.LastMatchReport.KeyEvents ?? Array.Empty<string>(),
+                MoraleDelta = data.LastMatchReport.MoraleDelta,
+                FanDelta = data.LastMatchReport.FanDelta,
+                BoardDelta = data.LastMatchReport.BoardDelta
+            };
     }
 
     private string BuildSquadStatusSummary()

@@ -4,7 +4,7 @@
 
 ### Active
 
-- Step 11: Save Game
+- None. Foundational plan complete.
 
 ### Backlog
 
@@ -24,6 +24,7 @@
 - Step 8: Live Match Scene with visible player movement
 - Step 9: Post-Match Scene
 - Step 10: Advance Date
+- Step 11: Save Game
 
 ## 2. Plan Rules
 
@@ -172,6 +173,7 @@ Persist full game state to local save slot and reload safely.
 
 ## 14. Immediate Next Subtask
 
-For active Step 11, smallest valid next subtask is:
+Foundational plan status:
 
-- add local save and load for the current career state, then wire the save/load scene and main menu to use those slots safely.
+- Main menu, new career, club choice, dashboard, squad, tactics, matchday, live match, post-match, date advance, and save/load slices are in place.
+- Further work requires a new active Plan step beyond the current foundation.

@@ -10,6 +10,7 @@ config/features=PackedStringArray("4.2", "C#")
 
 [autoload]
 GameState="*res://scripts/GameState.cs"
+SaveSystem="*res://scripts/SaveSystem.cs"
 
 [dotnet]
 project/assembly_name="Touchline"
