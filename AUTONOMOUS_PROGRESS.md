@@ -4,7 +4,7 @@
 - Step 1: Main Menu
 
 ## Last completed verified task
-- Phase 2 reset complete: replaced source-of-truth docs with Godot plus C# product direction, activated new revamp plan, and passed full repo verification gates.
+- Phase 3 isolation complete: archived the old web client under legacy/web-prototype and removed it from active workspace routing.
 
 ## Current subtask in progress
 - Step 1 subtask: scaffold Godot project foundation and wire MainMenu as startup scene.
@@ -12,7 +12,7 @@
 ## Next queued subtasks
 - Add New Career and Load Game target scene stubs for menu navigation.
 - Verify scene transition flow for MainMenu buttons.
-- Isolate old web prototype under legacy path so it is no longer the active shell.
+- Add initial GameState, SaveSystem, and CalendarSystem singleton stubs.
 
 ## Known blockers
 - None currently.
