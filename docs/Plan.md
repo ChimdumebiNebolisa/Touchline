@@ -4,11 +4,10 @@
 
 ### Active
 
-- Step 1: Main Menu
+- Step 2: New Career
 
 ### Backlog
 
-- Step 2: New Career
 - Step 3: Choose Club
 - Step 4: Club Dashboard
 - Step 5: Squad Screen with named players
@@ -25,7 +24,7 @@
 
 ### Done
 
-- None for the Godot revamp baseline
+- Step 1: Main Menu
 
 ## 2. Plan Rules
 
@@ -174,6 +173,6 @@ Persist full game state to local save slot and reload safely.
 
 ## 14. Immediate Next Subtask
 
-For active Step 1, smallest valid next subtask is:
+For active Step 2, smallest valid next subtask is:
 
-- scaffold Godot project files and create MainMenu scene as startup entry point.
+- create CareerSetup scene state fields for manager name and profile seed with runtime GameState handoff stub.
