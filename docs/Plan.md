@@ -4,11 +4,10 @@
 
 ### Active
 
-- Step 13: Rebuild main menu and shell framing
+- Step 14: Redesign career setup and club selection
 
 ### Backlog
 
-- Step 14: Redesign career setup and club selection
 - Step 15: Rebuild the club dashboard as the real command center
 - Step 16: Create the player profile scene
 - Step 17: Rebuild squad management into a football workspace
@@ -45,6 +44,7 @@
 - Step 10: Advance Date
 - Step 11: Save Game
 - Step 12: Establish the visual system
+- Step 13: Rebuild main menu and shell framing
 
 ## 2. Plan Rules
 
@@ -108,6 +108,13 @@ Make the game feel like a football title from first boot through resume and load
 ### Objective
 
 Turn setup and club selection into a football-native onboarding flow with meaningful club identity context.
+
+### Allowed Subtasks
+
+- improve career setup copy and framing so it reads like football onboarding rather than generic form entry
+- enrich club selection with club identity, expectation, and upcoming-context cues derived from available state
+- preserve the selected-club handoff into the dashboard while making the decision feel more informed
+- add lightweight presentation context without inventing unsupported football systems
 
 ### Verification
 
@@ -321,8 +328,8 @@ Remove remaining prototype edges and harden the shell for repeated play.
 
 ## 23. Immediate Next Subtask
 
-Step 13 starts with the smallest valid shell-framing slice:
+Step 14 starts with the smallest valid onboarding-context slice:
 
-- enrich the main menu with save-aware resume context
-- tighten first-screen copy and entry hierarchy
-- verify the project still builds cleanly before broader shell framing work continues
+- improve career setup and club-selection copy and hierarchy
+- add lightweight club identity context to selection
+- verify the project still builds cleanly before broader onboarding work continues
