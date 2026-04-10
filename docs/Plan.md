@@ -4,6 +4,8 @@
 
 ### Active
 
+- Step 32: Run a comprehensive management-shell UI/UX overhaul
+
 ### Backlog
 
 ### Blocked
@@ -394,8 +396,35 @@ Remove remaining prototype edges and harden the shell for repeated play.
 - layout, copy, focus behavior, and readability are consistent across the shell
 - strongest available automated checks pass and manual Godot regression coverage is documented
 
-## 23. Immediate Next Subtask
+## 23. Step 32: Run a comprehensive management-shell UI/UX overhaul
 
-All currently planned steps are complete.
+### Objective
 
-- Continue with bug fixes, deeper polish, or scope changes only after the source-of-truth docs are updated.
+Transform the current Godot shell from a centered prototype-card presentation into a desktop-first football operations interface without changing the underlying management flow.
+
+### Allowed Subtasks
+
+- introduce reusable shell primitives for page framing, section hierarchy, summary stats, chips, action groups, and structured data surfaces
+- replace centered-card defaults on management screens with a wider app-shell layout that uses desktop width intentionally
+- rebuild the dashboard first, then tactics, standings, fixtures, squad, club selection, career setup, and main menu in that order unless a dependency requires a different sequence
+- reduce explanatory copy and replace raw text dumps with football-native tables, rows, widgets, and status treatments derived from existing authoritative state
+- keep navigation, save/load, matchday launch, and player-profile handoffs intact while presentation changes are applied
+
+### Verification
+
+- management screens no longer default to a narrow centered-card composition
+- dashboard, tactics, standings, fixtures, and squad read as football-native control surfaces rather than debug or placeholder views
+- the redesign uses reusable visual primitives instead of screen-specific styling duplication
+- strongest available checks pass for the touched areas, including `dotnet build game/Touchline.sln` and the relevant headless Godot route checks; manual shell walkthrough updates are documented if automation cannot cover the visual regression directly
+
+### Exit Criteria
+
+- post-menu screens use a coherent desktop-first shell with clear hierarchy and restrained football-native styling
+- dashboard acts as the clear club command center required by the PRD
+- standings, fixtures, tactics, and squad present structured football information rather than plain text blocks
+- copy across the shell is materially tighter and easier to scan
+
+## 24. Immediate Next Subtask
+
+- Step 32 is now active.
+- Begin with a dashboard-first shell refactor that establishes reusable layout and hierarchy primitives for the rest of the management screens.

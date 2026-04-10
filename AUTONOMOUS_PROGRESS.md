@@ -1,32 +1,31 @@
 # Autonomous Progress
 
 ## Current active Plan step
-- No active Plan step. Steps 1 through 31 are complete.
+- Step 32: Run a comprehensive management-shell UI/UX overhaul.
 
 ## Last completed verified task
 - Step 31 complete: polished the squad screen into the shared shell style, kept lineup and player-profile behavior intact, updated the Step 30 route check for the new layout, and documented the interactive Godot regression walkthrough in `docs/ManualRegression.md`.
 
 ## Current subtask in progress
-- Blocked: user requested a major UI/UX overhaul, but `docs/Plan.md` says all steps are complete and explicitly states that future work requires a new or updated source-of-truth plan before more product changes.
+- Step 32 kickoff: redesign the club dashboard first and use it to establish reusable desktop-first shell primitives for the management screens.
 
 ## Next queued subtasks
-- Await a source-of-truth doc update that creates a new active UI overhaul / polish step.
-- After docs update, resume with a dashboard-first shell refactor that introduces reusable desktop-first shell primitives.
-- Re-verify the full navigation and visual shell after each major screen pass.
+- Rebuild the tactical board around the new shell primitives and a stronger football-native pitch presentation.
+- Replace standings and fixtures `ItemList` surfaces with more structured competition views.
+- Rework squad presentation around richer player rows, state chips, and split-pane hierarchy.
 
 ## Known blockers
-- Source-of-truth blocker: the requested redesign is not currently authorized by `docs/Plan.md`. The file states `All currently planned steps are complete.` and `Continue with bug fixes, deeper polish, or scope changes only after the source-of-truth docs are updated.`
-- Smallest human decision needed: update `docs/Plan.md` and any related source-of-truth docs to add a new active step that explicitly authorizes a broad UI/UX overhaul of the Godot shell, or confirm that the existing completed steps should be reopened with a new active subtask.
-- Godot Mono is available locally, so targeted headless runtime validation can now run from this shell environment once the docs allow further implementation.
+- No active blockers.
+- Godot Mono is available locally, so targeted headless runtime validation can run from this shell environment during Step 32.
 
 ## Last verification run
 - Passed `dotnet build game/Touchline.sln`, headless Godot check `step30_navigation_flow_check.gd`, `npm run test`, `npm run typecheck`, `npm run lint`, and `npm run build` on 2026-04-10 after the Step 31 squad polish pass. Manual Godot regression coverage is documented in `docs/ManualRegression.md`.
-- Current blocker evidence: reviewed `docs/Plan.md`, which currently has no active step and ends with `All currently planned steps are complete.` and `Continue with bug fixes, deeper polish, or scope changes only after the source-of-truth docs are updated.`
+- Doc consistency rechecked on 2026-04-10 after activating Step 32 in `docs/Plan.md`.
 
 ## Last commit hash
-- a263ae0
+- 526ea56
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`.
-- Do not make further product/UI edits until the source-of-truth docs create a new active step or explicitly reopen a completed one.
-- Once the docs are updated, start with a dashboard-first shell overhaul that replaces the centered-card default with reusable desktop-first layout primitives, then verify the full route and visual shell again.
+- Continue with Step 32 by rebuilding the dashboard first, using it to establish reusable shell primitives for later management screens.
+- Verify layout integrity, navigation integrity, and the strongest available automated checks after each meaningful screen pass before committing.
