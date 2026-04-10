@@ -20,27 +20,28 @@ public partial class SquadScreen : Control
 
     public override void _Ready()
     {
-        _clubContextLabel = GetNode<Label>("Center/Panel/ClubContextLabel");
-        _positionFilter = GetNode<OptionButton>("Center/Panel/PositionFilter");
-        _lineupSummaryLabel = GetNode<Label>("Center/Panel/LineupSummaryLabel");
-        _playerList = GetNode<ItemList>("Center/Panel/PlayerList");
-        _playerDetailLabel = GetNode<Label>("Center/Panel/PlayerDetailLabel");
-        _lineupActionButton = GetNode<Button>("Center/Panel/LineupActionButton");
-        _lineupStatusLabel = GetNode<Label>("Center/Panel/LineupStatusLabel");
-        _openProfileButton = GetNode<Button>("Center/Panel/OpenProfileButton");
+        _clubContextLabel = GetNode<Label>("Center/Shell/Padding/Content/Header/ClubContextLabel");
+        _positionFilter = GetNode<OptionButton>("Center/Shell/Padding/Content/BodyRow/SelectionCard/SelectionPadding/SelectionContent/PositionFilter");
+        _lineupSummaryLabel = GetNode<Label>("Center/Shell/Padding/Content/Header/LineupSummaryLabel");
+        _playerList = GetNode<ItemList>("Center/Shell/Padding/Content/BodyRow/SelectionCard/SelectionPadding/SelectionContent/PlayerList");
+        _playerDetailLabel = GetNode<Label>("Center/Shell/Padding/Content/BodyRow/DetailCard/DetailPadding/DetailContent/PlayerDetailLabel");
+        _lineupActionButton = GetNode<Button>("Center/Shell/Padding/Content/BodyRow/DetailCard/DetailPadding/DetailContent/ActionsRow/LineupActionButton");
+        _lineupStatusLabel = GetNode<Label>("Center/Shell/Padding/Content/BodyRow/DetailCard/DetailPadding/DetailContent/LineupStatusLabel");
+        _openProfileButton = GetNode<Button>("Center/Shell/Padding/Content/BodyRow/DetailCard/DetailPadding/DetailContent/ActionsRow/OpenProfileButton");
 
         if (GameState.Instance == null || string.IsNullOrWhiteSpace(GameState.Instance.SelectedClubName))
         {
             _clubContextLabel.Text = "Club context unavailable.";
             _lineupSummaryLabel.Text = "Lineup summary unavailable.";
-            _playerDetailLabel.Text = "Select a player to inspect details.";
+            _playerDetailLabel.Text = "Select a player to inspect the current role, condition, and pathway notes.";
             _lineupActionButton.Disabled = true;
             _lineupStatusLabel.Text = "Lineup changes unavailable.";
             _openProfileButton.Disabled = true;
             return;
         }
 
-        _clubContextLabel.Text = $"{GameState.Instance.SelectedClubName} squad";
+        _clubContextLabel.Text =
+            $"{GameState.Instance.SelectedClubName} squad workspace | Next assignment: {GameState.Instance.CurrentOpponentName}";
 
         PopulatePlayerList((int)_positionFilter.GetSelectedId());
     }
@@ -83,10 +84,10 @@ public partial class SquadScreen : Control
         }
         else
         {
-            _playerDetailLabel.Text = "No players match this filter.";
+            _playerDetailLabel.Text = "No players match this filter in the current squad view.";
             _lineupActionButton.Disabled = true;
             _openProfileButton.Disabled = true;
-            _lineupStatusLabel.Text = "No players match this filter.";
+            _lineupStatusLabel.Text = "Adjust the filter to return to an actionable squad group.";
         }
     }
 
@@ -111,11 +112,14 @@ public partial class SquadScreen : Control
         var player = GameState.Instance.SquadPlayers[index];
         var lineupTag = player.IsStarting ? "Starting XI" : "Bench";
         _playerDetailLabel.Text =
-            $"{player.Name} | {player.Position} | {lineupTag} | Age {player.Age} | Form {player.Form} | Morale {player.Morale} | Fitness {player.Fitness}";
+            $"{player.Name}\n{player.Position} | {lineupTag} | Age {player.Age}\nForm {player.Form} | Morale {player.Morale} | Fitness {player.Fitness}";
         _lineupActionButton.Disabled = false;
         _lineupActionButton.Text = player.IsStarting ? $"Move {player.Name} to Bench" : $"Promote {player.Name} to XI";
         _openProfileButton.Disabled = false;
         _openProfileButton.Text = $"Open {player.Name} Profile";
+        _lineupStatusLabel.Text = player.IsStarting
+            ? $"{player.Name} currently anchors the XI. Use the action row to rotate or inspect the full profile."
+            : $"{player.Name} is currently a bench option. Use the action row to promote or inspect the full profile.";
     }
 
     private static bool MatchesFilter(string position, int filterId)
@@ -191,6 +195,6 @@ public partial class SquadScreen : Control
 
         var bench = GameState.Instance.SquadPlayers.Length - starters;
         _lineupSummaryLabel.Text =
-            $"Current selection: {starters} in the XI | {bench} on the bench. Lineup changes flow directly into upcoming match preparation.";
+            $"XI ready: {starters} starters | {bench} bench options. Every change here feeds straight into the next match preparation flow.";
     }
 }

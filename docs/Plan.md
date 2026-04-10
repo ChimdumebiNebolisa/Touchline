@@ -4,8 +4,6 @@
 
 ### Active
 
-- Step 31: Run a full polish and usability pass
-
 ### Backlog
 
 ### Blocked
@@ -44,6 +42,7 @@
 - Step 28: Complete season continuity and progression
 - Step 29: Expose board, fan, and perception context properly
 - Step 30: Create a navigation and transition pass
+- Step 31: Run a full polish and usability pass
 
 ## 2. Plan Rules
 
@@ -397,8 +396,6 @@ Remove remaining prototype edges and harden the shell for repeated play.
 
 ## 23. Immediate Next Subtask
 
-Step 31 starts with the most visible remaining prototype edge:
+All currently planned steps are complete.
 
-- rebuild the squad screen into the same football-native shell quality as the other primary surfaces
-- keep lineup, player-profile, and dashboard returns intact while improving readability and composition
-- verify the polished shell with headless Godot coverage plus the strongest repo checks before declaring the final pass complete
+- Continue with bug fixes, deeper polish, or scope changes only after the source-of-truth docs are updated.

@@ -1,30 +1,28 @@
 # Autonomous Progress
 
 ## Current active Plan step
-- Step 31: Run a full polish and usability pass.
+- No active Plan step. Steps 1 through 31 are complete.
 
 ## Last completed verified task
-- Completed Step 30 by expanding `step30_navigation_flow_check.gd` to cover the real `MainMenu -> CareerSetup -> ChooseClub -> ClubDashboard` onboarding path plus squad, player profile, tactics, fixtures, standings, matchday, save/load, and post-match return flow.
+- Step 31 complete: polished the squad screen into the shared shell style, kept lineup and player-profile behavior intact, updated the Step 30 route check for the new layout, and documented the interactive Godot regression walkthrough in `docs/ManualRegression.md`.
 
 ## Current subtask in progress
-- Polish the squad screen so it no longer reads like a prototype compared with the other primary Touchline surfaces.
+- No active implementation subtask.
 
 ## Next queued subtasks
-- Review whether any other archived or unused runtime files can be removed without violating legacy-preservation guardrails.
-- Document manual Godot regression coverage for the final shell pass.
-- Finish the Step 31 final polish pass with refreshed runtime coverage.
+- No queued Plan subtasks. Future work requires a new or updated source-of-truth plan.
 
 ## Known blockers
 - No active blockers.
 - Godot Mono is available locally, so targeted headless runtime validation can now run from this shell environment.
 
 ## Last verification run
-- Passed `dotnet build game/Touchline.sln`, headless Godot check `step30_navigation_flow_check.gd`, `npm run test`, `npm run typecheck`, `npm run lint`, and `npm run build` on 2026-04-10 after closing the Step 30 navigation pass.
+- Passed `dotnet build game/Touchline.sln`, headless Godot check `step30_navigation_flow_check.gd`, `npm run test`, `npm run typecheck`, `npm run lint`, and `npm run build` on 2026-04-10 after the Step 31 squad polish pass. Manual Godot regression coverage is documented in `docs/ManualRegression.md`.
 
 ## Last commit hash
 - a263ae0
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`.
-- Confirm Step 31 is the only active step.
-- Start with the squad-screen polish pass, preserve the existing lineup and player-profile behavior, and rerun the strongest relevant checks before the next commit.
+- Confirm there is no active step before starting further work.
+- Update the source-of-truth docs first if a new feature, polish pass, or cleanup direction is required.

@@ -191,9 +191,9 @@ func _process(_delta: float) -> bool:
             _fail("SquadScreen did not load from ClubDashboard")
             return false
 
-        var club_context := current_scene.get_node("Center/Panel/ClubContextLabel") as Label
-        var player_list := current_scene.get_node("Center/Panel/PlayerList") as ItemList
-        var open_profile_button := current_scene.get_node("Center/Panel/OpenProfileButton") as Button
+        var club_context := current_scene.get_node("Center/Shell/Padding/Content/Header/ClubContextLabel") as Label
+        var player_list := current_scene.get_node("Center/Shell/Padding/Content/BodyRow/SelectionCard/SelectionPadding/SelectionContent/PlayerList") as ItemList
+        var open_profile_button := current_scene.get_node("Center/Shell/Padding/Content/BodyRow/DetailCard/DetailPadding/DetailContent/ActionsRow/OpenProfileButton") as Button
         if club_context == null or player_list == null or open_profile_button == null:
             _fail("SquadScreen controls are missing")
             return false
@@ -236,7 +236,7 @@ func _process(_delta: float) -> bool:
             _fail("PlayerProfile back navigation did not return to SquadScreen")
             return false
 
-        var back_button := current_scene.get_node("Center/Panel/BackButton") as Button
+        var back_button := current_scene.get_node("Center/Shell/Padding/Content/BackButton") as Button
         if back_button == null:
             _fail("SquadScreen back button is missing after returning from PlayerProfile")
             return false

@@ -11,6 +11,25 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1")
 
+[node name="Backdrop" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0352941, 0.054902, 0.0705882, 1)
+
+[node name="AccentBand" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 0.2
+grow_horizontal = 2
+color = Color(0.0705882, 0.117647, 0.152941, 1)
+
 [node name="Center" type="CenterContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
@@ -19,27 +38,76 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Panel" type="VBoxContainer" parent="Center"]
+[node name="Shell" type="PanelContainer" parent="Center"]
+custom_minimum_size = Vector2(980, 0)
 layout_mode = 2
-custom_minimum_size = Vector2(560, 440)
-theme_override_constants/separation = 10
 
-[node name="Heading" type="Label" parent="Center/Panel"]
+[node name="Padding" type="MarginContainer" parent="Center/Shell"]
 layout_mode = 2
-text = "Squad Screen"
+theme_override_constants/margin_left = 30
+theme_override_constants/margin_top = 28
+theme_override_constants/margin_right = 30
+theme_override_constants/margin_bottom = 28
+
+[node name="Content" type="VBoxContainer" parent="Center/Shell/Padding"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Header" type="VBoxContainer" parent="Center/Shell/Padding/Content"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Heading" type="Label" parent="Center/Shell/Padding/Content/Header"]
+layout_mode = 2
+text = "Squad Workspace"
 horizontal_alignment = 1
+theme_override_font_sizes/font_size = 34
 
-[node name="ClubContextLabel" type="Label" parent="Center/Panel"]
+[node name="ClubContextLabel" type="Label" parent="Center/Shell/Padding/Content/Header"]
 layout_mode = 2
 text = "Club context unavailable."
 autowrap_mode = 3
 horizontal_alignment = 1
 
-[node name="FilterLabel" type="Label" parent="Center/Panel"]
+[node name="LineupSummaryLabel" type="Label" parent="Center/Shell/Padding/Content/Header"]
+layout_mode = 2
+text = "Lineup summary unavailable."
+autowrap_mode = 3
+horizontal_alignment = 1
+
+[node name="BodyRow" type="HBoxContainer" parent="Center/Shell/Padding/Content"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="SelectionCard" type="PanelContainer" parent="Center/Shell/Padding/Content/BodyRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SelectionPadding" type="MarginContainer" parent="Center/Shell/Padding/Content/BodyRow/SelectionCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 18
+
+[node name="SelectionContent" type="VBoxContainer" parent="Center/Shell/Padding/Content/BodyRow/SelectionCard/SelectionPadding"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="SelectionHeading" type="Label" parent="Center/Shell/Padding/Content/BodyRow/SelectionCard/SelectionPadding/SelectionContent"]
+layout_mode = 2
+text = "Available Squad"
+
+[node name="SelectionHintLabel" type="Label" parent="Center/Shell/Padding/Content/BodyRow/SelectionCard/SelectionPadding/SelectionContent"]
+layout_mode = 2
+text = "Filter the current squad, inspect the active role, then move directly into lineup or player-profile decisions."
+autowrap_mode = 3
+
+[node name="FilterLabel" type="Label" parent="Center/Shell/Padding/Content/BodyRow/SelectionCard/SelectionPadding/SelectionContent"]
 layout_mode = 2
 text = "Position Filter"
 
-[node name="PositionFilter" type="OptionButton" parent="Center/Panel"]
+[node name="PositionFilter" type="OptionButton" parent="Center/Shell/Padding/Content/BodyRow/SelectionCard/SelectionPadding/SelectionContent"]
 layout_mode = 2
 item_count = 5
 selected = 0
@@ -54,42 +122,69 @@ popup/item_3/id = 3
 popup/item_4/text = "Forwards"
 popup/item_4/id = 4
 
-[node name="LineupSummaryLabel" type="Label" parent="Center/Panel"]
+[node name="PlayerList" type="ItemList" parent="Center/Shell/Padding/Content/BodyRow/SelectionCard/SelectionPadding/SelectionContent"]
 layout_mode = 2
-text = "Lineup summary unavailable."
+custom_minimum_size = Vector2(0, 360)
+size_flags_vertical = 3
+
+[node name="DetailCard" type="PanelContainer" parent="Center/Shell/Padding/Content/BodyRow"]
+custom_minimum_size = Vector2(340, 0)
+layout_mode = 2
+
+[node name="DetailPadding" type="MarginContainer" parent="Center/Shell/Padding/Content/BodyRow/DetailCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 18
+
+[node name="DetailContent" type="VBoxContainer" parent="Center/Shell/Padding/Content/BodyRow/DetailCard/DetailPadding"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="DetailHeading" type="Label" parent="Center/Shell/Padding/Content/BodyRow/DetailCard/DetailPadding/DetailContent"]
+layout_mode = 2
+text = "Selection Detail"
+
+[node name="DetailHintLabel" type="Label" parent="Center/Shell/Padding/Content/BodyRow/DetailCard/DetailPadding/DetailContent"]
+layout_mode = 2
+text = "The selected player detail stays grounded in the current career state and feeds directly into the next match preparation flow."
 autowrap_mode = 3
-horizontal_alignment = 1
 
-[node name="PlayerList" type="ItemList" parent="Center/Panel"]
+[node name="PlayerDetailLabel" type="Label" parent="Center/Shell/Padding/Content/BodyRow/DetailCard/DetailPadding/DetailContent"]
+custom_minimum_size = Vector2(0, 140)
 layout_mode = 2
-custom_minimum_size = Vector2(540, 280)
-
-[node name="PlayerDetailLabel" type="Label" parent="Center/Panel"]
-layout_mode = 2
-text = "Select a player to inspect details."
+text = "Select a player to inspect the current role, condition, and pathway notes."
 autowrap_mode = 3
-horizontal_alignment = 1
+vertical_alignment = 0
 
-[node name="LineupActionButton" type="Button" parent="Center/Panel"]
+[node name="LineupStatusLabel" type="Label" parent="Center/Shell/Padding/Content/BodyRow/DetailCard/DetailPadding/DetailContent"]
+custom_minimum_size = Vector2(0, 90)
 layout_mode = 2
+text = "Lineup changes unavailable."
+autowrap_mode = 3
+vertical_alignment = 0
+
+[node name="ActionsRow" type="HBoxContainer" parent="Center/Shell/Padding/Content/BodyRow/DetailCard/DetailPadding/DetailContent"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="LineupActionButton" type="Button" parent="Center/Shell/Padding/Content/BodyRow/DetailCard/DetailPadding/DetailContent/ActionsRow"]
+layout_mode = 2
+size_flags_horizontal = 3
 text = "Adjust Lineup Role"
 
-[node name="LineupStatusLabel" type="Label" parent="Center/Panel"]
+[node name="OpenProfileButton" type="Button" parent="Center/Shell/Padding/Content/BodyRow/DetailCard/DetailPadding/DetailContent/ActionsRow"]
 layout_mode = 2
-text = "Lineup changes will appear here."
-autowrap_mode = 3
-horizontal_alignment = 1
-
-[node name="OpenProfileButton" type="Button" parent="Center/Panel"]
-layout_mode = 2
+size_flags_horizontal = 3
 text = "Open Player Profile"
 
-[node name="BackButton" type="Button" parent="Center/Panel"]
+[node name="BackButton" type="Button" parent="Center/Shell/Padding/Content"]
 layout_mode = 2
 text = "Back to Club Dashboard"
 
-[connection signal="item_selected" from="Center/Panel/PositionFilter" to="." method="OnFilterSelected"]
-[connection signal="item_selected" from="Center/Panel/PlayerList" to="." method="OnPlayerSelected"]
-[connection signal="pressed" from="Center/Panel/LineupActionButton" to="." method="OnLineupActionPressed"]
-[connection signal="pressed" from="Center/Panel/OpenProfileButton" to="." method="OnOpenProfilePressed"]
-[connection signal="pressed" from="Center/Panel/BackButton" to="." method="OnBackPressed"]
+[connection signal="item_selected" from="Center/Shell/Padding/Content/BodyRow/SelectionCard/SelectionPadding/SelectionContent/PositionFilter" to="." method="OnFilterSelected"]
+[connection signal="item_selected" from="Center/Shell/Padding/Content/BodyRow/SelectionCard/SelectionPadding/SelectionContent/PlayerList" to="." method="OnPlayerSelected"]
+[connection signal="pressed" from="Center/Shell/Padding/Content/BodyRow/DetailCard/DetailPadding/DetailContent/ActionsRow/LineupActionButton" to="." method="OnLineupActionPressed"]
+[connection signal="pressed" from="Center/Shell/Padding/Content/BodyRow/DetailCard/DetailPadding/DetailContent/ActionsRow/OpenProfileButton" to="." method="OnOpenProfilePressed"]
+[connection signal="pressed" from="Center/Shell/Padding/Content/BackButton" to="." method="OnBackPressed"]
