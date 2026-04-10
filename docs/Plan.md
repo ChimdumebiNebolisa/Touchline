@@ -4,11 +4,9 @@
 
 ### Active
 
-- Step 30: Create a navigation and transition pass
+- Step 31: Run a full polish and usability pass
 
 ### Backlog
-
-- Step 31: Run a full polish and usability pass
 
 ### Blocked
 
@@ -45,6 +43,7 @@
 - Step 27: Integrate the save path with the authoritative domain model
 - Step 28: Complete season continuity and progression
 - Step 29: Expose board, fan, and perception context properly
+- Step 30: Create a navigation and transition pass
 
 ## 2. Plan Rules
 
@@ -398,8 +397,8 @@ Remove remaining prototype edges and harden the shell for repeated play.
 
 ## 23. Immediate Next Subtask
 
-Step 30 continues with the next smallest navigation slice:
+Step 31 starts with the most visible remaining prototype edge:
 
-- expand navigation coverage across squad, player profile, tactics, fixtures, and standings handoffs
-- keep scene transitions grounded in existing authoritative state rather than scene-local routing shortcuts
-- verify the broader shell flow with headless Godot coverage before moving on to final polish
+- rebuild the squad screen into the same football-native shell quality as the other primary surfaces
+- keep lineup, player-profile, and dashboard returns intact while improving readability and composition
+- verify the polished shell with headless Godot coverage plus the strongest repo checks before declaring the final pass complete
