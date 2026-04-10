@@ -83,8 +83,8 @@ func _process(_delta: float) -> bool:
             _fail("ClubDashboard did not load after club selection")
             return false
 
-        var club_context := current_scene.get_node("Center/Shell/Padding/Content/Header/ClubContextLabel") as Label
-        var squad_button := current_scene.get_node("Center/Shell/Padding/Content/DashboardRow/OperationsCard/OperationsPadding/OperationsContent/ActionsGrid/SquadButton") as Button
+        var club_context := current_scene.get_node("RootMargin/Shell/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderInfo/ClubContextLabel") as Label
+        var squad_button := current_scene.get_node("RootMargin/Shell/RailCard/RailPadding/RailContent/NavButtons/SquadButton") as Button
         if club_context == null or squad_button == null:
             _fail("Dashboard controls missing")
             return false
@@ -102,8 +102,8 @@ func _process(_delta: float) -> bool:
             _fail("SquadScreen did not load from the dashboard")
             return false
 
-        var player_list := current_scene.get_node("Center/Panel/PlayerList") as ItemList
-        var club_context := current_scene.get_node("Center/Panel/ClubContextLabel") as Label
+        var player_list := current_scene.get_node("Center/Shell/Padding/Content/BodyRow/SelectionCard/SelectionPadding/SelectionContent/PlayerList") as ItemList
+        var club_context := current_scene.get_node("Center/Shell/Padding/Content/Header/ClubContextLabel") as Label
         if player_list == null or club_context == null:
             _fail("SquadScreen controls missing")
             return false

@@ -38,8 +38,8 @@ func _process(_delta: float) -> bool:
             _fail("ClubDashboard did not load for the Step 29 pressure check")
             return false
 
-        var pressure_reasons := current_scene.get_node("Center/Shell/Padding/Content/DashboardRow/SnapshotCard/SnapshotPadding/SnapshotContent/PressureReasonsLabel") as Label
-        var matchday_button := current_scene.get_node("Center/Shell/Padding/Content/DashboardRow/OperationsCard/OperationsPadding/OperationsContent/ActionsGrid/MatchdayButton") as Button
+        var pressure_reasons := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/MainStack/LowerRow/PressureCard/PressurePadding/PressureContent/PressureReasonsLabel") as Label
+        var matchday_button := current_scene.get_node("RootMargin/Shell/RailCard/RailPadding/RailContent/NavButtons/MatchdayButton") as Button
         if pressure_reasons == null or matchday_button == null:
             _fail("Dashboard pressure controls are missing")
             return false

@@ -82,7 +82,7 @@ func _process(_delta: float) -> bool:
             _fail("WorldGenerator did not seed the selected club")
             return false
 
-        var matchday_button := current_scene.get_node("Center/Shell/Padding/Content/DashboardRow/OperationsCard/OperationsPadding/OperationsContent/ActionsGrid/MatchdayButton") as Button
+        var matchday_button := current_scene.get_node("RootMargin/Shell/RailCard/RailPadding/RailContent/NavButtons/MatchdayButton") as Button
         if matchday_button == null:
             _fail("Dashboard matchday button missing")
             return false
@@ -127,7 +127,7 @@ func _process(_delta: float) -> bool:
             _fail("Continue flow did not return to ClubDashboard")
             return false
 
-        var date_label := current_scene.get_node("Center/Shell/Padding/Content/Header/DateLabel") as Label
+        var date_label := current_scene.get_node("RootMargin/Shell/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderInfo/DateLabel") as Label
         if date_label == null:
             _fail("Dashboard date label missing after continue flow")
             return false

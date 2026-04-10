@@ -69,8 +69,8 @@ func _process(_delta: float) -> bool:
             _fail("ClubDashboard did not load from ChooseClub")
             return false
 
-        var save_button := current_scene.get_node("Center/Shell/Padding/Content/DashboardRow/OperationsCard/OperationsPadding/OperationsContent/ActionsGrid/SaveButton") as Button
-        var club_context := current_scene.get_node("Center/Shell/Padding/Content/Header/ClubContextLabel") as Label
+        var save_button := current_scene.get_node("RootMargin/Shell/RailCard/RailPadding/RailContent/FooterActions/SaveButton") as Button
+        var club_context := current_scene.get_node("RootMargin/Shell/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderInfo/ClubContextLabel") as Label
         if save_button == null or club_context == null:
             _fail("ClubDashboard controls are missing after club selection")
             return false
@@ -88,8 +88,8 @@ func _process(_delta: float) -> bool:
             _fail("ClubDashboard did not remain active after saving")
             return false
 
-        var save_hint := current_scene.get_node("Center/Shell/Padding/Content/DashboardRow/OperationsCard/OperationsPadding/OperationsContent/SaveHintLabel") as Label
-        var back_button := current_scene.get_node("Center/Shell/Padding/Content/BackButton") as Button
+        var save_hint := current_scene.get_node("RootMargin/Shell/RailCard/RailPadding/RailContent/FooterActions/SaveHintLabel") as Label
+        var back_button := current_scene.get_node("RootMargin/Shell/RailCard/RailPadding/RailContent/FooterActions/BackButton") as Button
         if save_hint == null or back_button == null:
             _fail("ClubDashboard save confirmation controls are missing")
             return false
@@ -172,8 +172,8 @@ func _process(_delta: float) -> bool:
             _fail("ClubDashboard did not load from SaveLoadScene")
             return false
 
-        var back_button := current_scene.get_node("Center/Shell/Padding/Content/BackButton") as Button
-        var squad_button := current_scene.get_node("Center/Shell/Padding/Content/DashboardRow/OperationsCard/OperationsPadding/OperationsContent/ActionsGrid/SquadButton") as Button
+        var back_button := current_scene.get_node("RootMargin/Shell/RailCard/RailPadding/RailContent/FooterActions/BackButton") as Button
+        var squad_button := current_scene.get_node("RootMargin/Shell/RailCard/RailPadding/RailContent/NavButtons/SquadButton") as Button
         if back_button == null or squad_button == null:
             _fail("ClubDashboard navigation controls are missing")
             return false
@@ -250,7 +250,7 @@ func _process(_delta: float) -> bool:
             _fail("SquadScreen back navigation did not return to ClubDashboard")
             return false
 
-        var tactics_button := current_scene.get_node("Center/Shell/Padding/Content/DashboardRow/OperationsCard/OperationsPadding/OperationsContent/ActionsGrid/TacticsButton") as Button
+        var tactics_button := current_scene.get_node("RootMargin/Shell/RailCard/RailPadding/RailContent/NavButtons/TacticsButton") as Button
         if tactics_button == null:
             _fail("ClubDashboard tactics button is missing")
             return false
@@ -285,7 +285,7 @@ func _process(_delta: float) -> bool:
             _fail("TacticsScreen back navigation did not return to ClubDashboard")
             return false
 
-        var fixtures_button := current_scene.get_node("Center/Shell/Padding/Content/DashboardRow/OperationsCard/OperationsPadding/OperationsContent/ActionsGrid/FixturesButton") as Button
+        var fixtures_button := current_scene.get_node("RootMargin/Shell/RailCard/RailPadding/RailContent/NavButtons/FixturesButton") as Button
         if fixtures_button == null:
             _fail("ClubDashboard fixtures button is missing")
             return false
@@ -318,7 +318,7 @@ func _process(_delta: float) -> bool:
             _fail("FixturesScreen back navigation did not return to ClubDashboard")
             return false
 
-        var standings_button := current_scene.get_node("Center/Shell/Padding/Content/DashboardRow/OperationsCard/OperationsPadding/OperationsContent/ActionsGrid/StandingsButton") as Button
+        var standings_button := current_scene.get_node("RootMargin/Shell/RailCard/RailPadding/RailContent/NavButtons/StandingsButton") as Button
         if standings_button == null:
             _fail("ClubDashboard standings button is missing")
             return false
@@ -353,7 +353,7 @@ func _process(_delta: float) -> bool:
             _fail("StandingsScreen back navigation did not return to ClubDashboard")
             return false
 
-        var matchday_button := current_scene.get_node("Center/Shell/Padding/Content/DashboardRow/OperationsCard/OperationsPadding/OperationsContent/ActionsGrid/MatchdayButton") as Button
+        var matchday_button := current_scene.get_node("RootMargin/Shell/RailCard/RailPadding/RailContent/NavButtons/MatchdayButton") as Button
         if matchday_button == null:
             _fail("ClubDashboard matchday button is missing after hub navigation coverage")
             return false
@@ -381,7 +381,7 @@ func _process(_delta: float) -> bool:
             _fail("Matchday back navigation did not return to ClubDashboard")
             return false
 
-        var matchday_button := current_scene.get_node("Center/Shell/Padding/Content/DashboardRow/OperationsCard/OperationsPadding/OperationsContent/ActionsGrid/MatchdayButton") as Button
+        var matchday_button := current_scene.get_node("RootMargin/Shell/RailCard/RailPadding/RailContent/NavButtons/MatchdayButton") as Button
         if matchday_button == null:
             _fail("ClubDashboard matchday button is missing after returning from MatchdayScene")
             return false
@@ -423,7 +423,7 @@ func _process(_delta: float) -> bool:
             _fail("PostMatchScene continue flow did not return to ClubDashboard")
             return false
 
-        var back_button := current_scene.get_node("Center/Shell/Padding/Content/BackButton") as Button
+        var back_button := current_scene.get_node("RootMargin/Shell/RailCard/RailPadding/RailContent/FooterActions/BackButton") as Button
         if back_button == null:
             _fail("ClubDashboard back button is missing after post-match continue")
             return false
