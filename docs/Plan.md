@@ -4,11 +4,10 @@
 
 ### Active
 
-- Step 29: Expose board, fan, and perception context properly
+- Step 30: Create a navigation and transition pass
 
 ### Backlog
 
-- Step 30: Create a navigation and transition pass
 - Step 31: Run a full polish and usability pass
 
 ### Blocked
@@ -45,6 +44,7 @@
 - Step 26: Move hardcoded football content into real data
 - Step 27: Integrate the save path with the authoritative domain model
 - Step 28: Complete season continuity and progression
+- Step 29: Expose board, fan, and perception context properly
 
 ## 2. Plan Rules
 

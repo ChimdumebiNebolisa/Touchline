@@ -209,7 +209,7 @@ horizontal_alignment = 0
 
 [node name="BackButton" type="Button" parent="Center/Shell/Padding/Content"]
 layout_mode = 2
-text = "Back to Choose Club"
+text = "Return to Main Menu"
 
 [connection signal="pressed" from="Center/Shell/Padding/Content/DashboardRow/OperationsCard/OperationsPadding/OperationsContent/ActionsGrid/SquadButton" to="." method="OnSquadPressed"]
 [connection signal="pressed" from="Center/Shell/Padding/Content/DashboardRow/OperationsCard/OperationsPadding/OperationsContent/ActionsGrid/TacticsButton" to="." method="OnTacticsPressed"]

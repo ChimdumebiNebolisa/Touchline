@@ -2,7 +2,7 @@ using Godot;
 
 public partial class ClubDashboard : Control
 {
-    private const string ChooseClubScenePath = "res://scenes/ChooseClub.tscn";
+    private const string MainMenuScenePath = "res://scenes/MainMenu.tscn";
     private const string SquadScreenScenePath = "res://scenes/SquadScreen.tscn";
     private const string TacticsScreenScenePath = "res://scenes/TacticsScreen.tscn";
     private const string FixturesScreenScenePath = "res://scenes/FixturesScreen.tscn";
@@ -79,7 +79,7 @@ public partial class ClubDashboard : Control
 
     private void OnBackPressed()
     {
-        GetTree().ChangeSceneToFile(ChooseClubScenePath);
+        GetTree().ChangeSceneToFile(MainMenuScenePath);
     }
 
     private void OnSquadPressed()
