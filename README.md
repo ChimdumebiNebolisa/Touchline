@@ -2,6 +2,11 @@
 
 Touchline is now a Godot plus C# football management game project.
 
+## Requirements
+
+- Godot 4.6.2 Mono/.NET
+- .NET 8 SDK or runtime
+
 The current product direction is defined by:
 
 - docs/PRD.md
@@ -19,6 +24,36 @@ The active build direction is the game foundation under game:
 - game/scripts
 - game/assets
 - game/data
+
+The Godot entrypoint is `game/project.godot`, and the app starts at `game/scenes/MainMenu.tscn`.
+
+## Run The Game
+
+From the repository root:
+
+```powershell
+$godot = (Get-Command Godot_v4.6.2-stable_mono_win64.exe).Source
+& $godot --path game
+```
+
+If you want the console variant instead:
+
+```powershell
+$godot = (Get-Command Godot_v4.6.2-stable_mono_win64_console.exe).Source
+& $godot --path game
+```
+
+## Verification
+
+The strongest routine checks currently used in this repo are:
+
+```powershell
+dotnet build game/Touchline.sln
+npm run test
+npm run typecheck
+npm run lint
+npm run build
+```
 
 ## Legacy Archive
 
