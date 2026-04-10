@@ -398,8 +398,8 @@ Remove remaining prototype edges and harden the shell for repeated play.
 
 ## 23. Immediate Next Subtask
 
-Step 29 starts with the smallest valid perception slice:
+Step 30 continues with the next smallest navigation slice:
 
-- add explicit board, fan, and dressing-room reason summaries to the primary shell surfaces
-- keep pressure explanations grounded in authoritative state rather than scene-local heuristics
-- verify the richer pressure context appears on the dashboard and matchday before moving on to navigation and final polish
+- expand navigation coverage across squad, player profile, tactics, fixtures, and standings handoffs
+- keep scene transitions grounded in existing authoritative state rather than scene-local routing shortcuts
+- verify the broader shell flow with headless Godot coverage before moving on to final polish
