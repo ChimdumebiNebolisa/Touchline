@@ -4,7 +4,7 @@
 
 ### Active
 
-- Step 32: Run a comprehensive management-shell UI/UX overhaul
+- None
 
 ### Backlog
 
@@ -45,6 +45,7 @@
 - Step 29: Expose board, fan, and perception context properly
 - Step 30: Create a navigation and transition pass
 - Step 31: Run a full polish and usability pass
+- Step 32: Run a comprehensive management-shell UI/UX overhaul
 
 ## 2. Plan Rules
 
@@ -426,5 +427,4 @@ Transform the current Godot shell from a centered prototype-card presentation in
 
 ## 24. Immediate Next Subtask
 
-- Step 32 is now active.
-- Begin with a dashboard-first shell refactor that establishes reusable layout and hierarchy primitives for the rest of the management screens.
+- No active Plan step. Update the source-of-truth docs before beginning any new product scope.

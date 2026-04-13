@@ -217,8 +217,8 @@ func _process(_delta: float) -> bool:
             _fail("PlayerProfile did not load from SquadScreen")
             return false
 
-        var heading := current_scene.get_node("Center/Panel/Padding/Content/Heading") as Label
-        var back_button := current_scene.get_node("Center/Panel/Padding/Content/BackButton") as Button
+        var heading := current_scene.get_node("RootMargin/Shell/MainColumn/HeaderCard/HeaderPadding/HeaderContent/PageTitleLabel") as Label
+        var back_button := current_scene.get_node("RootMargin/Shell/ContextColumn/ContextCard/ContextPadding/ContextContent/BackButton") as Button
         if heading == null or back_button == null:
             _fail("PlayerProfile controls are missing")
             return false
@@ -367,7 +367,7 @@ func _process(_delta: float) -> bool:
             _fail("MatchdayScene did not load from ClubDashboard")
             return false
 
-        var back_button := current_scene.get_node("Center/Shell/Padding/Content/ActionsRow/BackButton") as Button
+        var back_button := current_scene.get_node("RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/BackButton") as Button
         if back_button == null:
             _fail("MatchdayScene back button is missing")
             return false
@@ -395,7 +395,7 @@ func _process(_delta: float) -> bool:
             _fail("MatchdayScene did not reopen for instant result flow")
             return false
 
-        var instant_result_button := current_scene.get_node("Center/Shell/Padding/Content/ActionsRow/InstantResultButton") as Button
+        var instant_result_button := current_scene.get_node("RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/InstantResultButton") as Button
         if instant_result_button == null or instant_result_button.disabled:
             _fail("Instant result button is unavailable for the Step 30 navigation check")
             return false
@@ -409,7 +409,7 @@ func _process(_delta: float) -> bool:
             _fail("PostMatchScene did not load after instant result")
             return false
 
-        var continue_button := current_scene.get_node("Center/Shell/Padding/Content/ContinueButton") as Button
+        var continue_button := current_scene.get_node("RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/ContinueButton") as Button
         if continue_button == null:
             _fail("PostMatchScene continue button is missing")
             return false

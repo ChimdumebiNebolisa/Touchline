@@ -134,13 +134,13 @@ public static class CompetitionRuntimeService
     {
         if (string.IsNullOrWhiteSpace(selectedClubName))
         {
-            return "Table impact unavailable.";
+            return "League table update could not resolve because no club is selected.";
         }
 
         var currentRow = GetCompetitionRow(table, selectedClubName);
         if (currentRow == null)
         {
-            return "Table impact unavailable.";
+            return $"{selectedClubName} finished the round, but the updated league row could not be resolved in the current pass.";
         }
 
         if (previousPosition < 0 || currentPosition < 0)

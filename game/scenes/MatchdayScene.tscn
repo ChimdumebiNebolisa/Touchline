@@ -18,179 +18,342 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.0352941, 0.054902, 0.0705882, 1)
+color = Color(0.0313726, 0.0509804, 0.0666667, 1)
 
-[node name="AccentBand" type="ColorRect" parent="."]
+[node name="TopBand" type="ColorRect" parent="."]
 layout_mode = 1
 anchors_preset = 10
+anchor_right = 1.0
+anchor_bottom = 0.26
+grow_horizontal = 2
+color = Color(0.0509804, 0.0862745, 0.117647, 1)
+
+[node name="LeftWash" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 8
 anchor_left = 0.0
 anchor_top = 0.0
-anchor_right = 1.0
-anchor_bottom = 0.2
-grow_horizontal = 2
-color = Color(0.0705882, 0.117647, 0.152941, 1)
+anchor_right = 0.34
+anchor_bottom = 1.0
+grow_vertical = 2
+color = Color(0.0235294, 0.0627451, 0.0901961, 0.24)
 
-[node name="Center" type="CenterContainer" parent="."]
+[node name="RootMargin" type="MarginContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 22
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 22
 
-[node name="Shell" type="PanelContainer" parent="Center"]
-custom_minimum_size = Vector2(980, 0)
+[node name="MainColumn" type="VBoxContainer" parent="RootMargin"]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="HeaderCard" type="PanelContainer" parent="RootMargin/MainColumn"]
 layout_mode = 2
 
-[node name="Padding" type="MarginContainer" parent="Center/Shell"]
+[node name="HeaderPadding" type="MarginContainer" parent="RootMargin/MainColumn/HeaderCard"]
 layout_mode = 2
-theme_override_constants/margin_left = 30
-theme_override_constants/margin_top = 28
-theme_override_constants/margin_right = 30
-theme_override_constants/margin_bottom = 28
+theme_override_constants/margin_left = 22
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 22
+theme_override_constants/margin_bottom = 20
 
-[node name="Content" type="VBoxContainer" parent="Center/Shell/Padding"]
+[node name="HeaderContent" type="HBoxContainer" parent="RootMargin/MainColumn/HeaderCard/HeaderPadding"]
 layout_mode = 2
-theme_override_constants/separation = 16
+theme_override_constants/separation = 20
 
-[node name="Header" type="VBoxContainer" parent="Center/Shell/Padding/Content"]
+[node name="HeaderInfo" type="VBoxContainer" parent="RootMargin/MainColumn/HeaderCard/HeaderPadding/HeaderContent"]
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_constants/separation = 8
 
-[node name="Heading" type="Label" parent="Center/Shell/Padding/Content/Header"]
+[node name="PageEyebrow" type="Label" parent="RootMargin/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderInfo"]
+layout_mode = 2
+text = "MATCH COMMAND"
+
+[node name="PageTitleLabel" type="Label" parent="RootMargin/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderInfo"]
 layout_mode = 2
 text = "Matchday"
-horizontal_alignment = 1
-theme_override_font_sizes/font_size = 34
+theme_override_font_sizes/font_size = 36
 
-[node name="CompetitionLabel" type="Label" parent="Center/Shell/Padding/Content/Header"]
+[node name="CompetitionLabel" type="Label" parent="RootMargin/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderInfo"]
 layout_mode = 2
 text = "Competition unavailable"
 autowrap_mode = 3
-horizontal_alignment = 1
 
-[node name="FixtureLabel" type="Label" parent="Center/Shell/Padding/Content/Header"]
+[node name="FixtureLabel" type="Label" parent="RootMargin/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderInfo"]
 layout_mode = 2
 text = "Fixture unavailable"
 autowrap_mode = 3
-horizontal_alignment = 1
 
-[node name="StakesLabel" type="Label" parent="Center/Shell/Padding/Content/Header"]
-layout_mode = 2
-text = "Match stakes unavailable."
-autowrap_mode = 3
-horizontal_alignment = 1
-
-[node name="BodyRow" type="HBoxContainer" parent="Center/Shell/Padding/Content"]
-layout_mode = 2
-theme_override_constants/separation = 16
-
-[node name="EventCard" type="PanelContainer" parent="Center/Shell/Padding/Content/BodyRow"]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="EventPadding" type="MarginContainer" parent="Center/Shell/Padding/Content/BodyRow/EventCard"]
-layout_mode = 2
-theme_override_constants/margin_left = 20
-theme_override_constants/margin_top = 18
-theme_override_constants/margin_right = 20
-theme_override_constants/margin_bottom = 18
-
-[node name="EventContent" type="VBoxContainer" parent="Center/Shell/Padding/Content/BodyRow/EventCard/EventPadding"]
+[node name="HeaderStatus" type="VBoxContainer" parent="RootMargin/MainColumn/HeaderCard/HeaderPadding/HeaderContent"]
+custom_minimum_size = Vector2(320, 0)
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="EventHeading" type="Label" parent="Center/Shell/Padding/Content/BodyRow/EventCard/EventPadding/EventContent"]
+[node name="MatchStateChip" type="PanelContainer" parent="RootMargin/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderStatus"]
 layout_mode = 2
-text = "Kickoff Context"
+size_flags_horizontal = 4
 
-[node name="KickoffContextLabel" type="Label" parent="Center/Shell/Padding/Content/BodyRow/EventCard/EventPadding/EventContent"]
+[node name="MatchStateChipPadding" type="MarginContainer" parent="RootMargin/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderStatus/MatchStateChip"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 6
+
+[node name="MatchStateChipLabel" type="Label" parent="RootMargin/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderStatus/MatchStateChip/MatchStateChipPadding"]
+layout_mode = 2
+text = "READY"
+horizontal_alignment = 1
+
+[node name="StakesLabel" type="Label" parent="RootMargin/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderStatus"]
+layout_mode = 2
+text = "Match stakes unavailable."
+autowrap_mode = 3
+
+[node name="SummaryGrid" type="GridContainer" parent="RootMargin/MainColumn"]
+layout_mode = 2
+columns = 4
+theme_override_constants/h_separation = 14
+theme_override_constants/v_separation = 14
+
+[node name="OpponentCard" type="PanelContainer" parent="RootMargin/MainColumn/SummaryGrid"]
+layout_mode = 2
+
+[node name="CardPadding" type="MarginContainer" parent="RootMargin/MainColumn/SummaryGrid/OpponentCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 16
+
+[node name="CardContent" type="VBoxContainer" parent="RootMargin/MainColumn/SummaryGrid/OpponentCard/CardPadding"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="CardEyebrow" type="Label" parent="RootMargin/MainColumn/SummaryGrid/OpponentCard/CardPadding/CardContent"]
+layout_mode = 2
+text = "OPPONENT"
+
+[node name="CardValueLabel" type="Label" parent="RootMargin/MainColumn/SummaryGrid/OpponentCard/CardPadding/CardContent"]
+layout_mode = 2
+text = "--"
+
+[node name="CardMetaLabel" type="Label" parent="RootMargin/MainColumn/SummaryGrid/OpponentCard/CardPadding/CardContent"]
+layout_mode = 2
+text = "Context unavailable."
+autowrap_mode = 3
+
+[node name="FormCard" type="PanelContainer" parent="RootMargin/MainColumn/SummaryGrid"]
+layout_mode = 2
+
+[node name="CardPadding" type="MarginContainer" parent="RootMargin/MainColumn/SummaryGrid/FormCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 16
+
+[node name="CardContent" type="VBoxContainer" parent="RootMargin/MainColumn/SummaryGrid/FormCard/CardPadding"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="CardEyebrow" type="Label" parent="RootMargin/MainColumn/SummaryGrid/FormCard/CardPadding/CardContent"]
+layout_mode = 2
+text = "FORM"
+
+[node name="CardValueLabel" type="Label" parent="RootMargin/MainColumn/SummaryGrid/FormCard/CardPadding/CardContent"]
+layout_mode = 2
+text = "--"
+
+[node name="CardMetaLabel" type="Label" parent="RootMargin/MainColumn/SummaryGrid/FormCard/CardPadding/CardContent"]
+layout_mode = 2
+text = "Recent run unavailable."
+autowrap_mode = 3
+
+[node name="PulseCard" type="PanelContainer" parent="RootMargin/MainColumn/SummaryGrid"]
+layout_mode = 2
+
+[node name="CardPadding" type="MarginContainer" parent="RootMargin/MainColumn/SummaryGrid/PulseCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 16
+
+[node name="CardContent" type="VBoxContainer" parent="RootMargin/MainColumn/SummaryGrid/PulseCard/CardPadding"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="CardEyebrow" type="Label" parent="RootMargin/MainColumn/SummaryGrid/PulseCard/CardPadding/CardContent"]
+layout_mode = 2
+text = "CLUB PULSE"
+
+[node name="CardValueLabel" type="Label" parent="RootMargin/MainColumn/SummaryGrid/PulseCard/CardPadding/CardContent"]
+layout_mode = 2
+text = "--"
+
+[node name="CardMetaLabel" type="Label" parent="RootMargin/MainColumn/SummaryGrid/PulseCard/CardPadding/CardContent"]
+layout_mode = 2
+text = "Pulse context unavailable."
+autowrap_mode = 3
+
+[node name="ReadinessCard" type="PanelContainer" parent="RootMargin/MainColumn/SummaryGrid"]
+layout_mode = 2
+
+[node name="CardPadding" type="MarginContainer" parent="RootMargin/MainColumn/SummaryGrid/ReadinessCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 16
+
+[node name="CardContent" type="VBoxContainer" parent="RootMargin/MainColumn/SummaryGrid/ReadinessCard/CardPadding"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="CardEyebrow" type="Label" parent="RootMargin/MainColumn/SummaryGrid/ReadinessCard/CardPadding/CardContent"]
+layout_mode = 2
+text = "READINESS"
+
+[node name="CardValueLabel" type="Label" parent="RootMargin/MainColumn/SummaryGrid/ReadinessCard/CardPadding/CardContent"]
+layout_mode = 2
+text = "--"
+
+[node name="CardMetaLabel" type="Label" parent="RootMargin/MainColumn/SummaryGrid/ReadinessCard/CardPadding/CardContent"]
+layout_mode = 2
+text = "Selection state unavailable."
+autowrap_mode = 3
+
+[node name="ContentRow" type="HBoxContainer" parent="RootMargin/MainColumn"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 18
+
+[node name="ContextCard" type="PanelContainer" parent="RootMargin/MainColumn/ContentRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ContextPadding" type="MarginContainer" parent="RootMargin/MainColumn/ContentRow/ContextCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 22
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 22
+theme_override_constants/margin_bottom = 20
+
+[node name="ContextContent" type="VBoxContainer" parent="RootMargin/MainColumn/ContentRow/ContextCard/ContextPadding"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ContextEyebrow" type="Label" parent="RootMargin/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent"]
+layout_mode = 2
+text = "KICKOFF CONTEXT"
+
+[node name="KickoffContextLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent"]
 layout_mode = 2
 text = "Kickoff context unavailable."
 autowrap_mode = 3
 
-[node name="LineupLabel" type="Label" parent="Center/Shell/Padding/Content/BodyRow/EventCard/EventPadding/EventContent"]
+[node name="LineupLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent"]
 layout_mode = 2
 text = "Lineup readiness unavailable."
 autowrap_mode = 3
 
-[node name="BenchLabel" type="Label" parent="Center/Shell/Padding/Content/BodyRow/EventCard/EventPadding/EventContent"]
+[node name="BenchLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent"]
 layout_mode = 2
 text = "Bench context unavailable."
 autowrap_mode = 3
 
-[node name="FormLabel" type="Label" parent="Center/Shell/Padding/Content/BodyRow/EventCard/EventPadding/EventContent"]
-layout_mode = 2
-text = "Form unavailable."
-autowrap_mode = 3
-
-[node name="PressureLabel" type="Label" parent="Center/Shell/Padding/Content/BodyRow/EventCard/EventPadding/EventContent"]
-layout_mode = 2
-text = "Pressure context unavailable."
-autowrap_mode = 3
-
-[node name="PressureReasonsLabel" type="Label" parent="Center/Shell/Padding/Content/BodyRow/EventCard/EventPadding/EventContent"]
+[node name="PressureReasonsLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent"]
 layout_mode = 2
 text = "Pressure reasons unavailable."
 autowrap_mode = 3
 
-[node name="PlanCard" type="PanelContainer" parent="Center/Shell/Padding/Content/BodyRow"]
-custom_minimum_size = Vector2(320, 0)
+[node name="PlanCard" type="PanelContainer" parent="RootMargin/MainColumn/ContentRow"]
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 
-[node name="PlanPadding" type="MarginContainer" parent="Center/Shell/Padding/Content/BodyRow/PlanCard"]
+[node name="PlanPadding" type="MarginContainer" parent="RootMargin/MainColumn/ContentRow/PlanCard"]
 layout_mode = 2
-theme_override_constants/margin_left = 20
-theme_override_constants/margin_top = 18
-theme_override_constants/margin_right = 20
-theme_override_constants/margin_bottom = 18
+theme_override_constants/margin_left = 22
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 22
+theme_override_constants/margin_bottom = 20
 
-[node name="PlanContent" type="VBoxContainer" parent="Center/Shell/Padding/Content/BodyRow/PlanCard/PlanPadding"]
+[node name="PlanContent" type="VBoxContainer" parent="RootMargin/MainColumn/ContentRow/PlanCard/PlanPadding"]
 layout_mode = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 12
 
-[node name="PlanHeading" type="Label" parent="Center/Shell/Padding/Content/BodyRow/PlanCard/PlanPadding/PlanContent"]
+[node name="PlanEyebrow" type="Label" parent="RootMargin/MainColumn/ContentRow/PlanCard/PlanPadding/PlanContent"]
 layout_mode = 2
-text = "Pre-Match Plan"
+text = "MATCH PLAN"
 
-[node name="TacticsLabel" type="Label" parent="Center/Shell/Padding/Content/BodyRow/PlanCard/PlanPadding/PlanContent"]
+[node name="PressureLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/PlanCard/PlanPadding/PlanContent"]
+layout_mode = 2
+text = "Pressure context unavailable."
+autowrap_mode = 3
+
+[node name="TacticsLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/PlanCard/PlanPadding/PlanContent"]
 layout_mode = 2
 text = "Tactics unavailable."
 autowrap_mode = 3
 
-[node name="OpponentFocusLabel" type="Label" parent="Center/Shell/Padding/Content/BodyRow/PlanCard/PlanPadding/PlanContent"]
+[node name="OpponentFocusLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/PlanCard/PlanPadding/PlanContent"]
 layout_mode = 2
 text = "Opponent focus unavailable."
 autowrap_mode = 3
 
-[node name="ReadinessLabel" type="Label" parent="Center/Shell/Padding/Content/BodyRow/PlanCard/PlanPadding/PlanContent"]
+[node name="ReadinessLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/PlanCard/PlanPadding/PlanContent"]
 layout_mode = 2
 text = "Readiness unavailable."
 autowrap_mode = 3
 
-[node name="StatusLabel" type="Label" parent="Center/Shell/Padding/Content"]
+[node name="ActionCard" type="PanelContainer" parent="RootMargin/MainColumn/ContentRow"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ActionPadding" type="MarginContainer" parent="RootMargin/MainColumn/ContentRow/ActionCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 22
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 22
+theme_override_constants/margin_bottom = 20
+
+[node name="ActionContent" type="VBoxContainer" parent="RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ActionEyebrow" type="Label" parent="RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent"]
+layout_mode = 2
+text = "MATCH ACTIONS"
+
+[node name="StatusLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent"]
 layout_mode = 2
 text = "Set up a career and club before entering matchday."
 autowrap_mode = 3
-horizontal_alignment = 1
 
-[node name="ActionsRow" type="HBoxContainer" parent="Center/Shell/Padding/Content"]
-layout_mode = 2
-alignment = 1
-theme_override_constants/separation = 16
-
-[node name="BackButton" type="Button" parent="Center/Shell/Padding/Content/ActionsRow"]
+[node name="BackButton" type="Button" parent="RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent"]
 layout_mode = 2
 text = "Back to Club Dashboard"
 
-[node name="InstantResultButton" type="Button" parent="Center/Shell/Padding/Content/ActionsRow"]
+[node name="InstantResultButton" type="Button" parent="RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent"]
 layout_mode = 2
 text = "Instant Result"
 
-[node name="StartMatchButton" type="Button" parent="Center/Shell/Padding/Content/ActionsRow"]
+[node name="StartMatchButton" type="Button" parent="RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent"]
 layout_mode = 2
 text = "Start Live Match"
 
-[connection signal="pressed" from="Center/Shell/Padding/Content/ActionsRow/BackButton" to="." method="OnBackPressed"]
-[connection signal="pressed" from="Center/Shell/Padding/Content/ActionsRow/InstantResultButton" to="." method="OnInstantResultPressed"]
-[connection signal="pressed" from="Center/Shell/Padding/Content/ActionsRow/StartMatchButton" to="." method="OnStartMatchPressed"]
+[connection signal="pressed" from="RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/BackButton" to="." method="OnBackPressed"]
+[connection signal="pressed" from="RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/InstantResultButton" to="." method="OnInstantResultPressed"]
+[connection signal="pressed" from="RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/StartMatchButton" to="." method="OnStartMatchPressed"]

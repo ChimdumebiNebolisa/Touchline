@@ -106,6 +106,18 @@ public static class MatchSimulator
             }
         }
 
+        if (names.Count == 0)
+        {
+            names.Add(state.SelectedClubName ?? "Touchline");
+        }
+
+        var rotationIndex = 0;
+        while (names.Count < 11)
+        {
+            names.Add(names[rotationIndex % names.Count]);
+            rotationIndex++;
+        }
+
         return names;
     }
 
@@ -197,7 +209,7 @@ public static class MatchSimulator
         events.Add(new MatchSimulationResult.MatchEvent
         {
             Minute = openingChanceMinute,
-            Summary = $"{openingChanceMinute}' Early warning. {homeLineup[8]} stretches the back line and forces a hurried clearance.",
+            Summary = $"{openingChanceMinute}' Early warning. {PickLineupName(homeLineup, 8, state.SelectedClubName ?? "Home")} stretches the back line and forces a hurried clearance.",
             HomeScore = homeScore,
             AwayScore = awayScore
         });
@@ -206,7 +218,7 @@ public static class MatchSimulator
         events.Add(new MatchSimulationResult.MatchEvent
         {
             Minute = bookedMinute,
-            Summary = $"{bookedMinute}' Midfield collision. {awayLineup[6]} goes into the book after stopping a transition.",
+            Summary = $"{bookedMinute}' Midfield collision. {PickLineupName(awayLineup, 6, state.CurrentOpponentName)} goes into the book after stopping a transition.",
             HomeScore = homeScore,
             AwayScore = awayScore
         });
@@ -226,7 +238,7 @@ public static class MatchSimulator
             {
                 homeGoals--;
                 homeScore++;
-                var scorer = homeLineup[8 + rng.Next(0, 3)];
+                var scorer = PickLineupName(homeLineup, 8 + rng.Next(0, 3), state.SelectedClubName ?? "Home");
                 events.Add(new MatchSimulationResult.MatchEvent
                 {
                     Minute = minute,
@@ -239,7 +251,7 @@ public static class MatchSimulator
             {
                 awayGoals--;
                 awayScore++;
-                var scorer = awayLineup[8 + rng.Next(0, 3)];
+                var scorer = PickLineupName(awayLineup, 8 + rng.Next(0, 3), state.CurrentOpponentName);
                 events.Add(new MatchSimulationResult.MatchEvent
                 {
                     Minute = minute,
@@ -254,7 +266,7 @@ public static class MatchSimulator
         events.Add(new MatchSimulationResult.MatchEvent
         {
             Minute = lateMinute,
-            Summary = $"{lateMinute}' Late surge. {homeLineup[6]} keeps the ball alive and the crowd sense a final push.",
+            Summary = $"{lateMinute}' Late surge. {PickLineupName(homeLineup, 6, state.SelectedClubName ?? "Home")} keeps the ball alive and the crowd sense a final push.",
             HomeScore = homeScore,
             AwayScore = awayScore
         });
@@ -262,6 +274,17 @@ public static class MatchSimulator
         events.Sort((left, right) => left.Minute.CompareTo(right.Minute));
 
         return events;
+    }
+
+    private static string PickLineupName(IReadOnlyList<string> lineup, int preferredIndex, string fallback)
+    {
+        if (lineup.Count == 0)
+        {
+            return fallback;
+        }
+
+        var safeIndex = Math.Clamp(preferredIndex, 0, lineup.Count - 1);
+        return lineup[safeIndex];
     }
 
     private static string BuildInitials(string fullName)

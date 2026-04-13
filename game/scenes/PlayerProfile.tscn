@@ -18,99 +18,327 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.0352941, 0.054902, 0.0705882, 1)
+color = Color(0.0313726, 0.0509804, 0.0666667, 1)
 
-[node name="AccentBand" type="ColorRect" parent="."]
+[node name="TopBand" type="ColorRect" parent="."]
 layout_mode = 1
 anchors_preset = 10
-anchor_left = 0.0
+anchor_right = 1.0
+anchor_bottom = 0.26
+grow_horizontal = 2
+color = Color(0.0509804, 0.0862745, 0.117647, 1)
+
+[node name="RightWash" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 9
+anchor_left = 0.72
 anchor_top = 0.0
 anchor_right = 1.0
-anchor_bottom = 0.22
+anchor_bottom = 1.0
 grow_horizontal = 2
-color = Color(0.0705882, 0.117647, 0.152941, 1)
+grow_vertical = 2
+color = Color(0.0392157, 0.0666667, 0.0901961, 0.5)
 
-[node name="Center" type="CenterContainer" parent="."]
+[node name="RootMargin" type="MarginContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 22
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 22
 
-[node name="Panel" type="PanelContainer" parent="Center"]
-custom_minimum_size = Vector2(700, 0)
+[node name="Shell" type="HBoxContainer" parent="RootMargin"]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="ContextColumn" type="VBoxContainer" parent="RootMargin/Shell"]
+custom_minimum_size = Vector2(280, 0)
 layout_mode = 2
 
-[node name="Padding" type="MarginContainer" parent="Center/Panel"]
+[node name="ContextCard" type="PanelContainer" parent="RootMargin/Shell/ContextColumn"]
 layout_mode = 2
-theme_override_constants/margin_left = 30
-theme_override_constants/margin_top = 26
-theme_override_constants/margin_right = 30
-theme_override_constants/margin_bottom = 26
 
-[node name="Content" type="VBoxContainer" parent="Center/Panel/Padding"]
+[node name="ContextPadding" type="MarginContainer" parent="RootMargin/Shell/ContextColumn/ContextCard"]
 layout_mode = 2
-theme_override_constants/separation = 12
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 18
 
-[node name="Heading" type="Label" parent="Center/Panel/Padding/Content"]
+[node name="ContextContent" type="VBoxContainer" parent="RootMargin/Shell/ContextColumn/ContextCard/ContextPadding"]
 layout_mode = 2
-text = "Player Profile"
+theme_override_constants/separation = 14
+
+[node name="ClubBadge" type="PanelContainer" parent="RootMargin/Shell/ContextColumn/ContextCard/ContextPadding/ContextContent"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="BadgeLabel" type="Label" parent="RootMargin/Shell/ContextColumn/ContextCard/ContextPadding/ContextContent/ClubBadge"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -16.0
+offset_top = -14.0
+offset_right = 16.0
+offset_bottom = 14.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "--"
 horizontal_alignment = 1
-theme_override_font_sizes/font_size = 34
+vertical_alignment = 1
 
-[node name="ClubContextLabel" type="Label" parent="Center/Panel/Padding/Content"]
+[node name="ClubNameLabel" type="Label" parent="RootMargin/Shell/ContextColumn/ContextCard/ContextPadding/ContextContent"]
+layout_mode = 2
+text = "Club unavailable"
+
+[node name="RoleChip" type="PanelContainer" parent="RootMargin/Shell/ContextColumn/ContextCard/ContextPadding/ContextContent"]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="RoleChipPadding" type="MarginContainer" parent="RootMargin/Shell/ContextColumn/ContextCard/ContextPadding/ContextContent/RoleChip"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 6
+
+[node name="RoleChipLabel" type="Label" parent="RootMargin/Shell/ContextColumn/ContextCard/ContextPadding/ContextContent/RoleChip/RoleChipPadding"]
+layout_mode = 2
+text = "NO PLAYER"
+horizontal_alignment = 1
+
+[node name="ClubContextLabel" type="Label" parent="RootMargin/Shell/ContextColumn/ContextCard/ContextPadding/ContextContent"]
 layout_mode = 2
 text = "Club context unavailable."
 autowrap_mode = 3
-horizontal_alignment = 1
 
-[node name="ProfileCard" type="PanelContainer" parent="Center/Panel/Padding/Content"]
+[node name="BackButton" type="Button" parent="RootMargin/Shell/ContextColumn/ContextCard/ContextPadding/ContextContent"]
+layout_mode = 2
+text = "Back to Squad"
+
+[node name="MainColumn" type="VBoxContainer" parent="RootMargin/Shell"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 18
+
+[node name="HeaderCard" type="PanelContainer" parent="RootMargin/Shell/MainColumn"]
 layout_mode = 2
 
-[node name="ProfilePadding" type="MarginContainer" parent="Center/Panel/Padding/Content/ProfileCard"]
+[node name="HeaderPadding" type="MarginContainer" parent="RootMargin/Shell/MainColumn/HeaderCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 22
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 22
+theme_override_constants/margin_bottom = 20
+
+[node name="HeaderContent" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/HeaderCard/HeaderPadding"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="PageEyebrow" type="Label" parent="RootMargin/Shell/MainColumn/HeaderCard/HeaderPadding/HeaderContent"]
+layout_mode = 2
+text = "PLAYER DOSSIER"
+
+[node name="PageTitleLabel" type="Label" parent="RootMargin/Shell/MainColumn/HeaderCard/HeaderPadding/HeaderContent"]
+layout_mode = 2
+text = "Player Profile"
+theme_override_font_sizes/font_size = 36
+
+[node name="StatusLabel" type="Label" parent="RootMargin/Shell/MainColumn/HeaderCard/HeaderPadding/HeaderContent"]
+layout_mode = 2
+text = "Select a player from the squad workspace."
+autowrap_mode = 3
+
+[node name="SummaryGrid" type="GridContainer" parent="RootMargin/Shell/MainColumn"]
+layout_mode = 2
+columns = 4
+theme_override_constants/h_separation = 14
+theme_override_constants/v_separation = 14
+
+[node name="PositionCard" type="PanelContainer" parent="RootMargin/Shell/MainColumn/SummaryGrid"]
+layout_mode = 2
+
+[node name="CardPadding" type="MarginContainer" parent="RootMargin/Shell/MainColumn/SummaryGrid/PositionCard"]
 layout_mode = 2
 theme_override_constants/margin_left = 18
 theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 18
 theme_override_constants/margin_bottom = 16
 
-[node name="ProfileContent" type="VBoxContainer" parent="Center/Panel/Padding/Content/ProfileCard/ProfilePadding"]
+[node name="CardContent" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/SummaryGrid/PositionCard/CardPadding"]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="IdentityLabel" type="Label" parent="Center/Panel/Padding/Content/ProfileCard/ProfilePadding/ProfileContent"]
+[node name="CardEyebrow" type="Label" parent="RootMargin/Shell/MainColumn/SummaryGrid/PositionCard/CardPadding/CardContent"]
 layout_mode = 2
-text = "Identity unavailable."
-autowrap_mode = 3
-horizontal_alignment = 0
+text = "POSITION"
 
-[node name="RoleLabel" type="Label" parent="Center/Panel/Padding/Content/ProfileCard/ProfilePadding/ProfileContent"]
+[node name="CardValueLabel" type="Label" parent="RootMargin/Shell/MainColumn/SummaryGrid/PositionCard/CardPadding/CardContent"]
+layout_mode = 2
+text = "--"
+
+[node name="CardMetaLabel" type="Label" parent="RootMargin/Shell/MainColumn/SummaryGrid/PositionCard/CardPadding/CardContent"]
 layout_mode = 2
 text = "Role unavailable."
 autowrap_mode = 3
-horizontal_alignment = 0
 
-[node name="ConditionLabel" type="Label" parent="Center/Panel/Padding/Content/ProfileCard/ProfilePadding/ProfileContent"]
+[node name="AgeCard" type="PanelContainer" parent="RootMargin/Shell/MainColumn/SummaryGrid"]
+layout_mode = 2
+
+[node name="CardPadding" type="MarginContainer" parent="RootMargin/Shell/MainColumn/SummaryGrid/AgeCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 16
+
+[node name="CardContent" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/SummaryGrid/AgeCard/CardPadding"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="CardEyebrow" type="Label" parent="RootMargin/Shell/MainColumn/SummaryGrid/AgeCard/CardPadding/CardContent"]
+layout_mode = 2
+text = "AGE"
+
+[node name="CardValueLabel" type="Label" parent="RootMargin/Shell/MainColumn/SummaryGrid/AgeCard/CardPadding/CardContent"]
+layout_mode = 2
+text = "--"
+
+[node name="CardMetaLabel" type="Label" parent="RootMargin/Shell/MainColumn/SummaryGrid/AgeCard/CardPadding/CardContent"]
+layout_mode = 2
+text = "Age band unavailable."
+autowrap_mode = 3
+
+[node name="FormCard" type="PanelContainer" parent="RootMargin/Shell/MainColumn/SummaryGrid"]
+layout_mode = 2
+
+[node name="CardPadding" type="MarginContainer" parent="RootMargin/Shell/MainColumn/SummaryGrid/FormCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 16
+
+[node name="CardContent" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/SummaryGrid/FormCard/CardPadding"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="CardEyebrow" type="Label" parent="RootMargin/Shell/MainColumn/SummaryGrid/FormCard/CardPadding/CardContent"]
+layout_mode = 2
+text = "FORM"
+
+[node name="CardValueLabel" type="Label" parent="RootMargin/Shell/MainColumn/SummaryGrid/FormCard/CardPadding/CardContent"]
+layout_mode = 2
+text = "--"
+
+[node name="CardMetaLabel" type="Label" parent="RootMargin/Shell/MainColumn/SummaryGrid/FormCard/CardPadding/CardContent"]
+layout_mode = 2
+text = "Form trend unavailable."
+autowrap_mode = 3
+
+[node name="FitnessCard" type="PanelContainer" parent="RootMargin/Shell/MainColumn/SummaryGrid"]
+layout_mode = 2
+
+[node name="CardPadding" type="MarginContainer" parent="RootMargin/Shell/MainColumn/SummaryGrid/FitnessCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 16
+
+[node name="CardContent" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/SummaryGrid/FitnessCard/CardPadding"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="CardEyebrow" type="Label" parent="RootMargin/Shell/MainColumn/SummaryGrid/FitnessCard/CardPadding/CardContent"]
+layout_mode = 2
+text = "FITNESS"
+
+[node name="CardValueLabel" type="Label" parent="RootMargin/Shell/MainColumn/SummaryGrid/FitnessCard/CardPadding/CardContent"]
+layout_mode = 2
+text = "--"
+
+[node name="CardMetaLabel" type="Label" parent="RootMargin/Shell/MainColumn/SummaryGrid/FitnessCard/CardPadding/CardContent"]
+layout_mode = 2
+text = "Availability unavailable."
+autowrap_mode = 3
+
+[node name="ContentRow" type="HBoxContainer" parent="RootMargin/Shell/MainColumn"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 18
+
+[node name="ProfileCard" type="PanelContainer" parent="RootMargin/Shell/MainColumn/ContentRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ProfilePadding" type="MarginContainer" parent="RootMargin/Shell/MainColumn/ContentRow/ProfileCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 22
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 22
+theme_override_constants/margin_bottom = 20
+
+[node name="ProfileContent" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/ContentRow/ProfileCard/ProfilePadding"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ProfileEyebrow" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/ProfileCard/ProfilePadding/ProfileContent"]
+layout_mode = 2
+text = "IDENTITY"
+
+[node name="IdentityLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/ProfileCard/ProfilePadding/ProfileContent"]
+layout_mode = 2
+text = "Identity unavailable."
+autowrap_mode = 3
+
+[node name="RoleLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/ProfileCard/ProfilePadding/ProfileContent"]
+layout_mode = 2
+text = "Role unavailable."
+autowrap_mode = 3
+
+[node name="ConditionLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/ProfileCard/ProfilePadding/ProfileContent"]
 layout_mode = 2
 text = "Condition unavailable."
 autowrap_mode = 3
-horizontal_alignment = 0
 
-[node name="PathwayLabel" type="Label" parent="Center/Panel/Padding/Content/ProfileCard/ProfilePadding/ProfileContent"]
+[node name="InsightCard" type="PanelContainer" parent="RootMargin/Shell/MainColumn/ContentRow"]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="InsightPadding" type="MarginContainer" parent="RootMargin/Shell/MainColumn/ContentRow/InsightCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 22
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 22
+theme_override_constants/margin_bottom = 20
+
+[node name="InsightContent" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="InsightEyebrow" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent"]
+layout_mode = 2
+text = "MATCH READINESS"
+
+[node name="PathwayLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent"]
 layout_mode = 2
 text = "Trajectory unavailable."
 autowrap_mode = 3
-horizontal_alignment = 0
 
-[node name="StatusLabel" type="Label" parent="Center/Panel/Padding/Content"]
+[node name="ReadinessLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent"]
 layout_mode = 2
-text = "Return to the squad screen and select a player first."
+text = "Readiness unavailable."
 autowrap_mode = 3
-horizontal_alignment = 1
 
-[node name="BackButton" type="Button" parent="Center/Panel/Padding/Content"]
-layout_mode = 2
-text = "Back to Squad"
-
-[connection signal="pressed" from="Center/Panel/Padding/Content/BackButton" to="." method="OnBackPressed"]
+[connection signal="pressed" from="RootMargin/Shell/ContextColumn/ContextCard/ContextPadding/ContextContent/BackButton" to="." method="OnBackPressed"]
