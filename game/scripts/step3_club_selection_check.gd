@@ -16,9 +16,9 @@ func _process(_delta: float) -> bool:
             _fail("CareerSetup scene did not load")
             return false
 
-        var name_input := current_scene.get_node("Center/Panel/ManagerNameInput") as LineEdit
-        var seed_input := current_scene.get_node("Center/Panel/SeedInput") as SpinBox
-        var start_button := current_scene.get_node("Center/Panel/StartCareerButton") as Button
+        var name_input := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/ManagerNameInput") as LineEdit
+        var seed_input := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/SeedInput") as SpinBox
+        var start_button := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/ActionsRow/StartCareerButton") as Button
 
         if name_input == null or seed_input == null or start_button == null:
             _fail("CareerSetup controls are missing")
@@ -35,18 +35,18 @@ func _process(_delta: float) -> bool:
             _fail("Career handoff did not open ChooseClub")
             return false
 
-        var club_list := current_scene.get_node("Center/Panel/ClubList") as ItemList
-        var confirm_button := current_scene.get_node("Center/Panel/ConfirmSelectionButton") as Button
+        var club_rows := current_scene.get_node("RootMargin/MainColumn/ContentRow/ListCard/ListPadding/ListContent/ClubScroll/ClubRows") as VBoxContainer
+        var confirm_button := current_scene.get_node("RootMargin/MainColumn/ContentRow/ListCard/ListPadding/ListContent/ActionsRow/ConfirmSelectionButton") as Button
 
-        if club_list == null or confirm_button == null:
+        if club_rows == null or confirm_button == null:
             _fail("ChooseClub list controls are missing")
             return false
 
-        if club_list.item_count < 2:
+        if club_rows.get_child_count() < 2:
             _fail("Expected seeded clubs to be populated")
             return false
 
-        club_list.select(1)
+        current_scene.call("SelectClubRow", 1)
         confirm_button.emit_signal("pressed")
         _stage = 2
         _ticks = 0
@@ -65,7 +65,7 @@ func _process(_delta: float) -> bool:
             _fail("SelectedClubName was not persisted correctly")
             return false
 
-        var dashboard_label := current_scene.get_node("Center/Panel/ClubContextLabel") as Label
+        var dashboard_label := current_scene.get_node("RootMargin/Shell/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderInfo/ClubContextLabel") as Label
         if dashboard_label == null or dashboard_label.text.find("Northbridge City") == -1:
             _fail("ClubDashboard context did not include selected club")
             return false

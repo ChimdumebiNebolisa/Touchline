@@ -30,9 +30,9 @@ func _process(_delta: float) -> bool:
             _fail("CareerSetup did not load from MainMenu")
             return false
 
-        var manager_name_input := current_scene.get_node("Center/Panel/Padding/Content/ManagerNameInput") as LineEdit
-        var seed_input := current_scene.get_node("Center/Panel/Padding/Content/SeedInput") as SpinBox
-        var start_button := current_scene.get_node("Center/Panel/Padding/Content/StartCareerButton") as Button
+        var manager_name_input := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/ManagerNameInput") as LineEdit
+        var seed_input := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/SeedInput") as SpinBox
+        var start_button := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/ActionsRow/StartCareerButton") as Button
         if manager_name_input == null or seed_input == null or start_button == null:
             _fail("CareerSetup controls are missing")
             return false
@@ -48,18 +48,18 @@ func _process(_delta: float) -> bool:
             _fail("ChooseClub did not load from CareerSetup")
             return false
 
-        var club_list := current_scene.get_node("Center/Panel/Padding/Content/ClubList") as ItemList
-        var identity_label := current_scene.get_node("Center/Panel/Padding/Content/PreviewCard/PreviewPadding/PreviewContent/IdentityLabel") as Label
-        var confirm_button := current_scene.get_node("Center/Panel/Padding/Content/ConfirmSelectionButton") as Button
-        if club_list == null or identity_label == null or confirm_button == null:
+        var club_rows := current_scene.get_node("RootMargin/MainColumn/ContentRow/ListCard/ListPadding/ListContent/ClubScroll/ClubRows") as VBoxContainer
+        var identity_label := current_scene.get_node("RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent/IdentityLabel") as Label
+        var confirm_button := current_scene.get_node("RootMargin/MainColumn/ContentRow/ListCard/ListPadding/ListContent/ActionsRow/ConfirmSelectionButton") as Button
+        if club_rows == null or identity_label == null or confirm_button == null:
             _fail("ChooseClub controls are missing")
             return false
 
-        if club_list.item_count == 0 or identity_label.text.find("Identity:") == -1:
+        if club_rows.get_child_count() == 0 or identity_label.text.find("Identity |") == -1:
             _fail("ChooseClub did not surface club preview context")
             return false
 
-        club_list.select(0)
+        current_scene.call("SelectClubRow", 0)
         confirm_button.emit_signal("pressed")
         _stage = 3
         _ticks = 0

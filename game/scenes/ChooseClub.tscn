@@ -18,119 +18,229 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.0352941, 0.054902, 0.0705882, 1)
+color = Color(0.0313726, 0.0509804, 0.0666667, 1)
 
-[node name="AccentBand" type="ColorRect" parent="."]
+[node name="TopBand" type="ColorRect" parent="."]
 layout_mode = 1
 anchors_preset = 10
-anchor_left = 0.0
-anchor_top = 0.0
 anchor_right = 1.0
-anchor_bottom = 0.24
+anchor_bottom = 0.28
 grow_horizontal = 2
-color = Color(0.0705882, 0.117647, 0.152941, 1)
+color = Color(0.0509804, 0.0862745, 0.117647, 1)
 
-[node name="Center" type="CenterContainer" parent="."]
+[node name="RootMargin" type="MarginContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 28
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 28
 
-[node name="Panel" type="PanelContainer" parent="Center"]
-custom_minimum_size = Vector2(680, 0)
+[node name="MainColumn" type="VBoxContainer" parent="RootMargin"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="HeroCard" type="PanelContainer" parent="RootMargin/MainColumn"]
 layout_mode = 2
 
-[node name="Padding" type="MarginContainer" parent="Center/Panel"]
+[node name="HeroPadding" type="MarginContainer" parent="RootMargin/MainColumn/HeroCard"]
 layout_mode = 2
-theme_override_constants/margin_left = 30
-theme_override_constants/margin_top = 26
-theme_override_constants/margin_right = 30
-theme_override_constants/margin_bottom = 26
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 22
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 22
 
-[node name="Content" type="VBoxContainer" parent="Center/Panel/Padding"]
-layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="Eyebrow" type="Label" parent="Center/Panel/Padding/Content"]
-layout_mode = 2
-text = "CLUB SELECTION"
-horizontal_alignment = 1
-
-[node name="Heading" type="Label" parent="Center/Panel/Padding/Content"]
-layout_mode = 2
-text = "Choose Club"
-horizontal_alignment = 1
-theme_override_font_sizes/font_size = 34
-
-[node name="CareerSummaryLabel" type="Label" parent="Center/Panel/Padding/Content"]
-layout_mode = 2
-text = "Career context unavailable."
-autowrap_mode = 3
-horizontal_alignment = 1
-
-[node name="StubMessage" type="Label" parent="Center/Panel/Padding/Content"]
-layout_mode = 2
-text = "Pick the club whose pressure, identity, and first fixture you want to own."
-autowrap_mode = 3
-horizontal_alignment = 1
-
-[node name="ClubList" type="ItemList" parent="Center/Panel/Padding/Content"]
-layout_mode = 2
-custom_minimum_size = Vector2(620, 220)
-
-[node name="PreviewCard" type="PanelContainer" parent="Center/Panel/Padding/Content"]
-layout_mode = 2
-
-[node name="PreviewPadding" type="MarginContainer" parent="Center/Panel/Padding/Content/PreviewCard"]
-layout_mode = 2
-theme_override_constants/margin_left = 18
-theme_override_constants/margin_top = 16
-theme_override_constants/margin_right = 18
-theme_override_constants/margin_bottom = 16
-
-[node name="PreviewContent" type="VBoxContainer" parent="Center/Panel/Padding/Content/PreviewCard/PreviewPadding"]
+[node name="HeroContent" type="VBoxContainer" parent="RootMargin/MainColumn/HeroCard/HeroPadding"]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="PreviewHeading" type="Label" parent="Center/Panel/Padding/Content/PreviewCard/PreviewPadding/PreviewContent"]
+[node name="PageEyebrow" type="Label" parent="RootMargin/MainColumn/HeroCard/HeroPadding/HeroContent"]
 layout_mode = 2
-text = "Club Snapshot"
-horizontal_alignment = 1
+text = "CLUB SELECTION"
 
-[node name="IdentityLabel" type="Label" parent="Center/Panel/Padding/Content/PreviewCard/PreviewPadding/PreviewContent"]
+[node name="PageTitleLabel" type="Label" parent="RootMargin/MainColumn/HeroCard/HeroPadding/HeroContent"]
 layout_mode = 2
-text = "Identity context unavailable."
+text = "Choose the Club"
+
+[node name="HeroSubtitleLabel" type="Label" parent="RootMargin/MainColumn/HeroCard/HeroPadding/HeroContent"]
+layout_mode = 2
+text = "Pick the brief you want to own. Identity, pressure, and the opening fixture all lock in here."
 autowrap_mode = 3
-horizontal_alignment = 0
 
-[node name="ExpectationLabel" type="Label" parent="Center/Panel/Padding/Content/PreviewCard/PreviewPadding/PreviewContent"]
+[node name="CareerSummaryLabel" type="Label" parent="RootMargin/MainColumn/HeroCard/HeroPadding/HeroContent"]
 layout_mode = 2
-text = "Expectation context unavailable."
+text = "Career context unavailable."
 autowrap_mode = 3
-horizontal_alignment = 0
 
-[node name="OpeningFixtureLabel" type="Label" parent="Center/Panel/Padding/Content/PreviewCard/PreviewPadding/PreviewContent"]
+[node name="ContentRow" type="HBoxContainer" parent="RootMargin/MainColumn"]
 layout_mode = 2
-text = "Opening fixture unavailable."
+size_flags_vertical = 3
+theme_override_constants/separation = 20
+
+[node name="ListCard" type="PanelContainer" parent="RootMargin/MainColumn/ContentRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ListPadding" type="MarginContainer" parent="RootMargin/MainColumn/ContentRow/ListCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 22
+theme_override_constants/margin_top = 22
+theme_override_constants/margin_right = 22
+theme_override_constants/margin_bottom = 22
+
+[node name="ListContent" type="VBoxContainer" parent="RootMargin/MainColumn/ContentRow/ListCard/ListPadding"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ListHeading" type="Label" parent="RootMargin/MainColumn/ContentRow/ListCard/ListPadding/ListContent"]
+layout_mode = 2
+text = "Available Clubs"
+
+[node name="ListHintLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/ListCard/ListPadding/ListContent"]
+layout_mode = 2
+text = "Each row surfaces the club's football identity and the pressure attached to the job."
 autowrap_mode = 3
-horizontal_alignment = 0
 
-[node name="ConfirmSelectionButton" type="Button" parent="Center/Panel/Padding/Content"]
+[node name="ClubScroll" type="ScrollContainer" parent="RootMargin/MainColumn/ContentRow/ListCard/ListPadding/ListContent"]
 layout_mode = 2
-text = "Confirm Club Selection"
+size_flags_vertical = 3
+follow_focus = true
+horizontal_scroll_mode = 0
 
-[node name="SelectionStatusLabel" type="Label" parent="Center/Panel/Padding/Content"]
+[node name="ClubRows" type="VBoxContainer" parent="RootMargin/MainColumn/ContentRow/ListCard/ListPadding/ListContent/ClubScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="SelectionStatusLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/ListCard/ListPadding/ListContent"]
 layout_mode = 2
 text = "No club selected yet."
 autowrap_mode = 3
-horizontal_alignment = 1
 
-[node name="BackButton" type="Button" parent="Center/Panel/Padding/Content"]
+[node name="ActionsRow" type="HBoxContainer" parent="RootMargin/MainColumn/ContentRow/ListCard/ListPadding/ListContent"]
 layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ConfirmSelectionButton" type="Button" parent="RootMargin/MainColumn/ContentRow/ListCard/ListPadding/ListContent/ActionsRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Confirm Club Selection"
+
+[node name="BackButton" type="Button" parent="RootMargin/MainColumn/ContentRow/ListCard/ListPadding/ListContent/ActionsRow"]
+layout_mode = 2
+size_flags_horizontal = 3
 text = "Back to Career Setup"
 
-[connection signal="item_selected" from="Center/Panel/Padding/Content/ClubList" to="." method="OnClubSelected"]
-[connection signal="pressed" from="Center/Panel/Padding/Content/ConfirmSelectionButton" to="." method="OnConfirmSelectionPressed"]
-[connection signal="pressed" from="Center/Panel/Padding/Content/BackButton" to="." method="OnBackPressed"]
+[node name="PreviewCard" type="PanelContainer" parent="RootMargin/MainColumn/ContentRow"]
+custom_minimum_size = Vector2(380, 0)
+layout_mode = 2
+
+[node name="PreviewPadding" type="MarginContainer" parent="RootMargin/MainColumn/ContentRow/PreviewCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 22
+theme_override_constants/margin_top = 22
+theme_override_constants/margin_right = 22
+theme_override_constants/margin_bottom = 22
+
+[node name="PreviewContent" type="VBoxContainer" parent="RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="PreviewHeading" type="Label" parent="RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent"]
+layout_mode = 2
+text = "Club Snapshot"
+
+[node name="PreviewHintLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent"]
+layout_mode = 2
+text = "Selected club context before you take the job."
+autowrap_mode = 3
+
+[node name="PreviewTopRow" type="HBoxContainer" parent="RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Badge" type="PanelContainer" parent="RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent/PreviewTopRow"]
+custom_minimum_size = Vector2(56, 56)
+layout_mode = 2
+
+[node name="BadgeLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent/PreviewTopRow/Badge"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -14.0
+offset_top = -12.0
+offset_right = 14.0
+offset_bottom = 12.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "--"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ClubMeta" type="VBoxContainer" parent="RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent/PreviewTopRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="ClubNameLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent/PreviewTopRow/ClubMeta"]
+layout_mode = 2
+text = "Club unavailable"
+
+[node name="TagRow" type="HBoxContainer" parent="RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="IdentityTag" type="PanelContainer" parent="RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent/TagRow"]
+layout_mode = 2
+
+[node name="IdentityTagPadding" type="MarginContainer" parent="RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent/TagRow/IdentityTag"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 6
+
+[node name="IdentityTagLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent/TagRow/IdentityTag/IdentityTagPadding"]
+layout_mode = 2
+text = "NO IDENTITY"
+horizontal_alignment = 1
+
+[node name="PressureTag" type="PanelContainer" parent="RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent/TagRow"]
+layout_mode = 2
+
+[node name="PressureTagPadding" type="MarginContainer" parent="RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent/TagRow/PressureTag"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 6
+
+[node name="PressureTagLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent/TagRow/PressureTag/PressureTagPadding"]
+layout_mode = 2
+text = "NO BRIEF"
+horizontal_alignment = 1
+
+[node name="IdentityLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent"]
+layout_mode = 2
+text = "Identity unavailable."
+autowrap_mode = 3
+
+[node name="ExpectationLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent"]
+layout_mode = 2
+text = "Board line unavailable."
+autowrap_mode = 3
+
+[node name="OpeningFixtureLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent"]
+layout_mode = 2
+text = "Opening fixture unavailable."
+autowrap_mode = 3
+
+[connection signal="pressed" from="RootMargin/MainColumn/ContentRow/ListCard/ListPadding/ListContent/ActionsRow/ConfirmSelectionButton" to="." method="OnConfirmSelectionPressed"]
+[connection signal="pressed" from="RootMargin/MainColumn/ContentRow/ListCard/ListPadding/ListContent/ActionsRow/BackButton" to="." method="OnBackPressed"]

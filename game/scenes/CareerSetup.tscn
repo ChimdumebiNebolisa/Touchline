@@ -18,122 +18,182 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.0352941, 0.054902, 0.0705882, 1)
+color = Color(0.0313726, 0.0509804, 0.0666667, 1)
 
-[node name="AccentBand" type="ColorRect" parent="."]
+[node name="TopBand" type="ColorRect" parent="."]
 layout_mode = 1
 anchors_preset = 10
-anchor_left = 0.0
-anchor_top = 0.0
 anchor_right = 1.0
-anchor_bottom = 0.24
+anchor_bottom = 0.28
 grow_horizontal = 2
-color = Color(0.0705882, 0.117647, 0.152941, 1)
+color = Color(0.0509804, 0.0862745, 0.117647, 1)
 
-[node name="Center" type="CenterContainer" parent="."]
+[node name="RootMargin" type="MarginContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 28
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 28
 
-[node name="Panel" type="PanelContainer" parent="Center"]
-custom_minimum_size = Vector2(620, 0)
+[node name="MainColumn" type="VBoxContainer" parent="RootMargin"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="HeroCard" type="PanelContainer" parent="RootMargin/MainColumn"]
 layout_mode = 2
 
-[node name="Padding" type="MarginContainer" parent="Center/Panel"]
+[node name="HeroPadding" type="MarginContainer" parent="RootMargin/MainColumn/HeroCard"]
 layout_mode = 2
-theme_override_constants/margin_left = 30
-theme_override_constants/margin_top = 26
-theme_override_constants/margin_right = 30
-theme_override_constants/margin_bottom = 26
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 22
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 22
 
-[node name="Content" type="VBoxContainer" parent="Center/Panel/Padding"]
-layout_mode = 2
-theme_override_constants/separation = 10
-
-[node name="Eyebrow" type="Label" parent="Center/Panel/Padding/Content"]
-layout_mode = 2
-text = "NEW CAREER"
-horizontal_alignment = 1
-
-[node name="Heading" type="Label" parent="Center/Panel/Padding/Content"]
-layout_mode = 2
-text = "Career Setup"
-horizontal_alignment = 1
-theme_override_font_sizes/font_size = 34
-
-[node name="IntroLabel" type="Label" parent="Center/Panel/Padding/Content"]
-layout_mode = 2
-text = "Set your identity, lock the seed, and enter a persistent football world."
-autowrap_mode = 3
-horizontal_alignment = 1
-
-[node name="OnboardingCard" type="PanelContainer" parent="Center/Panel/Padding/Content"]
-layout_mode = 2
-
-[node name="OnboardingPadding" type="MarginContainer" parent="Center/Panel/Padding/Content/OnboardingCard"]
-layout_mode = 2
-theme_override_constants/margin_left = 18
-theme_override_constants/margin_top = 16
-theme_override_constants/margin_right = 18
-theme_override_constants/margin_bottom = 16
-
-[node name="OnboardingContent" type="VBoxContainer" parent="Center/Panel/Padding/Content/OnboardingCard/OnboardingPadding"]
+[node name="HeroContent" type="VBoxContainer" parent="RootMargin/MainColumn/HeroCard/HeroPadding"]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="OnboardingHeading" type="Label" parent="Center/Panel/Padding/Content/OnboardingCard/OnboardingPadding/OnboardingContent"]
+[node name="PageEyebrow" type="Label" parent="RootMargin/MainColumn/HeroCard/HeroPadding/HeroContent"]
 layout_mode = 2
-text = "What This Sets"
-horizontal_alignment = 1
+text = "NEW CAREER"
 
-[node name="OnboardingSummary" type="Label" parent="Center/Panel/Padding/Content/OnboardingCard/OnboardingPadding/OnboardingContent"]
+[node name="PageTitleLabel" type="Label" parent="RootMargin/MainColumn/HeroCard/HeroPadding/HeroContent"]
 layout_mode = 2
-text = "Your manager name anchors the career. The seed fixes the world start so club choice, fixtures, and future saves stay coherent."
+text = "Build the World"
+
+[node name="HeroSubtitleLabel" type="Label" parent="RootMargin/MainColumn/HeroCard/HeroPadding/HeroContent"]
+layout_mode = 2
+text = "Set the manager identity and seed, then step into a persistent football world."
 autowrap_mode = 3
-horizontal_alignment = 0
 
-[node name="OnboardingNextStep" type="Label" parent="Center/Panel/Padding/Content/OnboardingCard/OnboardingPadding/OnboardingContent"]
+[node name="ContentRow" type="HBoxContainer" parent="RootMargin/MainColumn"]
 layout_mode = 2
-text = "Next step: choose the club whose pressure and identity you want to own."
+size_flags_vertical = 3
+theme_override_constants/separation = 20
+
+[node name="FormCard" type="PanelContainer" parent="RootMargin/MainColumn/ContentRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="FormPadding" type="MarginContainer" parent="RootMargin/MainColumn/ContentRow/FormCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 22
+theme_override_constants/margin_top = 22
+theme_override_constants/margin_right = 22
+theme_override_constants/margin_bottom = 22
+
+[node name="FormContent" type="VBoxContainer" parent="RootMargin/MainColumn/ContentRow/FormCard/FormPadding"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="FormHeading" type="Label" parent="RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent"]
+layout_mode = 2
+text = "Career Identity"
+
+[node name="FormHintLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent"]
+layout_mode = 2
+text = "Keep it tight. One manager name, one seed, one persistent save path."
 autowrap_mode = 3
-horizontal_alignment = 0
 
-[node name="ManagerNameLabel" type="Label" parent="Center/Panel/Padding/Content"]
+[node name="ManagerNameLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent"]
 layout_mode = 2
-text = "Manager Name"
+text = "Manager name"
 
-[node name="ManagerNameInput" type="LineEdit" parent="Center/Panel/Padding/Content"]
+[node name="ManagerNameInput" type="LineEdit" parent="RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent"]
 layout_mode = 2
 placeholder_text = "Enter manager name"
 text = "Alex Mercer"
 
-[node name="SeedLabel" type="Label" parent="Center/Panel/Padding/Content"]
+[node name="SeedLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent"]
 layout_mode = 2
-text = "Career Seed"
+text = "Career seed"
 
-[node name="SeedInput" type="SpinBox" parent="Center/Panel/Padding/Content"]
+[node name="SeedInput" type="SpinBox" parent="RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent"]
 layout_mode = 2
 min_value = 1.0
 max_value = 999999.0
 step = 1.0
 value = 20260408.0
 
-[node name="StartCareerButton" type="Button" parent="Center/Panel/Padding/Content"]
+[node name="StatusLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent"]
 layout_mode = 2
-text = "Begin Career and Choose Club"
-
-[node name="StatusLabel" type="Label" parent="Center/Panel/Padding/Content"]
-layout_mode = 2
-text = "Career state will initialize, then the club-selection step will open."
+text = "Start a career to initialize the world, then move straight into club selection."
 autowrap_mode = 3
-horizontal_alignment = 1
 
-[node name="BackButton" type="Button" parent="Center/Panel/Padding/Content"]
+[node name="ActionsRow" type="HBoxContainer" parent="RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent"]
 layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="StartCareerButton" type="Button" parent="RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/ActionsRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Begin Career"
+
+[node name="BackButton" type="Button" parent="RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/ActionsRow"]
+layout_mode = 2
+size_flags_horizontal = 3
 text = "Back to Main Menu"
 
-[connection signal="pressed" from="Center/Panel/Padding/Content/StartCareerButton" to="." method="OnStartCareerPressed"]
-[connection signal="pressed" from="Center/Panel/Padding/Content/BackButton" to="." method="OnBackPressed"]
+[node name="PreviewCard" type="PanelContainer" parent="RootMargin/MainColumn/ContentRow"]
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+
+[node name="PreviewPadding" type="MarginContainer" parent="RootMargin/MainColumn/ContentRow/PreviewCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 22
+theme_override_constants/margin_top = 22
+theme_override_constants/margin_right = 22
+theme_override_constants/margin_bottom = 22
+
+[node name="PreviewContent" type="VBoxContainer" parent="RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="PreviewHeading" type="Label" parent="RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent"]
+layout_mode = 2
+text = "World Preview"
+
+[node name="PreviewHintLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent"]
+layout_mode = 2
+text = "What the world seed is about to lock in."
+autowrap_mode = 3
+
+[node name="ManagerPreviewLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent"]
+layout_mode = 2
+text = "Manager | Alex Mercer"
+autowrap_mode = 3
+
+[node name="SeedPreviewLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent"]
+layout_mode = 2
+text = "Seed | 20260408"
+autowrap_mode = 3
+
+[node name="WorldPackPreviewLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent"]
+layout_mode = 2
+text = "World pack unavailable."
+autowrap_mode = 3
+
+[node name="StartDatePreviewLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent"]
+layout_mode = 2
+text = "Start date unavailable."
+autowrap_mode = 3
+
+[node name="PersistencePreviewLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent"]
+layout_mode = 2
+text = "Persistence preview unavailable."
+autowrap_mode = 3
+
+[node name="SeedImpactPreviewLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent"]
+layout_mode = 2
+text = "Seed impact unavailable."
+autowrap_mode = 3
+
+[connection signal="text_changed" from="RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/ManagerNameInput" to="." method="OnManagerNameChanged"]
+[connection signal="value_changed" from="RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/SeedInput" to="." method="OnSeedValueChanged"]
+[connection signal="pressed" from="RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/ActionsRow/StartCareerButton" to="." method="OnStartCareerPressed"]
+[connection signal="pressed" from="RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/ActionsRow/BackButton" to="." method="OnBackPressed"]

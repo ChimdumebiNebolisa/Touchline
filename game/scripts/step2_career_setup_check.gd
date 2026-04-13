@@ -16,9 +16,9 @@ func _process(_delta: float) -> bool:
             _fail("CareerSetup scene did not load")
             return false
 
-        var name_input := current_scene.get_node("Center/Panel/ManagerNameInput") as LineEdit
-        var seed_input := current_scene.get_node("Center/Panel/SeedInput") as SpinBox
-        var start_button := current_scene.get_node("Center/Panel/StartCareerButton") as Button
+        var name_input := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/ManagerNameInput") as LineEdit
+        var seed_input := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/SeedInput") as SpinBox
+        var start_button := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/ActionsRow/StartCareerButton") as Button
 
         if name_input == null or seed_input == null or start_button == null:
             _fail("CareerSetup profile controls are missing")
@@ -60,7 +60,7 @@ func _process(_delta: float) -> bool:
             _fail("CountryPackId was not stored correctly")
             return false
 
-        var summary_label := current_scene.get_node("Center/Panel/CareerSummaryLabel") as Label
+        var summary_label := current_scene.get_node("RootMargin/MainColumn/HeroCard/HeroPadding/HeroContent/CareerSummaryLabel") as Label
         if summary_label == null:
             _fail("ChooseClub summary label is missing")
             return false
