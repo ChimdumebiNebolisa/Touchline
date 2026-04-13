@@ -46,6 +46,7 @@
 - Step 30: Create a navigation and transition pass
 - Step 31: Run a full polish and usability pass
 - Step 32: Run a comprehensive management-shell UI/UX overhaul
+- Step 33: Rewrite repository documentation and README
 
 ## 2. Plan Rules
 
@@ -428,3 +429,28 @@ Transform the current Godot shell from a centered prototype-card presentation in
 ## 24. Immediate Next Subtask
 
 - No active Plan step. Update the source-of-truth docs before beginning any new product scope.
+
+## 25. Step 33: Rewrite repository documentation and README
+
+### Objective
+
+Replace the thin transitional repository README with a proper project-facing guide that matches the current Godot football-management game, repository structure, and verification workflow.
+
+### Allowed Subtasks
+
+- rewrite `README.md` around the actual product identity, current feature set, repository layout, setup requirements, run instructions, and verification workflow
+- remove stale web-prototype guidance that no longer reflects the active product path
+- document the source-of-truth docs and repo operating model clearly for contributors without changing product scope
+- keep the README grounded in the shipped Godot/C# architecture and current repo tooling rather than aspirational or unsupported workflows
+
+### Verification
+
+- README instructions match the active Godot/C# product path described in `docs/PRD.md` and `docs/Architecture.md`
+- README verification commands do not advertise stale or unsupported web-stack checks as the primary workflow
+- `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, `docs/Plan.md`, and `README.md` remain internally consistent after the rewrite
+
+### Exit Criteria
+
+- the repo has a clear, accurate top-level README for players, developers, and contributors
+- setup and run instructions reflect the real local workflow
+- documentation no longer implies the legacy web prototype is the active product
