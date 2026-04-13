@@ -16,9 +16,9 @@ func _process(_delta: float) -> bool:
             _fail("CareerSetup scene did not load")
             return false
 
-        var name_input := current_scene.get_node("Center/Panel/ManagerNameInput") as LineEdit
-        var seed_input := current_scene.get_node("Center/Panel/SeedInput") as SpinBox
-        var start_button := current_scene.get_node("Center/Panel/StartCareerButton") as Button
+        var name_input := current_scene.get_node("Center/Panel/Padding/Content/ManagerNameInput") as LineEdit
+        var seed_input := current_scene.get_node("Center/Panel/Padding/Content/SeedInput") as SpinBox
+        var start_button := current_scene.get_node("Center/Panel/Padding/Content/StartCareerButton") as Button
 
         if name_input == null or seed_input == null or start_button == null:
             _fail("CareerSetup controls are missing")
@@ -35,8 +35,8 @@ func _process(_delta: float) -> bool:
             _fail("ChooseClub did not load")
             return false
 
-        var club_list := current_scene.get_node("Center/Panel/ClubList") as ItemList
-        var confirm_button := current_scene.get_node("Center/Panel/ConfirmSelectionButton") as Button
+        var club_list := current_scene.get_node("Center/Panel/Padding/Content/ClubList") as ItemList
+        var confirm_button := current_scene.get_node("Center/Panel/Padding/Content/ConfirmSelectionButton") as Button
 
         if club_list == null or confirm_button == null:
             _fail("ChooseClub controls are missing")
@@ -52,7 +52,7 @@ func _process(_delta: float) -> bool:
             _fail("ClubDashboard did not load")
             return false
 
-        var tactics_button := current_scene.get_node("Center/Panel/TacticsButton") as Button
+        var tactics_button := current_scene.get_node("RootMargin/Shell/RailCard/RailPadding/RailContent/NavButtons/TacticsButton") as Button
         if tactics_button == null:
             _fail("TacticsButton missing on ClubDashboard")
             return false
@@ -66,13 +66,13 @@ func _process(_delta: float) -> bool:
             _fail("TacticsScreen did not load")
             return false
 
-        var formation := current_scene.get_node("Center/Panel/FormationOption") as OptionButton
-        var press_spin := current_scene.get_node("Center/Panel/PressSpin") as SpinBox
-        var tempo_spin := current_scene.get_node("Center/Panel/TempoSpin") as SpinBox
-        var width_spin := current_scene.get_node("Center/Panel/WidthSpin") as SpinBox
-        var risk_spin := current_scene.get_node("Center/Panel/RiskSpin") as SpinBox
-        var save_button := current_scene.get_node("Center/Panel/SaveButton") as Button
-        var back_button := current_scene.get_node("Center/Panel/BackButton") as Button
+        var formation := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/FormationOption") as OptionButton
+        var press_spin := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/PressSpin") as SpinBox
+        var tempo_spin := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/TempoSpin") as SpinBox
+        var width_spin := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/WidthSpin") as SpinBox
+        var risk_spin := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/RiskSpin") as SpinBox
+        var save_button := current_scene.get_node("RootMargin/Shell/RailCard/RailPadding/RailContent/FooterActions/SaveButton") as Button
+        var back_button := current_scene.get_node("RootMargin/Shell/RailCard/RailPadding/RailContent/FooterActions/BackButton") as Button
 
         if formation == null or press_spin == null or tempo_spin == null or width_spin == null or risk_spin == null or save_button == null or back_button == null:
             _fail("TacticsScreen controls are missing")
@@ -107,7 +107,7 @@ func _process(_delta: float) -> bool:
             _fail("Back from TacticsScreen did not return to ClubDashboard")
             return false
 
-        var tactics_button := current_scene.get_node("Center/Panel/TacticsButton") as Button
+        var tactics_button := current_scene.get_node("RootMargin/Shell/RailCard/RailPadding/RailContent/NavButtons/TacticsButton") as Button
         if tactics_button == null:
             _fail("TacticsButton missing on ClubDashboard")
             return false
@@ -121,11 +121,11 @@ func _process(_delta: float) -> bool:
             _fail("TacticsScreen did not reload")
             return false
 
-        var formation := current_scene.get_node("Center/Panel/FormationOption") as OptionButton
-        var press_spin := current_scene.get_node("Center/Panel/PressSpin") as SpinBox
-        var tempo_spin := current_scene.get_node("Center/Panel/TempoSpin") as SpinBox
-        var width_spin := current_scene.get_node("Center/Panel/WidthSpin") as SpinBox
-        var risk_spin := current_scene.get_node("Center/Panel/RiskSpin") as SpinBox
+        var formation := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/FormationOption") as OptionButton
+        var press_spin := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/PressSpin") as SpinBox
+        var tempo_spin := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/TempoSpin") as SpinBox
+        var width_spin := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/WidthSpin") as SpinBox
+        var risk_spin := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/RiskSpin") as SpinBox
 
         if formation == null or press_spin == null or tempo_spin == null or width_spin == null or risk_spin == null:
             _fail("TacticsScreen controls missing on reload")

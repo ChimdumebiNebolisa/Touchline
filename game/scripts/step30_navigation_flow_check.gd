@@ -264,8 +264,8 @@ func _process(_delta: float) -> bool:
             _fail("TacticsScreen did not load from ClubDashboard")
             return false
 
-        var club_context := current_scene.get_node("Center/Shell/Padding/Content/Header/ClubContextLabel") as Label
-        var back_button := current_scene.get_node("Center/Shell/Padding/Content/ActionsRow/BackButton") as Button
+        var club_context := current_scene.get_node("RootMargin/Shell/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderInfo/ClubContextLabel") as Label
+        var back_button := current_scene.get_node("RootMargin/Shell/RailCard/RailPadding/RailContent/FooterActions/BackButton") as Button
         if club_context == null or back_button == null:
             _fail("TacticsScreen controls are missing")
             return false

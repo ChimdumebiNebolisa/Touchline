@@ -18,155 +18,569 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.0352941, 0.054902, 0.0705882, 1)
+color = Color(0.0313726, 0.0509804, 0.0666667, 1)
 
-[node name="AccentBand" type="ColorRect" parent="."]
+[node name="TopBand" type="ColorRect" parent="."]
 layout_mode = 1
 anchors_preset = 10
-anchor_left = 0.0
-anchor_top = 0.0
 anchor_right = 1.0
-anchor_bottom = 0.18
+anchor_bottom = 0.24
 grow_horizontal = 2
-color = Color(0.0705882, 0.117647, 0.152941, 1)
+color = Color(0.0509804, 0.0862745, 0.117647, 1)
 
-[node name="Center" type="CenterContainer" parent="."]
+[node name="RootMargin" type="MarginContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 22
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 22
 
-[node name="Shell" type="PanelContainer" parent="Center"]
-custom_minimum_size = Vector2(980, 0)
+[node name="Shell" type="HBoxContainer" parent="RootMargin"]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="RailCard" type="PanelContainer" parent="RootMargin/Shell"]
+custom_minimum_size = Vector2(272, 0)
 layout_mode = 2
 
-[node name="Padding" type="MarginContainer" parent="Center/Shell"]
+[node name="RailPadding" type="MarginContainer" parent="RootMargin/Shell/RailCard"]
 layout_mode = 2
-theme_override_constants/margin_left = 30
-theme_override_constants/margin_top = 28
-theme_override_constants/margin_right = 30
-theme_override_constants/margin_bottom = 28
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 18
 
-[node name="Content" type="VBoxContainer" parent="Center/Shell/Padding"]
-layout_mode = 2
-theme_override_constants/separation = 16
-
-[node name="Header" type="VBoxContainer" parent="Center/Shell/Padding/Content"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="Heading" type="Label" parent="Center/Shell/Padding/Content/Header"]
-layout_mode = 2
-text = "Tactical Board"
-horizontal_alignment = 1
-theme_override_font_sizes/font_size = 34
-
-[node name="ClubContextLabel" type="Label" parent="Center/Shell/Padding/Content/Header"]
-layout_mode = 2
-text = "Club context unavailable."
-autowrap_mode = 3
-horizontal_alignment = 1
-
-[node name="MatchPlanLabel" type="Label" parent="Center/Shell/Padding/Content/Header"]
-layout_mode = 2
-text = "Match plan unavailable."
-autowrap_mode = 3
-horizontal_alignment = 1
-
-[node name="BoardRow" type="HBoxContainer" parent="Center/Shell/Padding/Content"]
+[node name="RailContent" type="VBoxContainer" parent="RootMargin/Shell/RailCard/RailPadding"]
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="PreviewCard" type="PanelContainer" parent="Center/Shell/Padding/Content/BoardRow"]
+[node name="IdentityCard" type="PanelContainer" parent="RootMargin/Shell/RailCard/RailPadding/RailContent"]
+layout_mode = 2
+
+[node name="IdentityPadding" type="MarginContainer" parent="RootMargin/Shell/RailCard/RailPadding/RailContent/IdentityCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="IdentityContent" type="VBoxContainer" parent="RootMargin/Shell/RailCard/RailPadding/RailContent/IdentityCard/IdentityPadding"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="IdentityTopRow" type="HBoxContainer" parent="RootMargin/Shell/RailCard/RailPadding/RailContent/IdentityCard/IdentityPadding/IdentityContent"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Badge" type="PanelContainer" parent="RootMargin/Shell/RailCard/RailPadding/RailContent/IdentityCard/IdentityPadding/IdentityContent/IdentityTopRow"]
+custom_minimum_size = Vector2(56, 56)
+layout_mode = 2
+
+[node name="BadgeLabel" type="Label" parent="RootMargin/Shell/RailCard/RailPadding/RailContent/IdentityCard/IdentityPadding/IdentityContent/IdentityTopRow/Badge"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -14.0
+offset_top = -12.0
+offset_right = 14.0
+offset_bottom = 12.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "--"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ClubMeta" type="VBoxContainer" parent="RootMargin/Shell/RailCard/RailPadding/RailContent/IdentityCard/IdentityPadding/IdentityContent/IdentityTopRow"]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_constants/separation = 4
 
-[node name="PreviewPadding" type="MarginContainer" parent="Center/Shell/Padding/Content/BoardRow/PreviewCard"]
+[node name="ClubNameLabel" type="Label" parent="RootMargin/Shell/RailCard/RailPadding/RailContent/IdentityCard/IdentityPadding/IdentityContent/IdentityTopRow/ClubMeta"]
+layout_mode = 2
+text = "Club unavailable"
+
+[node name="ManagerLabel" type="Label" parent="RootMargin/Shell/RailCard/RailPadding/RailContent/IdentityCard/IdentityPadding/IdentityContent/IdentityTopRow/ClubMeta"]
+layout_mode = 2
+text = "Manager unavailable"
+autowrap_mode = 3
+
+[node name="SeasonLabel" type="Label" parent="RootMargin/Shell/RailCard/RailPadding/RailContent/IdentityCard/IdentityPadding/IdentityContent"]
+layout_mode = 2
+text = "Season unavailable"
+
+[node name="CompetitionChip" type="PanelContainer" parent="RootMargin/Shell/RailCard/RailPadding/RailContent/IdentityCard/IdentityPadding/IdentityContent"]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="CompetitionChipPadding" type="MarginContainer" parent="RootMargin/Shell/RailCard/RailPadding/RailContent/IdentityCard/IdentityPadding/IdentityContent/CompetitionChip"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 6
+
+[node name="CompetitionChipLabel" type="Label" parent="RootMargin/Shell/RailCard/RailPadding/RailContent/IdentityCard/IdentityPadding/IdentityContent/CompetitionChip/CompetitionChipPadding"]
+layout_mode = 2
+text = "NO COMPETITION"
+horizontal_alignment = 1
+
+[node name="SectionLabel" type="Label" parent="RootMargin/Shell/RailCard/RailPadding/RailContent"]
+layout_mode = 2
+text = "OPERATIONS"
+
+[node name="NavButtons" type="VBoxContainer" parent="RootMargin/Shell/RailCard/RailPadding/RailContent"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="DashboardButton" type="Button" parent="RootMargin/Shell/RailCard/RailPadding/RailContent/NavButtons"]
+layout_mode = 2
+text = "Dashboard"
+
+[node name="SquadButton" type="Button" parent="RootMargin/Shell/RailCard/RailPadding/RailContent/NavButtons"]
+layout_mode = 2
+text = "Squad"
+
+[node name="TacticsButton" type="Button" parent="RootMargin/Shell/RailCard/RailPadding/RailContent/NavButtons"]
+layout_mode = 2
+text = "Tactics"
+
+[node name="FixturesButton" type="Button" parent="RootMargin/Shell/RailCard/RailPadding/RailContent/NavButtons"]
+layout_mode = 2
+text = "Fixtures"
+
+[node name="StandingsButton" type="Button" parent="RootMargin/Shell/RailCard/RailPadding/RailContent/NavButtons"]
+layout_mode = 2
+text = "Standings"
+
+[node name="MatchdayButton" type="Button" parent="RootMargin/Shell/RailCard/RailPadding/RailContent/NavButtons"]
+layout_mode = 2
+text = "Launch Matchday"
+
+[node name="Spacer" type="Control" parent="RootMargin/Shell/RailCard/RailPadding/RailContent"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="FooterActions" type="VBoxContainer" parent="RootMargin/Shell/RailCard/RailPadding/RailContent"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="SaveButton" type="Button" parent="RootMargin/Shell/RailCard/RailPadding/RailContent/FooterActions"]
+layout_mode = 2
+text = "Save Tactical Plan"
+
+[node name="ResetButton" type="Button" parent="RootMargin/Shell/RailCard/RailPadding/RailContent/FooterActions"]
+layout_mode = 2
+text = "Reset to Saved"
+
+[node name="SaveHintLabel" type="Label" parent="RootMargin/Shell/RailCard/RailPadding/RailContent/FooterActions"]
+layout_mode = 2
+text = "Save status unavailable."
+autowrap_mode = 3
+
+[node name="BackButton" type="Button" parent="RootMargin/Shell/RailCard/RailPadding/RailContent/FooterActions"]
+layout_mode = 2
+text = "Back to Club Dashboard"
+
+[node name="MainColumn" type="VBoxContainer" parent="RootMargin/Shell"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 18
+
+[node name="HeaderCard" type="PanelContainer" parent="RootMargin/Shell/MainColumn"]
+layout_mode = 2
+
+[node name="HeaderPadding" type="MarginContainer" parent="RootMargin/Shell/MainColumn/HeaderCard"]
 layout_mode = 2
 theme_override_constants/margin_left = 20
 theme_override_constants/margin_top = 18
 theme_override_constants/margin_right = 20
 theme_override_constants/margin_bottom = 18
 
-[node name="PreviewContent" type="VBoxContainer" parent="Center/Shell/Padding/Content/BoardRow/PreviewCard/PreviewPadding"]
+[node name="HeaderContent" type="HBoxContainer" parent="RootMargin/Shell/MainColumn/HeaderCard/HeaderPadding"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="HeaderInfo" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/HeaderCard/HeaderPadding/HeaderContent"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="PageEyebrow" type="Label" parent="RootMargin/Shell/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderInfo"]
+layout_mode = 2
+text = "TACTICAL BOARD"
+
+[node name="PageTitleLabel" type="Label" parent="RootMargin/Shell/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderInfo"]
+layout_mode = 2
+text = "Match Plan"
+theme_override_font_sizes/font_size = 36
+
+[node name="ClubContextLabel" type="Label" parent="RootMargin/Shell/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderInfo"]
+layout_mode = 2
+text = "Club context unavailable."
+autowrap_mode = 3
+
+[node name="MatchPlanLabel" type="Label" parent="RootMargin/Shell/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderInfo"]
+layout_mode = 2
+text = "Match plan unavailable."
+autowrap_mode = 3
+
+[node name="HeaderStatus" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/HeaderCard/HeaderPadding/HeaderContent"]
+custom_minimum_size = Vector2(280, 0)
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="PreviewHeading" type="Label" parent="Center/Shell/Padding/Content/BoardRow/PreviewCard/PreviewPadding/PreviewContent"]
+[node name="ChipRow" type="HBoxContainer" parent="RootMargin/Shell/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderStatus"]
 layout_mode = 2
-text = "Match Plan"
+theme_override_constants/separation = 10
 
-[node name="FormationBadgeLabel" type="Label" parent="Center/Shell/Padding/Content/BoardRow/PreviewCard/PreviewPadding/PreviewContent"]
+[node name="TacticalChip" type="PanelContainer" parent="RootMargin/Shell/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderStatus/ChipRow"]
 layout_mode = 2
-text = "No tactical shape loaded"
-theme_override_font_sizes/font_size = 24
 
-[node name="FormationBoardLabel" type="Label" parent="Center/Shell/Padding/Content/BoardRow/PreviewCard/PreviewPadding/PreviewContent"]
+[node name="TacticalChipPadding" type="MarginContainer" parent="RootMargin/Shell/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderStatus/ChipRow/TacticalChip"]
 layout_mode = 2
-text = "Tactical board unavailable."
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 6
+
+[node name="TacticalChipLabel" type="Label" parent="RootMargin/Shell/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderStatus/ChipRow/TacticalChip/TacticalChipPadding"]
+layout_mode = 2
+text = "MATCH PLAN"
+horizontal_alignment = 1
+
+[node name="ReadinessChip" type="PanelContainer" parent="RootMargin/Shell/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderStatus/ChipRow"]
+layout_mode = 2
+
+[node name="ReadinessChipPadding" type="MarginContainer" parent="RootMargin/Shell/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderStatus/ChipRow/ReadinessChip"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 6
+
+[node name="ReadinessChipLabel" type="Label" parent="RootMargin/Shell/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderStatus/ChipRow/ReadinessChip/ReadinessChipPadding"]
+layout_mode = 2
+text = "READY"
+horizontal_alignment = 1
+
+[node name="HeaderStatusLabel" type="Label" parent="RootMargin/Shell/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderStatus"]
+layout_mode = 2
+text = "Status unavailable."
 autowrap_mode = 3
 
-[node name="ShapeSummaryLabel" type="Label" parent="Center/Shell/Padding/Content/BoardRow/PreviewCard/PreviewPadding/PreviewContent"]
+[node name="SummaryGrid" type="GridContainer" parent="RootMargin/Shell/MainColumn"]
+layout_mode = 2
+columns = 5
+theme_override_constants/h_separation = 14
+theme_override_constants/v_separation = 14
+
+[node name="FormationCard" type="PanelContainer" parent="RootMargin/Shell/MainColumn/SummaryGrid"]
+layout_mode = 2
+
+[node name="CardPadding" type="MarginContainer" parent="RootMargin/Shell/MainColumn/SummaryGrid/FormationCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 16
+
+[node name="CardContent" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/SummaryGrid/FormationCard/CardPadding"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="CardEyebrow" type="Label" parent="RootMargin/Shell/MainColumn/SummaryGrid/FormationCard/CardPadding/CardContent"]
+layout_mode = 2
+text = "FORMATION"
+
+[node name="CardValueLabel" type="Label" parent="RootMargin/Shell/MainColumn/SummaryGrid/FormationCard/CardPadding/CardContent"]
+layout_mode = 2
+text = "--"
+
+[node name="CardMetaLabel" type="Label" parent="RootMargin/Shell/MainColumn/SummaryGrid/FormationCard/CardPadding/CardContent"]
+layout_mode = 2
+text = "Formation unavailable."
+autowrap_mode = 3
+
+[node name="PressCard" type="PanelContainer" parent="RootMargin/Shell/MainColumn/SummaryGrid"]
+layout_mode = 2
+
+[node name="CardPadding" type="MarginContainer" parent="RootMargin/Shell/MainColumn/SummaryGrid/PressCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 16
+
+[node name="CardContent" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/SummaryGrid/PressCard/CardPadding"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="CardEyebrow" type="Label" parent="RootMargin/Shell/MainColumn/SummaryGrid/PressCard/CardPadding/CardContent"]
+layout_mode = 2
+text = "PRESS"
+
+[node name="CardValueLabel" type="Label" parent="RootMargin/Shell/MainColumn/SummaryGrid/PressCard/CardPadding/CardContent"]
+layout_mode = 2
+text = "--"
+
+[node name="CardMetaLabel" type="Label" parent="RootMargin/Shell/MainColumn/SummaryGrid/PressCard/CardPadding/CardContent"]
+layout_mode = 2
+text = "Press unavailable."
+autowrap_mode = 3
+
+[node name="TempoCard" type="PanelContainer" parent="RootMargin/Shell/MainColumn/SummaryGrid"]
+layout_mode = 2
+
+[node name="CardPadding" type="MarginContainer" parent="RootMargin/Shell/MainColumn/SummaryGrid/TempoCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 16
+
+[node name="CardContent" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/SummaryGrid/TempoCard/CardPadding"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="CardEyebrow" type="Label" parent="RootMargin/Shell/MainColumn/SummaryGrid/TempoCard/CardPadding/CardContent"]
+layout_mode = 2
+text = "TEMPO"
+
+[node name="CardValueLabel" type="Label" parent="RootMargin/Shell/MainColumn/SummaryGrid/TempoCard/CardPadding/CardContent"]
+layout_mode = 2
+text = "--"
+
+[node name="CardMetaLabel" type="Label" parent="RootMargin/Shell/MainColumn/SummaryGrid/TempoCard/CardPadding/CardContent"]
+layout_mode = 2
+text = "Tempo unavailable."
+autowrap_mode = 3
+
+[node name="WidthCard" type="PanelContainer" parent="RootMargin/Shell/MainColumn/SummaryGrid"]
+layout_mode = 2
+
+[node name="CardPadding" type="MarginContainer" parent="RootMargin/Shell/MainColumn/SummaryGrid/WidthCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 16
+
+[node name="CardContent" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/SummaryGrid/WidthCard/CardPadding"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="CardEyebrow" type="Label" parent="RootMargin/Shell/MainColumn/SummaryGrid/WidthCard/CardPadding/CardContent"]
+layout_mode = 2
+text = "WIDTH"
+
+[node name="CardValueLabel" type="Label" parent="RootMargin/Shell/MainColumn/SummaryGrid/WidthCard/CardPadding/CardContent"]
+layout_mode = 2
+text = "--"
+
+[node name="CardMetaLabel" type="Label" parent="RootMargin/Shell/MainColumn/SummaryGrid/WidthCard/CardPadding/CardContent"]
+layout_mode = 2
+text = "Width unavailable."
+autowrap_mode = 3
+
+[node name="RiskCard" type="PanelContainer" parent="RootMargin/Shell/MainColumn/SummaryGrid"]
+layout_mode = 2
+
+[node name="CardPadding" type="MarginContainer" parent="RootMargin/Shell/MainColumn/SummaryGrid/RiskCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 16
+
+[node name="CardContent" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/SummaryGrid/RiskCard/CardPadding"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="CardEyebrow" type="Label" parent="RootMargin/Shell/MainColumn/SummaryGrid/RiskCard/CardPadding/CardContent"]
+layout_mode = 2
+text = "RISK"
+
+[node name="CardValueLabel" type="Label" parent="RootMargin/Shell/MainColumn/SummaryGrid/RiskCard/CardPadding/CardContent"]
+layout_mode = 2
+text = "--"
+
+[node name="CardMetaLabel" type="Label" parent="RootMargin/Shell/MainColumn/SummaryGrid/RiskCard/CardPadding/CardContent"]
+layout_mode = 2
+text = "Risk unavailable."
+autowrap_mode = 3
+
+[node name="ContentRow" type="HBoxContainer" parent="RootMargin/Shell/MainColumn"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 18
+
+[node name="PitchCard" type="PanelContainer" parent="RootMargin/Shell/MainColumn/ContentRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PitchPadding" type="MarginContainer" parent="RootMargin/Shell/MainColumn/ContentRow/PitchCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 22
+theme_override_constants/margin_top = 22
+theme_override_constants/margin_right = 22
+theme_override_constants/margin_bottom = 22
+
+[node name="PitchContent" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/ContentRow/PitchCard/PitchPadding"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TopMeta" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/ContentRow/PitchCard/PitchPadding/PitchContent"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="FormationBadgeLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/PitchCard/PitchPadding/PitchContent/TopMeta"]
+layout_mode = 2
+text = "No tactical shape loaded"
+
+[node name="PitchSummaryLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/PitchCard/PitchPadding/PitchContent/TopMeta"]
+layout_mode = 2
+text = "Pitch board unavailable."
+autowrap_mode = 3
+
+[node name="PitchPanel" type="PanelContainer" parent="RootMargin/Shell/MainColumn/ContentRow/PitchCard/PitchPadding/PitchContent"]
+custom_minimum_size = Vector2(0, 340)
+layout_mode = 2
+
+[node name="PitchPanelPadding" type="MarginContainer" parent="RootMargin/Shell/MainColumn/ContentRow/PitchCard/PitchPadding/PitchContent/PitchPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 18
+
+[node name="PitchField" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/ContentRow/PitchCard/PitchPadding/PitchContent/PitchPanel/PitchPanelPadding"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="PitchRows" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/ContentRow/PitchCard/PitchPadding/PitchContent/PitchPanel/PitchPanelPadding/PitchField"]
+layout_mode = 2
+size_flags_vertical = 3
+alignment = 1
+theme_override_constants/separation = 18
+
+[node name="FrontRow" type="CenterContainer" parent="RootMargin/Shell/MainColumn/ContentRow/PitchCard/PitchPadding/PitchContent/PitchPanel/PitchPanelPadding/PitchField/PitchRows"]
+layout_mode = 2
+
+[node name="FrontRowLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/PitchCard/PitchPadding/PitchContent/PitchPanel/PitchPanelPadding/PitchField/PitchRows/FrontRow"]
+layout_mode = 2
+text = " "
+horizontal_alignment = 1
+
+[node name="AttackBand" type="CenterContainer" parent="RootMargin/Shell/MainColumn/ContentRow/PitchCard/PitchPadding/PitchContent/PitchPanel/PitchPanelPadding/PitchField/PitchRows"]
+layout_mode = 2
+
+[node name="AttackBandLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/PitchCard/PitchPadding/PitchContent/PitchPanel/PitchPanelPadding/PitchField/PitchRows/AttackBand"]
+layout_mode = 2
+text = " "
+horizontal_alignment = 1
+
+[node name="MidfieldBand" type="CenterContainer" parent="RootMargin/Shell/MainColumn/ContentRow/PitchCard/PitchPadding/PitchContent/PitchPanel/PitchPanelPadding/PitchField/PitchRows"]
+layout_mode = 2
+
+[node name="MidfieldBandLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/PitchCard/PitchPadding/PitchContent/PitchPanel/PitchPanelPadding/PitchField/PitchRows/MidfieldBand"]
+layout_mode = 2
+text = " "
+horizontal_alignment = 1
+
+[node name="BackLine" type="CenterContainer" parent="RootMargin/Shell/MainColumn/ContentRow/PitchCard/PitchPadding/PitchContent/PitchPanel/PitchPanelPadding/PitchField/PitchRows"]
+layout_mode = 2
+
+[node name="BackLineLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/PitchCard/PitchPadding/PitchContent/PitchPanel/PitchPanelPadding/PitchField/PitchRows/BackLine"]
+layout_mode = 2
+text = " "
+horizontal_alignment = 1
+
+[node name="KeeperRow" type="CenterContainer" parent="RootMargin/Shell/MainColumn/ContentRow/PitchCard/PitchPadding/PitchContent/PitchPanel/PitchPanelPadding/PitchField/PitchRows"]
+layout_mode = 2
+
+[node name="KeeperLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/PitchCard/PitchPadding/PitchContent/PitchPanel/PitchPanelPadding/PitchField/PitchRows/KeeperRow"]
+layout_mode = 2
+text = " "
+horizontal_alignment = 1
+
+[node name="ChannelRow" type="HBoxContainer" parent="RootMargin/Shell/MainColumn/ContentRow/PitchCard/PitchPadding/PitchContent"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="LeftChannel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/PitchCard/PitchPadding/PitchContent/ChannelRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "LEFT"
+horizontal_alignment = 0
+
+[node name="CenterChannel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/PitchCard/PitchPadding/PitchContent/ChannelRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "CENTRE"
+horizontal_alignment = 1
+
+[node name="RightChannel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/PitchCard/PitchPadding/PitchContent/ChannelRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "RIGHT"
+horizontal_alignment = 2
+
+[node name="ShapeSummaryLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/PitchCard/PitchPadding/PitchContent"]
 layout_mode = 2
 text = "Shape note unavailable."
 autowrap_mode = 3
 
-[node name="PressPreviewLabel" type="Label" parent="Center/Shell/Padding/Content/BoardRow/PreviewCard/PreviewPadding/PreviewContent"]
-layout_mode = 2
-text = "Press note unavailable."
-autowrap_mode = 3
-
-[node name="TempoPreviewLabel" type="Label" parent="Center/Shell/Padding/Content/BoardRow/PreviewCard/PreviewPadding/PreviewContent"]
-layout_mode = 2
-text = "Tempo note unavailable."
-autowrap_mode = 3
-
-[node name="WidthPreviewLabel" type="Label" parent="Center/Shell/Padding/Content/BoardRow/PreviewCard/PreviewPadding/PreviewContent"]
-layout_mode = 2
-text = "Width note unavailable."
-autowrap_mode = 3
-
-[node name="RiskPreviewLabel" type="Label" parent="Center/Shell/Padding/Content/BoardRow/PreviewCard/PreviewPadding/PreviewContent"]
-layout_mode = 2
-text = "Risk note unavailable."
-autowrap_mode = 3
-
-[node name="PreviewSummaryLabel" type="Label" parent="Center/Shell/Padding/Content/BoardRow/PreviewCard/PreviewPadding/PreviewContent"]
+[node name="PreviewSummaryLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/PitchCard/PitchPadding/PitchContent"]
 layout_mode = 2
 text = "Tactical summary unavailable."
 autowrap_mode = 3
 
-[node name="ControlsCard" type="PanelContainer" parent="Center/Shell/Padding/Content/BoardRow"]
-custom_minimum_size = Vector2(320, 0)
+[node name="StatusLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/PitchCard/PitchPadding/PitchContent"]
+layout_mode = 2
+text = "Status unavailable."
+autowrap_mode = 3
+
+[node name="SideStack" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/ContentRow"]
+custom_minimum_size = Vector2(340, 0)
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="ControlsCard" type="PanelContainer" parent="RootMargin/Shell/MainColumn/ContentRow/SideStack"]
 layout_mode = 2
 
-[node name="ControlsPadding" type="MarginContainer" parent="Center/Shell/Padding/Content/BoardRow/ControlsCard"]
+[node name="ControlsPadding" type="MarginContainer" parent="RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard"]
 layout_mode = 2
 theme_override_constants/margin_left = 20
-theme_override_constants/margin_top = 18
+theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 20
-theme_override_constants/margin_bottom = 18
+theme_override_constants/margin_bottom = 20
 
-[node name="ControlsContent" type="VBoxContainer" parent="Center/Shell/Padding/Content/BoardRow/ControlsCard/ControlsPadding"]
+[node name="ControlsContent" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="ControlsHeading" type="Label" parent="Center/Shell/Padding/Content/BoardRow/ControlsCard/ControlsPadding/ControlsContent"]
+[node name="ControlsHeading" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent"]
 layout_mode = 2
 text = "Adjust Shape"
 
-[node name="ControlsHintLabel" type="Label" parent="Center/Shell/Padding/Content/BoardRow/ControlsCard/ControlsPadding/ControlsContent"]
+[node name="ControlsHintLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent"]
 layout_mode = 2
-text = "Tune the current match plan, review the live summary, then save the board into the next fixture."
+text = "Tune the next plan and read the pitch before you save."
 autowrap_mode = 3
 
-[node name="FormationLabel" type="Label" parent="Center/Shell/Padding/Content/BoardRow/ControlsCard/ControlsPadding/ControlsContent"]
+[node name="FormationLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent"]
 layout_mode = 2
 text = "Base formation"
 
-[node name="FormationOption" type="OptionButton" parent="Center/Shell/Padding/Content/BoardRow/ControlsCard/ControlsPadding/ControlsContent"]
+[node name="FormationOption" type="OptionButton" parent="RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent"]
 layout_mode = 2
 item_count = 3
 selected = 0
@@ -177,69 +591,104 @@ popup/item_1/id = 1
 popup/item_2/text = "3-5-2"
 popup/item_2/id = 2
 
-[node name="PressLabel" type="Label" parent="Center/Shell/Padding/Content/BoardRow/ControlsCard/ControlsPadding/ControlsContent"]
+[node name="PressLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent"]
 layout_mode = 2
 text = "Press line"
 
-[node name="PressSpin" type="SpinBox" parent="Center/Shell/Padding/Content/BoardRow/ControlsCard/ControlsPadding/ControlsContent"]
+[node name="PressSpin" type="SpinBox" parent="RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent"]
 layout_mode = 2
 min_value = 0.0
 max_value = 100.0
 step = 1.0
 
-[node name="TempoLabel" type="Label" parent="Center/Shell/Padding/Content/BoardRow/ControlsCard/ControlsPadding/ControlsContent"]
+[node name="TempoLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent"]
 layout_mode = 2
 text = "Ball speed"
 
-[node name="TempoSpin" type="SpinBox" parent="Center/Shell/Padding/Content/BoardRow/ControlsCard/ControlsPadding/ControlsContent"]
+[node name="TempoSpin" type="SpinBox" parent="RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent"]
 layout_mode = 2
 min_value = 0.0
 max_value = 100.0
 step = 1.0
 
-[node name="WidthLabel" type="Label" parent="Center/Shell/Padding/Content/BoardRow/ControlsCard/ControlsPadding/ControlsContent"]
+[node name="WidthLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent"]
 layout_mode = 2
 text = "Width"
 
-[node name="WidthSpin" type="SpinBox" parent="Center/Shell/Padding/Content/BoardRow/ControlsCard/ControlsPadding/ControlsContent"]
+[node name="WidthSpin" type="SpinBox" parent="RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent"]
 layout_mode = 2
 min_value = 0.0
 max_value = 100.0
 step = 1.0
 
-[node name="RiskLabel" type="Label" parent="Center/Shell/Padding/Content/BoardRow/ControlsCard/ControlsPadding/ControlsContent"]
+[node name="RiskLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent"]
 layout_mode = 2
 text = "Commitment"
 
-[node name="RiskSpin" type="SpinBox" parent="Center/Shell/Padding/Content/BoardRow/ControlsCard/ControlsPadding/ControlsContent"]
+[node name="RiskSpin" type="SpinBox" parent="RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent"]
 layout_mode = 2
 min_value = 0.0
 max_value = 100.0
 step = 1.0
 
-[node name="StatusLabel" type="Label" parent="Center/Shell/Padding/Content"]
+[node name="ControlSummaryLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent"]
 layout_mode = 2
-text = "Adjust the board, review the match plan, then save the changes into the next fixture."
+text = "Control summary unavailable."
 autowrap_mode = 3
-horizontal_alignment = 1
 
-[node name="ActionsRow" type="HBoxContainer" parent="Center/Shell/Padding/Content"]
+[node name="NotesCard" type="PanelContainer" parent="RootMargin/Shell/MainColumn/ContentRow/SideStack"]
 layout_mode = 2
-alignment = 1
-theme_override_constants/separation = 16
 
-[node name="BackButton" type="Button" parent="Center/Shell/Padding/Content/ActionsRow"]
+[node name="NotesPadding" type="MarginContainer" parent="RootMargin/Shell/MainColumn/ContentRow/SideStack/NotesCard"]
 layout_mode = 2
-text = "Back to Club Dashboard"
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
 
-[node name="SaveButton" type="Button" parent="Center/Shell/Padding/Content/ActionsRow"]
+[node name="NotesContent" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/ContentRow/SideStack/NotesCard/NotesPadding"]
 layout_mode = 2
-text = "Save Tactical Board"
+theme_override_constants/separation = 10
 
-[connection signal="item_selected" from="Center/Shell/Padding/Content/BoardRow/ControlsCard/ControlsPadding/ControlsContent/FormationOption" to="." method="OnFormationSelected"]
-[connection signal="value_changed" from="Center/Shell/Padding/Content/BoardRow/ControlsCard/ControlsPadding/ControlsContent/PressSpin" to="." method="OnTacticControlChanged"]
-[connection signal="value_changed" from="Center/Shell/Padding/Content/BoardRow/ControlsCard/ControlsPadding/ControlsContent/TempoSpin" to="." method="OnTacticControlChanged"]
-[connection signal="value_changed" from="Center/Shell/Padding/Content/BoardRow/ControlsCard/ControlsPadding/ControlsContent/WidthSpin" to="." method="OnTacticControlChanged"]
-[connection signal="value_changed" from="Center/Shell/Padding/Content/BoardRow/ControlsCard/ControlsPadding/ControlsContent/RiskSpin" to="." method="OnTacticControlChanged"]
-[connection signal="pressed" from="Center/Shell/Padding/Content/ActionsRow/BackButton" to="." method="OnBackPressed"]
-[connection signal="pressed" from="Center/Shell/Padding/Content/ActionsRow/SaveButton" to="." method="OnSavePressed"]
+[node name="NotesHeading" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/SideStack/NotesCard/NotesPadding/NotesContent"]
+layout_mode = 2
+text = "Tactical Notes"
+
+[node name="PressPreviewLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/SideStack/NotesCard/NotesPadding/NotesContent"]
+layout_mode = 2
+text = "Press note unavailable."
+autowrap_mode = 3
+
+[node name="TempoPreviewLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/SideStack/NotesCard/NotesPadding/NotesContent"]
+layout_mode = 2
+text = "Tempo note unavailable."
+autowrap_mode = 3
+
+[node name="WidthPreviewLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/SideStack/NotesCard/NotesPadding/NotesContent"]
+layout_mode = 2
+text = "Width note unavailable."
+autowrap_mode = 3
+
+[node name="RiskPreviewLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/SideStack/NotesCard/NotesPadding/NotesContent"]
+layout_mode = 2
+text = "Risk note unavailable."
+autowrap_mode = 3
+
+[node name="SavedPlanLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/SideStack/NotesCard/NotesPadding/NotesContent"]
+layout_mode = 2
+text = "No saved tactical plan."
+autowrap_mode = 3
+
+[connection signal="pressed" from="RootMargin/Shell/RailCard/RailPadding/RailContent/NavButtons/DashboardButton" to="." method="OnDashboardPressed"]
+[connection signal="pressed" from="RootMargin/Shell/RailCard/RailPadding/RailContent/NavButtons/SquadButton" to="." method="OnSquadPressed"]
+[connection signal="pressed" from="RootMargin/Shell/RailCard/RailPadding/RailContent/NavButtons/FixturesButton" to="." method="OnFixturesPressed"]
+[connection signal="pressed" from="RootMargin/Shell/RailCard/RailPadding/RailContent/NavButtons/StandingsButton" to="." method="OnStandingsPressed"]
+[connection signal="pressed" from="RootMargin/Shell/RailCard/RailPadding/RailContent/NavButtons/MatchdayButton" to="." method="OnMatchdayPressed"]
+[connection signal="pressed" from="RootMargin/Shell/RailCard/RailPadding/RailContent/FooterActions/SaveButton" to="." method="OnSavePressed"]
+[connection signal="pressed" from="RootMargin/Shell/RailCard/RailPadding/RailContent/FooterActions/ResetButton" to="." method="OnResetPressed"]
+[connection signal="pressed" from="RootMargin/Shell/RailCard/RailPadding/RailContent/FooterActions/BackButton" to="." method="OnBackPressed"]
+[connection signal="item_selected" from="RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/FormationOption" to="." method="OnFormationSelected"]
+[connection signal="value_changed" from="RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/PressSpin" to="." method="OnTacticControlChanged"]
+[connection signal="value_changed" from="RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/TempoSpin" to="." method="OnTacticControlChanged"]
+[connection signal="value_changed" from="RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/WidthSpin" to="." method="OnTacticControlChanged"]
+[connection signal="value_changed" from="RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/RiskSpin" to="." method="OnTacticControlChanged"]
