@@ -299,8 +299,8 @@ func _process(_delta: float) -> bool:
             _fail("FixturesScreen did not load from ClubDashboard")
             return false
 
-        var competition_label := current_scene.get_node("Center/Shell/Padding/Content/Header/CompetitionLabel") as Label
-        var back_button := current_scene.get_node("Center/Shell/Padding/Content/BackButton") as Button
+        var competition_label := current_scene.get_node("RootMargin/Shell/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderInfo/CompetitionLabel") as Label
+        var back_button := current_scene.get_node("RootMargin/Shell/RailCard/RailPadding/RailContent/FooterActions/BackButton") as Button
         if competition_label == null or back_button == null:
             _fail("FixturesScreen controls are missing")
             return false
@@ -332,8 +332,8 @@ func _process(_delta: float) -> bool:
             _fail("StandingsScreen did not load from ClubDashboard")
             return false
 
-        var club_summary := current_scene.get_node("Center/Shell/Padding/Content/BodyRow/ContextCard/ContextPadding/ContextContent/ClubSummaryLabel") as Label
-        var back_button := current_scene.get_node("Center/Shell/Padding/Content/BackButton") as Button
+        var club_summary := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent/ClubSummaryLabel") as Label
+        var back_button := current_scene.get_node("RootMargin/Shell/RailCard/RailPadding/RailContent/FooterActions/BackButton") as Button
         if club_summary == null or back_button == null:
             _fail("StandingsScreen controls are missing")
             return false
