@@ -18,17 +18,25 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.0352941, 0.054902, 0.0705882, 1)
+color = Color(0.0313726, 0.0509804, 0.0666667, 1)
 
-[node name="AccentBand" type="ColorRect" parent="."]
+[node name="TopBand" type="ColorRect" parent="."]
 layout_mode = 1
 anchors_preset = 10
+anchor_right = 1.0
+anchor_bottom = 0.32
+grow_horizontal = 2
+color = Color(0.0509804, 0.0862745, 0.117647, 1)
+
+[node name="LeftWash" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 8
 anchor_left = 0.0
 anchor_top = 0.0
-anchor_right = 1.0
-anchor_bottom = 0.28
-grow_horizontal = 2
-color = Color(0.0705882, 0.117647, 0.152941, 1)
+anchor_right = 0.34
+anchor_bottom = 1.0
+grow_vertical = 2
+color = Color(0.0235294, 0.0627451, 0.0901961, 0.28)
 
 [node name="Center" type="CenterContainer" parent="."]
 layout_mode = 1
@@ -39,19 +47,19 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="MenuCard" type="PanelContainer" parent="Center"]
-custom_minimum_size = Vector2(620, 0)
+custom_minimum_size = Vector2(760, 0)
 layout_mode = 2
 
 [node name="Padding" type="MarginContainer" parent="Center/MenuCard"]
 layout_mode = 2
-theme_override_constants/margin_left = 32
-theme_override_constants/margin_top = 28
-theme_override_constants/margin_right = 32
-theme_override_constants/margin_bottom = 28
+theme_override_constants/margin_left = 34
+theme_override_constants/margin_top = 30
+theme_override_constants/margin_right = 34
+theme_override_constants/margin_bottom = 30
 
 [node name="Menu" type="VBoxContainer" parent="Center/MenuCard/Padding"]
 layout_mode = 2
-theme_override_constants/separation = 14
+theme_override_constants/separation = 16
 
 [node name="Eyebrow" type="Label" parent="Center/MenuCard/Padding/Menu"]
 layout_mode = 2
@@ -62,7 +70,7 @@ horizontal_alignment = 1
 layout_mode = 2
 text = "TOUCHLINE"
 horizontal_alignment = 1
-theme_override_font_sizes/font_size = 42
+theme_override_font_sizes/font_size = 48
 
 [node name="Subtitle" type="Label" parent="Center/MenuCard/Padding/Menu"]
 layout_mode = 2
@@ -75,39 +83,129 @@ layout_mode = 2
 
 [node name="ResumePadding" type="MarginContainer" parent="Center/MenuCard/Padding/Menu/ResumeCard"]
 layout_mode = 2
-theme_override_constants/margin_left = 18
-theme_override_constants/margin_top = 16
-theme_override_constants/margin_right = 18
-theme_override_constants/margin_bottom = 16
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 18
 
 [node name="ResumeContent" type="VBoxContainer" parent="Center/MenuCard/Padding/Menu/ResumeCard/ResumePadding"]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 12
 
-[node name="ResumeHeading" type="Label" parent="Center/MenuCard/Padding/Menu/ResumeCard/ResumePadding/ResumeContent"]
+[node name="ResumeTopRow" type="HBoxContainer" parent="Center/MenuCard/Padding/Menu/ResumeCard/ResumePadding/ResumeContent"]
 layout_mode = 2
-text = "Career Status"
+theme_override_constants/separation = 14
+
+[node name="Badge" type="PanelContainer" parent="Center/MenuCard/Padding/Menu/ResumeCard/ResumePadding/ResumeContent/ResumeTopRow"]
+custom_minimum_size = Vector2(56, 56)
+layout_mode = 2
+
+[node name="BadgeLabel" type="Label" parent="Center/MenuCard/Padding/Menu/ResumeCard/ResumePadding/ResumeContent/ResumeTopRow/Badge"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -14.0
+offset_top = -12.0
+offset_right = 14.0
+offset_bottom = 12.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "--"
 horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ResumeMeta" type="VBoxContainer" parent="Center/MenuCard/Padding/Menu/ResumeCard/ResumePadding/ResumeContent/ResumeTopRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="ResumeHeading" type="Label" parent="Center/MenuCard/Padding/Menu/ResumeCard/ResumePadding/ResumeContent/ResumeTopRow/ResumeMeta"]
+layout_mode = 2
+text = "FEATURED CAREER"
+
+[node name="ClubNameLabel" type="Label" parent="Center/MenuCard/Padding/Menu/ResumeCard/ResumePadding/ResumeContent/ResumeTopRow/ResumeMeta"]
+layout_mode = 2
+text = "Touchline Career"
 
 [node name="ResumeSummaryLabel" type="Label" parent="Center/MenuCard/Padding/Menu/ResumeCard/ResumePadding/ResumeContent"]
 layout_mode = 2
 text = "Checking local save slot."
 autowrap_mode = 3
-horizontal_alignment = 1
+horizontal_alignment = 0
 
 [node name="ResumeStatusLabel" type="Label" parent="Center/MenuCard/Padding/Menu/ResumeCard/ResumePadding/ResumeContent"]
 layout_mode = 2
 text = "Resume information unavailable."
 autowrap_mode = 3
+horizontal_alignment = 0
+
+[node name="DetailGrid" type="GridContainer" parent="Center/MenuCard/Padding/Menu/ResumeCard/ResumePadding/ResumeContent"]
+layout_mode = 2
+columns = 5
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 8
+
+[node name="ManagerLabel" type="Label" parent="Center/MenuCard/Padding/Menu/ResumeCard/ResumePadding/ResumeContent/DetailGrid"]
+layout_mode = 2
+text = "MANAGER"
 horizontal_alignment = 1
+
+[node name="SeasonLabel" type="Label" parent="Center/MenuCard/Padding/Menu/ResumeCard/ResumePadding/ResumeContent/DetailGrid"]
+layout_mode = 2
+text = "SEASON / DATE"
+horizontal_alignment = 1
+
+[node name="FixtureLabel" type="Label" parent="Center/MenuCard/Padding/Menu/ResumeCard/ResumePadding/ResumeContent/DetailGrid"]
+layout_mode = 2
+text = "NEXT FIXTURE"
+horizontal_alignment = 1
+
+[node name="TableLabel" type="Label" parent="Center/MenuCard/Padding/Menu/ResumeCard/ResumePadding/ResumeContent/DetailGrid"]
+layout_mode = 2
+text = "TABLE"
+horizontal_alignment = 1
+
+[node name="FormLabel" type="Label" parent="Center/MenuCard/Padding/Menu/ResumeCard/ResumePadding/ResumeContent/DetailGrid"]
+layout_mode = 2
+text = "FORM"
+horizontal_alignment = 1
+
+[node name="ManagerValueLabel" type="Label" parent="Center/MenuCard/Padding/Menu/ResumeCard/ResumePadding/ResumeContent/DetailGrid"]
+layout_mode = 2
+text = "--"
+horizontal_alignment = 1
+
+[node name="SeasonValueLabel" type="Label" parent="Center/MenuCard/Padding/Menu/ResumeCard/ResumePadding/ResumeContent/DetailGrid"]
+layout_mode = 2
+text = "--"
+horizontal_alignment = 1
+
+[node name="FixtureValueLabel" type="Label" parent="Center/MenuCard/Padding/Menu/ResumeCard/ResumePadding/ResumeContent/DetailGrid"]
+layout_mode = 2
+text = "No live fixture"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="TableValueLabel" type="Label" parent="Center/MenuCard/Padding/Menu/ResumeCard/ResumePadding/ResumeContent/DetailGrid"]
+layout_mode = 2
+text = "--"
+horizontal_alignment = 1
+
+[node name="FormValueLabel" type="Label" parent="Center/MenuCard/Padding/Menu/ResumeCard/ResumePadding/ResumeContent/DetailGrid"]
+layout_mode = 2
+text = "--"
+horizontal_alignment = 1
+
+[node name="LoadGameButton" type="Button" parent="Center/MenuCard/Padding/Menu"]
+layout_mode = 2
+text = "Continue Career"
 
 [node name="NewCareerButton" type="Button" parent="Center/MenuCard/Padding/Menu"]
 layout_mode = 2
 text = "New Career"
-
-[node name="LoadGameButton" type="Button" parent="Center/MenuCard/Padding/Menu"]
-layout_mode = 2
-text = "Load Game"
 
 [node name="ExitButton" type="Button" parent="Center/MenuCard/Padding/Menu"]
 layout_mode = 2
@@ -115,7 +213,7 @@ text = "Exit"
 
 [node name="Footer" type="Label" parent="Center/MenuCard/Padding/Menu"]
 layout_mode = 2
-text = "Persistent careers, named players, and live 2D match presentation."
+text = "Persistent careers, named players, and one shared football world."
 autowrap_mode = 3
 horizontal_alignment = 1
 

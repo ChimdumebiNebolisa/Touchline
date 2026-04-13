@@ -121,8 +121,8 @@ func _process(_delta: float) -> bool:
             _fail("SaveLoadScene did not load from MainMenu")
             return false
 
-        var back_button := current_scene.get_node("Center/Panel/Padding/Content/BackButton") as Button
-        var heading := current_scene.get_node("Center/Panel/Padding/Content/Heading") as Label
+        var back_button := current_scene.get_node("RootMargin/MainColumn/ActionsRow/BackButton") as Button
+        var heading := current_scene.get_node("RootMargin/MainColumn/HeroCard/HeroPadding/HeroContent/PageTitleLabel") as Label
         if back_button == null or heading == null:
             _fail("SaveLoadScene controls are missing")
             return false
@@ -158,7 +158,7 @@ func _process(_delta: float) -> bool:
             _fail("SaveLoadScene did not reopen for resume flow")
             return false
 
-        var load_button := current_scene.get_node("Center/Panel/Padding/Content/LoadButton") as Button
+        var load_button := current_scene.get_node("RootMargin/MainColumn/ActionsRow/LoadButton") as Button
         if load_button == null or load_button.disabled:
             _fail("SaveLoadScene load button is unavailable for resume flow")
             return false

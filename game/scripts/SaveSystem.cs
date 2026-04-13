@@ -125,6 +125,11 @@ public partial class SaveSystem : Node
         return $"Slot 1 | {saveData.SelectedClubName} | Season {saveData.SeasonStartYear}/{((saveData.SeasonStartYear + 1) % 100):00} | {saveData.CurrentDateIso}";
     }
 
+    public bool TryGetSlotPreview(out SaveSlotData saveData, out string statusMessage)
+    {
+        return TryReadSave(out saveData, out statusMessage, out _);
+    }
+
     public bool SaveGame(out string statusMessage)
     {
         if (GameState.Instance == null || !GameState.Instance.CareerInitialized || string.IsNullOrWhiteSpace(GameState.Instance.SelectedClubName))
