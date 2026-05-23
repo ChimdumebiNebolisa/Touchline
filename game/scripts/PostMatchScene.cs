@@ -126,11 +126,11 @@ public partial class PostMatchScene : Control
         _pressureValueLabel.Text = BuildPressureHeadline(report.PressureSummary);
         _pressureMetaLabel.Text = report.PressureSummary;
 
-        _deltasLabel.Text = report.ConsequenceSummary;
+        _deltasLabel.Text = $"{report.ConsequenceSummary}\nStats | {report.StatsSummary}";
         _tableImpactLabel.Text = report.TableImpactSummary;
-        _tacticalLabel.Text = $"{report.TacticalSummary}\nCause | {report.CauseSummary}";
+        _tacticalLabel.Text = $"{report.TacticalSummary}\nTactical read | {report.TacticalExplanation}\nCause | {report.CauseSummary}";
         _pressureLabel.Text = report.PressureSummary;
-        _eventsLabel.Text = string.Join("\n", report.KeyEvents);
+        _eventsLabel.Text = $"{string.Join("\n", report.KeyEvents)}\n\nKey moments\n{report.KeyPlayerMoments}";
         _nextStepLabel.Text = "Advance to Club Dashboard and carry this result into the next planning cycle.";
     }
 

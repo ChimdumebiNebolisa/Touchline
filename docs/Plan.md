@@ -52,6 +52,9 @@
 - Step 36: Replace hardcoded away lineups with seeded opponent squads
 - Step 37: Improve match action selection and tactical variation
 - Step 38: Make post-match consequences use richer playback causes
+- Step 39: Add explicit match action participant metadata
+- Step 40: Add lightweight playback-derived match stats
+- Step 41: Upgrade post-match report readability
 
 ## 2. Plan Rules
 
@@ -587,3 +590,78 @@ Use the authoritative playback timeline to explain post-match morale, fan, and b
 - `GameState.ApplyMatchResult` uses playback-cause analysis
 - post-match and dashboard consequence copy can explain why deltas changed
 - no large analytics/xG system is introduced
+
+## 31. Step 39: Add explicit match action participant metadata
+
+### Objective
+
+Expose who participated in each authoritative match action so renderers and reports do not infer involvement from labels.
+
+### Allowed Subtasks
+
+- add optional participant ids for passers, receivers, carriers, shooters, keepers, defenders, interceptors, clearers, and scorers
+- populate participant metadata during match action generation
+- validate major action kinds have sensible participants when applicable
+- keep legacy action positioning fields available for playback compatibility
+
+### Verification
+
+- pass, shot, save, clearance, interception, and goal actions include expected participant metadata
+- playback frames and events remain valid
+- no participant decision logic is added to scenes
+
+### Exit Criteria
+
+- `MatchAction` exposes explicit participant metadata
+- match simulator populates participants deterministically from selected runtime players
+- live and instant match paths still share the same result
+
+## 32. Step 40: Add lightweight playback-derived match stats
+
+### Objective
+
+Attach deterministic match stats to playback results by deriving them from authoritative actions.
+
+### Allowed Subtasks
+
+- count shots, goals, saves, clearances, interceptions, possession phases, and completed passes from `MatchTimeline.Actions`
+- attach the stats model to `MatchPlaybackResult`
+- validate stats are internally consistent with the action list and final score
+- avoid invented stats, xG, or scene-side stat computation
+
+### Verification
+
+- stat totals match playback actions
+- final score agrees with goal stats
+- post-match systems consume stats from playback rather than recomputing in UI
+
+### Exit Criteria
+
+- `MatchPlaybackResult` includes a `MatchStats` summary
+- stats remain deterministic for the same seed, fixture, and tactics
+- no fake report numbers are introduced
+
+## 33. Step 41: Upgrade post-match report readability
+
+### Objective
+
+Make the post-match report explain how the match unfolded using concrete stats, causes, and key participant moments.
+
+### Allowed Subtasks
+
+- extend `LastMatchReport` with stats summary, tactical explanation, and key player moments
+- derive report copy from playback stats/actions in domain services
+- render the richer report data in `PostMatchScene`
+- keep save/load compatible with older reports missing the new fields
+
+### Verification
+
+- post-match report displays final score, cause summary, stat comparison, key moments, and consequence deltas
+- old saves restore with safe report defaults
+- live, instant, post-match, and navigation checks still pass
+
+### Exit Criteria
+
+- manager-facing report copy references concrete playback causes
+- `PostMatchScene` remains a renderer of `LastMatchReport`
+- no complex analytics model or unrelated UI rebuild is added

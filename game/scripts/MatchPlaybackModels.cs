@@ -81,10 +81,24 @@ public sealed class MatchAction
     public required string Label { get; init; }
     public string? FromPlayerId { get; init; }
     public string? ToPlayerId { get; init; }
+    public required ActionParticipants Participants { get; init; }
     public required Vector2 FromPosition { get; init; }
     public required Vector2 ToPosition { get; init; }
     public required int HomeScoreAfter { get; init; }
     public required int AwayScoreAfter { get; init; }
+}
+
+public sealed class ActionParticipants
+{
+    public string? PasserPlayerId { get; init; }
+    public string? ReceiverPlayerId { get; init; }
+    public string? CarrierPlayerId { get; init; }
+    public string? ShooterPlayerId { get; init; }
+    public string? GoalkeeperPlayerId { get; init; }
+    public string? DefenderPlayerId { get; init; }
+    public string? InterceptorPlayerId { get; init; }
+    public string? ClearerPlayerId { get; init; }
+    public string? ScorerPlayerId { get; init; }
 }
 
 public sealed class MatchEvent
@@ -116,6 +130,28 @@ public sealed class MatchTimeline
     public required MatchAction[] Actions { get; init; }
 }
 
+public sealed class MatchStats
+{
+    public required int HomeShots { get; init; }
+    public required int AwayShots { get; init; }
+    public required int HomeGoals { get; init; }
+    public required int AwayGoals { get; init; }
+    public required int HomeSaves { get; init; }
+    public required int AwaySaves { get; init; }
+    public required int HomeClearances { get; init; }
+    public required int AwayClearances { get; init; }
+    public required int HomeInterceptions { get; init; }
+    public required int AwayInterceptions { get; init; }
+    public required int HomePossessionPhaseCount { get; init; }
+    public required int AwayPossessionPhaseCount { get; init; }
+    public required int HomeCompletedPasses { get; init; }
+    public required int AwayCompletedPasses { get; init; }
+    public required int HomeLateGoals { get; init; }
+    public required int AwayLateGoals { get; init; }
+    public required int PressureTurnovers { get; init; }
+    public required int LongestPossessionChain { get; init; }
+}
+
 public sealed class MatchPlaybackResult
 {
     public required string HomeClubName { get; init; }
@@ -129,6 +165,7 @@ public sealed class MatchPlaybackResult
     public required BallState BallState { get; init; }
     public required string PossessionTeam { get; init; }
     public required string[] ActionLabels { get; init; }
+    public required MatchStats Stats { get; init; }
     public required string FinalResultSummary { get; init; }
 
     public int HomeGoals => FinalHomeScore;

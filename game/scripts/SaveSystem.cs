@@ -57,6 +57,9 @@ public sealed class SaveSlotMatchReportData
     public string TacticalSummary { get; set; } = string.Empty;
     public string PressureSummary { get; set; } = string.Empty;
     public string CauseSummary { get; set; } = string.Empty;
+    public string StatsSummary { get; set; } = string.Empty;
+    public string KeyPlayerMoments { get; set; } = string.Empty;
+    public string TacticalExplanation { get; set; } = string.Empty;
     public string[]? KeyEvents { get; set; }
     public int MoraleDelta { get; set; }
     public int FanDelta { get; set; }
@@ -328,6 +331,9 @@ public partial class SaveSystem : Node
                     TacticalSummary = state.LastMatchReport.TacticalSummary,
                     PressureSummary = state.LastMatchReport.PressureSummary,
                     CauseSummary = state.LastMatchReport.CauseSummary,
+                    StatsSummary = state.LastMatchReport.StatsSummary,
+                    KeyPlayerMoments = state.LastMatchReport.KeyPlayerMoments,
+                    TacticalExplanation = state.LastMatchReport.TacticalExplanation,
                     KeyEvents = state.LastMatchReport.KeyEvents,
                     MoraleDelta = state.LastMatchReport.MoraleDelta,
                     FanDelta = state.LastMatchReport.FanDelta,
@@ -416,6 +422,9 @@ public partial class SaveSystem : Node
                     TacticalSummary = source.LastMatchReport.TacticalSummary,
                     PressureSummary = source.LastMatchReport.PressureSummary,
                     CauseSummary = source.LastMatchReport.CauseSummary,
+                    StatsSummary = source.LastMatchReport.StatsSummary,
+                    KeyPlayerMoments = source.LastMatchReport.KeyPlayerMoments,
+                    TacticalExplanation = source.LastMatchReport.TacticalExplanation,
                     KeyEvents = source.LastMatchReport.KeyEvents == null ? null : (string[])source.LastMatchReport.KeyEvents.Clone(),
                     MoraleDelta = source.LastMatchReport.MoraleDelta,
                     FanDelta = source.LastMatchReport.FanDelta,

@@ -9,6 +9,9 @@ public sealed class PostMatchConsequenceResult
     public required string ResultLabel { get; init; }
     public required string ConsequenceSummary { get; init; }
     public required string CauseSummary { get; init; }
+    public required string StatsSummary { get; init; }
+    public required string KeyPlayerMoments { get; init; }
+    public required string TacticalExplanation { get; init; }
     public required string PressureSummary { get; init; }
     public required string[] KeyEvents { get; init; }
 }
@@ -74,6 +77,9 @@ public static class PostMatchConsequenceService
         fanDelta = Math.Clamp(fanDelta, -8, 8);
         boardDelta = Math.Clamp(boardDelta, -8, 8);
         var causeSummary = BuildCauseSummary(result, state, analysis);
+        var statsSummary = BuildStatsSummary(result.Stats);
+        var tacticalExplanation = BuildTacticalExplanation(result, state, analysis);
+        var keyPlayerMoments = BuildKeyPlayerMoments(result);
         var pressureSummary =
             $"Club pressure now sits at morale {Math.Clamp(state.TeamMorale + moraleDelta, 0, 100)}, fan trust {Math.Clamp(state.FanSentiment + fanDelta, 0, 100)}, and board confidence {Math.Clamp(state.BoardConfidence + boardDelta, 0, 100)}. Cause: {causeSummary}";
 
@@ -86,6 +92,9 @@ public static class PostMatchConsequenceService
             ConsequenceSummary =
                 $"Morale {FormatSignedDelta(moraleDelta)} | Fans {FormatSignedDelta(fanDelta)} | Board {FormatSignedDelta(boardDelta)} | Cause: {causeSummary}",
             CauseSummary = causeSummary,
+            StatsSummary = statsSummary,
+            KeyPlayerMoments = keyPlayerMoments,
+            TacticalExplanation = tacticalExplanation,
             PressureSummary = pressureSummary,
             KeyEvents = BuildKeyEvents(result, causeSummary)
         };
@@ -97,57 +106,21 @@ public static class PostMatchConsequenceService
         var previousHomeScore = 0;
         var previousAwayScore = 0;
 
+        analysis.HomeShots = result.Stats.HomeShots;
+        analysis.AwayShots = result.Stats.AwayShots;
+        analysis.HomeSaves = result.Stats.HomeSaves;
+        analysis.AwaySaves = result.Stats.AwaySaves;
+        analysis.HomeClearances = result.Stats.HomeClearances;
+        analysis.AwayClearances = result.Stats.AwayClearances;
+        analysis.HomeInterceptions = result.Stats.HomeInterceptions;
+        analysis.AwayInterceptions = result.Stats.AwayInterceptions;
+        analysis.HomeLateGoal = result.Stats.HomeLateGoals > 0;
+
         foreach (var action in result.Timeline.Actions)
         {
-            var isHomeAction = action.Team == result.HomeClubName;
             switch (action.Kind)
             {
-                case MatchActionKind.Shot:
-                    if (isHomeAction)
-                    {
-                        analysis.HomeShots++;
-                    }
-                    else
-                    {
-                        analysis.AwayShots++;
-                    }
-                    break;
-                case MatchActionKind.Save:
-                    if (isHomeAction)
-                    {
-                        analysis.HomeSaves++;
-                    }
-                    else
-                    {
-                        analysis.AwaySaves++;
-                    }
-                    break;
-                case MatchActionKind.Clearance:
-                    if (isHomeAction)
-                    {
-                        analysis.HomeClearances++;
-                    }
-                    else
-                    {
-                        analysis.AwayClearances++;
-                    }
-                    break;
-                case MatchActionKind.Interception:
-                    if (isHomeAction)
-                    {
-                        analysis.HomeInterceptions++;
-                    }
-                    else
-                    {
-                        analysis.AwayInterceptions++;
-                    }
-                    break;
                 case MatchActionKind.Goal:
-                    if (action.StartSecond >= 75 * 60 && isHomeAction)
-                    {
-                        analysis.HomeLateGoal = true;
-                    }
-
                     if (previousHomeScore < previousAwayScore && action.HomeScoreAfter >= action.AwayScoreAfter)
                     {
                         analysis.Comeback = true;
@@ -208,6 +181,73 @@ public static class PostMatchConsequenceService
         return string.Join("; ", causes);
     }
 
+    private static string BuildStatsSummary(MatchStats stats)
+    {
+        return $"Shots: {stats.HomeShots}-{stats.AwayShots} | Saves: {stats.HomeSaves}-{stats.AwaySaves} | Interceptions: {stats.HomeInterceptions}-{stats.AwayInterceptions} | Passes: {stats.HomeCompletedPasses}-{stats.AwayCompletedPasses}";
+    }
+
+    private static string BuildTacticalExplanation(MatchPlaybackResult result, GameState state, MatchCauseAnalysis analysis)
+    {
+        var explanations = new List<string>();
+        if (state.Risk >= 70)
+        {
+            explanations.Add(analysis.HomeShots >= analysis.AwayShots
+                ? "The high-risk setup created shot volume but left transition pressure in the report."
+                : "The high-risk setup did not convert into enough shots and increased exposure.");
+        }
+
+        if (state.PressIntensity >= 70)
+        {
+            explanations.Add(analysis.HomeInterceptions >= analysis.AwayInterceptions
+                ? "The press generated enough interceptions to shape the match."
+                : "The press did not create enough turnovers to control the flow.");
+        }
+
+        if (result.Stats.HomeLateGoals + result.Stats.AwayLateGoals > 0)
+        {
+            explanations.Add("A late goal changed the emotional read of the result.");
+        }
+
+        if (explanations.Count == 0)
+        {
+            explanations.Add("The report follows the action profile: shots, saves, turnovers, and possession chains.");
+        }
+
+        return string.Join(" ", explanations);
+    }
+
+    private static string BuildKeyPlayerMoments(MatchPlaybackResult result)
+    {
+        var moments = new List<string>();
+        foreach (var action in result.Timeline.Actions)
+        {
+            if (action.Kind == MatchActionKind.Goal && !string.IsNullOrWhiteSpace(action.Participants.ScorerPlayerId))
+            {
+                moments.Add($"Goal: {ResolvePlayerName(result, action.Participants.ScorerPlayerId)} at {FormatMinute(action.StartSecond)}.");
+            }
+            else if (action.Kind == MatchActionKind.Save && !string.IsNullOrWhiteSpace(action.Participants.GoalkeeperPlayerId))
+            {
+                moments.Add($"Save: {ResolvePlayerName(result, action.Participants.GoalkeeperPlayerId)} stopped a shot at {FormatMinute(action.StartSecond)}.");
+            }
+            else if (action.Kind == MatchActionKind.Interception && !string.IsNullOrWhiteSpace(action.Participants.InterceptorPlayerId))
+            {
+                moments.Add($"Turnover: {ResolvePlayerName(result, action.Participants.InterceptorPlayerId)} intercepted at {FormatMinute(action.StartSecond)}.");
+            }
+
+            if (moments.Count == 3)
+            {
+                break;
+            }
+        }
+
+        if (moments.Count == 0)
+        {
+            moments.Add("No standout participant moment separated from the action feed.");
+        }
+
+        return string.Join("\n", moments);
+    }
+
     private static string BuildResultLabel(int goalDifference, string opponentName, MatchCauseAnalysis analysis)
     {
         if (goalDifference > 0)
@@ -241,6 +281,24 @@ public static class PostMatchConsequenceService
 
         recentEvents[^1] = $"Cause: {causeSummary}";
         return recentEvents;
+    }
+
+    private static string ResolvePlayerName(MatchPlaybackResult result, string playerId)
+    {
+        foreach (var player in result.PlayerStates)
+        {
+            if (player.PlayerId == playerId)
+            {
+                return player.Name;
+            }
+        }
+
+        return playerId;
+    }
+
+    private static string FormatMinute(int matchSecond)
+    {
+        return $"{Math.Max(1, (matchSecond / 60) + 1)}'";
     }
 
     private static string FormatSignedDelta(int delta)

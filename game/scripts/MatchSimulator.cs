@@ -75,6 +75,7 @@ public static class MatchSimulator
         var events = BuildEvents(homeClubName, awayClubName, actions, frames);
         frames = AttachEventsToFrames(frames, events);
         var finalFrame = frames[^1];
+        var stats = MatchStatsService.Build(homeClubName, awayClubName, actions);
 
         return new MatchPlaybackResult
         {
@@ -95,6 +96,7 @@ public static class MatchSimulator
             BallState = finalFrame.Ball,
             PossessionTeam = finalFrame.PossessionTeam,
             ActionLabels = Array.ConvertAll(actions, action => action.Label),
+            Stats = stats,
             FinalResultSummary = $"{homeClubName} {finalFrame.HomeScore} - {finalFrame.AwayScore} {awayClubName}"
         };
     }
@@ -714,12 +716,63 @@ public static class MatchSimulator
             Label = label,
             FromPlayerId = fromPlayer?.Id,
             ToPlayerId = toPlayer?.Id,
+            Participants = BuildParticipants(kind, fromPlayer, toPlayer),
             FromPosition = ClampPitch(fromPosition),
             ToPosition = ClampPitch(toPosition),
             HomeScoreAfter = homeScoreAfter,
             AwayScoreAfter = awayScoreAfter
         });
         actionIndex++;
+    }
+
+    private static ActionParticipants BuildParticipants(MatchActionKind kind, RuntimePlayer? fromPlayer, RuntimePlayer? toPlayer)
+    {
+        return kind switch
+        {
+            MatchActionKind.Kickoff => new ActionParticipants
+            {
+                CarrierPlayerId = fromPlayer?.Id ?? toPlayer?.Id
+            },
+            MatchActionKind.Pass => new ActionParticipants
+            {
+                PasserPlayerId = fromPlayer?.Id,
+                ReceiverPlayerId = toPlayer?.Id
+            },
+            MatchActionKind.Carry => new ActionParticipants
+            {
+                CarrierPlayerId = fromPlayer?.Id ?? toPlayer?.Id
+            },
+            MatchActionKind.Shot => new ActionParticipants
+            {
+                ShooterPlayerId = fromPlayer?.Id
+            },
+            MatchActionKind.Save => new ActionParticipants
+            {
+                ShooterPlayerId = fromPlayer?.Id,
+                GoalkeeperPlayerId = toPlayer?.Id
+            },
+            MatchActionKind.Clearance => new ActionParticipants
+            {
+                ClearerPlayerId = fromPlayer?.Id,
+                GoalkeeperPlayerId = fromPlayer?.Role == "GK" ? fromPlayer.Id : null
+            },
+            MatchActionKind.Interception => new ActionParticipants
+            {
+                DefenderPlayerId = toPlayer?.Id,
+                InterceptorPlayerId = toPlayer?.Id,
+                ReceiverPlayerId = fromPlayer?.Id
+            },
+            MatchActionKind.Goal => new ActionParticipants
+            {
+                ShooterPlayerId = fromPlayer?.Id,
+                ScorerPlayerId = fromPlayer?.Id
+            },
+            MatchActionKind.Reset => new ActionParticipants
+            {
+                CarrierPlayerId = fromPlayer?.Id ?? toPlayer?.Id
+            },
+            _ => new ActionParticipants()
+        };
     }
 
     private static bool ShouldCreateEvent(MatchAction action)

@@ -99,6 +99,112 @@ public static class MatchPlaybackContractValidator
             return "Goal action exists but final score did not update.";
         }
 
+        var participantValidation = ValidateActionParticipants(playback);
+        if (participantValidation != PassMessage)
+        {
+            return participantValidation;
+        }
+
+        var statsValidation = ValidateMatchStats(playback);
+        if (statsValidation != PassMessage)
+        {
+            return statsValidation;
+        }
+
+        return PassMessage;
+    }
+
+    public static string ValidateActionParticipants(MatchPlaybackResult playback)
+    {
+        foreach (var action in playback.Timeline.Actions)
+        {
+            var participants = action.Participants;
+            switch (action.Kind)
+            {
+                case MatchActionKind.Pass:
+                    if (string.IsNullOrWhiteSpace(participants.PasserPlayerId) ||
+                        string.IsNullOrWhiteSpace(participants.ReceiverPlayerId))
+                    {
+                        return $"Pass action {action.Id} is missing passer or receiver metadata.";
+                    }
+                    break;
+                case MatchActionKind.Shot:
+                    if (string.IsNullOrWhiteSpace(participants.ShooterPlayerId))
+                    {
+                        return $"Shot action {action.Id} is missing shooter metadata.";
+                    }
+                    break;
+                case MatchActionKind.Save:
+                    if (string.IsNullOrWhiteSpace(participants.ShooterPlayerId) ||
+                        string.IsNullOrWhiteSpace(participants.GoalkeeperPlayerId))
+                    {
+                        return $"Save action {action.Id} is missing shooter or goalkeeper metadata.";
+                    }
+                    break;
+                case MatchActionKind.Clearance:
+                    if (string.IsNullOrWhiteSpace(participants.ClearerPlayerId))
+                    {
+                        return $"Clearance action {action.Id} is missing clearer metadata.";
+                    }
+                    break;
+                case MatchActionKind.Interception:
+                    if (string.IsNullOrWhiteSpace(participants.InterceptorPlayerId))
+                    {
+                        return $"Interception action {action.Id} is missing interceptor metadata.";
+                    }
+                    break;
+                case MatchActionKind.Goal:
+                    if (string.IsNullOrWhiteSpace(participants.ScorerPlayerId))
+                    {
+                        return $"Goal action {action.Id} is missing scorer metadata.";
+                    }
+                    break;
+            }
+        }
+
+        return PassMessage;
+    }
+
+    public static string ValidateMatchStats(MatchPlaybackResult playback)
+    {
+        var expected = MatchStatsService.Build(playback.HomeClubName, playback.AwayClubName, playback.Timeline.Actions);
+        var stats = playback.Stats;
+
+        if (stats.HomeGoals != playback.FinalHomeScore || stats.AwayGoals != playback.FinalAwayScore)
+        {
+            return "Match stats goal totals do not match final score.";
+        }
+
+        if (stats.HomeShots != expected.HomeShots || stats.AwayShots != expected.AwayShots)
+        {
+            return "Match stats shot totals do not match playback actions.";
+        }
+
+        if (stats.HomeSaves != expected.HomeSaves || stats.AwaySaves != expected.AwaySaves)
+        {
+            return "Match stats save totals do not match playback actions.";
+        }
+
+        if (stats.HomeClearances != expected.HomeClearances || stats.AwayClearances != expected.AwayClearances)
+        {
+            return "Match stats clearance totals do not match playback actions.";
+        }
+
+        if (stats.HomeInterceptions != expected.HomeInterceptions || stats.AwayInterceptions != expected.AwayInterceptions)
+        {
+            return "Match stats interception totals do not match playback actions.";
+        }
+
+        if (stats.HomeCompletedPasses != expected.HomeCompletedPasses || stats.AwayCompletedPasses != expected.AwayCompletedPasses)
+        {
+            return "Match stats completed pass totals do not match playback actions.";
+        }
+
+        if (stats.HomePossessionPhaseCount <= 0 || stats.AwayPossessionPhaseCount <= 0)
+        {
+            return "Match stats must include possession phases for both teams.";
+        }
+
         return PassMessage;
     }
 

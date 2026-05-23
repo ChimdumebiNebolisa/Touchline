@@ -27,6 +27,9 @@ public partial class GameState : Node
         public required string TacticalSummary { get; init; }
         public required string PressureSummary { get; init; }
         public required string CauseSummary { get; init; }
+        public required string StatsSummary { get; init; }
+        public required string KeyPlayerMoments { get; init; }
+        public required string TacticalExplanation { get; init; }
         public required string[] KeyEvents { get; init; }
         public required int MoraleDelta { get; init; }
         public required int FanDelta { get; init; }
@@ -327,6 +330,51 @@ public partial class GameState : Node
         return MatchPlaybackContractValidator.PassMessage;
     }
 
+    public string ValidateActionParticipantsContract()
+    {
+        return MatchPlaybackContractValidator.ValidateActionParticipants(PrepareCurrentMatchResult(true));
+    }
+
+    public string ValidateMatchStatsContract()
+    {
+        return MatchPlaybackContractValidator.ValidateMatchStats(PrepareCurrentMatchResult(true));
+    }
+
+    public string ValidatePostMatchReportContract()
+    {
+        var result = PrepareCurrentMatchResult(true);
+        ApplyMatchResult(result);
+
+        if (LastMatchReport == null)
+        {
+            return "Post-match report was not created.";
+        }
+
+        if (string.IsNullOrWhiteSpace(LastMatchReport.StatsSummary) ||
+            !LastMatchReport.StatsSummary.Contains("Shots:", StringComparison.Ordinal) ||
+            !LastMatchReport.StatsSummary.Contains("Saves:", StringComparison.Ordinal))
+        {
+            return "Post-match report is missing stats summary.";
+        }
+
+        if (string.IsNullOrWhiteSpace(LastMatchReport.KeyPlayerMoments))
+        {
+            return "Post-match report is missing key player moments.";
+        }
+
+        if (string.IsNullOrWhiteSpace(LastMatchReport.TacticalExplanation))
+        {
+            return "Post-match report is missing tactical explanation.";
+        }
+
+        if (string.IsNullOrWhiteSpace(LastMatchReport.CauseSummary))
+        {
+            return "Post-match report is missing cause summary.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
     public void ApplyMatchResult(MatchPlaybackResult result)
     {
         CurrentMatchResult = result;
@@ -355,6 +403,9 @@ public partial class GameState : Node
             TacticalSummary = result.TacticalSummary,
             PressureSummary = consequence.PressureSummary,
             CauseSummary = consequence.CauseSummary,
+            StatsSummary = consequence.StatsSummary,
+            KeyPlayerMoments = consequence.KeyPlayerMoments,
+            TacticalExplanation = consequence.TacticalExplanation,
             KeyEvents = consequence.KeyEvents,
             MoraleDelta = consequence.MoraleDelta,
             FanDelta = consequence.FanDelta,
@@ -422,6 +473,15 @@ public partial class GameState : Node
                 CauseSummary = string.IsNullOrWhiteSpace(data.LastMatchReport.CauseSummary)
                     ? "Cause detail unavailable for this saved report."
                     : data.LastMatchReport.CauseSummary,
+                StatsSummary = string.IsNullOrWhiteSpace(data.LastMatchReport.StatsSummary)
+                    ? "Stats unavailable for this saved report."
+                    : data.LastMatchReport.StatsSummary,
+                KeyPlayerMoments = string.IsNullOrWhiteSpace(data.LastMatchReport.KeyPlayerMoments)
+                    ? "Key player moments unavailable for this saved report."
+                    : data.LastMatchReport.KeyPlayerMoments,
+                TacticalExplanation = string.IsNullOrWhiteSpace(data.LastMatchReport.TacticalExplanation)
+                    ? "Tactical explanation unavailable for this saved report."
+                    : data.LastMatchReport.TacticalExplanation,
                 KeyEvents = data.LastMatchReport.KeyEvents ?? Array.Empty<string>(),
                 MoraleDelta = data.LastMatchReport.MoraleDelta,
                 FanDelta = data.LastMatchReport.FanDelta,
