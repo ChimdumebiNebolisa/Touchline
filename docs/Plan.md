@@ -55,6 +55,9 @@
 - Step 39: Add explicit match action participant metadata
 - Step 40: Add lightweight playback-derived match stats
 - Step 41: Upgrade post-match report readability
+- Step 42: Harden repeated matchday progression
+- Step 43: Improve player condition/form/morale changes
+- Step 44: Add multi-match regression checks
 
 ## 2. Plan Rules
 
@@ -665,3 +668,78 @@ Make the post-match report explain how the match unfolded using concrete stats, 
 - manager-facing report copy references concrete playback causes
 - `PostMatchScene` remains a renderer of `LastMatchReport`
 - no complex analytics model or unrelated UI rebuild is added
+
+## 34. Step 42: Harden repeated matchday progression
+
+### Objective
+
+Keep the career loop stable across repeated matchdays so fixtures, standings, reports, form, and next-match context update exactly once per resolved match.
+
+### Allowed Subtasks
+
+- guard against replaying an already completed current fixture
+- ensure match resolution updates completed fixtures, standings, recent form, report state, and dashboard summaries
+- preserve instant and live result paths through the same career-state application
+- keep end-of-fixture-list behavior safe through the existing season rollover path
+
+### Verification
+
+- resolving one match completes the current round and advances the selected club table row once
+- reapplying the same completed result does not duplicate table, fixture, or form effects
+- post-match calendar advance moves to the next valid open match context
+
+### Exit Criteria
+
+- the current fixture cannot duplicate career effects after completion
+- next opponent and fixture summary refresh after post-match advance
+- no season rollover rewrite or unrelated UI rebuild is introduced
+
+## 35. Step 43: Improve player condition/form/morale changes
+
+### Objective
+
+Apply simple, explainable player-state changes after matches using the authoritative playback and selected squad state.
+
+### Allowed Subtasks
+
+- reduce starting player fitness after match participation
+- keep non-starter fitness loss minimal or absent
+- reward scorers, keepers with saves, and defensive contributors with small form/morale gains
+- apply modest team-result morale effects and clamp all values safely
+
+### Verification
+
+- starter fitness decreases after a resolved match
+- player form, morale, and fitness remain inside valid bounds
+- at least one player state changes after match resolution
+
+### Exit Criteria
+
+- post-match player changes are deterministic and lightweight
+- save/load preserves changed squad condition
+- no injuries, training, contracts, transfers, or complex development model is added
+
+## 36. Step 44: Add multi-match regression checks
+
+### Objective
+
+Add automated coverage for multiple matchdays so save/load, calendar, fixtures, standings, reports, and player condition remain continuous.
+
+### Allowed Subtasks
+
+- add a progression check for one resolved match and post-match calendar advance
+- add a player condition check for post-match squad state changes
+- add a multi-match save/load regression check covering two resolved matches
+- keep checks focused on existing career-loop behavior
+
+### Verification
+
+- multi-match checks pass alongside existing match-engine, live, post-match, and navigation checks
+- save/load preserves date, matchday, table, fixtures, squad player state, and latest report after multiple matches
+- resolving multiple matches does not duplicate the same result
+
+### Exit Criteria
+
+- repeated career-loop automation covers the current hardened path
+- failures report explicit continuity issues
+- no product scope is added beyond the hardening pass

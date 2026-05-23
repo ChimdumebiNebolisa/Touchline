@@ -230,6 +230,12 @@ public partial class GameState : Node
         ApplyMatchResult(result);
     }
 
+    public bool IsCurrentClubFixtureComplete()
+    {
+        var fixture = GetCurrentClubFixture();
+        return fixture?.IsComplete ?? false;
+    }
+
     public string ValidateCurrentMatchPlaybackContract()
     {
         return MatchPlaybackContractValidator.Validate(PrepareCurrentMatchResult(true));
@@ -375,8 +381,243 @@ public partial class GameState : Node
         return MatchPlaybackContractValidator.PassMessage;
     }
 
+    public string ValidateMatchdayProgressionContract()
+    {
+        var matchdayBefore = CurrentMatchday;
+        var opponentBefore = CurrentOpponentName;
+        var completedBefore = CountCompletedFixtures();
+        var openFixturesInRound = CountOpenFixturesForMatchday(matchdayBefore);
+        var rowBefore = GetCompetitionRow(SelectedClubName ?? string.Empty);
+        if (rowBefore == null)
+        {
+            return "Selected club row is unavailable before match progression.";
+        }
+
+        var result = PrepareCurrentMatchResult(true);
+        ApplyMatchResult(result);
+        if (LastMatchReport == null)
+        {
+            return "Match progression did not create a post-match report.";
+        }
+
+        if (!IsCurrentClubFixtureComplete())
+        {
+            return "Resolved match did not mark the current club fixture complete.";
+        }
+
+        var completedAfter = CountCompletedFixtures();
+        if (completedAfter != completedBefore + openFixturesInRound)
+        {
+            return $"Expected completed fixture count to increase by {openFixturesInRound}, moved from {completedBefore} to {completedAfter}.";
+        }
+
+        var rowAfter = GetCompetitionRow(SelectedClubName ?? string.Empty);
+        if (rowAfter == null || rowAfter.Played != rowBefore.Played + 1)
+        {
+            return "Selected club table row did not advance by exactly one match.";
+        }
+
+        var recentAfter = _recentResults.Count;
+        ApplyMatchResult(result);
+        var rowAfterReplay = GetCompetitionRow(SelectedClubName ?? string.Empty);
+        if (CountCompletedFixtures() != completedAfter ||
+            rowAfterReplay == null ||
+            rowAfterReplay.Played != rowAfter.Played ||
+            _recentResults.Count != recentAfter)
+        {
+            return "Reapplying a completed match changed career state again.";
+        }
+
+        if (TouchlineCalendarSystem.Instance == null || !TouchlineCalendarSystem.Instance.AdvanceCareerDate())
+        {
+            return TouchlineCalendarSystem.Instance?.LastStatusMessage ?? "Calendar system unavailable during progression validation.";
+        }
+
+        if (CurrentMatchday != matchdayBefore + 1)
+        {
+            return $"Expected matchday {matchdayBefore + 1} after calendar advance, found {CurrentMatchday}.";
+        }
+
+        if (CurrentOpponentName == opponentBefore)
+        {
+            return "Next opponent did not change after advancing to the next match context.";
+        }
+
+        if (LastMatchReport != null)
+        {
+            return "Post-match report was not cleared after advancing to the next match context.";
+        }
+
+        if (IsCurrentClubFixtureComplete())
+        {
+            return "Next match context points at an already completed fixture.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
+    public string ValidatePlayerConditionContract()
+    {
+        var before = SquadPlayers;
+        var result = PrepareCurrentMatchResult(true);
+        ApplyMatchResult(result);
+
+        if (SquadPlayers.Length != before.Length)
+        {
+            return "Post-match player update changed squad size.";
+        }
+
+        var sawStarterFitnessDrop = false;
+        var sawAnyPlayerStateChange = false;
+        for (var index = 0; index < SquadPlayers.Length; index++)
+        {
+            var previous = before[index];
+            var current = SquadPlayers[index];
+            if (!IsPlayerValueInBounds(current))
+            {
+                return $"Player state moved out of bounds for {current.Name}.";
+            }
+
+            if (previous.IsStarting && current.Fitness < previous.Fitness)
+            {
+                sawStarterFitnessDrop = true;
+            }
+
+            if (!previous.IsStarting && current.Fitness < previous.Fitness)
+            {
+                return $"Non-starter {current.Name} lost fitness despite not starting.";
+            }
+
+            if (current.Fitness != previous.Fitness || current.Form != previous.Form || current.Morale != previous.Morale)
+            {
+                sawAnyPlayerStateChange = true;
+            }
+        }
+
+        if (!sawStarterFitnessDrop)
+        {
+            return "No starting player lost fitness after the match.";
+        }
+
+        if (!sawAnyPlayerStateChange)
+        {
+            return "Post-match player condition update did not change any player state.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
+    public string ValidateMultiMatchRegressionContract()
+    {
+        var firstMatchday = CurrentMatchday;
+        var firstCompletedBefore = CountCompletedFixtures();
+        ApplyMatchResult(PrepareCurrentMatchResult(true));
+        if (CountCompletedFixtures() <= firstCompletedBefore)
+        {
+            return "First match did not complete fixtures.";
+        }
+
+        if (TouchlineCalendarSystem.Instance == null || !TouchlineCalendarSystem.Instance.AdvanceCareerDate())
+        {
+            return TouchlineCalendarSystem.Instance?.LastStatusMessage ?? "Calendar system unavailable during multi-match validation.";
+        }
+
+        if (CurrentMatchday != firstMatchday + 1)
+        {
+            return "Calendar did not advance to the second matchday.";
+        }
+
+        var secondMatchday = CurrentMatchday;
+        ApplyMatchResult(PrepareCurrentMatchResult(true));
+        if (CurrentMatchday != secondMatchday)
+        {
+            return "Resolving the second match changed matchday before calendar advance.";
+        }
+
+        if (LastMatchReport == null)
+        {
+            return "Second match did not leave a post-match report.";
+        }
+
+        var expectedDate = CurrentDate;
+        var expectedMatchday = CurrentMatchday;
+        var expectedCompletedFixtures = CountCompletedFixtures();
+        var expectedOpponent = CurrentOpponentName;
+        var expectedNextFixtureSummary = NextFixtureSummary;
+        var expectedReportScoreline = LastMatchReport.Scoreline;
+        var expectedFirstPlayer = SquadPlayers.Length == 0 ? null : SquadPlayers[0];
+        var expectedRow = GetCompetitionRow(SelectedClubName ?? string.Empty);
+        if (expectedFirstPlayer == null || expectedRow == null)
+        {
+            return "Expected save/load comparison state is unavailable.";
+        }
+
+        if (SaveSystem.Instance == null)
+        {
+            return "Save system unavailable during multi-match validation.";
+        }
+
+        if (!SaveSystem.Instance.SaveGame(out var saveStatus))
+        {
+            return saveStatus;
+        }
+
+        var mutationClub = ResolveDifferentClub(SelectedClubName);
+        if (TouchlineWorldGenerator.Instance != null && !string.IsNullOrWhiteSpace(mutationClub))
+        {
+            TouchlineWorldGenerator.Instance.BeginNewCareer("Regression Mutation", CareerSeed + 909);
+            TouchlineWorldGenerator.Instance.SelectClub(mutationClub);
+        }
+
+        if (!SaveSystem.Instance.LoadGame(out var loadStatus))
+        {
+            return loadStatus;
+        }
+
+        if (CurrentDate != expectedDate ||
+            CurrentMatchday != expectedMatchday ||
+            CurrentOpponentName != expectedOpponent ||
+            NextFixtureSummary != expectedNextFixtureSummary ||
+            CountCompletedFixtures() != expectedCompletedFixtures)
+        {
+            return "Save/load did not preserve date, matchday, opponent, fixture summary, and completion count after multiple matches.";
+        }
+
+        if (LastMatchReport == null || LastMatchReport.Scoreline != expectedReportScoreline)
+        {
+            return "Save/load did not preserve the latest match report.";
+        }
+
+        var loadedRow = GetCompetitionRow(SelectedClubName ?? string.Empty);
+        if (loadedRow == null ||
+            loadedRow.Played != expectedRow.Played ||
+            loadedRow.Points != expectedRow.Points ||
+            loadedRow.GoalsFor != expectedRow.GoalsFor ||
+            loadedRow.GoalsAgainst != expectedRow.GoalsAgainst)
+        {
+            return "Save/load did not preserve the selected club table row after multiple matches.";
+        }
+
+        if (SquadPlayers.Length == 0 ||
+            SquadPlayers[0].Name != expectedFirstPlayer.Name ||
+            SquadPlayers[0].Fitness != expectedFirstPlayer.Fitness ||
+            SquadPlayers[0].Form != expectedFirstPlayer.Form ||
+            SquadPlayers[0].Morale != expectedFirstPlayer.Morale)
+        {
+            return "Save/load did not preserve squad player condition after match progression.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
     public void ApplyMatchResult(MatchPlaybackResult result)
     {
+        if (IsCurrentClubFixtureComplete())
+        {
+            CurrentMatchResult = null;
+            return;
+        }
+
         CurrentMatchResult = result;
         var goalDifference = result.FinalHomeScore - result.FinalAwayScore;
         var previousPosition = GetClubTablePosition(SelectedClubName ?? string.Empty);
@@ -385,6 +626,11 @@ public partial class GameState : Node
         TeamMorale = Math.Clamp(TeamMorale + consequence.MoraleDelta, 0, 100);
         FanSentiment = Math.Clamp(FanSentiment + consequence.FanDelta, 0, 100);
         BoardConfidence = Math.Clamp(BoardConfidence + consequence.BoardDelta, 0, 100);
+        if (!string.IsNullOrWhiteSpace(SelectedClubName))
+        {
+            SquadPlayers = DevelopmentSystem.ApplyPostMatchChanges(SquadPlayers, SelectedClubName, result);
+        }
+
         SquadStatusSummary = BuildSquadStatusSummary();
         UpdateFormSummary(goalDifference);
 
@@ -614,7 +860,23 @@ public partial class GameState : Node
 
     private string BuildSquadStatusSummary()
     {
-        return $"23 registered players | morale {DescribeLevel(TeamMorale)} | fans {DescribeLevel(FanSentiment)} | board {DescribeLevel(BoardConfidence)}";
+        var averageFitness = 0;
+        var averageForm = 0;
+        if (SquadPlayers.Length > 0)
+        {
+            var totalFitness = 0;
+            var totalForm = 0;
+            foreach (var player in SquadPlayers)
+            {
+                totalFitness += player.Fitness;
+                totalForm += player.Form;
+            }
+
+            averageFitness = totalFitness / SquadPlayers.Length;
+            averageForm = totalForm / SquadPlayers.Length;
+        }
+
+        return $"{SquadPlayers.Length} registered players | avg fitness {averageFitness} | avg form {averageForm} | morale {DescribeLevel(TeamMorale)} | fans {DescribeLevel(FanSentiment)} | board {DescribeLevel(BoardConfidence)}";
     }
 
     private void RecordCompetitionResults(int homeGoals, int awayGoals)
@@ -913,6 +1175,59 @@ public partial class GameState : Node
         }
 
         return recentEvents;
+    }
+
+    private int CountCompletedFixtures()
+    {
+        var count = 0;
+        foreach (var fixture in CompetitionFixtures)
+        {
+            if (fixture.IsComplete)
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    private int CountOpenFixturesForMatchday(int matchday)
+    {
+        var count = 0;
+        foreach (var fixture in CompetitionFixtures)
+        {
+            if (fixture.Matchday == matchday && !fixture.IsComplete)
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    private static bool IsPlayerValueInBounds(SquadPlayer player)
+    {
+        return IsInPercentRange(player.Form) &&
+            IsInPercentRange(player.Morale) &&
+            IsInPercentRange(player.Fitness);
+    }
+
+    private static bool IsInPercentRange(int value)
+    {
+        return value >= 0 && value <= 100;
+    }
+
+    private string ResolveDifferentClub(string? selectedClubName)
+    {
+        foreach (var clubName in AvailableClubs)
+        {
+            if (clubName != selectedClubName)
+            {
+                return clubName;
+            }
+        }
+
+        return string.Empty;
     }
 
     private int GetClubTablePosition(string clubName)
