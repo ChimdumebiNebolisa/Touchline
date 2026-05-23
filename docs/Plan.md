@@ -61,6 +61,9 @@
 - Step 45: Harden season rollover
 - Step 46: Add lightweight season-end player aging/development
 - Step 47: Add full-season regression checks
+- Step 48: Improve dashboard manager-facing context
+- Step 49: Improve matchday preparation clarity
+- Step 50: Add end-to-end user-flow regression coverage
 
 ## 2. Plan Rules
 
@@ -821,4 +824,71 @@ Cover long-run career continuity by simulating a full season into rollover and t
 
 - full-season regression automation passes with existing route checks
 - failures identify the broken long-run continuity assumption directly
+- no unrelated product scope is added
+
+## 40. Step 48: Improve dashboard manager-facing context
+
+### Objective
+
+Make the dashboard explain the current career state clearly from authoritative runtime state.
+
+### Allowed Subtasks
+
+- surface season, date, matchday, next fixture, league position, recent form, pressure, squad condition, tactics, and latest report context
+- expose small formatted summaries from `GameState` where scene copy needs shared authoritative state
+- keep the dashboard as a renderer and navigation hub rather than a domain-rule owner
+
+### Verification
+
+- dashboard context check confirms season/date, next fixture, pressure, lineup, tactics, table, and status context render
+- existing navigation and career-flow checks still pass
+
+### Exit Criteria
+
+- dashboard clearly communicates whether the club is entering a new season, ready for matchday, post-match, or between matches
+- no table rules, match rules, or consequence rules are moved into the scene
+
+## 41. Step 49: Improve matchday preparation clarity
+
+### Objective
+
+Make matchday read as a clear pre-match decision screen before live or instant resolution.
+
+### Allowed Subtasks
+
+- show opponent, competition, season, date, lineup readiness, tactical setup, pressure, form, and seeded opponent context
+- clarify that live match and instant result share the same engine and produce the same career-state handoff
+- warn clearly when a fixture is already recorded or unavailable
+
+### Verification
+
+- matchday preparation check confirms opponent, tactics, lineup, pressure, and action-choice context render
+- live and instant result checks still pass through the shared engine
+
+### Exit Criteria
+
+- matchday presents manager preparation context without adding scouting, advice, or football decision logic to the scene
+- no match engine or unrelated screen rewrite is introduced
+
+## 42. Step 50: Add end-to-end user-flow regression coverage
+
+### Objective
+
+Cover the manager-facing route from career setup through dashboard, matchday, post-match, dashboard return, and save/load context.
+
+### Allowed Subtasks
+
+- add dashboard context regression coverage
+- add matchday preparation regression coverage
+- add an end-to-end flow check that verifies post-match continue and save/load preserve manager-facing context
+- keep existing match, report, season, save/load, and navigation checks compatible
+
+### Verification
+
+- new Step 48, 49, and 50 checks pass alongside compatible existing checks from Step 22 through Step 47
+- save/load after the flow preserves manager identity, next opponent, and dashboard context
+
+### Exit Criteria
+
+- end-to-end route automation covers the polished manager-facing flow
 - no unrelated product scope is added

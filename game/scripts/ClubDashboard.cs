@@ -202,62 +202,63 @@ public partial class ClubDashboard : Control
             return;
         }
 
-        var clubName = GameState.Instance.SelectedClubName!;
+        var state = GameState.Instance;
+        var clubName = state.SelectedClubName!;
         var position = GetClubPosition(clubName);
-        var tableSize = GameState.Instance.CompetitionTable.Length;
+        var tableSize = state.CompetitionTable.Length;
         var currentRow = GetCompetitionRow(clubName);
-        var hasMatchReport = GameState.Instance.LastMatchReport != null;
+        var hasMatchReport = state.LastMatchReport != null;
+        var careerPhase = state.BuildCareerPhaseSummary();
 
         _clubBadgeLabel.Text = BuildClubMonogram(clubName);
         _clubNameLabel.Text = clubName;
-        _managerLabel.Text = $"Manager {GameState.Instance.ManagerName}";
-        _seasonLabel.Text = $"Season {GameState.Instance.SeasonLabel}";
-        _competitionChipLabel.Text = GameState.Instance.CompetitionName.ToUpperInvariant();
-        _clubContextLabel.Text = $"{clubName} club command | Manager {GameState.Instance.ManagerName}";
-        _dateLabel.Text = $"{GameState.Instance.CurrentDateLabel} | Matchday {GameState.Instance.CurrentMatchday}";
-        _priorityChipLabel.Text = BuildPriorityTag(GameState.Instance);
+        _managerLabel.Text = $"Manager {state.ManagerName}";
+        _seasonLabel.Text = $"Season {state.SeasonLabel}";
+        _competitionChipLabel.Text = state.CompetitionName.ToUpperInvariant();
+        _clubContextLabel.Text = $"{clubName} club command | Manager {state.ManagerName}";
+        _dateLabel.Text = $"Season {state.SeasonLabel} | {state.CurrentDateLabel} | Matchday {state.CurrentMatchday}";
+        _priorityChipLabel.Text = BuildPriorityTag(state);
         SetStateChip(hasMatchReport ? "POST-MATCH" : "MATCH WEEK", hasMatchReport);
-        _headerStatusLabel.Text = hasMatchReport
-            ? $"Latest outcome: {GameState.Instance.LastMatchReport!.Scoreline}"
-            : "No result logged yet. The opening stretch is still in front of the club.";
+        _headerStatusLabel.Text = careerPhase;
 
-        _nextMatchValueLabel.Text = GameState.Instance.CurrentOpponentName;
-        _nextMatchMetaLabel.Text = GameState.Instance.NextFixtureSummary;
+        _nextMatchValueLabel.Text = state.CurrentOpponentName;
+        _nextMatchMetaLabel.Text = $"Next fixture | {state.NextFixtureSummary}";
         _tableValueLabel.Text = position > 0 ? $"{position}/{tableSize}" : "--";
         _tableMetaLabel.Text = currentRow == null
             ? "Table position unavailable."
-            : $"{currentRow.Points} pts | GD {FormatSigned(currentRow.GoalDifference)}";
-        _moraleValueLabel.Text = $"{GameState.Instance.TeamMorale}";
-        _moraleMetaLabel.Text = $"Morale {DescribePulse(GameState.Instance.TeamMorale)}";
-        _boardValueLabel.Text = $"{GameState.Instance.BoardConfidence}";
-        _boardMetaLabel.Text = $"Fans {GameState.Instance.FanSentiment} | board pulse";
-        _shapeValueLabel.Text = GameState.Instance.TacticalFormation;
-        _shapeMetaLabel.Text = $"Press {GameState.Instance.PressIntensity} | Tempo {GameState.Instance.Tempo}";
+            : $"{currentRow.Points} pts | GD {FormatSigned(currentRow.GoalDifference)} | {currentRow.Played} played";
+        _moraleValueLabel.Text = $"{state.TeamMorale}";
+        _moraleMetaLabel.Text = $"Team morale {DescribePulse(state.TeamMorale)} | Fans {state.FanSentiment}";
+        _boardValueLabel.Text = $"{state.BoardConfidence}";
+        _boardMetaLabel.Text = $"Board confidence | Fan sentiment {state.FanSentiment}";
+        _shapeValueLabel.Text = state.TacticalFormation;
+        _shapeMetaLabel.Text = $"Press {state.PressIntensity} | Tempo {state.Tempo} | Risk {state.Risk}";
 
-        _fixturePreviewLabel.Text = GameState.Instance.NextFixtureSummary;
-        _focusContextLabel.Text = $"{GameState.Instance.CompetitionName} | {BuildTableLine(position, tableSize, currentRow)}";
-        _recommendedMoveLabel.Text = BuildPrioritySummary(GameState.Instance);
-        _actionHintLabel.Text = "Primary action: launch matchday when squad and tactics feel set.";
+        _fixturePreviewLabel.Text = $"{careerPhase}\n{state.NextFixtureSummary}";
+        _focusContextLabel.Text = $"{state.CompetitionName} | {state.BuildLeaguePositionSummary()}";
+        _recommendedMoveLabel.Text = BuildPrioritySummary(state);
+        _actionHintLabel.Text = state.IsCurrentClubFixtureComplete()
+            ? "Primary action: advance after the post-match review, not replay the completed fixture."
+            : "Primary action: launch matchday when squad and tactics feel set.";
 
-        _formValueLabel.Text = BuildCompactForm(GameState.Instance.FormSummary);
+        _formValueLabel.Text = BuildCompactForm(state.FormSummary);
         _lastResultLabel.Text = hasMatchReport
-            ? $"{GameState.Instance.LastMatchReport!.ResultLabel} {GameState.Instance.LastMatchReport.ConsequenceSummary}"
-            : "No completed result yet.";
+            ? $"Last match | {state.LastMatchReport!.Scoreline} | {state.LastMatchReport.ResultLabel}"
+            : state.BuildRecentResultsSummary();
         _tableImpactLabel.Text = hasMatchReport
-            ? GameState.Instance.LastMatchReport!.TableImpactSummary
+            ? $"{state.LastMatchReport!.TableImpactSummary} | {state.LastMatchReport.StatsSummary}"
             : BuildTableLine(position, tableSize, currentRow);
 
         _pressureValueLabel.Text =
-            $"Morale {GameState.Instance.TeamMorale} | Fans {GameState.Instance.FanSentiment} | Board {GameState.Instance.BoardConfidence}";
-        _pressureReasonsLabel.Text = PerceptionSystem.BuildPressureReasonSummary(GameState.Instance);
+            $"Morale {state.TeamMorale} | Fans {state.FanSentiment} | Board {state.BoardConfidence}";
+        _pressureReasonsLabel.Text = PerceptionSystem.BuildPressureReasonSummary(state);
 
-        _squadStatusLabel.Text = GameState.Instance.SquadStatusSummary;
-        _tacticsSummaryLabel.Text =
-            $"{GameState.Instance.TacticalFormation} | Press {GameState.Instance.PressIntensity} | Tempo {GameState.Instance.Tempo} | Width {GameState.Instance.Width} | Risk {GameState.Instance.Risk}";
-        _priorityLabel.Text = BuildPrioritySummary(GameState.Instance);
+        _squadStatusLabel.Text = $"{state.BuildLineupReadinessSummary()}\n{state.SquadStatusSummary}";
+        _tacticsSummaryLabel.Text = state.BuildTacticalPlanSummary();
+        _priorityLabel.Text = BuildPrioritySummary(state);
         _statusLabel.Text = hasMatchReport
-            ? $"{GameState.Instance.LastMatchReport!.FixtureLabel}: {GameState.Instance.LastMatchReport.Scoreline}"
-            : "Opening week ready. Review the squad, sharpen the board, and head into the first fixture.";
+            ? $"{state.LastMatchReport!.FixtureLabel}: {state.LastMatchReport.Scoreline} | Cause: {state.LastMatchReport.CauseSummary}"
+            : $"{careerPhase} | {state.BuildOpponentContextSummary()}";
         _saveHintLabel.Text = SaveSystem.Instance == null
             ? "Save unavailable."
             : "Save the live career state before leaving the session.";

@@ -134,10 +134,11 @@ public partial class MatchdayScene : Control
             return;
         }
 
+        var state = GameState.Instance;
         var startingCount = 0;
         var benchCount = 0;
         var totalFitness = 0;
-        foreach (var player in GameState.Instance.SquadPlayers)
+        foreach (var player in state.SquadPlayers)
         {
             if (player.IsStarting)
             {
@@ -154,39 +155,37 @@ public partial class MatchdayScene : Control
         var fixtureComplete = IsCurrentFixtureComplete();
         var readinessValue = startingCount >= 11 ? "XI READY" : $"XI {startingCount}/11";
 
-        _competitionLabel.Text = GameState.Instance.CompetitionName;
-        _fixtureLabel.Text = $"{GameState.Instance.SelectedClubName} vs {GameState.Instance.CurrentOpponentName} | {GameState.Instance.CurrentDateLabel}";
+        _competitionLabel.Text = $"{state.CompetitionName} | Season {state.SeasonLabel}";
+        _fixtureLabel.Text = $"{state.SelectedClubName} vs {state.CurrentOpponentName} | {state.CurrentDateLabel} | Matchday {state.CurrentMatchday}";
         _stakesLabel.Text = BuildStakesLabel();
         SetMatchStateChip(fixtureComplete ? "RECORDED" : "READY", fixtureComplete);
 
-        _opponentValueLabel.Text = GameState.Instance.CurrentOpponentName;
-        _opponentMetaLabel.Text = $"Matchday {GameState.Instance.CurrentMatchday} | {GameState.Instance.NextFixtureSummary}";
-        _formValueLabel.Text = BuildCompactForm(GameState.Instance.FormSummary);
-        _formMetaLabel.Text = GameState.Instance.LastMatchReport == null
-            ? "No prior result logged yet."
-            : GameState.Instance.LastMatchReport.ResultLabel;
-        _pulseValueLabel.Text = $"{GameState.Instance.TeamMorale}/{GameState.Instance.FanSentiment}/{GameState.Instance.BoardConfidence}";
+        _opponentValueLabel.Text = state.CurrentOpponentName;
+        _opponentMetaLabel.Text = state.BuildOpponentContextSummary();
+        _formValueLabel.Text = BuildCompactForm(state.FormSummary);
+        _formMetaLabel.Text = state.BuildRecentResultsSummary();
+        _pulseValueLabel.Text = $"{state.TeamMorale}/{state.FanSentiment}/{state.BoardConfidence}";
         _pulseMetaLabel.Text = "Morale / Fans / Board";
         _readinessValueLabel.Text = readinessValue;
         _readinessMetaLabel.Text = startingCount >= 11
             ? $"Avg fitness {averageFitness} | Bench {benchCount}"
             : $"Bench {benchCount} | Auto-fill active if launched";
 
-        _kickoffContextLabel.Text = $"{GameState.Instance.CurrentDateLabel} kickoff window. Result feeds table, pressure, and the next dashboard state.";
-        _lineupLabel.Text = $"Lineup | Starting XI {startingCount}/11 | Average fitness {averageFitness}";
+        _kickoffContextLabel.Text = $"{state.BuildCareerPhaseSummary()} Result feeds table, pressure, player condition, and the next dashboard state.";
+        _lineupLabel.Text = state.BuildLineupReadinessSummary();
         _benchLabel.Text = $"Bench | {benchCount} options available behind the active XI.";
-        _pressureReasonsLabel.Text = PerceptionSystem.BuildPressureReasonSummary(GameState.Instance);
+        _pressureReasonsLabel.Text = PerceptionSystem.BuildPressureReasonSummary(state);
 
-        _pressureLabel.Text = $"Club pulse | Morale {GameState.Instance.TeamMorale} | Fans {GameState.Instance.FanSentiment} | Board {GameState.Instance.BoardConfidence}";
-        _tacticsLabel.Text = $"Plan | {GameState.Instance.TacticalFormation} | Press {GameState.Instance.PressIntensity} | Tempo {GameState.Instance.Tempo} | Width {GameState.Instance.Width} | Risk {GameState.Instance.Risk}";
-        _opponentFocusLabel.Text = BuildOpponentFocusLabel();
+        _pressureLabel.Text = $"Pressure context | Morale {state.TeamMorale} | Fans {state.FanSentiment} | Board {state.BoardConfidence}";
+        _tacticsLabel.Text = state.BuildTacticalPlanSummary();
+        _opponentFocusLabel.Text = state.BuildOpponentContextSummary();
         _readinessLabel.Text = startingCount >= 11
             ? "Selection call | The XI is complete and ready for kickoff."
             : "Selection call | The engine will complete the XI from the remaining squad list.";
 
         _statusLabel.Text = fixtureComplete
             ? "This fixture is already in the season record. Return to the dashboard and advance instead of replaying it."
-            : "Primary action: launch the live match when squad and tactics look right. Instant result stays secondary.";
+            : "Decision: Live Match shows the 2D playback; Instant Result resolves the same engine immediately. Both feed the same post-match report.";
         _instantResultButton.Disabled = fixtureComplete;
         _startMatchButton.Disabled = fixtureComplete;
     }

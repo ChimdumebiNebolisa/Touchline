@@ -237,6 +237,133 @@ public partial class GameState : Node
         return fixture?.IsComplete ?? false;
     }
 
+    public string BuildCareerPhaseSummary()
+    {
+        if (!CareerInitialized)
+        {
+            return "Career inactive: start or load a career.";
+        }
+
+        if (string.IsNullOrWhiteSpace(SelectedClubName))
+        {
+            return "Club selection pending: choose a club to enter the season loop.";
+        }
+
+        var currentFixture = GetCurrentClubFixture();
+        if (LastMatchReport != null)
+        {
+            return $"Post-match review: {LastMatchReport.Scoreline} logged. Continue to advance the calendar.";
+        }
+
+        if (currentFixture == null)
+        {
+            return $"Season transition: {SeasonLabel} has no active fixture for matchday {CurrentMatchday}.";
+        }
+
+        if (currentFixture.IsComplete)
+        {
+            return $"Between matches: matchday {CurrentMatchday} result is recorded. Advance to the next fixture.";
+        }
+
+        if (CurrentMatchday == 1 && CountCompletedFixtures() == 0)
+        {
+            return $"New season opener: {SeasonLabel} begins on {CurrentDateLabel} against {CurrentOpponentName}.";
+        }
+
+        return $"Ready for matchday: {CurrentDateLabel}, matchday {CurrentMatchday} vs {CurrentOpponentName}.";
+    }
+
+    public string BuildLeaguePositionSummary()
+    {
+        if (string.IsNullOrWhiteSpace(SelectedClubName))
+        {
+            return "League position unavailable until a club is selected.";
+        }
+
+        var row = GetCompetitionRow(SelectedClubName);
+        var position = GetClubTablePosition(SelectedClubName);
+        if (row == null || position <= 0)
+        {
+            return "League position unavailable.";
+        }
+
+        return $"League position: {position}/{CompetitionTable.Length} | {row.Points} pts | GD {FormatSignedDelta(row.GoalDifference)} | {row.Played} played";
+    }
+
+    public string BuildRecentResultsSummary()
+    {
+        if (_recentResults.Count == 0)
+        {
+            return "Recent results: no completed matches yet.";
+        }
+
+        return $"Recent results: {string.Join(" ", _recentResults)}";
+    }
+
+    public string BuildLineupReadinessSummary()
+    {
+        var starters = 0;
+        var bench = 0;
+        var totalFitness = 0;
+        var totalForm = 0;
+        foreach (var player in SquadPlayers)
+        {
+            if (player.IsStarting)
+            {
+                starters++;
+                totalFitness += player.Fitness;
+                totalForm += player.Form;
+            }
+            else
+            {
+                bench++;
+            }
+        }
+
+        var averageFitness = starters == 0 ? 0 : totalFitness / starters;
+        var averageForm = starters == 0 ? 0 : totalForm / starters;
+        var readiness = starters >= 11 ? "XI ready" : $"XI incomplete ({starters}/11)";
+        return $"Lineup readiness: {readiness} | avg XI fitness {averageFitness} | avg XI form {averageForm} | bench {bench}";
+    }
+
+    public string BuildTacticalPlanSummary()
+    {
+        return $"Tactical setup: {TacticalFormation} | press {PressIntensity} | tempo {Tempo} | width {Width} | risk {Risk}";
+    }
+
+    public string BuildOpponentContextSummary()
+    {
+        if (string.IsNullOrWhiteSpace(CurrentOpponentName))
+        {
+            return "Opponent context unavailable.";
+        }
+
+        var opponentRow = GetCompetitionRow(CurrentOpponentName);
+        var opponentPosition = GetClubTablePosition(CurrentOpponentName);
+        var opponentSquad = GetClubSquad(CurrentOpponentName);
+        var starters = 0;
+        var totalFitness = 0;
+        var totalForm = 0;
+        foreach (var player in opponentSquad)
+        {
+            if (!player.IsStarting)
+            {
+                continue;
+            }
+
+            starters++;
+            totalFitness += player.Fitness;
+            totalForm += player.Form;
+        }
+
+        var averageFitness = starters == 0 ? 0 : totalFitness / starters;
+        var averageForm = starters == 0 ? 0 : totalForm / starters;
+        var tableLine = opponentRow == null || opponentPosition <= 0
+            ? "table line unavailable"
+            : $"position {opponentPosition}/{CompetitionTable.Length}, {opponentRow.Points} pts, GD {FormatSignedDelta(opponentRow.GoalDifference)}";
+        return $"Opponent context: {CurrentOpponentName} | {tableLine} | seeded XI {starters} | avg form {averageForm} | avg fitness {averageFitness}";
+    }
+
     public string ValidateCurrentMatchPlaybackContract()
     {
         return MatchPlaybackContractValidator.Validate(PrepareCurrentMatchResult(true));
