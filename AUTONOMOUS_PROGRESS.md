@@ -1,10 +1,10 @@
 # Autonomous Progress
 
 ## Current active Plan step
-- None. Steps 42-44 are complete.
+- None. Steps 45-47 are complete.
 
 ## Last completed verified task
-- Steps 42-44 career-loop hardening complete: repeated match resolution is guarded against duplicate effects, post-match player fitness/form/morale changes now apply from playback, and multi-match regression checks cover progression, condition, save/load, fixtures, standings, reports, and calendar continuity.
+- Steps 45-47 long-run career hardening complete: season rollover is gated on completed fixtures, new seasons reset fixtures/standings/matchday while preserving career identity and squad, season-end player aging/development is deterministic and clamped, and full-season regression checks cover rollover plus save/load continuity.
 
 ## Current subtask in progress
 - None.
@@ -14,7 +14,7 @@
 
 ## Known blockers
 - No active blockers.
-- Godot Mono is available locally, and targeted headless runtime validation ran successfully for Steps 42-44 plus the existing route checks.
+- Godot Mono is available locally. Headless checks were run as individual processes to avoid unrelated process-teardown noise from large shell batches.
 
 ## Last verification run
 - `dotnet build game/Touchline.sln` passed.
@@ -22,6 +22,11 @@
 - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step34_match_playback_check.gd` passed with `STEP34_MATCH_PLAYBACK_PASS`.
 - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step22_shared_engine_check.gd` passed with `STEP22_SHARED_ENGINE_PASS`.
 - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step23_post_match_check.gd` passed with `STEP23_POST_MATCH_PASS`.
+- `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step25_autoload_flow_check.gd` passed with `STEP25_AUTOLOAD_FLOW_PASS`.
+- `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step26_seed_data_check.gd` passed with `STEP26_SEED_DATA_PASS`.
+- `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step27_save_compat_check.gd` passed with `STEP27_SAVE_COMPAT_PASS`.
+- `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step28_season_rollover_check.gd` passed with `STEP28_SEASON_ROLLOVER_PASS`.
+- `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step29_pressure_context_check.gd` passed with `STEP29_PRESSURE_CONTEXT_PASS`.
 - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step30_navigation_flow_check.gd` passed with `STEP30_NAVIGATION_FLOW_PASS`.
 - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step36_opponent_squad_check.gd` passed with `STEP36_OPPONENT_SQUAD_PASS`.
 - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step37_match_variation_check.gd` passed with `STEP37_MATCH_VARIATION_PASS`.
@@ -32,11 +37,14 @@
 - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step42_matchday_progression_check.gd` passed with `STEP42_MATCHDAY_PROGRESSION_PASS`.
 - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step43_player_condition_check.gd` passed with `STEP43_PLAYER_CONDITION_PASS`.
 - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step44_multi_match_regression_check.gd` passed with `STEP44_MULTI_MATCH_REGRESSION_PASS`.
+- `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step45_season_rollover_check.gd` passed with `STEP45_SEASON_ROLLOVER_PASS`.
+- `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step46_season_development_check.gd` passed with `STEP46_SEASON_DEVELOPMENT_PASS`.
+- `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step47_full_season_regression_check.gd` passed with `STEP47_FULL_SEASON_REGRESSION_PASS`.
 
 ## Last commit hash
-- a9d27ae
+- 1ceb088
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`.
-- Steps 42-44 are complete. Do not begin new product work until the source-of-truth docs name a new active step.
+- Steps 45-47 are complete. Do not begin new product work until the source-of-truth docs name a new active step.
 - If new scope is approved, start from the updated `docs/Plan.md` state and verify before committing.
