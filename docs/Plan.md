@@ -47,6 +47,7 @@
 - Step 31: Run a full polish and usability pass
 - Step 32: Run a comprehensive management-shell UI/UX overhaul
 - Step 33: Rewrite repository documentation and README
+- Step 34: Introduce authoritative match playback frames
 
 ## 2. Plan Rules
 
@@ -454,3 +455,30 @@ Replace the thin transitional repository README with a proper project-facing gui
 - the repo has a clear, accurate top-level README for players, developers, and contributors
 - setup and run instructions reflect the real local workflow
 - documentation no longer implies the legacy web prototype is the active product
+
+## 26. Step 34: Introduce authoritative match playback frames
+
+### Objective
+
+Replace the decorative match marker model with an authoritative frame-based playback contract that can drive both live rendering and instant resolution from one shared C# match engine.
+
+### Allowed Subtasks
+
+- add C# domain models for match playback, timeline frames, ball state, player agent state, actions, events, and tactical shape
+- refactor `MatchSimulator` so it emits deterministic renderable football state instead of marker swing data
+- generate simple possession phases with pass, carry, shot, save, clearance, interception, goal, reset, and kickoff actions
+- keep `LiveMatchScene` as a light renderer of engine output, with only minimal compatibility changes needed to keep the app working
+- preserve instant-result, post-match, save/load, fixtures, standings, and dashboard flows
+
+### Verification
+
+- `dotnet build game/Touchline.sln`
+- relevant headless Godot route checks still compatible with the current scene tree
+- playback output contains frames with ball state, possession, all 22 player states, action labels, and events tied to actions or frame ranges
+
+### Exit Criteria
+
+- live and instant match paths consume the same `MatchPlaybackResult`
+- frame data contains enough football state for future live-renderer interpolation
+- the old marker swing/sway model is no longer the authoritative movement source
+- no unrelated screen rebuild or advanced physics scope is introduced

@@ -96,7 +96,7 @@ public partial class GameState : Node
     public string? SelectedPlayerProfileName { get; private set; }
     public CompetitionRow[] CompetitionTable { get; private set; } = Array.Empty<CompetitionRow>();
     public CompetitionFixture[] CompetitionFixtures { get; private set; } = Array.Empty<CompetitionFixture>();
-    public MatchSimulationResult? CurrentMatchResult { get; private set; }
+    public MatchPlaybackResult? CurrentMatchResult { get; private set; }
 
     public override void _EnterTree()
     {
@@ -209,7 +209,7 @@ public partial class GameState : Node
         CurrentMatchResult = null;
     }
 
-    public MatchSimulationResult PrepareCurrentMatchResult(bool forceNew = false)
+    public MatchPlaybackResult PrepareCurrentMatchResult(bool forceNew = false)
     {
         if (!forceNew && CurrentMatchResult != null)
         {
@@ -226,11 +226,15 @@ public partial class GameState : Node
         ApplyMatchResult(result);
     }
 
-    public void ApplyMatchResult(MatchSimulationResult result)
+    public string ValidateCurrentMatchPlaybackContract()
+    {
+        return MatchPlaybackContractValidator.Validate(PrepareCurrentMatchResult(true));
+    }
+
+    public void ApplyMatchResult(MatchPlaybackResult result)
     {
         CurrentMatchResult = result;
-        var finalEvent = result.Events[^1];
-        var goalDifference = finalEvent.HomeScore - finalEvent.AwayScore;
+        var goalDifference = result.FinalHomeScore - result.FinalAwayScore;
         var previousPosition = GetClubTablePosition(SelectedClubName ?? string.Empty);
         var moraleDelta = goalDifference > 0 ? 4 : goalDifference == 0 ? 1 : -4;
         var fanDelta = goalDifference > 0 ? 5 : goalDifference == 0 ? 0 : -5;
@@ -242,7 +246,7 @@ public partial class GameState : Node
         SquadStatusSummary = BuildSquadStatusSummary();
         UpdateFormSummary(goalDifference);
 
-        RecordCompetitionResults(finalEvent.HomeScore, finalEvent.AwayScore);
+        RecordCompetitionResults(result.FinalHomeScore, result.FinalAwayScore);
         RefreshFixtureContext();
         var currentPosition = GetClubTablePosition(SelectedClubName ?? string.Empty);
         var tableImpactSummary = BuildTableImpactSummary(previousPosition, currentPosition);
@@ -252,7 +256,7 @@ public partial class GameState : Node
         LastMatchReport = new MatchReport
         {
             FixtureLabel = $"{result.HomeClubName} vs {result.AwayClubName}",
-            Scoreline = $"{finalEvent.HomeScore} - {finalEvent.AwayScore}",
+            Scoreline = $"{result.FinalHomeScore} - {result.FinalAwayScore}",
             ResultLabel = BuildResultLabel(goalDifference, result.AwayClubName),
             ConsequenceSummary =
                 $"Morale {FormatSignedDelta(moraleDelta)} | Fans {FormatSignedDelta(fanDelta)} | Board {FormatSignedDelta(boardDelta)}",
@@ -582,14 +586,14 @@ public partial class GameState : Node
         return delta >= 0 ? $"+{delta}" : delta.ToString();
     }
 
-    private static string[] ExtractRecentEvents(MatchSimulationResult result)
+    private static string[] ExtractRecentEvents(MatchPlaybackResult result)
     {
-        var count = Math.Min(4, result.Events.Length);
+        var count = Math.Min(4, result.EventFeed.Length);
         var recentEvents = new string[count];
 
         for (var index = 0; index < count; index++)
         {
-            recentEvents[index] = result.Events[result.Events.Length - count + index].Summary;
+            recentEvents[index] = result.EventFeed[result.EventFeed.Length - count + index].Summary;
         }
 
         return recentEvents;

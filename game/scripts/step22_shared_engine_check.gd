@@ -25,7 +25,7 @@ func _process(_delta: float) -> bool:
             _fail("MatchdayScene did not load for instant route")
             return false
 
-        var instant_button := current_scene.get_node("Center/Shell/Padding/Content/ActionsRow/InstantResultButton") as Button
+        var instant_button := current_scene.get_node("RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/InstantResultButton") as Button
         if instant_button == null:
             _fail("InstantResultButton missing on MatchdayScene")
             return false
@@ -39,7 +39,7 @@ func _process(_delta: float) -> bool:
             _fail("Instant route did not open PostMatchScene")
             return false
 
-        var score_label := current_scene.get_node("Center/Panel/ScoreLabel") as Label
+        var score_label := current_scene.get_node("RootMargin/MainColumn/HeaderCard/HeaderPadding/HeaderContent/ScoreCard/ScorePadding/ScoreContent/ScoreLabel") as Label
         if score_label == null:
             _fail("Post-match score label missing after instant route")
             return false
@@ -63,7 +63,7 @@ func _process(_delta: float) -> bool:
             _fail("MatchdayScene did not reload for live route")
             return false
 
-        var live_button := current_scene.get_node("Center/Shell/Padding/Content/ActionsRow/StartMatchButton") as Button
+        var live_button := current_scene.get_node("RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/StartMatchButton") as Button
         if live_button == null:
             _fail("StartMatchButton missing on MatchdayScene")
             return false
@@ -100,7 +100,7 @@ func _process(_delta: float) -> bool:
             _fail("Live route did not hand off to PostMatchScene")
             return false
 
-        var score_label := current_scene.get_node("Center/Panel/ScoreLabel") as Label
+        var score_label := current_scene.get_node("RootMargin/MainColumn/HeaderCard/HeaderPadding/HeaderContent/ScoreCard/ScorePadding/ScoreContent/ScoreLabel") as Label
         if score_label == null:
             _fail("Post-match score label missing after live route")
             return false
