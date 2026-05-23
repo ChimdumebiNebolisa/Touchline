@@ -1,10 +1,10 @@
 # Autonomous Progress
 
 ## Current active Plan step
-- None. Steps 39-41 are complete.
+- None. Steps 42-44 are complete.
 
 ## Last completed verified task
-- Steps 39-41 match-report upgrade complete: match actions now expose explicit participant metadata, playback results include deterministic action-derived stats, and post-match reports render stats, cause reasoning, tactical explanation, and key player moments.
+- Steps 42-44 career-loop hardening complete: repeated match resolution is guarded against duplicate effects, post-match player fitness/form/morale changes now apply from playback, and multi-match regression checks cover progression, condition, save/load, fixtures, standings, reports, and calendar continuity.
 
 ## Current subtask in progress
 - None.
@@ -14,7 +14,7 @@
 
 ## Known blockers
 - No active blockers.
-- Godot Mono is available locally, and targeted headless runtime validation ran successfully for Steps 39-41 plus the existing route checks.
+- Godot Mono is available locally, and targeted headless runtime validation ran successfully for Steps 42-44 plus the existing route checks.
 
 ## Last verification run
 - `dotnet build game/Touchline.sln` passed.
@@ -29,11 +29,14 @@
 - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step39_action_participants_check.gd` passed with `STEP39_ACTION_PARTICIPANTS_PASS`.
 - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step40_match_stats_check.gd` passed with `STEP40_MATCH_STATS_PASS`.
 - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step41_post_match_report_check.gd` passed with `STEP41_POST_MATCH_REPORT_PASS`.
+- `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step42_matchday_progression_check.gd` passed with `STEP42_MATCHDAY_PROGRESSION_PASS`.
+- `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step43_player_condition_check.gd` passed with `STEP43_PLAYER_CONDITION_PASS`.
+- `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step44_multi_match_regression_check.gd` passed with `STEP44_MULTI_MATCH_REGRESSION_PASS`.
 
 ## Last commit hash
-- af0f0c5
+- a9d27ae
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`.
-- Steps 39-41 are complete. Do not begin new product work until the source-of-truth docs name a new active step.
+- Steps 42-44 are complete. Do not begin new product work until the source-of-truth docs name a new active step.
 - If new scope is approved, start from the updated `docs/Plan.md` state and verify before committing.
