@@ -15,6 +15,8 @@ public static class MatchSimulator
         public required string Role { get; init; }
         public required bool IsHome { get; init; }
         public required int ShapeIndex { get; init; }
+        public required int Form { get; init; }
+        public required int Fitness { get; init; }
     }
 
     public static MatchPlaybackResult Simulate(GameState state)
@@ -24,16 +26,37 @@ public static class MatchSimulator
         var awayClubName = state.CurrentOpponentName;
         var tacticalShape = BuildTacticalShape(state.TacticalFormation, state.Width);
         var homeLineup = BuildHomeLineup(state, homeClubName);
-        var awayLineup = BuildAwayLineup(awayClubName);
+        var awayLineup = BuildAwayLineup(state, awayClubName);
         var players = new List<RuntimePlayer>(22);
         players.AddRange(homeLineup);
         players.AddRange(awayLineup);
 
-        var plannedHomeGoals = Math.Clamp((state.PressIntensity + state.Tempo + state.Risk - 150) / 35 + rng.Next(0, 2), 0, 3);
-        var plannedAwayGoals = Math.Clamp((150 - state.Width) / 45 + rng.Next(0, 2), 0, 2);
+        var homeAttackQuality = AverageRoleForm(homeLineup, "CM", "AM", "RW", "LW", "ST");
+        var homeDefensiveQuality = AverageRoleForm(homeLineup, "GK", "RB", "CB", "LB");
+        var awayAttackQuality = AverageRoleForm(awayLineup, "CM", "AM", "RW", "LW", "ST");
+        var awayDefensiveQuality = AverageRoleForm(awayLineup, "GK", "RB", "CB", "LB");
+        var plannedHomeGoals = Math.Clamp(
+            (homeAttackQuality - awayDefensiveQuality + state.PressIntensity / 3 + state.Tempo / 2 + state.Risk / 2 - 72) / 24 + rng.Next(0, 2),
+            0,
+            4);
+        var plannedAwayGoals = Math.Clamp(
+            (awayAttackQuality - homeDefensiveQuality + state.Risk / 2 + (100 - state.PressIntensity) / 4 - 46) / 28 + rng.Next(0, 2),
+            0,
+            3);
         if (plannedHomeGoals == 0 && plannedAwayGoals == 0)
         {
-            plannedHomeGoals = 1;
+            if (state.Risk >= 62 || state.Tempo >= 62)
+            {
+                plannedHomeGoals = 1;
+            }
+            else
+            {
+                plannedAwayGoals = rng.NextDouble() < 0.35 ? 1 : 0;
+                if (plannedAwayGoals == 0)
+                {
+                    plannedHomeGoals = 1;
+                }
+            }
         }
 
         var actions = BuildActions(
@@ -43,6 +66,10 @@ public static class MatchSimulator
             tacticalShape,
             plannedHomeGoals,
             plannedAwayGoals,
+            state.PressIntensity,
+            state.Tempo,
+            state.Width,
+            state.Risk,
             rng);
         var frames = BuildFrames(homeClubName, awayClubName, players, tacticalShape, actions);
         var events = BuildEvents(homeClubName, awayClubName, actions, frames);
@@ -127,46 +154,76 @@ public static class MatchSimulator
         {
             lineup[index] = new RuntimePlayer
             {
-                Id = $"home-{index:00}",
+                Id = ClubSquadFactory.BuildPlayerId(teamName, selectedPlayers[index].Name, index),
                 Name = selectedPlayers[index].Name,
                 Team = teamName,
                 Role = selectedPlayers[index].Position,
                 IsHome = true,
-                ShapeIndex = index
+                ShapeIndex = index,
+                Form = selectedPlayers[index].Form,
+                Fitness = selectedPlayers[index].Fitness
             };
         }
 
         return lineup;
     }
 
-    private static RuntimePlayer[] BuildAwayLineup(string teamName)
+    private static RuntimePlayer[] BuildAwayLineup(GameState state, string teamName)
     {
-        var names = new[]
+        var squad = state.GetClubSquad(teamName);
+        var selectedPlayers = new List<ClubSquadPlayer>(11);
+        foreach (var player in squad)
         {
-            ("Roman Ivic", "GK"),
-            ("Maksym Hale", "RB"),
-            ("Victor Salcedo", "CB"),
-            ("Pavel Drago", "CB"),
-            ("Nico Barros", "LB"),
-            ("Ilyas Cherif", "CM"),
-            ("Samir Gashi", "CM"),
-            ("Tom Bisset", "AM"),
-            ("Leandro Pires", "RW"),
-            ("Bruno Keita", "ST"),
-            ("Yuri Markovic", "LW")
-        };
+            if (player.IsStarting)
+            {
+                selectedPlayers.Add(player);
+            }
+
+            if (selectedPlayers.Count == 11)
+            {
+                break;
+            }
+        }
+
+        foreach (var player in squad)
+        {
+            if (selectedPlayers.Count == 11)
+            {
+                break;
+            }
+
+            if (!selectedPlayers.Exists(candidate => candidate.PlayerId == player.PlayerId))
+            {
+                selectedPlayers.Add(player);
+            }
+        }
+
+        if (selectedPlayers.Count == 0)
+        {
+            selectedPlayers.AddRange(ClubSquadFactory.BuildFallbackSquad(teamName, state.WorldSeed));
+        }
+
+        var rotationIndex = 0;
+        while (selectedPlayers.Count < 11)
+        {
+            selectedPlayers.Add(selectedPlayers[rotationIndex % selectedPlayers.Count]);
+            rotationIndex++;
+        }
 
         var lineup = new RuntimePlayer[11];
         for (var index = 0; index < lineup.Length; index++)
         {
+            var player = selectedPlayers[index];
             lineup[index] = new RuntimePlayer
             {
-                Id = $"away-{index:00}",
-                Name = names[index].Item1,
+                Id = player.PlayerId,
+                Name = player.Name,
                 Team = teamName,
-                Role = names[index].Item2,
+                Role = player.Position,
                 IsHome = false,
-                ShapeIndex = index
+                ShapeIndex = index,
+                Form = player.Form,
+                Fitness = player.Fitness
             };
         }
 
@@ -180,6 +237,10 @@ public static class MatchSimulator
         TacticalShape shape,
         int plannedHomeGoals,
         int plannedAwayGoals,
+        int pressIntensity,
+        int tempo,
+        int width,
+        int risk,
         Random rng)
     {
         var actions = new List<MatchAction>();
@@ -189,7 +250,7 @@ public static class MatchSimulator
         var awayScore = 0;
         var actionIndex = 1;
 
-        var kickoffPlayer = Pick(players, homeClubName, 6);
+        var kickoffPlayer = PickByRole(players, homeClubName, rng, 6, "CM", "AM");
         AddAction(
             actions,
             ref actionIndex,
@@ -205,33 +266,47 @@ public static class MatchSimulator
             homeScore,
             awayScore);
 
-        var phaseStart = 270;
-        for (var phase = 0; phase < 15; phase++)
+        var phaseCount = Math.Clamp(12 + tempo / 18 + risk / 40, 13, 18);
+        var phaseGap = (MatchDurationSeconds - 540) / phaseCount;
+        var homeGoalSlots = BuildGoalSlots(plannedHomeGoals, phaseCount, 1);
+        var awayGoalSlots = BuildGoalSlots(plannedAwayGoals, phaseCount, 3);
+
+        for (var phase = 0; phase < phaseCount; phase++)
         {
-            var forceHomeGoal = homeGoalsRemaining > 0 && (phase == 1 || phase == 5 || (phase == 10 && awayGoalsRemaining == 0));
-            var forceAwayGoal = awayGoalsRemaining > 0 && !forceHomeGoal && (phase == 3 || phase == 8 || phase == 12);
+            var forceHomeGoal = homeGoalsRemaining > 0 && homeGoalSlots.Contains(phase);
+            var forceAwayGoal = awayGoalsRemaining > 0 && !forceHomeGoal && awayGoalSlots.Contains(phase);
+            var homePossessionBias = Math.Clamp(0.52f + (pressIntensity - 50) * 0.003f + (tempo - 50) * 0.001f - Math.Max(0, risk - 70) * 0.0015f, 0.38f, 0.68f);
             var possessionTeam = forceHomeGoal
                 ? homeClubName
                 : forceAwayGoal
                     ? awayClubName
-                    : rng.NextDouble() < 0.55 ? homeClubName : awayClubName;
+                    : rng.NextDouble() < homePossessionBias ? homeClubName : awayClubName;
             var possessionIsHome = possessionTeam == homeClubName;
             var goalInPhase = (possessionIsHome && homeGoalsRemaining > 0 && forceHomeGoal) ||
                 (!possessionIsHome && awayGoalsRemaining > 0 && forceAwayGoal);
-            var sequenceStart = phaseStart + phase * 330 + rng.Next(-18, 19);
+            var sequenceStart = 180 + phase * phaseGap + rng.Next(-22, 23);
             sequenceStart = Math.Clamp(sequenceStart, 60, MatchDurationSeconds - 330);
+            var patternRoll = rng.NextDouble();
+            var directBreak = (risk >= 65 && patternRoll < 0.35) || (tempo >= 72 && patternRoll < 0.25);
+            var wideAttack = !directBreak && width >= 58 && patternRoll < 0.78;
+            var laneY = ResolveLaneY(width, phase, rng, wideAttack);
+            var finalLaneY = Math.Clamp(laneY + ((float)rng.NextDouble() - 0.5f) * 0.10f, 0.14f, 0.86f);
 
-            var firstPasser = Pick(players, possessionTeam, 5);
-            var firstReceiver = Pick(players, possessionTeam, 7 + (phase % 2));
+            var firstPasser = PickByRole(players, possessionTeam, rng, 5 + phase % 2, "CM", "AM", "RB", "LB");
+            var firstReceiver = wideAttack
+                ? PickByRole(players, possessionTeam, rng, 8 + phase % 3, "RW", "LW", "RB", "LB")
+                : PickByRole(players, possessionTeam, rng, 7, "CM", "AM");
             var carrier = firstReceiver;
-            var finalReceiver = Pick(players, possessionTeam, 9 + (phase % 2));
+            var finalReceiver = directBreak
+                ? PickByRole(players, possessionTeam, rng, 9, "ST", "RW", "LW")
+                : PickByRole(players, possessionTeam, rng, 9 + phase % 2, "ST", "AM", "RW", "LW");
             var defendingTeam = possessionIsHome ? awayClubName : homeClubName;
-            var defender = Pick(players, defendingTeam, 2 + (phase % 3));
-            var keeper = Pick(players, defendingTeam, 0);
+            var defender = PickByRole(players, defendingTeam, rng, 2 + phase % 3, "CB", "RB", "LB", "CM");
+            var keeper = PickByRole(players, defendingTeam, rng, 0, "GK");
             var passStart = GetShapePosition(firstPasser, shape, true);
-            var passEnd = GetAttackingLanePosition(firstReceiver, shape, possessionIsHome, 0.42f + (phase % 3) * 0.08f);
-            var carryEnd = GetAttackingLanePosition(carrier, shape, possessionIsHome, 0.58f + (phase % 2) * 0.08f);
-            var finalPassEnd = GetAttackingLanePosition(finalReceiver, shape, possessionIsHome, 0.76f);
+            var passEnd = GetAttackingLanePosition(firstReceiver, shape, possessionIsHome, directBreak ? 0.44f : 0.36f + (phase % 3) * 0.04f, laneY);
+            var carryEnd = GetAttackingLanePosition(carrier, shape, possessionIsHome, directBreak ? 0.66f : 0.54f + (phase % 2) * 0.07f, finalLaneY);
+            var finalPassEnd = GetAttackingLanePosition(finalReceiver, shape, possessionIsHome, directBreak ? 0.78f : 0.74f, finalLaneY);
             var goalTarget = possessionIsHome
                 ? new Vector2(0.98f, 0.44f + (float)rng.NextDouble() * 0.12f)
                 : new Vector2(0.02f, 0.44f + (float)rng.NextDouble() * 0.12f);
@@ -239,20 +314,45 @@ public static class MatchSimulator
                 ? new Vector2(0.36f, 0.30f + (float)rng.NextDouble() * 0.40f)
                 : new Vector2(0.64f, 0.30f + (float)rng.NextDouble() * 0.40f);
 
-            AddAction(actions, ref actionIndex, MatchActionKind.Pass, sequenceStart, sequenceStart + 12, possessionTeam, $"Pass: {firstPasser.Name} to {firstReceiver.Name}", firstPasser, firstReceiver, passStart, passEnd, homeScore, awayScore);
-            AddAction(actions, ref actionIndex, MatchActionKind.Carry, sequenceStart + 12, sequenceStart + 30, possessionTeam, $"Carry: {carrier.Name} advances the ball", carrier, carrier, passEnd, carryEnd, homeScore, awayScore);
+            var passDuration = tempo >= 70 ? 8 : 12;
+            var carryDuration = directBreak ? 12 : tempo >= 70 ? 15 : 20;
+            var finalPassDuration = directBreak ? 8 : 12;
+            var currentSecond = sequenceStart;
+            var pressureTurnoverChance = Math.Clamp(
+                0.12f +
+                (defendingTeam == homeClubName ? pressIntensity * 0.003f : risk * 0.002f) +
+                (directBreak ? 0.04f : 0.0f) +
+                (wideAttack ? 0.02f : 0.0f),
+                0.12f,
+                0.52f);
 
-            if (!goalInPhase && phase % 5 == 2)
+            AddAction(actions, ref actionIndex, MatchActionKind.Pass, currentSecond, currentSecond + passDuration, possessionTeam, BuildPassLabel(firstPasser, firstReceiver, wideAttack, directBreak), firstPasser, firstReceiver, passStart, passEnd, homeScore, awayScore);
+            currentSecond += passDuration;
+            AddAction(actions, ref actionIndex, MatchActionKind.Carry, currentSecond, currentSecond + carryDuration, possessionTeam, BuildCarryLabel(carrier, directBreak, wideAttack), carrier, carrier, passEnd, carryEnd, homeScore, awayScore);
+            currentSecond += carryDuration;
+
+            if (!goalInPhase && rng.NextDouble() < pressureTurnoverChance)
             {
                 var interceptionPoint = carryEnd.Lerp(finalPassEnd, 0.62f);
-                AddAction(actions, ref actionIndex, MatchActionKind.Pass, sequenceStart + 30, sequenceStart + 42, possessionTeam, $"Pass: {carrier.Name} looks for {finalReceiver.Name}", carrier, finalReceiver, carryEnd, finalPassEnd, homeScore, awayScore);
-                AddAction(actions, ref actionIndex, MatchActionKind.Interception, sequenceStart + 42, sequenceStart + 54, defendingTeam, $"Interception: {defender.Name} steps across the lane", finalReceiver, defender, interceptionPoint, GetShapePosition(defender, shape, false), homeScore, awayScore);
-                AddAction(actions, ref actionIndex, MatchActionKind.Reset, sequenceStart + 54, sequenceStart + 72, defendingTeam, "Reset: possession settles after the turnover", defender, defender, GetShapePosition(defender, shape, true), GetShapePosition(defender, shape, true), homeScore, awayScore);
+                if (!directBreak)
+                {
+                    AddAction(actions, ref actionIndex, MatchActionKind.Pass, currentSecond, currentSecond + finalPassDuration, possessionTeam, $"Pass: {carrier.Name} risks the lane toward {finalReceiver.Name}", carrier, finalReceiver, carryEnd, finalPassEnd, homeScore, awayScore);
+                    currentSecond += finalPassDuration;
+                }
+
+                AddAction(actions, ref actionIndex, MatchActionKind.Interception, currentSecond, currentSecond + 12, defendingTeam, $"Interception: {defender.Name} reads the {DescribeLane(laneY)} lane", finalReceiver, defender, interceptionPoint, GetShapePosition(defender, shape, false), homeScore, awayScore);
+                AddAction(actions, ref actionIndex, MatchActionKind.Reset, currentSecond + 12, currentSecond + 30, defendingTeam, "Reset: possession settles after the turnover", defender, defender, GetShapePosition(defender, shape, true), GetShapePosition(defender, shape, true), homeScore, awayScore);
                 continue;
             }
 
-            AddAction(actions, ref actionIndex, MatchActionKind.Pass, sequenceStart + 30, sequenceStart + 42, possessionTeam, $"Pass: {carrier.Name} releases {finalReceiver.Name}", carrier, finalReceiver, carryEnd, finalPassEnd, homeScore, awayScore);
-            AddAction(actions, ref actionIndex, MatchActionKind.Shot, sequenceStart + 42, sequenceStart + 54, possessionTeam, $"Shot: {finalReceiver.Name} attacks the goal", finalReceiver, null, finalPassEnd, goalTarget, homeScore, awayScore);
+            if (!directBreak)
+            {
+                AddAction(actions, ref actionIndex, MatchActionKind.Pass, currentSecond, currentSecond + finalPassDuration, possessionTeam, BuildFinalPassLabel(carrier, finalReceiver, wideAttack), carrier, finalReceiver, carryEnd, finalPassEnd, homeScore, awayScore);
+                currentSecond += finalPassDuration;
+            }
+
+            AddAction(actions, ref actionIndex, MatchActionKind.Shot, currentSecond, currentSecond + 12, possessionTeam, BuildShotLabel(finalReceiver, risk, directBreak, wideAttack), finalReceiver, null, finalPassEnd, goalTarget, homeScore, awayScore);
+            currentSecond += 12;
 
             if (goalInPhase)
             {
@@ -267,19 +367,20 @@ public static class MatchSimulator
                     awayScore++;
                 }
 
-                AddAction(actions, ref actionIndex, MatchActionKind.Goal, sequenceStart + 54, sequenceStart + 66, possessionTeam, $"Goal: {finalReceiver.Name} scores for {possessionTeam}", finalReceiver, null, goalTarget, goalTarget, homeScore, awayScore);
-                AddAction(actions, ref actionIndex, MatchActionKind.Reset, sequenceStart + 66, sequenceStart + 86, defendingTeam, "Reset: restart after the goal", keeper, keeper, new Vector2(0.50f, 0.50f), new Vector2(0.50f, 0.50f), homeScore, awayScore);
+                AddAction(actions, ref actionIndex, MatchActionKind.Goal, currentSecond, currentSecond + 12, possessionTeam, $"Goal: {finalReceiver.Name} finishes the {DescribeLane(laneY)} attack for {possessionTeam}", finalReceiver, null, goalTarget, goalTarget, homeScore, awayScore);
+                AddAction(actions, ref actionIndex, MatchActionKind.Reset, currentSecond + 12, currentSecond + 32, defendingTeam, "Reset: restart after the goal", keeper, keeper, new Vector2(0.50f, 0.50f), new Vector2(0.50f, 0.50f), homeScore, awayScore);
                 continue;
             }
 
-            if (phase % 3 == 0)
+            var saveChance = Math.Clamp(0.48f + keeper.Form * 0.002f - risk * 0.002f - (directBreak ? 0.05f : 0.0f), 0.28f, 0.72f);
+            if (rng.NextDouble() < saveChance)
             {
-                AddAction(actions, ref actionIndex, MatchActionKind.Save, sequenceStart + 54, sequenceStart + 68, defendingTeam, $"Save: {keeper.Name} gets behind the shot", finalReceiver, keeper, goalTarget, GetShapePosition(keeper, shape, true), homeScore, awayScore);
-                AddAction(actions, ref actionIndex, MatchActionKind.Clearance, sequenceStart + 68, sequenceStart + 84, defendingTeam, $"Clearance: {keeper.Name} sends play away", keeper, null, GetShapePosition(keeper, shape, true), clearanceTarget, homeScore, awayScore);
+                AddAction(actions, ref actionIndex, MatchActionKind.Save, currentSecond, currentSecond + 14, defendingTeam, $"Save: {keeper.Name} gets behind the {DescribeLane(laneY)} shot", finalReceiver, keeper, goalTarget, GetShapePosition(keeper, shape, true), homeScore, awayScore);
+                AddAction(actions, ref actionIndex, MatchActionKind.Clearance, currentSecond + 14, currentSecond + 30, defendingTeam, $"Clearance: {keeper.Name} sends play away", keeper, null, GetShapePosition(keeper, shape, true), clearanceTarget, homeScore, awayScore);
             }
             else
             {
-                AddAction(actions, ref actionIndex, MatchActionKind.Clearance, sequenceStart + 54, sequenceStart + 72, defendingTeam, $"Clearance: {defender.Name} clears the danger", defender, null, goalTarget, clearanceTarget, homeScore, awayScore);
+                AddAction(actions, ref actionIndex, MatchActionKind.Clearance, currentSecond, currentSecond + 18, defendingTeam, $"Clearance: {defender.Name} clears the danger", defender, null, goalTarget, clearanceTarget, homeScore, awayScore);
             }
         }
 
@@ -643,6 +744,153 @@ public static class MatchSimulator
         };
     }
 
+    private static HashSet<int> BuildGoalSlots(int goalCount, int phaseCount, int offset)
+    {
+        var slots = new HashSet<int>();
+        for (var index = 0; index < goalCount; index++)
+        {
+            var slot = Math.Clamp(offset + ((index + 1) * phaseCount) / (goalCount + 1), 1, Math.Max(1, phaseCount - 2));
+            while (slots.Contains(slot) && slot < phaseCount - 1)
+            {
+                slot++;
+            }
+
+            slots.Add(slot);
+        }
+
+        return slots;
+    }
+
+    private static int AverageRoleForm(IReadOnlyList<RuntimePlayer> players, params string[] roles)
+    {
+        var total = 0;
+        var count = 0;
+        foreach (var player in players)
+        {
+            if (!HasRole(player, roles))
+            {
+                continue;
+            }
+
+            total += player.Form;
+            count++;
+        }
+
+        return count == 0 ? 68 : total / count;
+    }
+
+    private static RuntimePlayer PickByRole(
+        IReadOnlyList<RuntimePlayer> players,
+        string team,
+        Random rng,
+        int fallbackShapeIndex,
+        params string[] roles)
+    {
+        var candidates = new List<RuntimePlayer>();
+        foreach (var player in players)
+        {
+            if (player.Team == team && HasRole(player, roles))
+            {
+                candidates.Add(player);
+            }
+        }
+
+        if (candidates.Count > 0)
+        {
+            return candidates[rng.Next(0, candidates.Count)];
+        }
+
+        return Pick(players, team, fallbackShapeIndex);
+    }
+
+    private static bool HasRole(RuntimePlayer player, params string[] roles)
+    {
+        foreach (var role in roles)
+        {
+            if (player.Role == role)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static float ResolveLaneY(int width, int phase, Random rng, bool wideAttack)
+    {
+        if (wideAttack || width >= 65)
+        {
+            var wideBase = phase % 2 == 0 ? 0.22f : 0.78f;
+            return Math.Clamp(wideBase + ((float)rng.NextDouble() - 0.5f) * 0.10f, 0.12f, 0.88f);
+        }
+
+        if (width <= 42)
+        {
+            return 0.42f + (float)rng.NextDouble() * 0.16f;
+        }
+
+        var lane = phase % 3 switch
+        {
+            0 => 0.34f,
+            1 => 0.50f,
+            _ => 0.66f
+        };
+        return Math.Clamp(lane + ((float)rng.NextDouble() - 0.5f) * 0.08f, 0.16f, 0.84f);
+    }
+
+    private static string BuildPassLabel(RuntimePlayer passer, RuntimePlayer receiver, bool wideAttack, bool directBreak)
+    {
+        if (directBreak)
+        {
+            return $"Pass: {passer.Name} breaks forward into {receiver.Name}";
+        }
+
+        return wideAttack
+            ? $"Pass: {passer.Name} switches wide to {receiver.Name}"
+            : $"Pass: {passer.Name} links play through {receiver.Name}";
+    }
+
+    private static string BuildCarryLabel(RuntimePlayer carrier, bool directBreak, bool wideAttack)
+    {
+        if (directBreak)
+        {
+            return $"Carry: {carrier.Name} drives vertically";
+        }
+
+        return wideAttack
+            ? $"Carry: {carrier.Name} attacks the channel"
+            : $"Carry: {carrier.Name} advances the ball";
+    }
+
+    private static string BuildFinalPassLabel(RuntimePlayer passer, RuntimePlayer receiver, bool wideAttack)
+    {
+        return wideAttack
+            ? $"Pass: {passer.Name} cuts the ball back to {receiver.Name}"
+            : $"Pass: {passer.Name} releases {receiver.Name}";
+    }
+
+    private static string BuildShotLabel(RuntimePlayer shooter, int risk, bool directBreak, bool wideAttack)
+    {
+        if (directBreak || risk >= 70)
+        {
+            return $"Shot: {shooter.Name} takes on the early chance";
+        }
+
+        return wideAttack
+            ? $"Shot: {shooter.Name} meets the wide attack"
+            : $"Shot: {shooter.Name} attacks the goal";
+    }
+
+    private static string DescribeLane(float y)
+    {
+        return y switch
+        {
+            < 0.36f => "left",
+            > 0.64f => "right",
+            _ => "central"
+        };
+    }
+
     private static RuntimePlayer Pick(IReadOnlyList<RuntimePlayer> players, string team, int preferredShapeIndex)
     {
         foreach (var player in players)
@@ -734,11 +982,10 @@ public static class MatchSimulator
         return bestIndex;
     }
 
-    private static Vector2 GetAttackingLanePosition(RuntimePlayer player, TacticalShape shape, bool homePossession, float x)
+    private static Vector2 GetAttackingLanePosition(RuntimePlayer player, TacticalShape shape, bool homePossession, float x, float laneY)
     {
-        var basePosition = GetPhaseShapePosition(player, shape, true);
         var attackX = homePossession ? x : 1.0f - x;
-        return ClampPitch(new Vector2(attackX, basePosition.Y));
+        return ClampPitch(new Vector2(attackX, laneY));
     }
 
     private static Vector2 GetShapePosition(RuntimePlayer player, TacticalShape shape, bool inPossession)

@@ -142,6 +142,24 @@ public partial class TouchlineWorldGenerator : Node
         };
     }
 
+    public ClubSquadPlayer[] ResolveClubSquad(string clubName, int worldSeed)
+    {
+        if (TryGetSeedData(out var seedData))
+        {
+            var clubData = FindClubData(seedData, clubName);
+            if (clubData != null && clubData.Players.Length >= 11)
+            {
+                return ClubSquadFactory.FromSeedClub(clubData, worldSeed);
+            }
+
+            LastStatusMessage = $"Using deterministic fallback squad for {clubName} because seeded club data is incomplete.";
+            return ClubSquadFactory.BuildFallbackSquad(clubName, worldSeed);
+        }
+
+        LastStatusMessage = $"Using deterministic fallback squad for {clubName} because world seed data could not be loaded.";
+        return ClubSquadFactory.BuildFallbackSquad(clubName, worldSeed);
+    }
+
     private bool TryGetSeedData(out WorldSeedData seedData)
     {
         if (_cachedSeedData != null)

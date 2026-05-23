@@ -26,6 +26,7 @@ public partial class GameState : Node
         public required string TableImpactSummary { get; init; }
         public required string TacticalSummary { get; init; }
         public required string PressureSummary { get; init; }
+        public required string CauseSummary { get; init; }
         public required string[] KeyEvents { get; init; }
         public required int MoraleDelta { get; init; }
         public required int FanDelta { get; init; }
@@ -231,18 +232,111 @@ public partial class GameState : Node
         return MatchPlaybackContractValidator.Validate(PrepareCurrentMatchResult(true));
     }
 
+    public string ValidateOpponentSquadSourcing()
+    {
+        var firstPlayback = PrepareCurrentMatchResult(true);
+        var firstAwayNames = ExtractTeamNames(firstPlayback, CurrentOpponentName);
+        var expectedSquad = GetClubSquad(CurrentOpponentName);
+
+        if (firstAwayNames.Length != 11)
+        {
+            return $"Expected 11 away player states, found {firstAwayNames.Length}.";
+        }
+
+        if (ContainsOldHardcodedAwayName(firstAwayNames))
+        {
+            return "Opponent lineup still contains the old hardcoded away XI.";
+        }
+
+        if (!ContainsSeededOpponentName(firstAwayNames, expectedSquad))
+        {
+            return "Opponent lineup did not source names from the resolved club squad.";
+        }
+
+        var secondPlayback = PrepareCurrentMatchResult(true);
+        var secondAwayNames = ExtractTeamNames(secondPlayback, CurrentOpponentName);
+        if (!StringArraysMatch(firstAwayNames, secondAwayNames))
+        {
+            return "Opponent lineup is not stable for the same seed and opponent.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
+    public string ValidateMatchVariationContract()
+    {
+        var originalFormation = TacticalFormation;
+        var originalPress = PressIntensity;
+        var originalTempo = Tempo;
+        var originalWidth = Width;
+        var originalRisk = Risk;
+
+        var baseline = PrepareCurrentMatchResult(true);
+        var kindCount = CountDistinctActionKinds(baseline);
+        if (kindCount < 7)
+        {
+            return $"Expected at least 7 action kinds, found {kindCount}.";
+        }
+
+        if (CountDistinctPassLanes(baseline) < 3)
+        {
+            return "Expected at least three distinct pass lanes across the match.";
+        }
+
+        UpdateTactics(originalFormation, 85, 78, 72, 76);
+        var aggressive = PrepareCurrentMatchResult(true);
+        UpdateTactics(originalFormation, 35, 42, 38, 35);
+        var conservative = PrepareCurrentMatchResult(true);
+        UpdateTactics(originalFormation, originalPress, originalTempo, originalWidth, originalRisk);
+        CurrentMatchResult = null;
+
+        if (BuildActionSignature(aggressive) == BuildActionSignature(conservative))
+        {
+            return "Different tactical inputs produced the same action signature.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
+    public string ValidatePostMatchCauseContract()
+    {
+        var result = PrepareCurrentMatchResult(true);
+        ApplyMatchResult(result);
+
+        if (LastMatchReport == null)
+        {
+            return "Post-match report was not created.";
+        }
+
+        if (string.IsNullOrWhiteSpace(LastMatchReport.CauseSummary))
+        {
+            return "Post-match report is missing cause summary.";
+        }
+
+        if (!LastMatchReport.ConsequenceSummary.Contains("Cause:", StringComparison.Ordinal))
+        {
+            return "Post-match consequence summary does not include playback cause reasoning.";
+        }
+
+        if (LastMatchReport.CauseSummary.Contains("scoreline", StringComparison.OrdinalIgnoreCase) &&
+            LastMatchReport.CauseSummary.Split(';', StringSplitOptions.RemoveEmptyEntries).Length < 2)
+        {
+            return "Post-match cause reasoning is still scoreline-only.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
     public void ApplyMatchResult(MatchPlaybackResult result)
     {
         CurrentMatchResult = result;
         var goalDifference = result.FinalHomeScore - result.FinalAwayScore;
         var previousPosition = GetClubTablePosition(SelectedClubName ?? string.Empty);
-        var moraleDelta = goalDifference > 0 ? 4 : goalDifference == 0 ? 1 : -4;
-        var fanDelta = goalDifference > 0 ? 5 : goalDifference == 0 ? 0 : -5;
-        var boardDelta = goalDifference > 0 ? 3 : goalDifference == 0 ? -1 : -4;
+        var consequence = PostMatchConsequenceService.Evaluate(result, this);
 
-        TeamMorale = Math.Clamp(TeamMorale + moraleDelta, 0, 100);
-        FanSentiment = Math.Clamp(FanSentiment + fanDelta, 0, 100);
-        BoardConfidence = Math.Clamp(BoardConfidence + boardDelta, 0, 100);
+        TeamMorale = Math.Clamp(TeamMorale + consequence.MoraleDelta, 0, 100);
+        FanSentiment = Math.Clamp(FanSentiment + consequence.FanDelta, 0, 100);
+        BoardConfidence = Math.Clamp(BoardConfidence + consequence.BoardDelta, 0, 100);
         SquadStatusSummary = BuildSquadStatusSummary();
         UpdateFormSummary(goalDifference);
 
@@ -250,23 +344,21 @@ public partial class GameState : Node
         RefreshFixtureContext();
         var currentPosition = GetClubTablePosition(SelectedClubName ?? string.Empty);
         var tableImpactSummary = BuildTableImpactSummary(previousPosition, currentPosition);
-        var pressureSummary =
-            $"Club pressure now sits at morale {TeamMorale}, fan trust {FanSentiment}, and board confidence {BoardConfidence}.";
 
         LastMatchReport = new MatchReport
         {
             FixtureLabel = $"{result.HomeClubName} vs {result.AwayClubName}",
             Scoreline = $"{result.FinalHomeScore} - {result.FinalAwayScore}",
-            ResultLabel = BuildResultLabel(goalDifference, result.AwayClubName),
-            ConsequenceSummary =
-                $"Morale {FormatSignedDelta(moraleDelta)} | Fans {FormatSignedDelta(fanDelta)} | Board {FormatSignedDelta(boardDelta)}",
+            ResultLabel = consequence.ResultLabel,
+            ConsequenceSummary = consequence.ConsequenceSummary,
             TableImpactSummary = tableImpactSummary,
             TacticalSummary = result.TacticalSummary,
-            PressureSummary = pressureSummary,
-            KeyEvents = ExtractRecentEvents(result),
-            MoraleDelta = moraleDelta,
-            FanDelta = fanDelta,
-            BoardDelta = boardDelta
+            PressureSummary = consequence.PressureSummary,
+            CauseSummary = consequence.CauseSummary,
+            KeyEvents = consequence.KeyEvents,
+            MoraleDelta = consequence.MoraleDelta,
+            FanDelta = consequence.FanDelta,
+            BoardDelta = consequence.BoardDelta
         };
         CurrentMatchResult = null;
     }
@@ -327,6 +419,9 @@ public partial class GameState : Node
                 TableImpactSummary = data.LastMatchReport.TableImpactSummary,
                 TacticalSummary = data.LastMatchReport.TacticalSummary,
                 PressureSummary = data.LastMatchReport.PressureSummary,
+                CauseSummary = string.IsNullOrWhiteSpace(data.LastMatchReport.CauseSummary)
+                    ? "Cause detail unavailable for this saved report."
+                    : data.LastMatchReport.CauseSummary,
                 KeyEvents = data.LastMatchReport.KeyEvents ?? Array.Empty<string>(),
                 MoraleDelta = data.LastMatchReport.MoraleDelta,
                 FanDelta = data.LastMatchReport.FanDelta,
@@ -382,6 +477,36 @@ public partial class GameState : Node
         }
 
         return null;
+    }
+
+    public ClubSquadPlayer[] GetClubSquad(string clubName)
+    {
+        if (!string.IsNullOrWhiteSpace(clubName) && clubName == SelectedClubName)
+        {
+            var selectedSquad = new ClubSquadPlayer[SquadPlayers.Length];
+            for (var index = 0; index < SquadPlayers.Length; index++)
+            {
+                var player = SquadPlayers[index];
+                selectedSquad[index] = new ClubSquadPlayer
+                {
+                    PlayerId = ClubSquadFactory.BuildPlayerId(clubName, player.Name, index),
+                    ClubName = clubName,
+                    Name = player.Name,
+                    Position = player.Position,
+                    Age = player.Age,
+                    Form = player.Form,
+                    Morale = player.Morale,
+                    Fitness = player.Fitness,
+                    IsStarting = player.IsStarting
+                };
+            }
+
+            return selectedSquad;
+        }
+
+        return TouchlineWorldGenerator.Instance == null
+            ? ClubSquadFactory.BuildFallbackSquad(clubName, WorldSeed)
+            : TouchlineWorldGenerator.Instance.ResolveClubSquad(clubName, WorldSeed);
     }
 
     public string TogglePlayerLineupStatus(string playerName)
@@ -584,6 +709,137 @@ public partial class GameState : Node
     private static string FormatSignedDelta(int delta)
     {
         return delta >= 0 ? $"+{delta}" : delta.ToString();
+    }
+
+    private static string[] ExtractTeamNames(MatchPlaybackResult playback, string teamName)
+    {
+        if (playback.Timeline.Frames.Length == 0)
+        {
+            return Array.Empty<string>();
+        }
+
+        var names = new List<string>();
+        foreach (var player in playback.Timeline.Frames[0].PlayerStates)
+        {
+            if (player.Team == teamName)
+            {
+                names.Add(player.Name);
+            }
+        }
+
+        return names.ToArray();
+    }
+
+    private static bool ContainsOldHardcodedAwayName(string[] names)
+    {
+        var oldNames = new[]
+        {
+            "Roman Ivic",
+            "Maksym Hale",
+            "Victor Salcedo",
+            "Pavel Drago",
+            "Nico Barros",
+            "Ilyas Cherif",
+            "Samir Gashi",
+            "Tom Bisset",
+            "Leandro Pires",
+            "Bruno Keita",
+            "Yuri Markovic"
+        };
+
+        foreach (var name in names)
+        {
+            foreach (var oldName in oldNames)
+            {
+                if (name == oldName)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private static bool ContainsSeededOpponentName(string[] playbackNames, ClubSquadPlayer[] expectedSquad)
+    {
+        foreach (var playbackName in playbackNames)
+        {
+            foreach (var expectedPlayer in expectedSquad)
+            {
+                if (playbackName == expectedPlayer.Name)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private static bool StringArraysMatch(string[] first, string[] second)
+    {
+        if (first.Length != second.Length)
+        {
+            return false;
+        }
+
+        for (var index = 0; index < first.Length; index++)
+        {
+            if (first[index] != second[index])
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static int CountDistinctActionKinds(MatchPlaybackResult playback)
+    {
+        var kinds = new List<MatchActionKind>();
+        foreach (var action in playback.Timeline.Actions)
+        {
+            if (!kinds.Contains(action.Kind))
+            {
+                kinds.Add(action.Kind);
+            }
+        }
+
+        return kinds.Count;
+    }
+
+    private static int CountDistinctPassLanes(MatchPlaybackResult playback)
+    {
+        var lanes = new List<int>();
+        foreach (var action in playback.Timeline.Actions)
+        {
+            if (action.Kind != MatchActionKind.Pass)
+            {
+                continue;
+            }
+
+            var lane = (int)MathF.Round(action.ToPosition.Y * 10.0f);
+            if (!lanes.Contains(lane))
+            {
+                lanes.Add(lane);
+            }
+        }
+
+        return lanes.Count;
+    }
+
+    private static string BuildActionSignature(MatchPlaybackResult playback)
+    {
+        var segments = new List<string>();
+        var limit = Math.Min(18, playback.Timeline.Actions.Length);
+        for (var index = 0; index < limit; index++)
+        {
+            var action = playback.Timeline.Actions[index];
+            segments.Add($"{action.Kind}:{action.Team}:{action.ToPosition.X:0.00}:{action.ToPosition.Y:0.00}");
+        }
+
+        return string.Join("|", segments);
     }
 
     private static string[] ExtractRecentEvents(MatchPlaybackResult result)

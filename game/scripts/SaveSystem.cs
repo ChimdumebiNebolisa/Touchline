@@ -56,6 +56,7 @@ public sealed class SaveSlotMatchReportData
     public string TableImpactSummary { get; set; } = string.Empty;
     public string TacticalSummary { get; set; } = string.Empty;
     public string PressureSummary { get; set; } = string.Empty;
+    public string CauseSummary { get; set; } = string.Empty;
     public string[]? KeyEvents { get; set; }
     public int MoraleDelta { get; set; }
     public int FanDelta { get; set; }
@@ -326,6 +327,7 @@ public partial class SaveSystem : Node
                     TableImpactSummary = state.LastMatchReport.TableImpactSummary,
                     TacticalSummary = state.LastMatchReport.TacticalSummary,
                     PressureSummary = state.LastMatchReport.PressureSummary,
+                    CauseSummary = state.LastMatchReport.CauseSummary,
                     KeyEvents = state.LastMatchReport.KeyEvents,
                     MoraleDelta = state.LastMatchReport.MoraleDelta,
                     FanDelta = state.LastMatchReport.FanDelta,
@@ -413,6 +415,7 @@ public partial class SaveSystem : Node
                     TableImpactSummary = source.LastMatchReport.TableImpactSummary,
                     TacticalSummary = source.LastMatchReport.TacticalSummary,
                     PressureSummary = source.LastMatchReport.PressureSummary,
+                    CauseSummary = source.LastMatchReport.CauseSummary,
                     KeyEvents = source.LastMatchReport.KeyEvents == null ? null : (string[])source.LastMatchReport.KeyEvents.Clone(),
                     MoraleDelta = source.LastMatchReport.MoraleDelta,
                     FanDelta = source.LastMatchReport.FanDelta,

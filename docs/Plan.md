@@ -49,6 +49,9 @@
 - Step 33: Rewrite repository documentation and README
 - Step 34: Introduce authoritative match playback frames
 - Step 35: Polish live match renderer readability
+- Step 36: Replace hardcoded away lineups with seeded opponent squads
+- Step 37: Improve match action selection and tactical variation
+- Step 38: Make post-match consequences use richer playback causes
 
 ## 2. Plan Rules
 
@@ -509,3 +512,78 @@ Make the frame-based live match playback readable as football action by clarifyi
 - pass, carry, shot, save, clearance, interception, and goal moments read from engine frames instead of scene-generated events
 - full-time status and post-match continuation remain clear
 - no match rules are moved into `LiveMatchScene`
+
+## 28. Step 36: Replace hardcoded away lineups with seeded opponent squads
+
+### Objective
+
+Make opponent XIs come from authoritative world club data instead of hardcoded simulator names.
+
+### Allowed Subtasks
+
+- expose deterministic club squad lookup from seeded world data
+- keep the selected club lineup sourced from current squad/starters
+- generate explicit deterministic fallback squads only when seed data is unavailable or incomplete
+- preserve 22-player playback frames and shared live/instant simulation
+
+### Verification
+
+- opponent playback players are sourced from the resolved opponent club squad
+- the old hardcoded away XI is no longer authoritative
+- same seed and opponent produce stable opponent names and ids
+
+### Exit Criteria
+
+- `MatchSimulator` no longer owns hardcoded away-player content
+- every available club can resolve a stable match squad
+- save/load and career flow continue to work without storing duplicate squad blobs
+
+## 29. Step 37: Improve match action selection and tactical variation
+
+### Objective
+
+Make the frame-based match engine produce less formulaic action chains while staying deterministic and lightweight.
+
+### Allowed Subtasks
+
+- vary possession phases by press, tempo, width, risk, and role selection
+- add controlled variation in pass lanes, attacking side, shot/save/clearance/interception outcomes, and pressure turnovers
+- keep the existing simple action set and authoritative playback contract
+- avoid complex AI, advanced ratings, physics, or playable controls
+
+### Verification
+
+- playback includes varied action kinds and pass lanes across a match
+- different tactical inputs produce different deterministic action signatures
+- live and instant paths still consume the same playback result
+
+### Exit Criteria
+
+- match actions respond visibly to tactical inputs
+- player roles influence passer/carrier/shooter/keeper/defender selection
+- playback still contains valid ball/player/action/event state
+
+## 30. Step 38: Make post-match consequences use richer playback causes
+
+### Objective
+
+Use the authoritative playback timeline to explain post-match morale, fan, and board consequences beyond final scoreline alone.
+
+### Allowed Subtasks
+
+- evaluate simple playback signals such as shots, late goals, saves, clearances, interceptions, comeback/collapse, press, and risk
+- keep consequence deltas bounded, simple, and explainable
+- store cause text in the match report and save payload safely
+- preserve `PostMatchScene` as a renderer of `LastMatchReport`
+
+### Verification
+
+- post-match report includes cause reasoning beyond scoreline
+- consequence deltas remain simple and explainable
+- old save payloads without cause text restore with a safe default
+
+### Exit Criteria
+
+- `GameState.ApplyMatchResult` uses playback-cause analysis
+- post-match and dashboard consequence copy can explain why deltas changed
+- no large analytics/xG system is introduced

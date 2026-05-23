@@ -128,7 +128,7 @@ public partial class PostMatchScene : Control
 
         _deltasLabel.Text = report.ConsequenceSummary;
         _tableImpactLabel.Text = report.TableImpactSummary;
-        _tacticalLabel.Text = report.TacticalSummary;
+        _tacticalLabel.Text = $"{report.TacticalSummary}\nCause | {report.CauseSummary}";
         _pressureLabel.Text = report.PressureSummary;
         _eventsLabel.Text = string.Join("\n", report.KeyEvents);
         _nextStepLabel.Text = "Advance to Club Dashboard and carry this result into the next planning cycle.";
