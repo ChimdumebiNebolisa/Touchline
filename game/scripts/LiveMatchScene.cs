@@ -8,11 +8,15 @@ public partial class LiveMatchScene : Control
     private const string PostMatchScenePath = "res://scenes/PostMatchScene.tscn";
     private const float SimulatedMinutesPerSecond = 6.0f;
     private const float MarkerSize = 30.0f;
-    private const float BallSize = 14.0f;
+    private const float BallSize = 18.0f;
+    private const float BallHaloSize = 34.0f;
+    private const float ActionLineThickness = 5.0f;
 
     private readonly List<Button> _markerNodes = new();
     private readonly List<string> _markerPlayerIds = new();
     private MatchPlaybackResult? _playback;
+    private ColorRect? _actionLineNode;
+    private PanelContainer? _ballHaloNode;
     private PanelContainer? _ballNode;
     private float _elapsedSeconds;
     private int _appliedEventCount;
@@ -27,6 +31,7 @@ public partial class LiveMatchScene : Control
     private Label? _controlLabel;
     private Label? _eventFeedLabel;
     private Label? _homeTagLabel;
+    private Label? _pitchStateLabel;
     private Label? _awayTagLabel;
     private Label? _pitchNoteLabel;
     private Control? _markersLayer;
@@ -43,6 +48,7 @@ public partial class LiveMatchScene : Control
         _controlLabel = GetNode<Label>("Margin/Root/ContentRow/SidebarCard/SidebarPadding/SidebarContent/ControlLabel");
         _eventFeedLabel = GetNode<Label>("Margin/Root/ContentRow/SidebarCard/SidebarPadding/SidebarContent/EventFeedLabel");
         _homeTagLabel = GetNode<Label>("Margin/Root/ContentRow/PitchColumn/PitchFrame/Pitch/PitchHeader/HomeTagLabel");
+        _pitchStateLabel = GetNode<Label>("Margin/Root/ContentRow/PitchColumn/PitchFrame/Pitch/PitchHeader/PitchStateLabel");
         _awayTagLabel = GetNode<Label>("Margin/Root/ContentRow/PitchColumn/PitchFrame/Pitch/PitchHeader/AwayTagLabel");
         _pitchNoteLabel = GetNode<Label>("Margin/Root/ContentRow/PitchColumn/PitchNoteLabel");
         _markersLayer = GetNode<Control>("Margin/Root/ContentRow/PitchColumn/PitchFrame/Pitch/MarkersLayer");
@@ -61,9 +67,10 @@ public partial class LiveMatchScene : Control
         _tacticalLabel.Text = _playback.TacticalSummary;
         _momentumLabel.Text = "Possession: opening restart";
         _statusLabel.Text = "Playback model loaded. Rendering engine frames.";
-        _controlLabel.Text = "Action: kickoff";
+        _controlLabel.Text = "Action | kickoff\nPossession | opening restart\nBall | carried | Carrier | loading";
         _eventFeedLabel.Text = "1' Kick-off.";
         _homeTagLabel.Text = _playback.HomeClubName;
+        _pitchStateLabel.Text = "Kickoff";
         _awayTagLabel.Text = _playback.AwayClubName;
         _pitchNoteLabel.Text = "The pitch now renders frame-based player and ball state from the match engine.";
 
@@ -108,6 +115,7 @@ public partial class LiveMatchScene : Control
         _controlLabel!.Text = "Action unavailable.";
         _eventFeedLabel!.Text = "No live events yet.";
         _homeTagLabel!.Text = "HOME";
+        _pitchStateLabel!.Text = "Unavailable";
         _awayTagLabel!.Text = "AWAY";
         _pitchNoteLabel!.Text = "Pitch presentation unavailable.";
     }
@@ -120,36 +128,53 @@ public partial class LiveMatchScene : Control
         }
 
         var initialFrame = _playback.Timeline.Frames[0];
+        _actionLineNode = new ColorRect
+        {
+            Name = "PlaybackActionLine",
+            MouseFilter = MouseFilterEnum.Ignore,
+            Visible = false,
+            Color = new Color(1.0f, 0.96f, 0.58f, 0.72f)
+        };
+        _markersLayer.AddChild(_actionLineNode);
+
         foreach (var player in initialFrame.PlayerStates)
         {
             var node = new Button
             {
+                Name = $"Marker_{player.PlayerId.Replace("-", "_")}",
                 Text = BuildInitials(player.Name),
                 Disabled = true,
                 FocusMode = FocusModeEnum.None,
-                MouseFilter = MouseFilterEnum.Ignore,
+                MouseFilter = MouseFilterEnum.Pass,
                 CustomMinimumSize = new Vector2(MarkerSize, MarkerSize),
-                TooltipText = $"{player.Name} | {player.CurrentIntent}"
+                TooltipText = BuildPlayerTooltip(player, initialFrame.Ball.CarrierPlayerId == player.PlayerId)
             };
 
             node.AddThemeColorOverride("font_disabled_color", Colors.White);
-            var markerStyle = BuildMarkerStyle(player.Team == _playback.HomeClubName);
-            node.AddThemeStyleboxOverride("disabled", markerStyle);
-            node.AddThemeStyleboxOverride("normal", markerStyle);
-            node.AddThemeStyleboxOverride("hover", markerStyle);
-            node.AddThemeStyleboxOverride("pressed", markerStyle);
+            node.AddThemeFontSizeOverride("font_size", 13);
+            ApplyMarkerStyle(node, BuildMarkerStyle(player.Team == _playback.HomeClubName, player.CurrentIntent, player.HasBall));
 
             _markersLayer.AddChild(node);
             _markerNodes.Add(node);
             _markerPlayerIds.Add(player.PlayerId);
         }
 
+        _ballHaloNode = new PanelContainer
+        {
+            Name = "PlaybackBallHalo",
+            CustomMinimumSize = new Vector2(BallHaloSize, BallHaloSize),
+            MouseFilter = MouseFilterEnum.Ignore
+        };
+        _ballHaloNode.AddThemeStyleboxOverride("panel", BuildBallHaloStyle(initialFrame.Ball.MovementState));
+        _markersLayer.AddChild(_ballHaloNode);
+
         _ballNode = new PanelContainer
         {
+            Name = "PlaybackBall",
             CustomMinimumSize = new Vector2(BallSize, BallSize),
             MouseFilter = MouseFilterEnum.Ignore
         };
-        _ballNode.AddThemeStyleboxOverride("panel", BuildBallStyle());
+        _ballNode.AddThemeStyleboxOverride("panel", BuildBallStyle(initialFrame.Ball.MovementState));
         _markersLayer.AddChild(_ballNode);
     }
 
@@ -161,16 +186,27 @@ public partial class LiveMatchScene : Control
         }
 
         var (currentFrame, nextFrame, progress) = ResolveFramePair(simulatedSecond);
+        var carrierLabel = ResolveCarrierLabel(currentFrame);
+        var involvedLabel = ResolveInvolvedPlayerLabel(currentFrame);
+        var hasEvent = !string.IsNullOrWhiteSpace(currentFrame.EventSummary);
+
         _scoreLabel!.Text = $"{currentFrame.HomeScore} - {currentFrame.AwayScore}";
         _clockLabel!.Text = $"{currentFrame.Minute:00}'";
         _statusLabel!.Text = currentFrame.EventSummary ?? currentFrame.CurrentActionLabel;
-        _controlLabel!.Text = $"Action: {currentFrame.CurrentActionLabel}";
-        _momentumLabel!.Text = $"Possession: {currentFrame.PossessionTeam}";
-        _pitchNoteLabel!.Text =
-            $"Ball: {currentFrame.Ball.MovementState} | Carrier: {ResolveCarrierLabel(currentFrame)}";
-        UpdateEventFeed(simulatedSecond);
+        _statusLabel.AddThemeColorOverride("font_color", hasEvent ? new Color(1.0f, 0.84f, 0.32f) : TouchlineTheme.TextPrimary);
+        _controlLabel!.Text =
+            $"Action | {currentFrame.CurrentActionLabel}\nPossession | {currentFrame.PossessionTeam}\nBall | {FormatBallMovement(currentFrame.Ball.MovementState)} | Carrier | {carrierLabel}\nFocus | {involvedLabel}";
+        _momentumLabel!.Text = $"Possession\n{currentFrame.PossessionTeam}\nBall: {FormatBallMovement(currentFrame.Ball.MovementState)}";
+        _pitchStateLabel!.Text = hasEvent ? "Key Moment" : FormatBallMovement(currentFrame.Ball.MovementState);
+        _pitchStateLabel.AddThemeColorOverride("font_color", hasEvent ? new Color(1.0f, 0.84f, 0.32f) : TouchlineTheme.TextMuted);
+        _pitchNoteLabel!.Text = hasEvent
+            ? currentFrame.EventSummary!
+            : $"Carrier: {carrierLabel} | Target: {FormatPitchPoint(currentFrame.Ball.TargetPosition)} | Focus: {involvedLabel}";
+
+        UpdateEventFeed(simulatedSecond, currentFrame.EventId);
         UpdateMarkerPositions(currentFrame, nextFrame, progress);
         UpdateBallPosition(currentFrame, nextFrame, progress);
+        UpdateActionLine(currentFrame, nextFrame, progress);
     }
 
     private (MatchFrame currentFrame, MatchFrame nextFrame, float progress) ResolveFramePair(int simulatedSecond)
@@ -188,7 +224,8 @@ public partial class LiveMatchScene : Control
             if (simulatedSecond >= current.MatchSecond && simulatedSecond <= next.MatchSecond)
             {
                 var duration = Math.Max(1, next.MatchSecond - current.MatchSecond);
-                return (current, next, Math.Clamp((simulatedSecond - current.MatchSecond) / (float)duration, 0.0f, 1.0f));
+                var progress = Math.Clamp((simulatedSecond - current.MatchSecond) / (float)duration, 0.0f, 1.0f);
+                return (current, next, SmoothStep(progress));
             }
         }
 
@@ -216,28 +253,87 @@ public partial class LiveMatchScene : Control
             var position = nextState == null
                 ? currentState.Position
                 : currentState.Position.Lerp(nextState.Position, progress);
+            var isCarrier = currentState.HasBall || currentFrame.Ball.CarrierPlayerId == currentState.PlayerId;
+            var markerSize = ResolveMarkerSize(currentState.CurrentIntent, isCarrier);
+            _markerNodes[index].CustomMinimumSize = new Vector2(markerSize, markerSize);
+            _markerNodes[index].Size = new Vector2(markerSize, markerSize);
             _markerNodes[index].Position = new Vector2(
-                size.X * position.X - MarkerSize * 0.5f,
-                size.Y * position.Y - MarkerSize * 0.5f);
-            _markerNodes[index].TooltipText = $"{currentState.Name} | {currentState.CurrentIntent}";
+                size.X * position.X - markerSize * 0.5f,
+                size.Y * position.Y - markerSize * 0.5f);
+            _markerNodes[index].TooltipText = BuildPlayerTooltip(currentState, isCarrier);
+            _markerNodes[index].AddThemeColorOverride("font_disabled_color", isCarrier ? new Color(0.044f, 0.051f, 0.047f) : Colors.White);
+            _markerNodes[index].AddThemeFontSizeOverride("font_size", isCarrier ? 15 : 13);
+            ApplyMarkerStyle(
+                _markerNodes[index],
+                BuildMarkerStyle(currentState.Team == _playback!.HomeClubName, currentState.CurrentIntent, isCarrier));
         }
     }
 
     private void UpdateBallPosition(MatchFrame currentFrame, MatchFrame nextFrame, float progress)
     {
-        if (_markersLayer == null || _ballNode == null)
+        if (_markersLayer == null || _ballNode == null || _ballHaloNode == null)
         {
             return;
         }
 
         var size = _markersLayer.Size;
         var ballPosition = currentFrame.Ball.Position.Lerp(nextFrame.Ball.Position, progress);
+        var liveBallSize = currentFrame.Ball.MovementState is BallMovementState.Shot or BallMovementState.Goal
+            ? BallSize + 4.0f
+            : BallSize;
+        var liveHaloSize = currentFrame.Ball.MovementState is BallMovementState.Shot or BallMovementState.Goal
+            ? BallHaloSize + 8.0f
+            : BallHaloSize;
+
+        _ballHaloNode.CustomMinimumSize = new Vector2(liveHaloSize, liveHaloSize);
+        _ballHaloNode.Size = new Vector2(liveHaloSize, liveHaloSize);
+        _ballHaloNode.Position = new Vector2(
+            size.X * ballPosition.X - liveHaloSize * 0.5f,
+            size.Y * ballPosition.Y - liveHaloSize * 0.5f);
+        _ballHaloNode.AddThemeStyleboxOverride("panel", BuildBallHaloStyle(currentFrame.Ball.MovementState));
+
+        _ballNode.CustomMinimumSize = new Vector2(liveBallSize, liveBallSize);
+        _ballNode.Size = new Vector2(liveBallSize, liveBallSize);
         _ballNode.Position = new Vector2(
-            size.X * ballPosition.X - BallSize * 0.5f,
-            size.Y * ballPosition.Y - BallSize * 0.5f);
+            size.X * ballPosition.X - liveBallSize * 0.5f,
+            size.Y * ballPosition.Y - liveBallSize * 0.5f);
+        _ballNode.AddThemeStyleboxOverride("panel", BuildBallStyle(currentFrame.Ball.MovementState));
     }
 
-    private void UpdateEventFeed(int simulatedSecond)
+    private void UpdateActionLine(MatchFrame currentFrame, MatchFrame nextFrame, float progress)
+    {
+        if (_markersLayer == null || _actionLineNode == null)
+        {
+            return;
+        }
+
+        if (!ShouldShowActionLine(currentFrame.Ball.MovementState))
+        {
+            _actionLineNode.Visible = false;
+            return;
+        }
+
+        var layerSize = _markersLayer.Size;
+        var currentBallPosition = currentFrame.Ball.Position.Lerp(nextFrame.Ball.Position, progress);
+        var start = ToPitchPixel(currentBallPosition, layerSize);
+        var target = ToPitchPixel(currentFrame.Ball.TargetPosition, layerSize);
+        var delta = target - start;
+        var length = delta.Length();
+        if (length < 8.0f)
+        {
+            _actionLineNode.Visible = false;
+            return;
+        }
+
+        _actionLineNode.Visible = true;
+        _actionLineNode.Position = start;
+        _actionLineNode.Size = new Vector2(length, ResolveActionLineThickness(currentFrame.Ball.MovementState));
+        _actionLineNode.PivotOffset = new Vector2(0.0f, _actionLineNode.Size.Y * 0.5f);
+        _actionLineNode.Rotation = delta.Angle();
+        _actionLineNode.Color = ResolveActionLineColor(currentFrame.Ball.MovementState, !string.IsNullOrWhiteSpace(currentFrame.EventSummary));
+    }
+
+    private void UpdateEventFeed(int simulatedSecond, string? activeEventId)
     {
         if (_playback == null)
         {
@@ -249,11 +345,19 @@ public partial class LiveMatchScene : Control
             _appliedEventCount++;
         }
 
+        var activeEventIndex = FindEventIndex(activeEventId);
+        if (activeEventIndex >= _appliedEventCount)
+        {
+            _appliedEventCount = activeEventIndex + 1;
+        }
+
         var startIndex = Math.Max(0, _appliedEventCount - 5);
         var feedLines = new List<string>();
         for (var index = startIndex; index < _appliedEventCount; index++)
         {
-            feedLines.Add(_playback.EventFeed[index].Summary);
+            var matchEvent = _playback.EventFeed[index];
+            var prefix = matchEvent.Id == activeEventId ? "> " : "  ";
+            feedLines.Add($"{prefix}{matchEvent.Summary}");
         }
 
         if (feedLines.Count == 0)
@@ -264,15 +368,67 @@ public partial class LiveMatchScene : Control
         _eventFeedLabel!.Text = string.Join("\n", feedLines);
     }
 
+    private int FindEventIndex(string? eventId)
+    {
+        if (_playback == null || string.IsNullOrWhiteSpace(eventId))
+        {
+            return -1;
+        }
+
+        for (var index = 0; index < _playback.EventFeed.Length; index++)
+        {
+            if (_playback.EventFeed[index].Id == eventId)
+            {
+                return index;
+            }
+        }
+
+        return -1;
+    }
+
     private string ResolveCarrierLabel(MatchFrame frame)
     {
         if (string.IsNullOrWhiteSpace(frame.Ball.CarrierPlayerId))
         {
-            return "none";
+            return frame.Ball.MovementState is BallMovementState.Passed or BallMovementState.Shot or BallMovementState.Cleared or BallMovementState.Loose or BallMovementState.Goal
+                ? "ball in motion"
+                : "none";
         }
 
         var carrier = FindPlayerState(frame, frame.Ball.CarrierPlayerId);
         return carrier?.Name ?? frame.Ball.CarrierPlayerId;
+    }
+
+    private static string ResolveInvolvedPlayerLabel(MatchFrame frame)
+    {
+        var player = FindPriorityPlayer(frame, PlayerIntent.Carry)
+            ?? FindPriorityPlayer(frame, PlayerIntent.Shoot)
+            ?? FindPriorityPlayer(frame, PlayerIntent.Receive)
+            ?? FindPriorityPlayer(frame, PlayerIntent.Press)
+            ?? FindPriorityPlayer(frame, PlayerIntent.Recover)
+            ?? FindPriorityPlayer(frame, PlayerIntent.Support);
+
+        return player == null
+            ? frame.CurrentActionLabel
+            : $"{player.Name} ({FormatIntent(player.CurrentIntent)})";
+    }
+
+    private static PlayerAgentState? FindPriorityPlayer(MatchFrame frame, PlayerIntent intent)
+    {
+        foreach (var player in frame.PlayerStates)
+        {
+            if (player.HasBall && intent == PlayerIntent.Carry)
+            {
+                return player;
+            }
+
+            if (player.CurrentIntent == intent)
+            {
+                return player;
+            }
+        }
+
+        return null;
     }
 
     private static PlayerAgentState? FindPlayerState(MatchFrame frame, string? playerId)
@@ -293,38 +449,206 @@ public partial class LiveMatchScene : Control
         return null;
     }
 
-    private static StyleBoxFlat BuildMarkerStyle(bool isHome)
+    private static void ApplyMarkerStyle(Button node, StyleBoxFlat markerStyle)
     {
+        node.AddThemeStyleboxOverride("disabled", markerStyle);
+        node.AddThemeStyleboxOverride("normal", markerStyle);
+        node.AddThemeStyleboxOverride("hover", markerStyle);
+        node.AddThemeStyleboxOverride("pressed", markerStyle);
+    }
+
+    private static StyleBoxFlat BuildMarkerStyle(bool isHome, PlayerIntent intent, bool hasBall)
+    {
+        var background = isHome ? new Color(0.129f, 0.424f, 0.690f) : new Color(0.698f, 0.204f, 0.251f);
+        var border = new Color(0.95f, 0.95f, 0.95f);
+        var borderWidth = 2;
+
+        if (hasBall)
+        {
+            background = new Color(0.96f, 0.72f, 0.20f);
+            border = new Color(1.0f, 0.96f, 0.58f);
+            borderWidth = 4;
+        }
+        else if (intent == PlayerIntent.Receive)
+        {
+            border = new Color(0.50f, 0.88f, 1.0f);
+            borderWidth = 3;
+        }
+        else if (intent == PlayerIntent.Shoot)
+        {
+            border = new Color(1.0f, 0.62f, 0.28f);
+            borderWidth = 4;
+        }
+        else if (intent == PlayerIntent.Press)
+        {
+            border = new Color(0.92f, 0.98f, 0.92f);
+            borderWidth = 3;
+        }
+        else if (intent == PlayerIntent.Recover)
+        {
+            border = new Color(0.70f, 0.88f, 1.0f);
+            borderWidth = 3;
+        }
+
         return new StyleBoxFlat
         {
-            BgColor = isHome ? new Color(0.129f, 0.424f, 0.690f) : new Color(0.698f, 0.204f, 0.251f),
+            BgColor = background,
             CornerRadiusTopLeft = 15,
             CornerRadiusTopRight = 15,
             CornerRadiusBottomRight = 15,
             CornerRadiusBottomLeft = 15,
-            BorderWidthLeft = 2,
-            BorderWidthTop = 2,
-            BorderWidthRight = 2,
-            BorderWidthBottom = 2,
-            BorderColor = new Color(0.95f, 0.95f, 0.95f)
+            BorderWidthLeft = borderWidth,
+            BorderWidthTop = borderWidth,
+            BorderWidthRight = borderWidth,
+            BorderWidthBottom = borderWidth,
+            BorderColor = border
         };
     }
 
-    private static StyleBoxFlat BuildBallStyle()
+    private static StyleBoxFlat BuildBallStyle(BallMovementState movementState)
     {
+        var fill = movementState switch
+        {
+            BallMovementState.Shot or BallMovementState.Goal => new Color(1.0f, 0.92f, 0.18f),
+            BallMovementState.Passed => new Color(0.98f, 0.98f, 0.94f),
+            BallMovementState.Cleared or BallMovementState.Saved => new Color(0.78f, 0.94f, 1.0f),
+            BallMovementState.Loose => new Color(1.0f, 0.72f, 0.58f),
+            _ => new Color(0.98f, 0.92f, 0.35f)
+        };
+
         return new StyleBoxFlat
         {
-            BgColor = new Color(0.98f, 0.92f, 0.35f),
-            CornerRadiusTopLeft = 7,
-            CornerRadiusTopRight = 7,
-            CornerRadiusBottomRight = 7,
-            CornerRadiusBottomLeft = 7,
+            BgColor = fill,
+            CornerRadiusTopLeft = 9,
+            CornerRadiusTopRight = 9,
+            CornerRadiusBottomRight = 9,
+            CornerRadiusBottomLeft = 9,
             BorderWidthLeft = 2,
             BorderWidthTop = 2,
             BorderWidthRight = 2,
             BorderWidthBottom = 2,
             BorderColor = new Color(0.08f, 0.08f, 0.08f)
         };
+    }
+
+    private static StyleBoxFlat BuildBallHaloStyle(BallMovementState movementState)
+    {
+        var halo = movementState switch
+        {
+            BallMovementState.Shot or BallMovementState.Goal => new Color(1.0f, 0.74f, 0.12f, 0.24f),
+            BallMovementState.Passed => new Color(1.0f, 1.0f, 0.86f, 0.18f),
+            BallMovementState.Cleared or BallMovementState.Saved => new Color(0.62f, 0.88f, 1.0f, 0.20f),
+            BallMovementState.Loose => new Color(1.0f, 0.44f, 0.30f, 0.20f),
+            _ => new Color(1.0f, 0.92f, 0.32f, 0.18f)
+        };
+
+        return new StyleBoxFlat
+        {
+            BgColor = halo,
+            CornerRadiusTopLeft = 17,
+            CornerRadiusTopRight = 17,
+            CornerRadiusBottomRight = 17,
+            CornerRadiusBottomLeft = 17,
+            BorderWidthLeft = 1,
+            BorderWidthTop = 1,
+            BorderWidthRight = 1,
+            BorderWidthBottom = 1,
+            BorderColor = new Color(1.0f, 0.98f, 0.78f, 0.24f)
+        };
+    }
+
+    private static bool ShouldShowActionLine(BallMovementState movementState)
+    {
+        return movementState is BallMovementState.Passed
+            or BallMovementState.Shot
+            or BallMovementState.Cleared
+            or BallMovementState.Saved
+            or BallMovementState.Loose
+            or BallMovementState.Goal;
+    }
+
+    private static float ResolveActionLineThickness(BallMovementState movementState)
+    {
+        return movementState is BallMovementState.Shot or BallMovementState.Goal
+            ? ActionLineThickness + 2.0f
+            : ActionLineThickness;
+    }
+
+    private static Color ResolveActionLineColor(BallMovementState movementState, bool hasEvent)
+    {
+        var alpha = hasEvent ? 0.95f : 0.68f;
+        return movementState switch
+        {
+            BallMovementState.Shot or BallMovementState.Goal => new Color(1.0f, 0.74f, 0.18f, alpha),
+            BallMovementState.Cleared or BallMovementState.Saved => new Color(0.60f, 0.90f, 1.0f, alpha),
+            BallMovementState.Loose => new Color(1.0f, 0.42f, 0.28f, alpha),
+            _ => new Color(1.0f, 1.0f, 0.86f, alpha)
+        };
+    }
+
+    private static float ResolveMarkerSize(PlayerIntent intent, bool hasBall)
+    {
+        if (hasBall)
+        {
+            return MarkerSize + 8.0f;
+        }
+
+        return intent is PlayerIntent.Receive or PlayerIntent.Shoot or PlayerIntent.Press
+            ? MarkerSize + 3.0f
+            : MarkerSize;
+    }
+
+    private static Vector2 ToPitchPixel(Vector2 normalizedPosition, Vector2 layerSize)
+    {
+        return new Vector2(layerSize.X * normalizedPosition.X, layerSize.Y * normalizedPosition.Y);
+    }
+
+    private static float SmoothStep(float value)
+    {
+        var clamped = Math.Clamp(value, 0.0f, 1.0f);
+        return clamped * clamped * (3.0f - 2.0f * clamped);
+    }
+
+    private static string BuildPlayerTooltip(PlayerAgentState player, bool hasBall)
+    {
+        var ballLabel = hasBall ? " | BALL" : string.Empty;
+        return $"{player.Name} | {player.Team} | {player.Role} | Intent: {FormatIntent(player.CurrentIntent)}{ballLabel}";
+    }
+
+    private static string FormatBallMovement(BallMovementState movementState)
+    {
+        return movementState switch
+        {
+            BallMovementState.Carried => "carried",
+            BallMovementState.Passed => "pass in flight",
+            BallMovementState.Shot => "shot",
+            BallMovementState.Loose => "loose",
+            BallMovementState.Cleared => "clearance",
+            BallMovementState.Saved => "save",
+            BallMovementState.Goal => "goal",
+            _ => movementState.ToString()
+        };
+    }
+
+    private static string FormatIntent(PlayerIntent intent)
+    {
+        return intent switch
+        {
+            PlayerIntent.HoldShape => "hold shape",
+            PlayerIntent.Support => "support",
+            PlayerIntent.Press => "press",
+            PlayerIntent.Receive => "receive",
+            PlayerIntent.Carry => "carry",
+            PlayerIntent.Shoot => "shoot",
+            PlayerIntent.Defend => "defend",
+            PlayerIntent.Recover => "recover",
+            _ => intent.ToString()
+        };
+    }
+
+    private static string FormatPitchPoint(Vector2 normalizedPosition)
+    {
+        return $"{normalizedPosition.X:0.00}, {normalizedPosition.Y:0.00}";
     }
 
     private static string BuildInitials(string fullName)
@@ -351,9 +675,14 @@ public partial class LiveMatchScene : Control
         }
 
         GameState.Instance?.ApplyMatchResult(_playback);
-        _statusLabel!.Text = "Full time. Review the result and consequence deltas in post-match.";
-        _controlLabel!.Text = "Action: full time";
-        _momentumLabel!.Text = "Possession: full time";
+        _scoreLabel!.Text = $"{_playback.FinalHomeScore} - {_playback.FinalAwayScore}";
+        _clockLabel!.Text = "FT";
+        _statusLabel!.Text = $"Full time | {_playback.FinalResultSummary}";
+        _statusLabel.AddThemeColorOverride("font_color", new Color(1.0f, 0.84f, 0.32f));
+        _controlLabel!.Text = "Action | full time\nNext | Continue to Post-Match";
+        _momentumLabel!.Text = "Full time\nPost-match ready";
+        _pitchStateLabel!.Text = "Full Time";
+        _pitchStateLabel.AddThemeColorOverride("font_color", new Color(1.0f, 0.84f, 0.32f));
         _pitchNoteLabel!.Text = "Playback complete. Continue to the post-match screen for the aftermath.";
         _backButton!.Text = "Continue to Post-Match";
         _matchComplete = true;

@@ -48,6 +48,7 @@
 - Step 32: Run a comprehensive management-shell UI/UX overhaul
 - Step 33: Rewrite repository documentation and README
 - Step 34: Introduce authoritative match playback frames
+- Step 35: Polish live match renderer readability
 
 ## 2. Plan Rules
 
@@ -482,3 +483,29 @@ Replace the decorative match marker model with an authoritative frame-based play
 - frame data contains enough football state for future live-renderer interpolation
 - the old marker swing/sway model is no longer the authoritative movement source
 - no unrelated screen rebuild or advanced physics scope is introduced
+
+## 27. Step 35: Polish live match renderer readability
+
+### Objective
+
+Make the frame-based live match playback readable as football action by clarifying ball movement, ball carrier, possession, current action, event emphasis, and full-time handoff without changing the match engine.
+
+### Allowed Subtasks
+
+- improve ball contrast, carrier highlighting, action-line/trail presentation, and marker affordances from `MatchFrame` data
+- make the live status area clearly show current action, possession, ball movement state, and carrier from the playback model
+- visually emphasize active event summaries while keeping the feed synchronized to `MatchPlaybackResult.EventFeed`
+- preserve post-match handoff and shared live/instant engine behavior
+
+### Verification
+
+- `dotnet build game/Touchline.sln`
+- existing headless Godot route checks for match playback, shared engine, post-match, and navigation still pass
+- optional renderer check confirms the live scene exposes the polished playback affordances
+
+### Exit Criteria
+
+- the ball and ball carrier are easy to identify during playback
+- pass, carry, shot, save, clearance, interception, and goal moments read from engine frames instead of scene-generated events
+- full-time status and post-match continuation remain clear
+- no match rules are moved into `LiveMatchScene`
