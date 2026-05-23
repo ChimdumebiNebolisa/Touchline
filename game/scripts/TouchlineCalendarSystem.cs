@@ -45,8 +45,15 @@ public partial class TouchlineCalendarSystem : Node
         var competitionTable = GameState.Instance.CompetitionTable;
         var competitionFixtures = GameState.Instance.CompetitionFixtures;
         var seasonLength = CompetitionRuntimeService.GetSeasonMatchdayCount(GameState.Instance.CompetitionFixtures);
+        var seasonComplete = CompetitionRuntimeService.IsSeasonComplete(GameState.Instance.CompetitionFixtures);
 
-        if (nextMatchday > seasonLength)
+        if (nextMatchday > seasonLength && !seasonComplete)
+        {
+            LastStatusMessage = "Season cannot roll over until every fixture in the current fixture list is complete.";
+            return false;
+        }
+
+        if (seasonComplete)
         {
             nextSeasonStartYear++;
             nextDate = new DateTime(nextSeasonStartYear, DefaultSeasonStartDate.Month, DefaultSeasonStartDate.Day);

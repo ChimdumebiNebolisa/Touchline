@@ -22,9 +22,9 @@ func _process(_delta: float) -> bool:
             _fail("CareerSetup scene did not load")
             return false
 
-        var manager_name := current_scene.get_node("Center/Panel/Padding/Content/ManagerNameInput") as LineEdit
-        var seed_input := current_scene.get_node("Center/Panel/Padding/Content/SeedInput") as SpinBox
-        var start_button := current_scene.get_node("Center/Panel/Padding/Content/StartCareerButton") as Button
+        var manager_name := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/ManagerNameInput") as LineEdit
+        var seed_input := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/SeedInput") as SpinBox
+        var start_button := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/ActionsRow/StartCareerButton") as Button
         if manager_name == null or seed_input == null or start_button == null:
             _fail("CareerSetup controls missing")
             return false
@@ -40,17 +40,16 @@ func _process(_delta: float) -> bool:
             _fail("ChooseClub scene did not load after career setup")
             return false
 
-        var club_list := current_scene.get_node("Center/Panel/Padding/Content/ClubList") as ItemList
-        if club_list == null:
+        var club_rows := current_scene.get_node("RootMargin/MainColumn/ContentRow/ListCard/ListPadding/ListContent/ClubScroll/ClubRows") as VBoxContainer
+        if club_rows == null:
             _fail("ChooseClub controls missing")
             return false
 
-        if club_list.item_count < 4:
+        if club_rows.get_child_count() < 4:
             _fail("Seed data did not populate the expected club list")
             return false
 
-        club_list.select(3)
-        club_list.emit_signal("item_selected", 3)
+        current_scene.call("SelectClubRow", 3)
         _stage = 2
         _ticks = 0
 
@@ -59,9 +58,9 @@ func _process(_delta: float) -> bool:
             _fail("ChooseClub scene did not stay active long enough for preview refresh")
             return false
 
-        var identity_label := current_scene.get_node("Center/Panel/Padding/Content/PreviewCard/PreviewPadding/PreviewContent/IdentityLabel") as Label
-        var expectation_label := current_scene.get_node("Center/Panel/Padding/Content/PreviewCard/PreviewPadding/PreviewContent/ExpectationLabel") as Label
-        var confirm_button := current_scene.get_node("Center/Panel/Padding/Content/ConfirmSelectionButton") as Button
+        var identity_label := current_scene.get_node("RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent/IdentityLabel") as Label
+        var expectation_label := current_scene.get_node("RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent/ExpectationLabel") as Label
+        var confirm_button := current_scene.get_node("RootMargin/MainColumn/ContentRow/ListCard/ListPadding/ListContent/ActionsRow/ConfirmSelectionButton") as Button
         if identity_label == null or expectation_label == null or confirm_button == null:
             _fail("ChooseClub preview controls missing")
             return false
@@ -102,9 +101,9 @@ func _process(_delta: float) -> bool:
             _fail("SquadScreen did not load from the dashboard")
             return false
 
-        var player_list := current_scene.get_node("Center/Shell/Padding/Content/BodyRow/SelectionCard/SelectionPadding/SelectionContent/PlayerList") as ItemList
-        var club_context := current_scene.get_node("Center/Shell/Padding/Content/Header/ClubContextLabel") as Label
-        if player_list == null or club_context == null:
+        var player_rows := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/SelectionCard/SelectionPadding/SelectionContent/PlayerScroll/PlayerRows") as VBoxContainer
+        var club_context := current_scene.get_node("RootMargin/Shell/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderInfo/ClubContextLabel") as Label
+        if player_rows == null or club_context == null:
             _fail("SquadScreen controls missing")
             return false
 
@@ -112,11 +111,12 @@ func _process(_delta: float) -> bool:
             _fail("SquadScreen did not inherit the seeded club context")
             return false
 
-        if player_list.item_count == 0:
+        if player_rows.get_child_count() == 0:
             _fail("SquadScreen did not receive seeded players")
             return false
 
-        if player_list.get_item_text(0).find("Riku Tanaka") == -1:
+        var selected_player_label := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/DetailCard/DetailPadding/DetailContent/PlayerNameLabel") as Label
+        if selected_player_label == null or selected_player_label.text.find("Riku Tanaka") == -1:
             _fail("SquadScreen did not render seeded player names from world-seed.json")
             return false
 

@@ -203,6 +203,7 @@ public partial class GameState : Node
         CompetitionFixtures = advance.CompetitionFixtures;
         CurrentOpponentName = advance.CurrentOpponentName;
         NextFixtureSummary = advance.NextFixtureSummary;
+        SquadStatusSummary = BuildSquadStatusSummary();
 
         if (advance.ResetRecentResults)
         {
@@ -605,6 +606,212 @@ public partial class GameState : Node
             SquadPlayers[0].Morale != expectedFirstPlayer.Morale)
         {
             return "Save/load did not preserve squad player condition after match progression.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
+    public string ValidateSeasonRolloverContract()
+    {
+        var startingSeasonYear = SeasonStartYear;
+        var selectedClub = SelectedClubName;
+        var startingSquadLength = SquadPlayers.Length;
+        var startingFirstPlayerAge = SquadPlayers.Length == 0 ? -1 : SquadPlayers[0].Age;
+        var startingFixtureCount = CompetitionFixtures.Length;
+        var rolloverMessage = CompleteCurrentSeason();
+        if (rolloverMessage != MatchPlaybackContractValidator.PassMessage)
+        {
+            return rolloverMessage;
+        }
+
+        if (SeasonStartYear != startingSeasonYear + 1)
+        {
+            return $"Expected season year {startingSeasonYear + 1}, found {SeasonStartYear}.";
+        }
+
+        if (CurrentMatchday != 1)
+        {
+            return $"Expected matchday 1 after rollover, found {CurrentMatchday}.";
+        }
+
+        if (SelectedClubName != selectedClub)
+        {
+            return "Selected club did not persist across season rollover.";
+        }
+
+        if (SquadPlayers.Length != startingSquadLength)
+        {
+            return "Squad size changed across season rollover.";
+        }
+
+        if (startingFirstPlayerAge >= 0 && SquadPlayers[0].Age != startingFirstPlayerAge + 1)
+        {
+            return "Players did not age by one year at season rollover.";
+        }
+
+        if (LastMatchReport != null)
+        {
+            return "Last match report was not cleared for the new season.";
+        }
+
+        if (CompetitionFixtures.Length != startingFixtureCount || CompetitionFixtures.Length == 0)
+        {
+            return "New-season fixture list was not regenerated with the expected size.";
+        }
+
+        if (CountCompletedFixtures() != 0)
+        {
+            return "New-season fixtures were not reset to open state.";
+        }
+
+        foreach (var row in CompetitionTable)
+        {
+            if (row.Played != 0 || row.Points != 0 || row.GoalsFor != 0 || row.GoalsAgainst != 0)
+            {
+                return "New-season standings were not reset.";
+            }
+        }
+
+        if (IsCurrentClubFixtureComplete())
+        {
+            return "New-season current fixture is already complete.";
+        }
+
+        if (!NextFixtureSummary.Contains("Matchday 1", StringComparison.Ordinal))
+        {
+            return "New-season fixture summary does not point at matchday 1.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
+    public string ValidateSeasonDevelopmentContract()
+    {
+        var before = SquadPlayers;
+        if (before.Length == 0)
+        {
+            return "No squad players available for season development validation.";
+        }
+
+        var rolloverMessage = CompleteCurrentSeason();
+        if (rolloverMessage != MatchPlaybackContractValidator.PassMessage)
+        {
+            return rolloverMessage;
+        }
+
+        var sawValueChange = false;
+        for (var index = 0; index < before.Length; index++)
+        {
+            var previous = before[index];
+            var current = SquadPlayers[index];
+            if (current.Name != previous.Name)
+            {
+                return "Squad player order or identity changed across season development.";
+            }
+
+            if (current.Age != previous.Age + 1)
+            {
+                return $"{current.Name} did not age by one year.";
+            }
+
+            if (!IsPlayerValueInBounds(current))
+            {
+                return $"Player state moved out of bounds for {current.Name}.";
+            }
+
+            if (current.Form != previous.Form || current.Morale != previous.Morale || current.Fitness != previous.Fitness)
+            {
+                sawValueChange = true;
+            }
+        }
+
+        if (!sawValueChange)
+        {
+            return "Season development did not change any player values.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
+    public string ValidateFullSeasonRegressionContract()
+    {
+        var rolloverMessage = CompleteCurrentSeason();
+        if (rolloverMessage != MatchPlaybackContractValidator.PassMessage)
+        {
+            return rolloverMessage;
+        }
+
+        var expectedSeasonYear = SeasonStartYear;
+        var expectedDate = CurrentDate;
+        var expectedMatchday = CurrentMatchday;
+        var expectedSelectedClub = SelectedClubName;
+        var expectedOpponent = CurrentOpponentName;
+        var expectedNextFixtureSummary = NextFixtureSummary;
+        var expectedFixtureCount = CompetitionFixtures.Length;
+        var expectedFirstPlayer = SquadPlayers.Length == 0 ? null : SquadPlayers[0];
+        if (expectedFirstPlayer == null)
+        {
+            return "Expected squad state is unavailable after season rollover.";
+        }
+
+        if (SaveSystem.Instance == null)
+        {
+            return "Save system unavailable during full-season regression validation.";
+        }
+
+        if (!SaveSystem.Instance.SaveGame(out var saveStatus))
+        {
+            return saveStatus;
+        }
+
+        var mutationClub = ResolveDifferentClub(SelectedClubName);
+        if (TouchlineWorldGenerator.Instance != null && !string.IsNullOrWhiteSpace(mutationClub))
+        {
+            TouchlineWorldGenerator.Instance.BeginNewCareer("Full Season Mutation", CareerSeed + 1200);
+            TouchlineWorldGenerator.Instance.SelectClub(mutationClub);
+        }
+
+        if (!SaveSystem.Instance.LoadGame(out var loadStatus))
+        {
+            return loadStatus;
+        }
+
+        if (SeasonStartYear != expectedSeasonYear ||
+            CurrentDate != expectedDate ||
+            CurrentMatchday != expectedMatchday ||
+            SelectedClubName != expectedSelectedClub ||
+            CurrentOpponentName != expectedOpponent ||
+            NextFixtureSummary != expectedNextFixtureSummary)
+        {
+            return "Save/load did not preserve new-season timeline and next-opponent context.";
+        }
+
+        if (CompetitionFixtures.Length != expectedFixtureCount || CountCompletedFixtures() != 0)
+        {
+            return "Save/load did not preserve reset new-season fixtures.";
+        }
+
+        foreach (var row in CompetitionTable)
+        {
+            if (row.Played != 0 || row.Points != 0 || row.GoalsFor != 0 || row.GoalsAgainst != 0)
+            {
+                return "Save/load did not preserve reset new-season standings.";
+            }
+        }
+
+        if (LastMatchReport != null)
+        {
+            return "Save/load restored a stale last match report after season rollover.";
+        }
+
+        if (SquadPlayers.Length == 0 ||
+            SquadPlayers[0].Name != expectedFirstPlayer.Name ||
+            SquadPlayers[0].Age != expectedFirstPlayer.Age ||
+            SquadPlayers[0].Fitness != expectedFirstPlayer.Fitness ||
+            SquadPlayers[0].Form != expectedFirstPlayer.Form ||
+            SquadPlayers[0].Morale != expectedFirstPlayer.Morale)
+        {
+            return "Save/load did not preserve post-rollover squad development state.";
         }
 
         return MatchPlaybackContractValidator.PassMessage;
@@ -1203,6 +1410,33 @@ public partial class GameState : Node
         }
 
         return count;
+    }
+
+    private string CompleteCurrentSeason()
+    {
+        var startingSeasonYear = SeasonStartYear;
+        var seasonLength = CompetitionRuntimeService.GetSeasonMatchdayCount(CompetitionFixtures);
+        for (var guard = 0; guard < seasonLength + 2 && SeasonStartYear == startingSeasonYear; guard++)
+        {
+            if (!IsCurrentClubFixtureComplete())
+            {
+                ApplyMatchResult(PrepareCurrentMatchResult(true));
+            }
+
+            if (TouchlineCalendarSystem.Instance == null)
+            {
+                return "Calendar system unavailable during season completion validation.";
+            }
+
+            if (!TouchlineCalendarSystem.Instance.AdvanceCareerDate())
+            {
+                return TouchlineCalendarSystem.Instance.LastStatusMessage;
+            }
+        }
+
+        return SeasonStartYear == startingSeasonYear + 1
+            ? MatchPlaybackContractValidator.PassMessage
+            : "Season rollover did not trigger after completing the fixture list.";
     }
 
     private static bool IsPlayerValueInBounds(SquadPlayer player)

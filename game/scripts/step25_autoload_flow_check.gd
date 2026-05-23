@@ -32,9 +32,9 @@ func _process(_delta: float) -> bool:
             _fail("CareerSetup scene did not load")
             return false
 
-        var manager_name := current_scene.get_node("Center/Panel/Padding/Content/ManagerNameInput") as LineEdit
-        var seed_input := current_scene.get_node("Center/Panel/Padding/Content/SeedInput") as SpinBox
-        var start_button := current_scene.get_node("Center/Panel/Padding/Content/StartCareerButton") as Button
+        var manager_name := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/ManagerNameInput") as LineEdit
+        var seed_input := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/SeedInput") as SpinBox
+        var start_button := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/ActionsRow/StartCareerButton") as Button
         if manager_name == null or seed_input == null or start_button == null:
             _fail("CareerSetup controls missing")
             return false
@@ -56,17 +56,16 @@ func _process(_delta: float) -> bool:
             _fail("Career bootstrap did not populate GameState")
             return false
 
-        var confirm_button := current_scene.get_node("Center/Panel/Padding/Content/ConfirmSelectionButton") as Button
-        var club_list := current_scene.get_node("Center/Panel/Padding/Content/ClubList") as ItemList
-        if confirm_button == null or club_list == null:
+        var confirm_button := current_scene.get_node("RootMargin/MainColumn/ContentRow/ListCard/ListPadding/ListContent/ActionsRow/ConfirmSelectionButton") as Button
+        var club_rows := current_scene.get_node("RootMargin/MainColumn/ContentRow/ListCard/ListPadding/ListContent/ClubScroll/ClubRows") as VBoxContainer
+        if confirm_button == null or club_rows == null:
             _fail("ChooseClub controls missing")
             return false
 
-        if club_list.item_count == 0:
+        if club_rows.get_child_count() == 0:
             _fail("ChooseClub did not receive seeded clubs")
             return false
 
-        club_list.select(0)
         confirm_button.emit_signal("pressed")
         print("STEP25_STAGE_1_OK")
         _stage = 2
@@ -97,7 +96,7 @@ func _process(_delta: float) -> bool:
             _fail("MatchdayScene did not load from the dashboard")
             return false
 
-        var instant_button := current_scene.get_node("Center/Shell/Padding/Content/ActionsRow/InstantResultButton") as Button
+        var instant_button := current_scene.get_node("RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/InstantResultButton") as Button
         if instant_button == null:
             _fail("Matchday instant-result button missing")
             return false
@@ -112,7 +111,7 @@ func _process(_delta: float) -> bool:
             _fail("PostMatchScene did not load")
             return false
 
-        var continue_button := current_scene.get_node("Center/Shell/Padding/Content/ContinueButton") as Button
+        var continue_button := current_scene.get_node("RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/ContinueButton") as Button
         if continue_button == null:
             _fail("PostMatchScene continue button missing")
             return false

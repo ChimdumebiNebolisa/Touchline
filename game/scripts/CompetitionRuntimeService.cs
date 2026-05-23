@@ -210,6 +210,24 @@ public static class CompetitionRuntimeService
         return maxMatchday == 0 ? 6 : maxMatchday;
     }
 
+    public static bool IsSeasonComplete(GameState.CompetitionFixture[] fixtures)
+    {
+        if (fixtures.Length == 0)
+        {
+            return false;
+        }
+
+        foreach (var fixture in fixtures)
+        {
+            if (!fixture.IsComplete)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     private static GameState.CompetitionFixture[] BuildCompetitionFixtures(string[] availableClubs, string selectedClubName)
     {
         var rivals = Array.FindAll(availableClubs, clubName => clubName != selectedClubName);

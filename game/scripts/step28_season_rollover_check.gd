@@ -28,6 +28,7 @@ func _process(_delta: float) -> bool:
             return false
 
         for _index in range(6):
+            game_state.ResolveCurrentMatchInstantly()
             if not calendar_system.AdvanceCareerDate():
                 _fail(calendar_system.LastStatusMessage)
                 return false
@@ -51,8 +52,8 @@ func _process(_delta: float) -> bool:
             _fail("GameState missing during rollover verification")
             return false
 
-        var identity_label := current_scene.get_node("Center/Panel/Padding/Content/ProfileCard/ProfilePadding/ProfileContent/IdentityLabel") as Label
-        var role_label := current_scene.get_node("Center/Panel/Padding/Content/ProfileCard/ProfilePadding/ProfileContent/RoleLabel") as Label
+        var identity_label := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/ProfileCard/ProfilePadding/ProfileContent/IdentityLabel") as Label
+        var role_label := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/ProfileCard/ProfilePadding/ProfileContent/RoleLabel") as Label
         if identity_label == null or role_label == null:
             _fail("PlayerProfile labels missing during rollover verification")
             return false

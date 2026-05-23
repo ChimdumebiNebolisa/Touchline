@@ -96,7 +96,7 @@ public static class DevelopmentSystem
             player =>
             {
                 var nextAge = player.Age + 1;
-                var rng = new Random(Math.Abs(HashCode.Combine(worldSeed, seasonStartYear, player.Name, player.Position)));
+                var rng = new Random(BuildStableSeed(worldSeed, seasonStartYear, player.Name, player.Position));
                 var formDelta = CalculateFormDelta(nextAge, rng);
                 var fitnessDelta = CalculateFitnessDelta(nextAge, rng);
                 var moraleDelta = formDelta > 0 ? 2 : formDelta < 0 ? -2 : 0;
@@ -142,5 +142,28 @@ public static class DevelopmentSystem
         }
 
         return -1 - rng.Next(0, 2);
+    }
+
+    private static int BuildStableSeed(int worldSeed, int seasonStartYear, string playerName, string playerPosition)
+    {
+        unchecked
+        {
+            var hash = 17;
+            hash = (hash * 31) + worldSeed;
+            hash = (hash * 31) + seasonStartYear;
+            hash = AddStableStringHash(hash, playerName);
+            hash = AddStableStringHash(hash, playerPosition);
+            return hash == int.MinValue ? int.MaxValue : Math.Abs(hash);
+        }
+    }
+
+    private static int AddStableStringHash(int hash, string value)
+    {
+        foreach (var character in value ?? string.Empty)
+        {
+            hash = (hash * 31) + character;
+        }
+
+        return hash;
     }
 }

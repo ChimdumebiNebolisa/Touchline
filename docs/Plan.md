@@ -58,6 +58,9 @@
 - Step 42: Harden repeated matchday progression
 - Step 43: Improve player condition/form/morale changes
 - Step 44: Add multi-match regression checks
+- Step 45: Harden season rollover
+- Step 46: Add lightweight season-end player aging/development
+- Step 47: Add full-season regression checks
 
 ## 2. Plan Rules
 
@@ -743,3 +746,79 @@ Add automated coverage for multiple matchdays so save/load, calendar, fixtures, 
 - repeated career-loop automation covers the current hardened path
 - failures report explicit continuity issues
 - no product scope is added beyond the hardening pass
+
+## 37. Step 45: Harden season rollover
+
+### Objective
+
+Make season rollover safe and explicit once the current fixture list has been completed.
+
+### Allowed Subtasks
+
+- detect whether every fixture in the current season is complete before allowing rollover
+- increment season year and reset matchday to the first new-season matchday
+- regenerate fixtures and reset standings for the new season
+- preserve selected club, squad, manager, pressure context, and career identity
+- clear season-specific match report state before the new campaign opens
+
+### Verification
+
+- completing the fixture list and advancing the calendar rolls into the next season
+- season label, date, matchday, fixtures, standings, next opponent, and report state are reset correctly
+- attempting rollover before fixture completion fails explicitly instead of silently skipping the season
+
+### Exit Criteria
+
+- dashboard, fixtures, and standings receive coherent new-season state
+- selected club and squad persist through rollover
+- no promotion, relegation, transfers, contracts, finances, or deep league systems are introduced
+
+## 38. Step 46: Add lightweight season-end player aging/development
+
+### Objective
+
+Apply deterministic season-end player aging and small development changes during rollover.
+
+### Allowed Subtasks
+
+- age every squad player by one year during season rollover
+- give younger players small form/morale/fitness upside where deterministic rules allow
+- apply small form/fitness decline pressure to older players
+- clamp form, morale, and fitness safely
+
+### Verification
+
+- every squad player ages by one year at rollover
+- at least one player value changes across the season-end development pass
+- all player values remain inside valid bounds after rollover and save/load
+
+### Exit Criteria
+
+- season-end development remains lightweight and explainable
+- changes are deterministic from seed, season, and player identity
+- no injuries, potential ratings, retirements, training plans, contracts, wages, or transfers are added
+
+## 39. Step 47: Add full-season regression checks
+
+### Objective
+
+Cover long-run career continuity by simulating a full season into rollover and through save/load.
+
+### Allowed Subtasks
+
+- add a season rollover contract check
+- add a season development contract check
+- add a full-season save/load regression check
+- preserve existing match-engine, post-match, progression, and navigation checks
+
+### Verification
+
+- all fixtures can be completed without duplicate application
+- season rollover resets fixtures and standings while preserving selected club and squad
+- save/load after rollover preserves season year, date, matchday, club, squad, fixtures, standings, and next opponent context
+
+### Exit Criteria
+
+- full-season regression automation passes with existing route checks
+- failures identify the broken long-run continuity assumption directly
+- no unrelated product scope is added

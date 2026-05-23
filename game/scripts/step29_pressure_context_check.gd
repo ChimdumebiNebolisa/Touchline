@@ -57,7 +57,7 @@ func _process(_delta: float) -> bool:
             _fail("MatchdayScene did not load for the Step 29 pressure check")
             return false
 
-        var pressure_reasons := current_scene.get_node("Center/Shell/Padding/Content/BodyRow/EventCard/EventPadding/EventContent/PressureReasonsLabel") as Label
+        var pressure_reasons := current_scene.get_node("RootMargin/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent/PressureReasonsLabel") as Label
         if pressure_reasons == null:
             _fail("Matchday pressure reasons label is missing")
             return false
