@@ -1,16 +1,15 @@
 # Autonomous Progress
 
 ## Current active Plan step
-- Step 57: Final regression and manual QA checklist.
+- Step 58: Demo asset plan.
 
 ## Last completed verified task
-- Step 56 release workflow complete: `docs/Release.md` documents the active Godot + C# run/build/headless/export workflow, and `step56_release_workflow_check.gd` verifies main scene, C# feature, autoloads, assembly name, and seed data.
+- Step 57 final QA complete: `docs/QA.md` groups the full automated suite and manual demo checklist, `step57_final_regression_check.gd` adds a final contract smoke, and the full Step 22, 23, 25-30, and 34-57 headless suite passed.
 
 ## Current subtask in progress
-- Step 57 final regression and manual QA checklist.
+- Step 58 demo asset plan.
 
 ## Next queued subtasks
-- Step 58: document the demo asset plan.
 - Step 59: lock final product boundary and limitations.
 - Step 60: rewrite README in final project format.
 
@@ -19,18 +18,17 @@
 - Godot Mono is available locally. Headless checks were run as individual processes to avoid unrelated process-teardown noise from large shell batches.
 
 ## Last verification run
-- Step 56 verification:
+- Step 57 verification:
   - `dotnet build game/Touchline.sln` passed.
   - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game --build-solutions --quit` passed.
-  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step56_release_workflow_check.gd` passed with `STEP56_RELEASE_WORKFLOW_PASS`.
-  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step22_shared_engine_check.gd` passed with `STEP22_SHARED_ENGINE_PASS`.
-  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step30_navigation_flow_check.gd` passed with `STEP30_NAVIGATION_FLOW_PASS`.
-  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step50_end_to_end_user_flow_check.gd` passed with `STEP50_END_TO_END_USER_FLOW_PASS`.
+  - Full headless suite passed: Step 22, Step 23, Steps 25-30, and Steps 34-57.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step57_final_regression_check.gd` passed with `STEP57_FINAL_REGRESSION_PASS`.
+  - Manual visual smoke checklist is documented in `docs/QA.md`; it should be executed during screenshot/video capture.
 
 ## Last commit hash
-- 697c591
+- Pending Step 57 implementation commit.
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`.
-- Continue from active Step 57 in `docs/Plan.md`.
-- Implement only the smallest valid Step 57 subtask, verify, commit, push, and update this file before moving to Step 58.
+- Continue from active Step 58 in `docs/Plan.md`.
+- Implement only the smallest valid Step 58 subtask, verify, commit, push, and update this file before moving to Step 59.

@@ -4,11 +4,10 @@
 
 ### Active
 
-- Step 57: Final regression and manual QA checklist
+- Step 58: Demo asset plan
 
 ### Backlog
 
-- Step 58: Demo asset plan
 - Step 59: Final product boundary and limitations pass
 - Step 60: Rewrite README in final project format
 
@@ -74,6 +73,7 @@
 - Step 54: Full UI consistency and visual polish pass
 - Step 55: Save/load and empty/error-state polish
 - Step 56: Demo-ready build and release workflow
+- Step 57: Final regression and manual QA checklist
 
 ## 2. Plan Rules
 
@@ -455,7 +455,7 @@ Transform the current Godot shell from a centered prototype-card presentation in
 
 ## 24. Immediate Next Subtask
 
-- Active Step 57: create the final regression and manual QA checklist for demo-safe verification.
+- Active Step 58: document the demo asset plan without generating screenshots or claiming unavailable assets.
 
 ## 25. Step 33: Rewrite repository documentation and README
 
