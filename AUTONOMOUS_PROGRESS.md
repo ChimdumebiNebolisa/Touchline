@@ -26,7 +26,7 @@
   - Manual visual smoke checklist is documented in `docs/QA.md`; it should be executed during screenshot/video capture.
 
 ## Last commit hash
-- Pending Step 57 implementation commit.
+- ec49f38
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`.
