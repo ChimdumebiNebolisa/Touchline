@@ -1,16 +1,18 @@
 # Autonomous Progress
 
 ## Current active Plan step
-- None. Steps 48-50 are complete.
+- Step 51: Polish squad and player-profile management clarity.
 
 ## Last completed verified task
 - Steps 48-50 manager-experience polish complete: dashboard context now surfaces season/date/matchday, league position, next fixture, pressure, lineup readiness, tactical setup, recent results, and last-report context; matchday preparation now explains opponent, lineup, tactics, pressure, and live-vs-instant choice; end-to-end user-flow checks cover career setup through post-match dashboard return and save/load context.
 
 ## Current subtask in progress
-- None.
+- Source-of-truth docs now activate the final Steps 51-60 roadmap; next implementation subtask is Step 51 squad/profile clarity.
 
 ## Next queued subtasks
-- None. There is no active Plan step. Update source-of-truth docs before beginning any new product scope.
+- Step 51: clarify squad starters, non-starters, player condition, and profile status.
+- Step 52: clarify tactics values and saved-plan behavior.
+- Step 53: clarify fixtures, standings, and rollover presentation.
 
 ## Known blockers
 - No active blockers.
@@ -49,5 +51,5 @@
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`.
-- Steps 48-50 are complete. Do not begin new product work until the source-of-truth docs name a new active step.
-- If new scope is approved, start from the updated `docs/Plan.md` state and verify before committing.
+- Continue from active Step 51 in `docs/Plan.md`.
+- Implement only the smallest valid Step 51 subtask, verify, commit, push, and update this file before moving to Step 52.

@@ -4,9 +4,19 @@
 
 ### Active
 
-- None
+- Step 51: Polish squad and player-profile management clarity
 
 ### Backlog
+
+- Step 52: Polish tactics screen clarity
+- Step 53: Polish fixtures and standings presentation
+- Step 54: Full UI consistency and visual polish pass
+- Step 55: Save/load and empty/error-state polish
+- Step 56: Demo-ready build and release workflow
+- Step 57: Final regression and manual QA checklist
+- Step 58: Demo asset plan
+- Step 59: Final product boundary and limitations pass
+- Step 60: Rewrite README in final project format
 
 ### Blocked
 
@@ -445,7 +455,7 @@ Transform the current Godot shell from a centered prototype-card presentation in
 
 ## 24. Immediate Next Subtask
 
-- No active Plan step. Update the source-of-truth docs before beginning any new product scope.
+- Active Step 51: polish squad and player-profile management clarity without adding transfers, training, injuries, or new player systems.
 
 ## 25. Step 33: Rewrite repository documentation and README
 
@@ -892,3 +902,309 @@ Cover the manager-facing route from career setup through dashboard, matchday, po
 
 - end-to-end route automation covers the polished manager-facing flow
 - no unrelated product scope is added
+
+## 43. Step 51: Polish squad and player-profile management clarity
+
+### Objective
+
+Make the squad and player profile screens feel like a real manager workspace while keeping lineup and player-state rules in domain/runtime state.
+
+### Allowed Subtasks
+
+- present starters, non-starters, bench, and reserve depth clearly from existing squad state
+- improve condition, form, morale, fitness, role, position, and lineup-status readability
+- surface post-match player-state visibility when a latest match report exists
+- tighten profile summary copy around identity, role, age, condition, and lineup status
+- add focused headless coverage for squad/profile clarity and lineup action continuity
+
+### Verification
+
+- `dotnet build game/Touchline.sln`
+- `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step5_squad_named_players_check.gd`
+- `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step30_navigation_flow_check.gd`
+- `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step43_player_condition_check.gd`
+- `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step50_end_to_end_user_flow_check.gd`
+- new `step51_squad_profile_check.gd`
+
+### Exit Criteria
+
+- squad screen clearly shows starters and non-starters
+- player profile clearly shows identity, role, age, form, morale, fitness, and lineup status
+- lineup actions still work
+- no business rules move into UI scenes
+- no transfer, training, injury, contract, or player-system expansion is introduced
+
+## 44. Step 52: Polish tactics screen clarity
+
+### Objective
+
+Make tactics readable and visibly connected to shared match behavior without adding a tactical advice engine.
+
+### Allowed Subtasks
+
+- show formation, press, tempo, width, and risk values clearly in the tactical board
+- add simple interpretation copy for press line, ball speed, pitch use, and risk commitment
+- clarify unsaved preview, saved plan, and reset-to-saved behavior
+- reuse existing tactical summary wording where it helps dashboard or matchday consistency
+- add focused headless coverage that saved tactics still affect shared match simulation
+
+### Verification
+
+- `dotnet build game/Touchline.sln`
+- Step 6 tactics persistence check
+- Step 22 shared engine check
+- Step 37 match variation check
+- Step 49 matchday preparation check
+- new `step52_tactics_context_check.gd`
+
+### Exit Criteria
+
+- all tactical values are visible and understandable
+- saved tactics persist and still feed the shared match engine
+- UI explains broad meaning but does not compute match rules
+- no tactical advice, scouting, or AI assistant system is added
+
+## 45. Step 53: Polish fixtures and standings presentation
+
+### Objective
+
+Make season context easier to read through clearer fixtures, standings, current matchday, and rollover presentation.
+
+### Allowed Subtasks
+
+- distinguish completed, next, and upcoming fixtures from existing competition state
+- show completed scorelines only for completed fixtures
+- highlight selected club context in fixtures and standings
+- clarify current season, matchday, date, next fixture, and table state
+- show coherent new-season state after existing rollover logic runs
+
+### Verification
+
+- `dotnet build game/Touchline.sln`
+- Step 28 season rollover check
+- Step 30 navigation flow check
+- Step 45 season rollover check
+- Step 47 full-season regression check
+- new `step53_competition_surfaces_check.gd`
+
+### Exit Criteria
+
+- fixtures screen clearly distinguishes completed and upcoming fixtures
+- standings screen clearly shows table columns and selected club context
+- rollover state is coherent
+- no new competition formats, cups, promotion, or relegation are added
+
+## 46. Step 54: Full UI consistency and visual polish pass
+
+### Objective
+
+Make all primary screens feel like one cohesive product through consistent layout, spacing, copy, buttons, chips, and navigation.
+
+### Allowed Subtasks
+
+- normalize section titles, chips, button language, and navigation labels across primary scenes
+- reduce debug-looking or prototype-looking normal-state copy
+- keep explicit unavailable/error states clear
+- use existing `TouchlineTheme` and current scene structure instead of large rewrites
+- add focused headless coverage for route-level consistency
+
+### Verification
+
+- `dotnet build game/Touchline.sln`
+- Step 30 navigation flow check
+- Step 35 live renderer check
+- Step 48 dashboard context check
+- Step 49 matchday preparation check
+- Step 50 end-to-end user-flow check
+- new `step54_ui_consistency_check.gd`
+
+### Exit Criteria
+
+- primary screens use consistent layout and copy conventions
+- navigation labels are clear
+- obvious prototype or debug wording is removed from populated screens
+- existing flow checks still pass
+
+## 47. Step 55: Save/load and empty/error-state polish
+
+### Objective
+
+Make the app safer and clearer when state is missing, unavailable, incomplete, or loaded from older saves.
+
+### Allowed Subtasks
+
+- strengthen save-slot preview clarity in main menu and load screen
+- improve load failure messaging for missing, corrupt, future-version, and incomplete saves
+- validate critical current-save fields before restore
+- preserve old-save compatibility through the existing migration path
+- clarify unavailable fixture and completed-season states without enabling replay
+
+### Verification
+
+- `dotnet build game/Touchline.sln`
+- Step 27 save compatibility check
+- Step 30 navigation flow check
+- Step 42 matchday progression check
+- Step 47 full-season regression check
+- Step 50 end-to-end user-flow check
+- new `step55_save_error_state_check.gd`
+
+### Exit Criteria
+
+- save/load screens clearly communicate slot state
+- old, missing, corrupt, or incomplete data does not crash core flows
+- fallback states are explicit and honest
+- no silent failures or fake successful loads are introduced
+
+## 48. Step 56: Demo-ready build and release workflow
+
+### Objective
+
+Make the project easier to run, verify, and package for demo review without overbuilt release infrastructure.
+
+### Allowed Subtasks
+
+- document Godot GUI and console/headless run commands
+- document .NET build, Godot solution build, and grouped headless verification commands
+- document practical Windows export guidance through Godot
+- add a small project-settings release workflow check if useful
+- avoid treating stale npm or web commands as the active product path
+
+### Verification
+
+- `dotnet build game/Touchline.sln`
+- Godot headless `--build-solutions --quit`
+- optional `step56_release_workflow_check.gd`
+- manual review of release workflow docs
+
+### Exit Criteria
+
+- a developer can run the Godot project
+- a developer can run build checks
+- a developer can understand how to produce a demo executable
+- no CI or packaging infrastructure is added beyond the practical checklist
+
+## 49. Step 57: Final regression and manual QA checklist
+
+### Objective
+
+Create a final proof pass that verifies the app is demo-safe.
+
+### Allowed Subtasks
+
+- group all automated checks by build, engine, route, save/load, progression, rollover, player state, and final flow
+- document manual QA for new career, load/resume, live match, instant result, post-match, multi-match progression, season rollover, save/load after rollover, and visual smoke
+- record known limitations honestly
+- add a small final smoke check only if it complements existing coverage
+
+### Verification
+
+- full automated suite from Step 22 onward
+- `dotnet build game/Touchline.sln`
+- Godot build-solutions
+- manual QA checklist review
+
+### Exit Criteria
+
+- final regression list exists
+- automated checks are grouped clearly
+- manual demo checklist is clear
+- known limitations are honest
+
+## 50. Step 58: Demo asset plan
+
+### Objective
+
+Plan the screenshots and short demo video proof needed to make the project credible.
+
+### Allowed Subtasks
+
+- document screenshots for main menu, dashboard, squad, tactics, fixtures, standings, matchday, live match, post-match, and save/load
+- define a short demo video structure covering the real playable loop
+- state what the demo proves from existing app behavior
+- define where final assets should be referenced from the README
+- use placeholders only when assets are not yet captured
+
+### Verification
+
+- manual review of demo asset plan
+- ensure planned assets map to actual Godot scenes and supported features
+
+### Exit Criteria
+
+- demo proof plan is specific
+- screenshots and video list map to actual app features
+- no fake claims or unsupported features are planned
+
+## 51. Step 59: Final product boundary and limitations pass
+
+### Objective
+
+Prevent scope creep and make the project boundary honest across source-of-truth docs.
+
+### Allowed Subtasks
+
+- define what Touchline is as a local-first single-player Godot/C# football management v1
+- define what Touchline is not, including backend, multiplayer, playable controls, 3D, transfers, contracts, wages, finances, scouting, injuries, promotion/relegation, youth academy, deep training, xG, multi-competition calendar, licensed teams, and external APIs
+- document supported flows, known limitations, and technical boundaries
+- clarify legacy web/TypeScript artifacts as reference-only
+- keep PRD, Architecture, Guardrails, and Plan consistent
+
+### Verification
+
+- doc consistency review across source-of-truth docs
+- stale active-path claim scan with `rg`
+- core build or route smoke if any code is touched
+
+### Exit Criteria
+
+- docs clearly state current product boundary
+- unsupported systems are not implied
+- legacy web code is not presented as active
+- final scope is demo-ready and honest
+
+## 52. Step 60: Rewrite README in final project format
+
+### Objective
+
+Rewrite `README.md` into the final project format exactly, with no extra sections.
+
+### Required README Structure
+
+- `# Project Name`
+- one-line description
+- `## Problem It Solves`
+- `## Demo`
+- `## Features`
+- `## Tech Stack`
+- `## Architecture`
+- `## Setup`
+- `## How to Use`
+- `## Key Technical Decisions`
+- `## Limitations`
+- `## License`
+- `MIT License`
+
+### Allowed Subtasks
+
+- replace the README with exactly the required section list
+- mention Godot + C# as the active product path
+- mention local-first single-player
+- include setup and verification commands
+- include an architecture diagram in text or Mermaid
+- mention legacy web code only inside an allowed section and only as archived/reference material
+- mark demo placeholders clearly if final assets are not present
+
+### Verification
+
+- README heading-order review
+- stale unsupported-claim scan
+- `dotnet build game/Touchline.sln`
+- representative final headless regression suite
+
+### Exit Criteria
+
+- README follows exactly the requested section list
+- README is accurate to the current app
+- README helps someone run, understand, and evaluate the project
+- no extra sections are added
