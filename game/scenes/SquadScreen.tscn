@@ -442,11 +442,11 @@ theme_override_constants/separation = 12
 
 [node name="SelectionHeading" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/SelectionCard/SelectionPadding/SelectionContent"]
 layout_mode = 2
-text = "Roster"
+text = "Starting XI / Non-Starters"
 
 [node name="SelectionHintLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/SelectionCard/SelectionPadding/SelectionContent"]
 layout_mode = 2
-text = "Clickable roster rows replace the old list dump so role, condition, and readiness scan faster."
+text = "Rows separate the Starting XI from non-starters, with bench and reserve depth shown through role, condition, and readiness."
 autowrap_mode = 3
 
 [node name="FilterRow" type="HBoxContainer" parent="RootMargin/Shell/MainColumn/ContentRow/SelectionCard/SelectionPadding/SelectionContent"]

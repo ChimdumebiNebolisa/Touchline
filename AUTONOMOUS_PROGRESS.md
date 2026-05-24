@@ -1,24 +1,31 @@
 # Autonomous Progress
 
 ## Current active Plan step
-- Step 51: Polish squad and player-profile management clarity.
+- Step 52: Polish tactics screen clarity.
 
 ## Last completed verified task
-- Steps 48-50 manager-experience polish complete: dashboard context now surfaces season/date/matchday, league position, next fixture, pressure, lineup readiness, tactical setup, recent results, and last-report context; matchday preparation now explains opponent, lineup, tactics, pressure, and live-vs-instant choice; end-to-end user-flow checks cover career setup through post-match dashboard return and save/load context.
+- Step 51 squad/profile clarity complete: squad rows now distinguish Starting XI and non-starters, condition/form/morale/fitness copy is explicit, post-match player-state visibility appears in squad/profile surfaces, and profile handoff preserves selected-player identity and lineup status.
 
 ## Current subtask in progress
-- Source-of-truth docs now activate the final Steps 51-60 roadmap; next implementation subtask is Step 51 squad/profile clarity.
+- Step 52 tactics clarity.
 
 ## Next queued subtasks
-- Step 51: clarify squad starters, non-starters, player condition, and profile status.
-- Step 52: clarify tactics values and saved-plan behavior.
 - Step 53: clarify fixtures, standings, and rollover presentation.
+- Step 54: apply full UI consistency pass.
+- Step 55: polish save/load and empty/error states.
 
 ## Known blockers
 - No active blockers.
 - Godot Mono is available locally. Headless checks were run as individual processes to avoid unrelated process-teardown noise from large shell batches.
 
 ## Last verification run
+- Step 51 verification:
+  - `dotnet build game/Touchline.sln` passed.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step5_squad_named_players_check.gd` passed with `STEP5_SUBTASK_PASS`.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step30_navigation_flow_check.gd` passed with `STEP30_NAVIGATION_FLOW_PASS`.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step43_player_condition_check.gd` passed with `STEP43_PLAYER_CONDITION_PASS`.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step50_end_to_end_user_flow_check.gd` passed with `STEP50_END_TO_END_USER_FLOW_PASS`.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step51_squad_profile_check.gd` passed with `STEP51_SQUAD_PROFILE_PASS`.
 - `dotnet build game/Touchline.sln` passed.
 - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step22_shared_engine_check.gd` passed with `STEP22_SHARED_ENGINE_PASS`.
 - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step23_post_match_check.gd` passed with `STEP23_POST_MATCH_PASS`.
@@ -47,9 +54,9 @@
 - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step50_end_to_end_user_flow_check.gd` passed with `STEP50_END_TO_END_USER_FLOW_PASS`.
 
 ## Last commit hash
-- 0d52cab
+- pending Step 51 commit.
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`.
-- Continue from active Step 51 in `docs/Plan.md`.
-- Implement only the smallest valid Step 51 subtask, verify, commit, push, and update this file before moving to Step 52.
+- Continue from active Step 52 in `docs/Plan.md`.
+- Implement only the smallest valid Step 52 subtask, verify, commit, push, and update this file before moving to Step 53.

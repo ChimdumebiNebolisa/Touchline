@@ -130,16 +130,16 @@ public partial class PlayerProfile : Control
             return;
         }
 
-        var lineupStatus = player.IsStarting ? "STARTING XI" : "BENCH OPTION";
+        var lineupStatus = player.IsStarting ? "STARTING XI" : "NON-STARTER";
         _badgeLabel.Text = BuildClubMonogram(GameState.Instance.SelectedClubName!);
         _clubNameLabel.Text = GameState.Instance.SelectedClubName!;
         _roleChipLabel.Text = lineupStatus;
-        _clubContextLabel.Text = $"{GameState.Instance.SelectedClubName} | {player.Position} | Age {player.Age}";
+        _clubContextLabel.Text = $"{GameState.Instance.SelectedClubName} | {player.Position} | Age {player.Age} | Lineup status {lineupStatus}";
         _pageTitleLabel.Text = player.Name;
         _statusLabel.Text = BuildStatusSummary(player);
 
         _positionValueLabel.Text = player.Position;
-        _positionMetaLabel.Text = player.IsStarting ? "Current starter in the active shape." : "Rotation option for the next selection call.";
+        _positionMetaLabel.Text = player.IsStarting ? "Current starter in the active shape." : "Non-starter in the bench/reserve group.";
         _ageValueLabel.Text = player.Age.ToString();
         _ageMetaLabel.Text = DescribeAgeBand(player.Age);
         _formValueLabel.Text = player.Form.ToString();
@@ -147,10 +147,10 @@ public partial class PlayerProfile : Control
         _fitnessValueLabel.Text = player.Fitness.ToString();
         _fitnessMetaLabel.Text = DescribeFitness(player.Fitness);
 
-        _identityLabel.Text = $"Identity | {player.Position} | Age {player.Age} | Morale {player.Morale} | Value stays tied to the live squad state.";
-        _roleLabel.Text = $"Current role | {lineupStatus} | Matchday contribution follows this selection state.";
+        _identityLabel.Text = $"Identity | {player.Name} | {GameState.Instance.SelectedClubName} | {player.Position} | Age {player.Age}";
+        _roleLabel.Text = $"Lineup status | {lineupStatus} | Matchday contribution follows this selection state.";
         _conditionLabel.Text = $"Condition | Fitness {player.Fitness} | Morale {player.Morale} | Form {player.Form}";
-        _pathwayLabel.Text = BuildTrajectorySummary(player);
+        _pathwayLabel.Text = BuildTrajectorySummary(player, GameState.Instance);
         _readinessLabel.Text = BuildReadinessSummary(player);
     }
 
@@ -182,40 +182,45 @@ public partial class PlayerProfile : Control
         GetTree().ChangeSceneToFile(SquadScreenScenePath);
     }
 
-    private static string BuildTrajectorySummary(GameState.SquadPlayer player)
+    private static string BuildTrajectorySummary(GameState.SquadPlayer player, GameState state)
     {
+        var latestMatchLine = state.LastMatchReport == null
+            ? "Current state is pre-match readiness."
+            : $"Latest match state reflected after {state.LastMatchReport.Scoreline}.";
+
         if (player.Age <= 21)
         {
-            return "Trajectory | Early-career player. Minutes and morale will shape the next development step.";
+            return $"Trajectory | Early-career player. Minutes and morale will shape the next development step. {latestMatchLine}";
         }
 
         if (player.Age >= 29)
         {
-            return "Trajectory | Senior squad piece. Short-term reliability matters as much as long-term planning.";
+            return $"Trajectory | Senior squad piece. Short-term reliability matters as much as long-term planning. {latestMatchLine}";
         }
 
-        return "Trajectory | Prime-cycle squad player. Current-season usage should drive immediate output.";
+        return $"Trajectory | Prime-cycle squad player. Current-season usage should drive immediate output. {latestMatchLine}";
     }
 
     private static string BuildReadinessSummary(GameState.SquadPlayer player)
     {
+        var lineupStatus = player.IsStarting ? "Starting XI" : "Non-starter";
         if (player.Fitness >= 85 && player.Morale >= 65)
         {
-            return "Match readiness | Green. Ready for heavy minutes in the next fixture.";
+            return $"Match readiness | Green | {lineupStatus}. Ready for heavy minutes in the next fixture.";
         }
 
         if (player.Fitness >= 72 && player.Morale >= 55)
         {
-            return "Match readiness | Stable. Usable now, but workload should stay controlled.";
+            return $"Match readiness | Stable | {lineupStatus}. Usable now, but workload should stay controlled.";
         }
 
-        return "Match readiness | Watch closely. Fitness or confidence is suppressing selection certainty.";
+        return $"Match readiness | Watch closely | {lineupStatus}. Fitness or confidence is suppressing selection certainty.";
     }
 
     private static string BuildStatusSummary(GameState.SquadPlayer player)
     {
-        var role = player.IsStarting ? "starting selection" : "bench selection";
-        return $"{player.Position} | {role} | Form {player.Form} | Fitness {player.Fitness}";
+        var role = player.IsStarting ? "Starting XI" : "Non-starter";
+        return $"{player.Position} | {role} | Age {player.Age} | Form {player.Form} | Morale {player.Morale} | Fitness {player.Fitness}";
     }
 
     private static string DescribeMetric(int value, string metric)

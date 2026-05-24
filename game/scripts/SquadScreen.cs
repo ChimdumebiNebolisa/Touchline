@@ -249,20 +249,20 @@ public partial class SquadScreen : Control
         _competitionChipLabel.Text = state.CompetitionName.ToUpperInvariant();
         _clubContextLabel.Text = $"{clubName} squad control";
         _lineupSummaryLabel.Text = $"Next assignment: {state.CurrentOpponentName} | Matchday {state.CurrentMatchday}";
-        _headerStatusLabel.Text = "Use the roster list to scan readiness quickly, then move the selected player into or out of the XI.";
+        _headerStatusLabel.Text = BuildHeaderStatus(state);
 
         _startersValueLabel.Text = starters.ToString();
-        _startersMetaLabel.Text = "Players in the XI";
+        _startersMetaLabel.Text = "Starting XI players";
         _benchValueLabel.Text = bench.ToString();
-        _benchMetaLabel.Text = "Bench options";
+        _benchMetaLabel.Text = "Non-starters: bench and reserve depth";
         _moraleValueLabel.Text = averageMorale.ToString();
         _moraleMetaLabel.Text = $"Average morale {DescribePulse(averageMorale)}";
         _fitnessValueLabel.Text = averageFitness.ToString();
         _fitnessMetaLabel.Text = $"Average fitness {DescribeReadiness(averageFitness)}";
         _nextMatchValueLabel.Text = state.CurrentOpponentName;
         _nextMatchMetaLabel.Text = state.NextFixtureSummary;
-        _squadStatusLabel.Text = state.SquadStatusSummary;
-        _actionHintLabel.Text = "Primary action: settle the XI, then open player context only when you need the deeper profile.";
+        _squadStatusLabel.Text = BuildSquadWorkspaceSummary(state, starters, bench);
+        _actionHintLabel.Text = "Primary action: settle the XI from the available squad. This screen is lineup and readiness only.";
         _railHintLabel.Text = "Review the roster, adjust the XI, then move into tactics or launch the next matchday.";
 
         _matchdayButton.Disabled = false;
@@ -408,7 +408,7 @@ public partial class SquadScreen : Control
         rowContent.AddThemeConstantOverride("separation", 14);
         padding.AddChild(rowContent);
 
-        rowContent.AddChild(CreateStateChip(player.IsStarting ? "XI" : "BENCH", player.IsStarting));
+        rowContent.AddChild(CreateStateChip(player.IsStarting ? "STARTING XI" : "NON-STARTER", player.IsStarting));
 
         var body = new VBoxContainer
         {
@@ -453,7 +453,7 @@ public partial class SquadScreen : Control
 
         var conditionLabel = new Label
         {
-            Text = $"Fit {player.Fitness} | Mor {player.Morale} | Form {player.Form}",
+            Text = $"Fitness {player.Fitness} | Morale {player.Morale} | Form {player.Form}",
             HorizontalAlignment = HorizontalAlignment.Right
         };
         conditionLabel.AddThemeFontSizeOverride("font_size", 13);
@@ -508,7 +508,7 @@ public partial class SquadScreen : Control
 
         _playerNameLabel.Text = player.Name;
         _detailMetaLabel.Text = $"{player.Position} | Age {player.Age} | {BuildPlayerStatusLine(player)}";
-        _roleChipLabel.Text = player.IsStarting ? "STARTING XI" : "BENCH UNIT";
+        _roleChipLabel.Text = player.IsStarting ? "STARTING XI" : "NON-STARTER";
         _statusChipLabel.Text = BuildReadinessLabel(player).ToUpperInvariant();
         TouchlineTheme.ApplyPanelVariant(_roleChip, player.IsStarting ? TouchlineSurfaceVariant.Positive : TouchlineSurfaceVariant.Accent, 999);
         TouchlineTheme.ApplyPanelVariant(_statusChip, ResolveReadinessVariant(player), 999);
@@ -517,10 +517,10 @@ public partial class SquadScreen : Control
         _moraleStatLabel.Text = $"Morale | {player.Morale} | {DescribePulse(player.Morale)}";
         _fitnessStatLabel.Text = $"Fitness | {player.Fitness} | {DescribeReadiness(player.Fitness)}";
         _readinessSummaryLabel.Text = BuildReadinessSummary(player);
-        _profileHintLabel.Text = "Open the player profile for the longer arc. Keep squad work here focused on match readiness and role.";
+        _profileHintLabel.Text = "Open the player profile for identity, lineup status, and the longer form-morale-fitness arc.";
         _lineupStatusLabel.Text = player.IsStarting
-            ? $"{player.Name} currently holds a starting role. Use the primary action only if you want to rotate the XI."
-            : $"{player.Name} is currently outside the XI. Promote only if the readiness level fits the next fixture.";
+            ? $"{player.Name} currently holds a Starting XI role. Use the primary action only if you want to rotate the XI."
+            : $"{player.Name} is a non-starter in the bench/reserve group. Promote only if the readiness level fits the next fixture.";
         _lineupActionButton.Disabled = false;
         _lineupActionButton.Text = player.IsStarting ? $"Move {player.Name} to Bench" : $"Promote {player.Name} to XI";
         _openProfileButton.Disabled = false;
@@ -617,7 +617,7 @@ public partial class SquadScreen : Control
 
     private static string BuildPlayerStatusLine(GameState.SquadPlayer player)
     {
-        return player.IsStarting ? "Current XI role" : "Rotation option";
+        return player.IsStarting ? "Starting XI role" : "Non-starter: bench/reserve depth";
     }
 
     private static string BuildReadinessLabel(GameState.SquadPlayer player)
@@ -660,7 +660,23 @@ public partial class SquadScreen : Control
 
     private static string BuildReadinessSummary(GameState.SquadPlayer player)
     {
-        return $"{player.Name} reads as {BuildReadinessLabel(player).ToLowerInvariant()} for the next fixture: form {player.Form}, morale {player.Morale}, fitness {player.Fitness}.";
+        return $"{player.Name} reads as {BuildReadinessLabel(player).ToLowerInvariant()} for the next fixture: form {player.Form}, morale {player.Morale}, fitness {player.Fitness}, lineup status {BuildPlayerStatusLine(player).ToLowerInvariant()}.";
+    }
+
+    private static string BuildHeaderStatus(GameState state)
+    {
+        var postMatchNote = state.LastMatchReport == null
+            ? "Current values are live pre-match condition."
+            : $"Latest match player state reflected after {state.LastMatchReport.Scoreline}.";
+        return $"Scan Starting XI and non-starters by condition, role, form, morale, and fitness. {postMatchNote}";
+    }
+
+    private static string BuildSquadWorkspaceSummary(GameState state, int starters, int nonStarters)
+    {
+        var reportLine = state.LastMatchReport == null
+            ? "No latest match report is active; values show current match readiness."
+            : $"Latest match player state reflected: {state.LastMatchReport.FixtureLabel} {state.LastMatchReport.Scoreline}.";
+        return $"Lineup status: Starting XI {starters}/11 | Non-starters {nonStarters}.\n{state.SquadStatusSummary}\n{reportLine}";
     }
 
     private static int CountStarters(GameState state)
