@@ -244,7 +244,7 @@ public partial class TacticsScreen : Control
         _riskSpin.Value = state.Risk;
 
         _savedPlanLabel.Text = BuildSavedPlanSummary(state);
-        _saveHintLabel.Text = "Save to lock this plan into the next fixture.";
+        _saveHintLabel.Text = "Unsaved preview: adjust the board, then save to apply it to the shared match engine.";
         RefreshBoard();
     }
 
@@ -325,8 +325,8 @@ public partial class TacticsScreen : Control
         ApplyFormationRows(formation, width);
         _shapeSummaryLabel.Text = BuildShapeSummary(formation);
         _previewSummaryLabel.Text = BuildPreviewSummary(formation, press, tempo, width, risk);
-        _statusLabel.Text = "Adjust the board, read the pitch shape, then save when the plan fits the next fixture.";
-        _controlHintLabel.Text = "One clear call: shape the next match, then lock it in.";
+        _statusLabel.Text = "Preview mode: these values explain the next match plan before they are saved.";
+        _controlHintLabel.Text = "Preview values are unsaved until Save Tactical Plan applies them.";
         _controlSummaryLabel.Text = BuildControlSummary(formation, press, tempo, width, risk);
         _pressPreviewLabel.Text = $"Press line: {DescribePress(press)}. {BuildPressPreview(press)}";
         _tempoPreviewLabel.Text = $"Ball speed: {DescribeTempo(tempo)}. {BuildTempoPreview(tempo)}";
@@ -383,8 +383,8 @@ public partial class TacticsScreen : Control
         GameState.Instance.UpdateTactics(formation, press, tempo, width, risk);
         _savedPlanLabel.Text = BuildSavedPlanSummary(GameState.Instance);
         RefreshBoard();
-        _statusLabel.Text = $"Saved tactical board: {formation} | {DescribePress(press)} | {DescribeTempo(tempo)} | {DescribeWidth(width)} | {DescribeRisk(risk)}";
-        _saveHintLabel.Text = "Tactical board saved into the next fixture.";
+        _statusLabel.Text = $"Saved tactical setup applied to the shared match engine: {formation} | Press {press} | Tempo {tempo} | Width {width} | Risk {risk}";
+        _saveHintLabel.Text = "Saved plan is now the matchday tactical setup.";
         SetReadinessChip("PLAN SAVED", true);
     }
 
@@ -403,8 +403,8 @@ public partial class TacticsScreen : Control
         _widthSpin.Value = GameState.Instance.Width;
         _riskSpin.Value = GameState.Instance.Risk;
         RefreshBoard();
-        _statusLabel.Text = "Reverted the board to the currently saved tactical plan.";
-        _saveHintLabel.Text = "Controls reset to the last saved plan.";
+        _statusLabel.Text = "Preview reset to the currently saved tactical setup.";
+        _saveHintLabel.Text = "Save is only needed after new tactical changes.";
     }
 
     private void OnBackPressed()
@@ -479,7 +479,7 @@ public partial class TacticsScreen : Control
 
     private static string BuildSavedPlanSummary(GameState state)
     {
-        return $"Saved plan: {state.TacticalFormation} | Press {state.PressIntensity} | Tempo {state.Tempo} | Width {state.Width} | Risk {state.Risk}";
+        return $"Saved tactical setup: {state.BuildTacticalPlanSummary()} | Shared match engine input: Formation {state.TacticalFormation} | Press {state.PressIntensity} | Tempo {state.Tempo} | Width {state.Width} | Risk {state.Risk}";
     }
 
     private static string BuildClubMonogram(string clubName)
@@ -604,12 +604,12 @@ public partial class TacticsScreen : Control
 
     private static string BuildPreviewSummary(string formation, int press, int tempo, int width, int risk)
     {
-        return $"Match plan: {formation} with {DescribePress(press).ToLowerInvariant()}, {DescribeTempo(tempo).ToLowerInvariant()}, {DescribeWidth(width).ToLowerInvariant()}, and {DescribeRisk(risk).ToLowerInvariant()}.";
+        return $"Shared match engine preview: {formation} with press {press} ({DescribePress(press).ToLowerInvariant()}), tempo {tempo} ({DescribeTempo(tempo).ToLowerInvariant()}), width {width} ({DescribeWidth(width).ToLowerInvariant()}), and risk {risk} ({DescribeRisk(risk).ToLowerInvariant()}).";
     }
 
     private static string BuildControlSummary(string formation, int press, int tempo, int width, int risk)
     {
-        return $"{formation} | {DescribePress(press)} | {DescribeTempo(tempo)} | {DescribeWidth(width)} | {DescribeRisk(risk)}";
+        return $"Preview values | Formation {formation} | Press {press} ({DescribePress(press)}) | Tempo {tempo} ({DescribeTempo(tempo)}) | Width {width} ({DescribeWidth(width)}) | Risk {risk} ({DescribeRisk(risk)})";
     }
 
     private static string DescribePress(int value)

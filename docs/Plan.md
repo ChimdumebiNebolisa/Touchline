@@ -4,11 +4,10 @@
 
 ### Active
 
-- Step 52: Polish tactics screen clarity
+- Step 53: Polish fixtures and standings presentation
 
 ### Backlog
 
-- Step 53: Polish fixtures and standings presentation
 - Step 54: Full UI consistency and visual polish pass
 - Step 55: Save/load and empty/error-state polish
 - Step 56: Demo-ready build and release workflow
@@ -74,6 +73,7 @@
 - Step 49: Improve matchday preparation clarity
 - Step 50: Add end-to-end user-flow regression coverage
 - Step 51: Polish squad and player-profile management clarity
+- Step 52: Polish tactics screen clarity
 
 ## 2. Plan Rules
 
@@ -455,7 +455,7 @@ Transform the current Godot shell from a centered prototype-card presentation in
 
 ## 24. Immediate Next Subtask
 
-- Active Step 52: polish tactics screen clarity without adding tactical advice, scouting, or new match rules.
+- Active Step 53: polish fixtures and standings presentation without adding new competition formats, cups, promotion, or relegation.
 
 ## 25. Step 33: Rewrite repository documentation and README
 
