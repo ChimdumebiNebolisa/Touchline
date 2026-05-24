@@ -212,10 +212,10 @@ public partial class StandingsScreen : Control
         _seasonLabel.Text = $"Season {state.SeasonLabel}";
         _competitionChipLabel.Text = state.CompetitionName.ToUpperInvariant();
         _competitionLabel.Text = $"{state.CompetitionName} standings desk";
-        _tableStatusLabel.Text = $"{state.CurrentDateLabel} | Matchday {state.CurrentMatchday}";
+        _tableStatusLabel.Text = $"Season {state.SeasonLabel} | {state.CurrentDateLabel} | Matchday {state.CurrentMatchday}";
         SetPositionChip(position, tableSize);
         SetStateChip(row);
-        _headerStatusLabel.Text = "The live table updates from completed rounds. Goal difference remains the first separator on level points.";
+        _headerStatusLabel.Text = $"Season {state.SeasonLabel}, Matchday {state.CurrentMatchday}: the selected club is highlighted and table columns read P, W, D, L, GF, GA, GD, Pts.";
 
         _positionValueLabel.Text = position > 0 ? $"{position}/{tableSize}" : "--";
         _positionMetaLabel.Text = position > 0 ? BuildPositionMeta(position, tableSize) : "Position unavailable.";
@@ -233,7 +233,7 @@ public partial class StandingsScreen : Control
         _nextFixtureLabel.Text = state.NextFixtureSummary;
         _tableNoteLabel.Text = row == null
             ? "Table note unavailable."
-            : $"Season pulse: {row.Played} played, {row.Points} points, {row.GoalsFor} scored, {row.GoalsAgainst} conceded.";
+            : $"Table columns: P played, W wins, D draws, L losses, GF goals for, GA goals against, GD goal difference, Pts points. Season pulse: {row.Played} played, {row.Points} points.";
         _railHintLabel.Text = "Read the table first, then move into fixtures or launch the next matchday.";
 
         _matchdayButton.Disabled = false;
@@ -314,7 +314,7 @@ public partial class StandingsScreen : Control
         padding.AddChild(rowLayout);
 
         rowLayout.AddChild(CreateTableCell(position.ToString(), 48, HorizontalAlignment.Center, false, isSelectedClub, true));
-        rowLayout.AddChild(CreateTableCell(row.ClubName, 220, HorizontalAlignment.Left, true, isSelectedClub, false));
+        rowLayout.AddChild(CreateTableCell(isSelectedClub ? $"{row.ClubName} (selected club)" : row.ClubName, 220, HorizontalAlignment.Left, true, isSelectedClub, false));
         rowLayout.AddChild(CreateTableCell(row.Played.ToString(), 44, HorizontalAlignment.Center, false, isSelectedClub, true));
         rowLayout.AddChild(CreateTableCell(row.Won.ToString(), 44, HorizontalAlignment.Center, false, isSelectedClub, true));
         rowLayout.AddChild(CreateTableCell(row.Drawn.ToString(), 44, HorizontalAlignment.Center, false, isSelectedClub, true));
@@ -475,7 +475,7 @@ public partial class StandingsScreen : Control
             return "Club summary unavailable.";
         }
 
-        return $"{row.ClubName} sit {position} of {tableSize} with {row.Points} points and a {FormatSigned(row.GoalDifference)} goal difference.";
+        return $"Selected club: {row.ClubName} sit {position} of {tableSize} with {row.Points} points and a {FormatSigned(row.GoalDifference)} goal difference.";
     }
 
     private static string BuildFormLine(string formSummary)

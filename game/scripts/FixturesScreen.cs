@@ -199,17 +199,17 @@ public partial class FixturesScreen : Control
         _seasonLabel.Text = $"Season {state.SeasonLabel}";
         _competitionChipLabel.Text = state.CompetitionName.ToUpperInvariant();
         _competitionLabel.Text = $"{state.CompetitionName} fixture desk";
-        _scheduleStatusLabel.Text = $"{state.CurrentDateLabel} | Matchday {state.CurrentMatchday}";
+        _scheduleStatusLabel.Text = $"Season {state.SeasonLabel} | {state.CurrentDateLabel} | Matchday {state.CurrentMatchday}";
         _weekChipLabel.Text = $"MD {state.CurrentMatchday}";
         SetStateChip(currentClubFixture);
-        _headerStatusLabel.Text = "Club fixtures stay separated from the rest of the round so the season rhythm scans immediately.";
+        _headerStatusLabel.Text = $"Season {state.SeasonLabel}, Matchday {state.CurrentMatchday}: completed results, the next fixture, and upcoming rounds stay separated.";
 
         _nextMatchValueLabel.Text = state.CurrentOpponentName;
         _nextMatchMetaLabel.Text = state.NextFixtureSummary;
         _matchdayValueLabel.Text = state.CurrentMatchday.ToString();
-        _matchdayMetaLabel.Text = "Current round";
+        _matchdayMetaLabel.Text = $"Current matchday | {state.CurrentDateLabel}";
         _seasonValueLabel.Text = state.SeasonLabel;
-        _seasonMetaLabel.Text = state.CurrentDateLabel;
+        _seasonMetaLabel.Text = $"Current season | Matchday {state.CurrentMatchday}";
         _formValueLabel.Text = BuildCompactForm(state.FormSummary);
         _formMetaLabel.Text = "Recent run";
         _tableValueLabel.Text = position > 0 ? $"{position}" : "--";
@@ -221,8 +221,8 @@ public partial class FixturesScreen : Control
         _timelineNoteLabel.Text = currentClubFixture == null
             ? "Fixture note unavailable."
             : currentClubFixture.IsComplete
-                ? $"Latest club result logged: {currentClubFixture.Scoreline}."
-                : "The next club fixture is still open. Use this desk to prepare the week.";
+                ? $"Completed fixture logged for {clubName}: {currentClubFixture.Scoreline}."
+                : $"Next fixture for {clubName} is still open. Upcoming rounds remain below.";
         _railHintLabel.Text = "Use fixtures to track the round, then move into standings or launch matchday.";
 
         _matchdayButton.Disabled = false;
@@ -359,7 +359,7 @@ public partial class FixturesScreen : Control
 
         var resultLabel = new Label
         {
-            Text = fixture.IsComplete ? fixture.Scoreline : (isClubFixture ? BuildVenueTag(fixture) : "League round"),
+            Text = fixture.IsComplete ? fixture.Scoreline : (isClubFixture ? BuildVenueTag(fixture) : "Upcoming league round"),
             HorizontalAlignment = HorizontalAlignment.Right
         };
         resultLabel.AddThemeFontSizeOverride("font_size", 14);
@@ -436,29 +436,41 @@ public partial class FixturesScreen : Control
 
         var clubName = GameState.Instance.SelectedClubName!;
         var opponent = fixture.HomeClubName == clubName ? fixture.AwayClubName : fixture.HomeClubName;
-        return fixture.IsComplete ? fixture.ResultSummary : opponent;
+        if (fixture.IsComplete)
+        {
+            return $"{fixture.ResultSummary} | Selected club: {clubName}";
+        }
+
+        return fixture.HomeClubName == clubName
+            ? $"{clubName} vs {opponent}"
+            : $"{opponent} vs {clubName}";
     }
 
     private static string BuildFixtureMeta(GameState.CompetitionFixture fixture, bool isClubFixture)
     {
         if (!isClubFixture || GameState.Instance == null || string.IsNullOrWhiteSpace(GameState.Instance.SelectedClubName))
         {
-            return fixture.IsComplete ? "Round companion result" : "Other fixture in the same round";
+            return fixture.IsComplete ? "Completed fixture | Scoreline recorded" : "Upcoming fixture | League round";
         }
 
         return fixture.IsComplete
-            ? $"{BuildVenueTag(fixture)} | Result recorded"
-            : $"{BuildVenueTag(fixture)} | Next club fixture";
+            ? $"{BuildVenueTag(fixture)} | Completed fixture | Scoreline recorded"
+            : $"{BuildVenueTag(fixture)} | {(IsCurrentFixture(fixture) ? "Next fixture" : "Upcoming fixture")}";
     }
 
     private static string BuildFixtureChipText(GameState.CompetitionFixture fixture, bool isCurrentWeek)
     {
         if (fixture.IsComplete)
         {
-            return isCurrentWeek ? "FT" : "DONE";
+            return "COMPLETED";
         }
 
-        return isCurrentWeek ? "NEXT" : "UP";
+        return isCurrentWeek ? "NEXT" : "UPCOMING";
+    }
+
+    private static bool IsCurrentFixture(GameState.CompetitionFixture fixture)
+    {
+        return GameState.Instance != null && fixture.Matchday == GameState.Instance.CurrentMatchday;
     }
 
     private static TouchlineSurfaceVariant ResolveFixtureChipVariant(GameState.CompetitionFixture fixture, bool isCurrentWeek)
