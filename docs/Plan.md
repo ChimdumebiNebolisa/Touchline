@@ -4,11 +4,11 @@
 
 ### Active
 
-- Step 59: Final product boundary and limitations pass
+- Step 60: Rewrite README in final project format
 
 ### Backlog
 
-- Step 60: Rewrite README in final project format
+- None
 
 ### Blocked
 
@@ -74,6 +74,13 @@
 - Step 56: Demo-ready build and release workflow
 - Step 57: Final regression and manual QA checklist
 - Step 58: Demo asset plan
+- Step 59: Final product boundary and limitations pass
+
+## 1.5 Final Product Boundary
+
+Touchline is finishing as a local-first, single-player Godot + C# football management demo. The supported loop is: start or load career, choose a seeded club, inspect dashboard/squad/profile/tactics/fixtures/standings, resolve matchday through live or instant shared-engine simulation, review post-match consequences, progress matchdays and season rollover, and save/load the local career.
+
+The final steps must not add backend services, online multiplayer, playable football controls, 3D match engine, transfer market, contracts, wages, finances, scouting, injuries, promotion/relegation, youth academy, deep training, complex xG, multi-competition calendar, licensed teams, external APIs, or tactical advice engine. Legacy web code is archived/reference material only and is not the active product path.
 
 ## 2. Plan Rules
 
@@ -455,7 +462,7 @@ Transform the current Godot shell from a centered prototype-card presentation in
 
 ## 24. Immediate Next Subtask
 
-- Active Step 59: lock final product boundary and limitations so the project stays demo-ready and honest.
+- Active Step 60: rewrite README in the final requested project format with no extra sections.
 
 ## 25. Step 33: Rewrite repository documentation and README
 

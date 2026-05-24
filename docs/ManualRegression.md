@@ -1,15 +1,16 @@
 # Manual Godot Regression Coverage
 
-This document records the interactive Godot walkthrough expected after the Step 31 shell polish pass.
+This document records the interactive Godot walkthrough expected for the active Godot + C# product path. `docs/QA.md` is the final regression checklist; this file remains a supporting manual walkthrough.
 
 Automated coverage exists for the primary route shape through:
 
 - `game/scripts/step30_navigation_flow_check.gd`
 - `dotnet build game/Touchline.sln`
-- `npm run test`
-- `npm run typecheck`
-- `npm run lint`
-- `npm run build`
+- `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game --build-solutions --quit`
+- `game/scripts/step50_end_to_end_user_flow_check.gd`
+- `game/scripts/step57_final_regression_check.gd`
+
+Legacy web/npm checks are not active product gates for the current Godot game.
 
 The manual Godot walkthrough should confirm the visual and usability details that headless checks do not cover directly.
 

@@ -11,6 +11,7 @@ Core principles:
 - autoload singletons for persistent runtime state
 - local save and load for career continuity
 - one project path focused on football game flow, not web UI tooling
+- local-first single-player runtime; no backend, external API, account, or online service dependency
 
 ## 2. Repository Shape After Revamp
 
@@ -25,7 +26,7 @@ Primary product path:
 
 Optional historical isolation path:
 
-- legacy (contains old web prototype and transitional artifacts)
+- legacy (contains old web prototype and transitional artifacts for reference only; it is not the active product path)
 
 ## 3. Runtime Layers
 
@@ -79,7 +80,6 @@ Core systems:
 
 - MatchSimulator
 - DevelopmentSystem
-- TransferSystem
 - PerceptionSystem
 - CalendarSystem
 - SaveSystem
@@ -138,7 +138,7 @@ Required outputs:
 
 - pitch with moving player markers or sprites
 - scoreline and match clock
-- key event feed (chances, goals, cards, injuries, substitutions)
+- key event feed (chances, goals, saves, pressure swings, and other simulated match actions)
 - tactical context display sufficient to feel football-native
 
 LiveMatchScene is a renderer and controller of simulation playback, not a rules engine.
@@ -149,10 +149,23 @@ LiveMatchScene is a renderer and controller of simulation playback, not a rules 
 - C# source lives under game/scripts
 - no requirement that old web stack remains main entry point
 - legacy stack may remain archived for reference only
+- local save data is stored through Godot `user://` paths
+- release proof is produced with Godot run/build/headless commands and manual export guidance, not npm/web commands
 
 ## 9. Non-Goals for Current Foundation
 
 - no backend or service split
+- no online multiplayer or external account system
+- no playable football controls
 - no 3D match renderer requirement
-- no deep contract-law simulation
+- no transfer market, contracts, wages, finance ledger, scouting, injuries, promotion/relegation, youth academy, deep training, complex xG, or multi-competition calendar
+- no real licensed teams
 - no broad feature expansion beyond active Plan step
+
+## 10. Final v1 Runtime Boundary
+
+The final v1 app should be understood as a polished local Godot management loop, not a complete football world simulation. The supported architecture is:
+
+Godot scenes -> autoload state/services -> C# domain systems -> local seed data and save file.
+
+Any future expansion must first update PRD, Architecture, Guardrails, and Plan. Until then, presentation scenes may clarify state and request actions, but they must not introduce new business rules or duplicate match/competition logic.

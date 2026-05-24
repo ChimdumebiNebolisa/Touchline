@@ -8,6 +8,8 @@ The player starts a career, chooses a club, and manages that club across matches
 
 This is not a one-off simulation harness and not a generic dashboard app.
 
+Final v1 boundary: Touchline is a local-first, single-player Godot + C# football management demo focused on the squad, tactics, matchday, post-match, save/load, and short seeded season loop. The shipped scale is intentionally small and local so the app can be demonstrated honestly instead of implying a broader management sim.
+
 ## 2. Core Fantasy
 
 The player is a manager living with consequences:
@@ -40,8 +42,8 @@ Main menu -> new career or load -> choose club -> club dashboard -> prepare squa
 ### 4.3 Named Players and Squad Management
 
 - all visible players have real names and identities
-- player records include age, position, attributes, form, morale, fitness, and value
-- Squad Screen supports lineup and bench management
+- player records include age, position, role, form, morale, fitness, and lineup status
+- Squad Screen supports lineup clarity across starters, bench/rotation players, and reserve depth
 - Player Profile screen exposes player-specific context and trajectory
 
 ### 4.4 Match and Season Flow
@@ -61,7 +63,7 @@ Main menu -> new career or load -> choose club -> club dashboard -> prepare squa
 
 - player aging each season
 - improvement, stagnation, and decline arcs
-- form, morale, fitness, and value fluctuate over time
+- form, morale, and fitness fluctuate over time
 
 ## 5. Product Constraints
 
@@ -70,14 +72,28 @@ Main menu -> new career or load -> choose club -> club dashboard -> prepare squa
 - no requirement for a 3D match engine in v1
 - no fake UI-only football systems
 - no unnamed placeholder player identities in player-facing flows
+- legacy web/TypeScript code is archived or reference-only, not the active product path
+- v1 must finish the demonstrable management loop rather than expand into new simulation pillars
 
 ## 6. Out of Scope for v1
 
-- deep scouting simulation tree
-- legal-contract-heavy transfer systems
-- full accounting ledger simulation
-- playable youth leagues
-- backend service architecture unless a hard blocker requires it
+- backend services
+- online multiplayer
+- playable football controls
+- 3D match engine
+- transfer market
+- contracts, wages, or finances
+- scouting
+- injuries
+- promotion or relegation
+- youth academy or playable youth leagues
+- deep training systems
+- complex xG model
+- multi-competition calendar
+- real licensed teams
+- external APIs
+- tactical advice engine or AI assistant
+- deep staff, media, board, or owner simulation beyond the current local demo surfaces
 
 ## 7. Acceptance Criteria
 
@@ -91,6 +107,7 @@ v1 direction is valid only if all are true:
 - live match view shows moving players and football context
 - post-match outcomes change ongoing career state
 - players age and their development state changes across seasons
+- unsupported systems are not implied in UI or docs
 
 ## 8. Success Test for Early Slices
 
@@ -100,3 +117,13 @@ The product should feel like a football game in motion, not internal tooling:
 - named players with continuity
 - visible consequence chains after results
 - a believable path from menu to season progression with save continuity
+
+## 9. Supported Final Demo Flows
+
+- start a local career
+- choose one seeded club
+- inspect dashboard, squad, player profile, tactics, fixtures, standings, and matchday
+- resolve a match through live playback or instant result using the same match engine
+- review post-match consequences and player-state effects
+- advance through multiple matchdays and short-season rollover
+- save and load the local career without fake success states

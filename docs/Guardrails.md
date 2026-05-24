@@ -23,6 +23,7 @@
 3. Scene scripts may request actions but may not define core simulation rules.
 4. Save and load must persist complete career-critical state.
 5. No backend-first detour unless a hard blocker is documented and approved.
+6. No external API or online service may become required for the v1 loop.
 
 ## 4. Persistence and Continuity Guardrails
 
@@ -33,11 +34,11 @@
 
 ## 5. Scope Guardrails
 
-1. No deep scouting tree in current scope.
-2. No deep finance ledger in current scope.
-3. No playable youth leagues in current scope.
-4. No fake completion by shipping shell-only scenes without working state transitions.
-5. Build only the smallest valid subtask for the active Plan step.
+1. No backend services, online multiplayer, playable football controls, or 3D match engine in current scope.
+2. No transfer market, contracts, wages, finances, scouting, injuries, promotion/relegation, youth academy, deep training, complex xG, multi-competition calendar, licensed teams, external APIs, or tactical advice engine in current scope.
+3. No fake completion by shipping shell-only scenes without working state transitions.
+4. Build only the smallest valid subtask for the active Plan step.
+5. Prefer finishing the demonstrable v1 loop over adding another simulation pillar.
 
 ## 6. Verification Guardrails
 
@@ -53,6 +54,7 @@
 2. Reusable old material may be preserved under legacy.
 3. Keep history intact while making new game path explicit.
 4. Avoid deleting useful reference content when clean isolation can preserve it.
+5. README and demo proof must present Godot + C# as the active product path; legacy web code is reference-only.
 
 ## 8. Hard Stop Conditions
 
