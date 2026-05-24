@@ -10,10 +10,8 @@ Touchline gives a small but complete football management loop: start or load a c
 
 - Live link: not applicable; Touchline is a local desktop Godot game.
 - Executable download: placeholder, not published yet.
-- Screenshots: placeholder, to be captured from the final Godot app.
-- Demo video: placeholder, to be captured after final demo proof.
-
-Planned proof assets are listed in `docs/Demo.md`.
+- Screenshots: `docs/demo/screenshots/`
+- Demo video: `docs/demo/touchline-live-match-demo.avi` (AVI; MP4 recording was not available locally).
 
 ## Features
 
@@ -107,7 +105,7 @@ Full verification groups are documented in `docs/QA.md`.
 - The shipped demo scale is a small seeded local league.
 - No backend services, online multiplayer, playable football controls, or 3D match engine.
 - No transfer market, contracts, wages, finances, scouting, injuries, promotion/relegation, youth academy, deep training, complex xG model, multi-competition calendar, licensed teams, external APIs, or tactical advice engine.
-- Demo screenshots, video, and executable download are placeholders until captured/published.
+- Demo screenshots and video are captured under `docs/demo/`; executable download remains unpublished.
 - Windows export is currently a manual Godot editor workflow.
 
 ## License
