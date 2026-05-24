@@ -1,134 +1,115 @@
 # Touchline
 
-Touchline is a desktop-first football management game built with Godot and C#.
+Local-first single-player football management game built with Godot + C#.
 
-The player starts a career, chooses a club, manages squad and tactics, plays through fixtures and standings, watches a live 2D match presentation or resolves matches instantly through the same shared engine, then carries the consequences forward across weeks, matchdays, and seasons.
+## Problem It Solves
 
-This repository is no longer a web-dashboard prototype. The active product path is the Godot/.NET game under [`game/`](game).
+Touchline gives a small but complete football management loop: start or load a career, choose a club, manage squad and tactics, read fixtures and standings, play live or instant matchdays through one shared engine, see post-match consequences, and keep the career moving through local save/load.
 
-## What the game currently includes
+## Demo
 
-- New Career flow
-- Load and resume flow
-- Club selection with seeded club identity
-- Club dashboard as the main command center
-- Squad workspace with named players and player profiles
-- Tactical board
-- Fixtures and standings screens
-- Matchday entry screen
-- Live 2D match view with visible player movement
-- Instant result path using the same match engine
-- Post-match consequence screen
-- Calendar advancement and season continuity
-- Local save/load persistence
+- Live link: not applicable; Touchline is a local desktop Godot game.
+- Executable download: placeholder, not published yet.
+- Screenshots: placeholder, to be captured from the final Godot app.
+- Demo video: placeholder, to be captured after final demo proof.
 
-## Product path
+Planned proof assets are listed in `docs/Demo.md`.
 
-The active product path is:
+## Features
 
-- [`game/project.godot`](game/project.godot)
-- [`game/Touchline.sln`](game/Touchline.sln)
-- [`game/scenes`](game/scenes)
-- [`game/scripts`](game/scripts)
-- [`game/data`](game/data)
+- New career, club selection, save, load, and resume flow.
+- Club dashboard with manager, season, matchday, next fixture, pressure, and squad context.
+- Squad workspace with Starting XI, non-starters, player condition, form, morale, fitness, and profile handoff.
+- Tactics board with formation, press, tempo, width, risk, interpretation text, and saved setup clarity.
+- Fixtures and standings with completed/upcoming state, scorelines, selected-club context, and rollover visibility.
+- Matchday screen with live match and instant result paths using the same shared match engine.
+- Live 2D match playback with clock, score, ball/player markers, and event feed.
+- Post-match report with scoreline, stats, causes, key events, pressure effects, and player-state consequences.
+- Short seeded season loop with player aging/development, multi-match progression, and season rollover.
 
-The main entry scene is [`game/scenes/MainMenu.tscn`](game/scenes/MainMenu.tscn).
+## Tech Stack
 
-## Requirements
+- Godot 4.6 Mono/.NET
+- C#
+- .NET 8 SDK
+- GDScript headless regression checks
+- Local JSON seed data in `game/data/world-seed.json`
+- Local Godot `user://` save data
 
-- Windows machine with Godot Mono installed
+## Architecture
+
+```mermaid
+flowchart TD
+    A["Godot scenes\nMainMenu, Dashboard, Squad, Tactics, Fixtures, Standings, Matchday, Live, PostMatch, SaveLoad"] --> B["Autoload state/services\nGameState, SaveSystem, CalendarSystem, WorldGenerator, TouchlineTheme"]
+    B --> C["C# domain systems\nMatchSimulator, CompetitionRuntimeService, DevelopmentSystem, PerceptionSystem"]
+    C --> D["Local data\nworld-seed.json"]
+    B --> E["Local save slot\nuser://slot-1.json"]
+    C --> B
+```
+
+Scenes present state and request actions. C# domain systems own simulation, competition, progression, development, and save-compatible state changes.
+
+## Setup
+
+Requirements:
+
+- Windows with Godot Mono installed
 - Godot 4.6.x Mono/.NET
 - .NET 8 SDK
 
-The repository has been exercised against the WinGet-installed Godot Mono console binary:
-
-```powershell
-Godot_v4.6.2-stable_mono_win64_console.exe
-```
-
-If your local Godot binary uses a different filename, adjust the examples below.
-
-## Run the game
-
-From the repository root:
-
-```powershell
-$godot = (Get-Command Godot_v4.6.2-stable_mono_win64.exe).Source
-& $godot --path game
-```
-
-Console/headless-capable variant:
-
-```powershell
-$godot = (Get-Command Godot_v4.6.2-stable_mono_win64_console.exe).Source
-& $godot --path game
-```
-
-You can also open [`game/project.godot`](game/project.godot) directly in the Godot editor.
-
-## Build and verification
-
-Primary .NET build:
+Run from the repository root:
 
 ```powershell
 dotnet build game/Touchline.sln
 ```
 
-Godot solution rebuild:
+Open the project:
 
 ```powershell
-$godot = (Get-Command Godot_v4.6.2-stable_mono_win64_console.exe).Source
-& $godot --headless --path game --build-solutions --quit
+Godot_v4.6.2-stable_mono_win64.exe --path game
 ```
 
-Representative headless route checks used in the current repo:
+Console/headless build:
 
 ```powershell
-$godot = (Get-Command Godot_v4.6.2-stable_mono_win64_console.exe).Source
-& $godot --headless --path game -s res://scripts/step23_post_match_check.gd
-& $godot --headless --path game -s res://scripts/step30_navigation_flow_check.gd
+Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game --build-solutions --quit
 ```
 
-There is legacy web code preserved under [`legacy/`](legacy), but `npm` checks are not the active product verification path for the current game.
+Representative verification:
 
-## Repository structure
-
-```text
-Touchline/
-|- docs/                 Source-of-truth product docs
-|- game/                 Active Godot/.NET game
-|  |- scenes/            Godot scenes and screen layouts
-|  |- scripts/           C# and GDScript runtime logic
-|  |- data/              Seed data
-|  `- project.godot      Godot project entrypoint
-|- legacy/               Archived web prototype/reference material
-`- AUTONOMOUS_PROGRESS.md
+```powershell
+Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step57_final_regression_check.gd
 ```
 
-## Source of truth
+Full verification groups are documented in `docs/QA.md`.
 
-The repo is spec-driven. The authoritative docs are:
+## How to Use
 
-- [`docs/PRD.md`](docs/PRD.md)
-- [`docs/Architecture.md`](docs/Architecture.md)
-- [`docs/Guardrails.md`](docs/Guardrails.md)
-- [`docs/Plan.md`](docs/Plan.md)
+1. Start Touchline from Godot and choose New Career.
+2. Enter a manager name, choose a seed, and select a club.
+3. Use the dashboard to move between squad, player profile, tactics, fixtures, standings, and matchday.
+4. Adjust lineup and tactics before matchday.
+5. Choose Live Match for 2D playback or Instant Result for the same match engine without playback.
+6. Review the post-match report, then continue the season.
+7. Save from the dashboard and use Continue Career or Save/Load to resume locally.
 
-Read them in that order before changing product behavior.
+## Key Technical Decisions
 
-## Development rules
+- Godot + C# is the active product path.
+- The app is local-first and single-player; no backend or external API is required.
+- Live match and instant result share one match engine.
+- UI scenes do not own match, competition, save, or development rules.
+- Seeded local data keeps clubs and players deterministic enough for repeatable checks.
+- Legacy web code is archived/reference-only and is not the active product path.
 
-- Godot plus C# is the only active product path.
-- Scene flow lives in Godot scenes; simulation logic lives in C# domain systems.
-- Do not invent scope outside the active Plan step.
-- Do not move business logic into UI scenes.
-- Verify meaningful changes before committing.
-- Keep [`AUTONOMOUS_PROGRESS.md`](AUTONOMOUS_PROGRESS.md) current when working autonomously.
+## Limitations
 
-## Legacy path
-
-The previous web prototype remains under [`legacy/`](legacy) for reference only. It is not the active game shell and should not be treated as the main product path.
+- The shipped demo scale is a small seeded local league.
+- No backend services, online multiplayer, playable football controls, or 3D match engine.
+- No transfer market, contracts, wages, finances, scouting, injuries, promotion/relegation, youth academy, deep training, complex xG model, multi-competition calendar, licensed teams, external APIs, or tactical advice engine.
+- Demo screenshots, video, and executable download are placeholders until captured/published.
+- Windows export is currently a manual Godot editor workflow.
 
 ## License
 
-This project is licensed under the MIT License. See [`LICENSE`](LICENSE).
+MIT License

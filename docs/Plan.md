@@ -4,7 +4,7 @@
 
 ### Active
 
-- Step 60: Rewrite README in final project format
+- None
 
 ### Backlog
 
@@ -75,6 +75,7 @@
 - Step 57: Final regression and manual QA checklist
 - Step 58: Demo asset plan
 - Step 59: Final product boundary and limitations pass
+- Step 60: Rewrite README in final project format
 
 ## 1.5 Final Product Boundary
 
@@ -462,7 +463,7 @@ Transform the current Godot shell from a centered prototype-card presentation in
 
 ## 24. Immediate Next Subtask
 
-- Active Step 60: rewrite README in the final requested project format with no extra sections.
+- Final implementation complete through Step 60. Stop feature work and switch to demo capture, README review, and submission mode.
 
 ## 25. Step 33: Rewrite repository documentation and README
 
