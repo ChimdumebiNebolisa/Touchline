@@ -1,16 +1,15 @@
 # Autonomous Progress
 
 ## Current active Plan step
-- Step 58: Demo asset plan.
+- Step 59: Final product boundary and limitations pass.
 
 ## Last completed verified task
-- Step 57 final QA complete: `docs/QA.md` groups the full automated suite and manual demo checklist, `step57_final_regression_check.gd` adds a final contract smoke, and the full Step 22, 23, 25-30, and 34-57 headless suite passed.
+- Step 58 demo asset plan complete: `docs/Demo.md` lists required screenshots, short video structure, proof claims, README placeholder rules, and capture guardrails mapped to actual app screens.
 
 ## Current subtask in progress
-- Step 58 demo asset plan.
+- Step 59 product boundary and limitations documentation.
 
 ## Next queued subtasks
-- Step 59: lock final product boundary and limitations.
 - Step 60: rewrite README in final project format.
 
 ## Known blockers
@@ -18,17 +17,19 @@
 - Godot Mono is available locally. Headless checks were run as individual processes to avoid unrelated process-teardown noise from large shell batches.
 
 ## Last verification run
-- Step 57 verification:
-  - `dotnet build game/Touchline.sln` passed.
-  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game --build-solutions --quit` passed.
-  - Full headless suite passed: Step 22, Step 23, Steps 25-30, and Steps 34-57.
-  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step57_final_regression_check.gd` passed with `STEP57_FINAL_REGRESSION_PASS`.
-  - Manual visual smoke checklist is documented in `docs/QA.md`; it should be executed during screenshot/video capture.
+- Step 58 verification:
+  - Manual review of `docs/Demo.md` completed.
+  - `rg -n -i "transfer|finance|scouting|injury|youth|online|backend|licensed|web" docs/Demo.md` found only explicit guardrail/unsupported-scope references.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step30_navigation_flow_check.gd` passed with `STEP30_NAVIGATION_FLOW_PASS`.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step35_live_renderer_check.gd` passed with `STEP35_LIVE_RENDERER_PASS`.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step48_dashboard_context_check.gd` passed with `STEP48_DASHBOARD_CONTEXT_PASS`.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step49_matchday_preparation_check.gd` passed with `STEP49_MATCHDAY_PREPARATION_PASS`.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step50_end_to_end_user_flow_check.gd` passed with `STEP50_END_TO_END_USER_FLOW_PASS`.
 
 ## Last commit hash
-- ec49f38
+- Pending Step 58 documentation commit.
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`.
-- Continue from active Step 58 in `docs/Plan.md`.
-- Implement only the smallest valid Step 58 subtask, verify, commit, push, and update this file before moving to Step 59.
+- Continue from active Step 59 in `docs/Plan.md`.
+- Implement only the smallest valid Step 59 subtask, verify, commit, push, and update this file before moving to Step 60.
