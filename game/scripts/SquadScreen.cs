@@ -263,7 +263,7 @@ public partial class SquadScreen : Control
         _nextMatchMetaLabel.Text = state.NextFixtureSummary;
         _squadStatusLabel.Text = BuildSquadWorkspaceSummary(state, starters, bench);
         _actionHintLabel.Text = "Primary action: settle the XI from the available squad. This screen is lineup and readiness only.";
-        _railHintLabel.Text = "Review the roster, adjust the XI, then move into tactics or launch the next matchday.";
+        _railHintLabel.Text = "Review the roster, adjust the XI, then move into Tactics or Matchday.";
 
         _matchdayButton.Disabled = false;
         PopulatePlayerRows((int)_positionFilter.GetSelectedId(), _selectedPlayerName);

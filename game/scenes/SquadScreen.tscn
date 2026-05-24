@@ -172,7 +172,7 @@ text = "Standings"
 
 [node name="MatchdayButton" type="Button" parent="RootMargin/Shell/RailCard/RailPadding/RailContent/NavButtons"]
 layout_mode = 2
-text = "Launch Matchday"
+text = "Matchday"
 
 [node name="Spacer" type="Control" parent="RootMargin/Shell/RailCard/RailPadding/RailContent"]
 layout_mode = 2

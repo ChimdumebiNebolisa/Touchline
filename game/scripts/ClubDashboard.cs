@@ -239,7 +239,7 @@ public partial class ClubDashboard : Control
         _recommendedMoveLabel.Text = BuildPrioritySummary(state);
         _actionHintLabel.Text = state.IsCurrentClubFixtureComplete()
             ? "Primary action: advance after the post-match review, not replay the completed fixture."
-            : "Primary action: launch matchday when squad and tactics feel set.";
+            : "Primary action: open Matchday when squad and tactics feel set.";
 
         _formValueLabel.Text = BuildCompactForm(state.FormSummary);
         _lastResultLabel.Text = hasMatchReport

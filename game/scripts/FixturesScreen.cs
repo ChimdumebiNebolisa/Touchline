@@ -223,7 +223,7 @@ public partial class FixturesScreen : Control
             : currentClubFixture.IsComplete
                 ? $"Completed fixture logged for {clubName}: {currentClubFixture.Scoreline}."
                 : $"Next fixture for {clubName} is still open. Upcoming rounds remain below.";
-        _railHintLabel.Text = "Use fixtures to track the round, then move into standings or launch matchday.";
+        _railHintLabel.Text = "Use fixtures to track the round, then move into standings or Matchday.";
 
         _matchdayButton.Disabled = false;
         PopulateFixtureSections();

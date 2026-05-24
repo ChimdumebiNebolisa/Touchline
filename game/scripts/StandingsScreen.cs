@@ -234,7 +234,7 @@ public partial class StandingsScreen : Control
         _tableNoteLabel.Text = row == null
             ? "Table note unavailable."
             : $"Table columns: P played, W wins, D draws, L losses, GF goals for, GA goals against, GD goal difference, Pts points. Season pulse: {row.Played} played, {row.Points} points.";
-        _railHintLabel.Text = "Read the table first, then move into fixtures or launch the next matchday.";
+        _railHintLabel.Text = "Read the table first, then move into Fixtures or Matchday.";
 
         _matchdayButton.Disabled = false;
         PopulateTable();
