@@ -294,11 +294,11 @@ text = "NEXT STEP"
 
 [node name="NextStepLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent"]
 layout_mode = 2
-text = "Advance to Club Dashboard"
+text = "Advance to Manager Hub"
 autowrap_mode = 3
 
 [node name="ContinueButton" type="Button" parent="RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent"]
 layout_mode = 2
-text = "Advance to Club Dashboard"
+text = "Advance to Manager Hub"
 
 [connection signal="pressed" from="RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/ContinueButton" to="." method="OnContinuePressed"]

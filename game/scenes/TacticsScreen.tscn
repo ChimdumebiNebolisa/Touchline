@@ -134,7 +134,7 @@ horizontal_alignment = 1
 
 [node name="SectionLabel" type="Label" parent="RootMargin/Shell/RailCard/RailPadding/RailContent"]
 layout_mode = 2
-text = "OPERATIONS"
+text = "CLUB OFFICE"
 
 [node name="NavButtons" type="VBoxContainer" parent="RootMargin/Shell/RailCard/RailPadding/RailContent"]
 layout_mode = 2
@@ -142,7 +142,7 @@ theme_override_constants/separation = 10
 
 [node name="DashboardButton" type="Button" parent="RootMargin/Shell/RailCard/RailPadding/RailContent/NavButtons"]
 layout_mode = 2
-text = "Dashboard"
+text = "Manager Hub"
 
 [node name="SquadButton" type="Button" parent="RootMargin/Shell/RailCard/RailPadding/RailContent/NavButtons"]
 layout_mode = 2
@@ -162,7 +162,7 @@ text = "Standings"
 
 [node name="MatchdayButton" type="Button" parent="RootMargin/Shell/RailCard/RailPadding/RailContent/NavButtons"]
 layout_mode = 2
-text = "Matchday"
+text = "Go to Matchday"
 
 [node name="Spacer" type="Control" parent="RootMargin/Shell/RailCard/RailPadding/RailContent"]
 layout_mode = 2
@@ -187,7 +187,7 @@ autowrap_mode = 3
 
 [node name="BackButton" type="Button" parent="RootMargin/Shell/RailCard/RailPadding/RailContent/FooterActions"]
 layout_mode = 2
-text = "Back to Club Dashboard"
+text = "Back to Manager Hub"
 
 [node name="MainColumn" type="VBoxContainer" parent="RootMargin/Shell"]
 layout_mode = 2
@@ -325,7 +325,7 @@ theme_override_constants/separation = 8
 
 [node name="CardEyebrow" type="Label" parent="RootMargin/Shell/MainColumn/SummaryGrid/PressCard/CardPadding/CardContent"]
 layout_mode = 2
-text = "PRESS"
+text = "PRESSING"
 
 [node name="CardValueLabel" type="Label" parent="RootMargin/Shell/MainColumn/SummaryGrid/PressCard/CardPadding/CardContent"]
 layout_mode = 2
@@ -406,7 +406,7 @@ theme_override_constants/separation = 8
 
 [node name="CardEyebrow" type="Label" parent="RootMargin/Shell/MainColumn/SummaryGrid/RiskCard/CardPadding/CardContent"]
 layout_mode = 2
-text = "RISK"
+text = "MENTALITY"
 
 [node name="CardValueLabel" type="Label" parent="RootMargin/Shell/MainColumn/SummaryGrid/RiskCard/CardPadding/CardContent"]
 layout_mode = 2
@@ -593,7 +593,7 @@ popup/item_2/id = 2
 
 [node name="PressLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent"]
 layout_mode = 2
-text = "Press line"
+text = "Pressing Intensity"
 
 [node name="PressSpin" type="SpinBox" parent="RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent"]
 layout_mode = 2
@@ -603,7 +603,7 @@ step = 1.0
 
 [node name="TempoLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent"]
 layout_mode = 2
-text = "Ball speed"
+text = "Tempo"
 
 [node name="TempoSpin" type="SpinBox" parent="RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent"]
 layout_mode = 2
@@ -623,7 +623,7 @@ step = 1.0
 
 [node name="RiskLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent"]
 layout_mode = 2
-text = "Commitment"
+text = "Mentality"
 
 [node name="RiskSpin" type="SpinBox" parent="RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent"]
 layout_mode = 2

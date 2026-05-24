@@ -62,35 +62,35 @@ func _validate_matchday_context() -> void:
         _fail("Matchday preparation labels are missing")
         return
 
-    if competition_label.text.find("Season") == -1:
-        _fail("Matchday competition label does not include season: %s" % competition_label.text)
+    if competition_label.text.find("Matchday") == -1 or competition_label.text.find("Novara Premier Division") == -1:
+        _fail("Matchday competition label does not include matchday and competition: %s" % competition_label.text)
         return
 
-    if fixture_label.text.find("Matchday") == -1:
-        _fail("Matchday fixture label does not include matchday: %s" % fixture_label.text)
+    if fixture_label.text.find("Riverton Athletic") == -1 or fixture_label.text.find("vs") == -1:
+        _fail("Matchday fixture label does not include the fixture header: %s" % fixture_label.text)
         return
 
-    if kickoff_context.text.find("Result feeds table") == -1:
-        _fail("Matchday kickoff context does not explain career effects: %s" % kickoff_context.text)
+    if kickoff_context.text.find("Dressing Room Brief") == -1:
+        _fail("Matchday dressing room brief is missing: %s" % kickoff_context.text)
         return
 
-    if lineup_label.text.find("Lineup readiness") == -1:
-        _fail("Matchday lineup readiness summary is missing: %s" % lineup_label.text)
+    if lineup_label.text.find("Team News") == -1:
+        _fail("Matchday team news summary is missing: %s" % lineup_label.text)
         return
 
-    if pressure_reasons.text.find("Board:") == -1 or pressure_reasons.text.find("Fans:") == -1 or pressure_reasons.text.find("Dressing room:") == -1:
+    if pressure_reasons.text.find("Club Mood") == -1 or pressure_reasons.text.find("Board:") == -1 or pressure_reasons.text.find("Fans:") == -1 or pressure_reasons.text.find("Dressing room:") == -1:
         _fail("Matchday pressure context is incomplete: %s" % pressure_reasons.text)
         return
 
-    if tactics_label.text.find("Tactical setup") == -1:
+    if tactics_label.text.find("Match Plan") == -1 or tactics_label.text.find("Tactical setup") == -1:
         _fail("Matchday tactical setup summary is missing: %s" % tactics_label.text)
         return
 
-    if opponent_focus.text.find("Opponent context") == -1 or opponent_focus.text.find("seeded XI") == -1:
+    if opponent_focus.text.find("Opponent Brief") == -1 or opponent_focus.text.find("seeded XI") == -1:
         _fail("Matchday opponent context is incomplete: %s" % opponent_focus.text)
         return
 
-    if status_label.text.find("Live Match") == -1 or status_label.text.find("Instant Result") == -1 or status_label.text.find("same engine") == -1:
+    if status_label.text.find("Watch Live Match") == -1 or status_label.text.find("Instant Result") == -1 or status_label.text.find("shared engine") == -1:
         _fail("Matchday live-vs-instant choice is unclear: %s" % status_label.text)
         return
 

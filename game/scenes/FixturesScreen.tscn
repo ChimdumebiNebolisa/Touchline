@@ -144,7 +144,7 @@ horizontal_alignment = 1
 
 [node name="SectionLabel" type="Label" parent="RootMargin/Shell/RailCard/RailPadding/RailContent"]
 layout_mode = 2
-text = "OPERATIONS"
+text = "CLUB OFFICE"
 
 [node name="NavButtons" type="VBoxContainer" parent="RootMargin/Shell/RailCard/RailPadding/RailContent"]
 layout_mode = 2
@@ -152,7 +152,7 @@ theme_override_constants/separation = 10
 
 [node name="DashboardButton" type="Button" parent="RootMargin/Shell/RailCard/RailPadding/RailContent/NavButtons"]
 layout_mode = 2
-text = "Dashboard"
+text = "Manager Hub"
 
 [node name="SquadButton" type="Button" parent="RootMargin/Shell/RailCard/RailPadding/RailContent/NavButtons"]
 layout_mode = 2
@@ -172,7 +172,7 @@ text = "Standings"
 
 [node name="MatchdayButton" type="Button" parent="RootMargin/Shell/RailCard/RailPadding/RailContent/NavButtons"]
 layout_mode = 2
-text = "Matchday"
+text = "Go to Matchday"
 
 [node name="Spacer" type="Control" parent="RootMargin/Shell/RailCard/RailPadding/RailContent"]
 layout_mode = 2
@@ -184,12 +184,12 @@ theme_override_constants/separation = 10
 
 [node name="RailHintLabel" type="Label" parent="RootMargin/Shell/RailCard/RailPadding/RailContent/FooterActions"]
 layout_mode = 2
-text = "Fixture desk unavailable."
+text = "Fixture list unavailable."
 autowrap_mode = 3
 
 [node name="BackButton" type="Button" parent="RootMargin/Shell/RailCard/RailPadding/RailContent/FooterActions"]
 layout_mode = 2
-text = "Back to Club Dashboard"
+text = "Back to Manager Hub"
 
 [node name="MainColumn" type="VBoxContainer" parent="RootMargin/Shell"]
 layout_mode = 2
@@ -516,7 +516,7 @@ theme_override_constants/separation = 12
 
 [node name="ContextHeading" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent"]
 layout_mode = 2
-text = "Current Focus"
+text = "Next Fixture Brief"
 
 [node name="ContextHintLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent"]
 layout_mode = 2

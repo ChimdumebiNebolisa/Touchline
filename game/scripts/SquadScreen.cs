@@ -166,16 +166,15 @@ public partial class SquadScreen : Control
         TouchlineTheme.ApplyPanelVariant(GetNode<PanelContainer>("RootMargin/Shell/MainColumn/SummaryGrid/NextMatchCard"), TouchlineSurfaceVariant.Card, 20);
         TouchlineTheme.ApplyPanelVariant(GetNode<PanelContainer>("RootMargin/Shell/MainColumn/ContentRow/DetailCard/DetailPadding/DetailContent/StatsCard"), TouchlineSurfaceVariant.Muted, 20);
 
-        TouchlineTheme.ApplyButtonVariant(_dashboardButton, TouchlineButtonVariant.Secondary);
-        TouchlineTheme.ApplyButtonVariant(_squadButton, TouchlineButtonVariant.Secondary);
-        TouchlineTheme.ApplyButtonVariant(_tacticsButton, TouchlineButtonVariant.Secondary);
-        TouchlineTheme.ApplyButtonVariant(_fixturesButton, TouchlineButtonVariant.Secondary);
-        TouchlineTheme.ApplyButtonVariant(_standingsButton, TouchlineButtonVariant.Secondary);
-        TouchlineTheme.ApplyButtonVariant(_matchdayButton, TouchlineButtonVariant.Primary);
+        TouchlineTheme.ApplyNavigationButton(_dashboardButton, false);
+        TouchlineTheme.ApplyNavigationButton(_squadButton, true);
+        TouchlineTheme.ApplyNavigationButton(_tacticsButton, false);
+        TouchlineTheme.ApplyNavigationButton(_fixturesButton, false);
+        TouchlineTheme.ApplyNavigationButton(_standingsButton, false);
+        TouchlineTheme.ApplyMatchdayCta(_matchdayButton);
         TouchlineTheme.ApplyButtonVariant(_lineupActionButton, TouchlineButtonVariant.Primary);
         TouchlineTheme.ApplyButtonVariant(_openProfileButton, TouchlineButtonVariant.Secondary);
         TouchlineTheme.ApplyButtonVariant(_backButton, TouchlineButtonVariant.Tertiary);
-        _squadButton.Disabled = true;
 
         TouchlineTheme.ApplyTitleStyle(_clubNameLabel, 28);
         TouchlineTheme.ApplyMutedStyle(_managerLabel, 15);
@@ -247,14 +246,14 @@ public partial class SquadScreen : Control
         _managerLabel.Text = $"Manager {state.ManagerName}";
         _seasonLabel.Text = $"Season {state.SeasonLabel}";
         _competitionChipLabel.Text = state.CompetitionName.ToUpperInvariant();
-        _clubContextLabel.Text = $"{clubName} squad control";
+        _clubContextLabel.Text = $"{clubName} Team Sheet";
         _lineupSummaryLabel.Text = $"Next assignment: {state.CurrentOpponentName} | Matchday {state.CurrentMatchday}";
         _headerStatusLabel.Text = BuildHeaderStatus(state);
 
         _startersValueLabel.Text = starters.ToString();
         _startersMetaLabel.Text = "Starting XI players";
         _benchValueLabel.Text = bench.ToString();
-        _benchMetaLabel.Text = "Non-starters: bench and reserve depth";
+        _benchMetaLabel.Text = "Bench and reserves";
         _moraleValueLabel.Text = averageMorale.ToString();
         _moraleMetaLabel.Text = $"Average morale {DescribePulse(averageMorale)}";
         _fitnessValueLabel.Text = averageFitness.ToString();
@@ -262,8 +261,8 @@ public partial class SquadScreen : Control
         _nextMatchValueLabel.Text = state.CurrentOpponentName;
         _nextMatchMetaLabel.Text = state.NextFixtureSummary;
         _squadStatusLabel.Text = BuildSquadWorkspaceSummary(state, starters, bench);
-        _actionHintLabel.Text = "Primary action: settle the XI from the available squad. This screen is lineup and readiness only.";
-        _railHintLabel.Text = "Review the roster, adjust the XI, then move into Tactics or Matchday.";
+        _actionHintLabel.Text = "Selection call: settle the XI from the available squad. This screen is lineup and readiness only.";
+        _railHintLabel.Text = "Review the team sheet, adjust the XI, then move into Tactics or Matchday.";
 
         _matchdayButton.Disabled = false;
         PopulatePlayerRows((int)_positionFilter.GetSelectedId(), _selectedPlayerName);
@@ -276,11 +275,11 @@ public partial class SquadScreen : Control
         _managerLabel.Text = "Manager unavailable";
         _seasonLabel.Text = "Season unavailable";
         _competitionChipLabel.Text = "NO COMPETITION";
-        _clubContextLabel.Text = "Squad control unavailable.";
+        _clubContextLabel.Text = "Team sheet unavailable.";
         _lineupSummaryLabel.Text = "Lineup summary unavailable.";
         _filterChipLabel.Text = "NO FILTER";
         _readinessChipLabel.Text = "OFFLINE";
-        _headerStatusLabel.Text = "Load a career to open the squad workspace.";
+        _headerStatusLabel.Text = "Load a career to open the team sheet.";
         _startersValueLabel.Text = "--";
         _startersMetaLabel.Text = "No XI loaded.";
         _benchValueLabel.Text = "--";
@@ -304,7 +303,7 @@ public partial class SquadScreen : Control
         _squadStatusLabel.Text = "Squad status unavailable.";
         _filterStatusLabel.Text = "Filter unavailable.";
         _actionHintLabel.Text = "Open a live career before making selection changes.";
-        _railHintLabel.Text = "Return to the dashboard once a club is active.";
+        _railHintLabel.Text = "Return to the Manager Hub once a club is active.";
         _lineupActionButton.Disabled = true;
         _openProfileButton.Disabled = true;
         _matchdayButton.Disabled = true;
@@ -373,13 +372,80 @@ public partial class SquadScreen : Control
         _currentVisibleSelectionIndex = selectedVisibleIndex;
         _selectedPlayerName = GameState.Instance.SquadPlayers[_visiblePlayerIndexes[selectedVisibleIndex]].Name;
 
-        for (var visibleIndex = 0; visibleIndex < _visiblePlayerIndexes.Count; visibleIndex++)
-        {
-            var player = GameState.Instance.SquadPlayers[_visiblePlayerIndexes[visibleIndex]];
-            _playerRows.AddChild(CreatePlayerRow(visibleIndex, player, visibleIndex == selectedVisibleIndex));
-        }
+        AddPlayerSectionRows("Starting XI", "On the pitch if the next match starts now.", (player, index) => player.IsStarting, selectedVisibleIndex);
+        AddPlayerSectionRows("Bench", "First non-starter group available for selection changes.", (player, index) => !player.IsStarting && CountNonStartersBefore(GameState.Instance, index) < 7, selectedVisibleIndex);
+        AddPlayerSectionRows("Reserves", "Depth outside the immediate bench group.", (player, index) => !player.IsStarting && CountNonStartersBefore(GameState.Instance, index) >= 7, selectedVisibleIndex);
 
         RenderPlayerDetailByVisibleIndex(selectedVisibleIndex);
+    }
+
+    private void AddPlayerSectionRows(string title, string meta, Func<GameState.SquadPlayer, int, bool> predicate, int selectedVisibleIndex)
+    {
+        if (GameState.Instance == null)
+        {
+            return;
+        }
+
+        var addedAny = false;
+        _playerRows.AddChild(CreateSectionHeader(title, meta));
+
+        for (var visibleIndex = 0; visibleIndex < _visiblePlayerIndexes.Count; visibleIndex++)
+        {
+            var playerIndex = _visiblePlayerIndexes[visibleIndex];
+            var player = GameState.Instance.SquadPlayers[playerIndex];
+            if (!predicate(player, playerIndex))
+            {
+                continue;
+            }
+
+            _playerRows.AddChild(CreatePlayerRow(visibleIndex, player, visibleIndex == selectedVisibleIndex));
+            addedAny = true;
+        }
+
+        if (!addedAny)
+        {
+            _playerRows.AddChild(CreateEmptySectionRow(title));
+        }
+    }
+
+    private static Control CreateSectionHeader(string title, string meta)
+    {
+        var header = new VBoxContainer
+        {
+            SizeFlagsHorizontal = SizeFlags.ExpandFill
+        };
+        header.AddThemeConstantOverride("separation", 2);
+
+        var titleLabel = new Label
+        {
+            Text = title,
+            SizeFlagsHorizontal = SizeFlags.ExpandFill
+        };
+        titleLabel.AddThemeFontSizeOverride("font_size", 15);
+        titleLabel.AddThemeColorOverride("font_color", TouchlineTheme.TextPrimary);
+        header.AddChild(titleLabel);
+
+        var metaLabel = new Label
+        {
+            Text = meta,
+            SizeFlagsHorizontal = SizeFlags.ExpandFill
+        };
+        metaLabel.AddThemeFontSizeOverride("font_size", 12);
+        metaLabel.AddThemeColorOverride("font_color", TouchlineTheme.TextQuiet);
+        header.AddChild(metaLabel);
+        return header;
+    }
+
+    private static Control CreateEmptySectionRow(string title)
+    {
+        var empty = new Label
+        {
+            Text = $"No {title.ToLowerInvariant()} players in this filter.",
+            SizeFlagsHorizontal = SizeFlags.ExpandFill
+        };
+        empty.AddThemeFontSizeOverride("font_size", 13);
+        empty.AddThemeColorOverride("font_color", TouchlineTheme.TextQuiet);
+        return empty;
     }
 
     private Control CreatePlayerRow(int visibleIndex, GameState.SquadPlayer player, bool selected)
@@ -408,7 +474,7 @@ public partial class SquadScreen : Control
         rowContent.AddThemeConstantOverride("separation", 14);
         padding.AddChild(rowContent);
 
-        rowContent.AddChild(CreateStateChip(player.IsStarting ? "STARTING XI" : "NON-STARTER", player.IsStarting));
+        rowContent.AddChild(CreateStateChip(player.IsStarting ? "STARTING XI" : "BENCH/RESERVE", player.IsStarting));
 
         var body = new VBoxContainer
         {
@@ -453,7 +519,7 @@ public partial class SquadScreen : Control
 
         var conditionLabel = new Label
         {
-            Text = $"Fitness {player.Fitness} | Morale {player.Morale} | Form {player.Form}",
+            Text = $"Form {player.Form} | Morale {player.Morale} | Fitness {player.Fitness}",
             HorizontalAlignment = HorizontalAlignment.Right
         };
         conditionLabel.AddThemeFontSizeOverride("font_size", 13);
@@ -508,7 +574,7 @@ public partial class SquadScreen : Control
 
         _playerNameLabel.Text = player.Name;
         _detailMetaLabel.Text = $"{player.Position} | Age {player.Age} | {BuildPlayerStatusLine(player)}";
-        _roleChipLabel.Text = player.IsStarting ? "STARTING XI" : "NON-STARTER";
+        _roleChipLabel.Text = player.IsStarting ? "STARTING XI" : "BENCH/RESERVE";
         _statusChipLabel.Text = BuildReadinessLabel(player).ToUpperInvariant();
         TouchlineTheme.ApplyPanelVariant(_roleChip, player.IsStarting ? TouchlineSurfaceVariant.Positive : TouchlineSurfaceVariant.Accent, 999);
         TouchlineTheme.ApplyPanelVariant(_statusChip, ResolveReadinessVariant(player), 999);
@@ -520,7 +586,7 @@ public partial class SquadScreen : Control
         _profileHintLabel.Text = "Open the player profile for identity, lineup status, and the longer form-morale-fitness arc.";
         _lineupStatusLabel.Text = player.IsStarting
             ? $"{player.Name} currently holds a Starting XI role. Use the primary action only if you want to rotate the XI."
-            : $"{player.Name} is a non-starter in the bench/reserve group. Promote only if the readiness level fits the next fixture.";
+            : $"{player.Name} is in the bench/reserve group. Promote only if the readiness level fits the next fixture.";
         _lineupActionButton.Disabled = false;
         _lineupActionButton.Text = player.IsStarting ? $"Move {player.Name} to Bench" : $"Promote {player.Name} to XI";
         _openProfileButton.Disabled = false;
@@ -585,6 +651,20 @@ public partial class SquadScreen : Control
         };
     }
 
+    private static int CountNonStartersBefore(GameState state, int playerIndex)
+    {
+        var count = 0;
+        for (var index = 0; index < playerIndex && index < state.SquadPlayers.Length; index++)
+        {
+            if (!state.SquadPlayers[index].IsStarting)
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
     private void SetReadinessChip(string text, bool positive)
     {
         _readinessChipLabel.Text = text;
@@ -617,7 +697,7 @@ public partial class SquadScreen : Control
 
     private static string BuildPlayerStatusLine(GameState.SquadPlayer player)
     {
-        return player.IsStarting ? "Starting XI role" : "Non-starter: bench/reserve depth";
+        return player.IsStarting ? "Starting XI role" : "Bench/reserve depth";
     }
 
     private static string BuildReadinessLabel(GameState.SquadPlayer player)
@@ -660,7 +740,7 @@ public partial class SquadScreen : Control
 
     private static string BuildReadinessSummary(GameState.SquadPlayer player)
     {
-        return $"{player.Name} reads as {BuildReadinessLabel(player).ToLowerInvariant()} for the next fixture: form {player.Form}, morale {player.Morale}, fitness {player.Fitness}, lineup status {BuildPlayerStatusLine(player).ToLowerInvariant()}.";
+        return $"{player.Name} reads as {BuildReadinessLabel(player).ToLowerInvariant()} for the next fixture: form {player.Form}, morale {player.Morale}, fitness {player.Fitness}, squad status {BuildPlayerStatusLine(player).ToLowerInvariant()}.";
     }
 
     private static string BuildHeaderStatus(GameState state)
@@ -668,7 +748,7 @@ public partial class SquadScreen : Control
         var postMatchNote = state.LastMatchReport == null
             ? "Current values are live pre-match condition."
             : $"Latest match player state reflected after {state.LastMatchReport.Scoreline}.";
-        return $"Scan Starting XI and non-starters by condition, role, form, morale, and fitness. {postMatchNote}";
+        return $"Scan Starting XI, bench, and reserves by position, age, form, morale, fitness, and status. {postMatchNote}";
     }
 
     private static string BuildSquadWorkspaceSummary(GameState state, int starters, int nonStarters)
@@ -676,7 +756,9 @@ public partial class SquadScreen : Control
         var reportLine = state.LastMatchReport == null
             ? "No latest match report is active; values show current match readiness."
             : $"Latest match player state reflected: {state.LastMatchReport.FixtureLabel} {state.LastMatchReport.Scoreline}.";
-        return $"Lineup status: Starting XI {starters}/11 | Non-starters {nonStarters}.\n{state.SquadStatusSummary}\n{reportLine}";
+        var benchCount = System.Math.Min(nonStarters, 7);
+        var reserveCount = System.Math.Max(0, nonStarters - benchCount);
+        return $"Team Sheet: Starting XI {starters}/11 | Bench {benchCount} | Reserves {reserveCount}.\n{state.SquadStatusSummary}\n{reportLine}";
     }
 
     private static int CountStarters(GameState state)

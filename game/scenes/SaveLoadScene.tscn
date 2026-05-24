@@ -101,7 +101,7 @@ autowrap_mode = 3
 
 [node name="DetailGrid" type="GridContainer" parent="RootMargin/MainColumn/SlotCard/SlotPadding/SlotContent"]
 layout_mode = 2
-columns = 4
+columns = 2
 theme_override_constants/h_separation = 12
 theme_override_constants/v_separation = 8
 

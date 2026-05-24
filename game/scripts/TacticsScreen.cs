@@ -1,4 +1,6 @@
 using Godot;
+using System;
+using System.Collections.Generic;
 
 public partial class TacticsScreen : Control
 {
@@ -49,6 +51,9 @@ public partial class TacticsScreen : Control
     private Label _leftChannelLabel = default!;
     private Label _centerChannelLabel = default!;
     private Label _rightChannelLabel = default!;
+    private Control _pitchRows = default!;
+    private Control _pitchField = default!;
+    private PitchDrawingControl _tacticalBoard = default!;
 
     private PanelContainer _railCard = default!;
     private PanelContainer _headerCard = default!;
@@ -75,6 +80,7 @@ public partial class TacticsScreen : Control
     private SpinBox _tempoSpin = default!;
     private SpinBox _widthSpin = default!;
     private SpinBox _riskSpin = default!;
+    private string? _selectedTacticPlayerName;
 
     public override void _Ready()
     {
@@ -124,6 +130,8 @@ public partial class TacticsScreen : Control
         _formationBadgeLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/PitchCard/PitchPadding/PitchContent/TopMeta/FormationBadgeLabel");
         _pitchSummaryLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/PitchCard/PitchPadding/PitchContent/TopMeta/PitchSummaryLabel");
         _pitchPanel = GetNode<PanelContainer>("RootMargin/Shell/MainColumn/ContentRow/PitchCard/PitchPadding/PitchContent/PitchPanel");
+        _pitchField = GetNode<Control>("RootMargin/Shell/MainColumn/ContentRow/PitchCard/PitchPadding/PitchContent/PitchPanel/PitchPanelPadding/PitchField");
+        _pitchRows = GetNode<Control>("RootMargin/Shell/MainColumn/ContentRow/PitchCard/PitchPadding/PitchContent/PitchPanel/PitchPanelPadding/PitchField/PitchRows");
         _frontRowLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/PitchCard/PitchPadding/PitchContent/PitchPanel/PitchPanelPadding/PitchField/PitchRows/FrontRow/FrontRowLabel");
         _attackBandLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/PitchCard/PitchPadding/PitchContent/PitchPanel/PitchPanelPadding/PitchField/PitchRows/AttackBand/AttackBandLabel");
         _midfieldBandLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/PitchCard/PitchPadding/PitchContent/PitchPanel/PitchPanelPadding/PitchField/PitchRows/MidfieldBand/MidfieldBandLabel");
@@ -169,16 +177,28 @@ public partial class TacticsScreen : Control
         TouchlineTheme.ApplyPanelVariant(_pitchPanel, TouchlineSurfaceVariant.Positive, 28);
         TouchlineTheme.ApplyPanelVariant(_controlsCard, TouchlineSurfaceVariant.Card, 24);
         TouchlineTheme.ApplyPanelVariant(_notesCard, TouchlineSurfaceVariant.Muted, 24);
-        TouchlineTheme.ApplyButtonVariant(_dashboardButton, TouchlineButtonVariant.Secondary);
-        TouchlineTheme.ApplyButtonVariant(_squadButton, TouchlineButtonVariant.Secondary);
-        TouchlineTheme.ApplyButtonVariant(_tacticsButton, TouchlineButtonVariant.Secondary);
-        TouchlineTheme.ApplyButtonVariant(_fixturesButton, TouchlineButtonVariant.Secondary);
-        TouchlineTheme.ApplyButtonVariant(_standingsButton, TouchlineButtonVariant.Secondary);
-        TouchlineTheme.ApplyButtonVariant(_matchdayButton, TouchlineButtonVariant.Primary);
+        _pitchRows.Visible = false;
+        if (_tacticalBoard == null)
+        {
+            _tacticalBoard = new PitchDrawingControl
+            {
+                Name = "TacticalBoard",
+                CustomMinimumSize = new Vector2(0, 330),
+                SizeFlagsHorizontal = SizeFlags.ExpandFill,
+                SizeFlagsVertical = SizeFlags.ExpandFill,
+                ClipContents = true
+            };
+            _pitchField.AddChild(_tacticalBoard);
+        }
+        TouchlineTheme.ApplyNavigationButton(_dashboardButton, false);
+        TouchlineTheme.ApplyNavigationButton(_squadButton, false);
+        TouchlineTheme.ApplyNavigationButton(_tacticsButton, true);
+        TouchlineTheme.ApplyNavigationButton(_fixturesButton, false);
+        TouchlineTheme.ApplyNavigationButton(_standingsButton, false);
+        TouchlineTheme.ApplyMatchdayCta(_matchdayButton);
         TouchlineTheme.ApplyButtonVariant(_saveButton, TouchlineButtonVariant.Primary);
         TouchlineTheme.ApplyButtonVariant(_resetButton, TouchlineButtonVariant.Secondary);
         TouchlineTheme.ApplyButtonVariant(_backButton, TouchlineButtonVariant.Tertiary);
-        _tacticsButton.Disabled = true;
 
         TouchlineTheme.ApplyTitleStyle(_clubNameLabel, 28);
         TouchlineTheme.ApplyMutedStyle(_managerLabel, 15);
@@ -328,40 +348,331 @@ public partial class TacticsScreen : Control
         _statusLabel.Text = "Preview mode: these values explain the next match plan before they are saved.";
         _controlHintLabel.Text = "Preview values are unsaved until Save Tactical Plan applies them.";
         _controlSummaryLabel.Text = BuildControlSummary(formation, press, tempo, width, risk);
-        _pressPreviewLabel.Text = $"Press line: {DescribePress(press)}. {BuildPressPreview(press)}";
-        _tempoPreviewLabel.Text = $"Ball speed: {DescribeTempo(tempo)}. {BuildTempoPreview(tempo)}";
+        _pressPreviewLabel.Text = $"Pressing Intensity: {DescribePress(press)}. {BuildPressPreview(press)}";
+        _tempoPreviewLabel.Text = $"Tempo: {DescribeTempo(tempo)}. {BuildTempoPreview(tempo)}";
         _widthPreviewLabel.Text = $"Pitch use: {DescribeWidth(width)}. {BuildWidthPreview(width)}";
-        _riskPreviewLabel.Text = $"Commitment: {DescribeRisk(risk)}. {BuildRiskPreview(risk)}";
+        _riskPreviewLabel.Text = $"Mentality: {DescribeRisk(risk)}. {BuildRiskPreview(risk)}";
     }
 
     private void ApplyFormationRows(string formation, int width)
     {
-        switch (formation)
-        {
-            case "4-2-3-1":
-                _frontRowLabel.Text = "ST";
-                _attackBandLabel.Text = "LW    AM    RW";
-                _midfieldBandLabel.Text = "CM        CM";
-                _backLineLabel.Text = "LB    CB    CB    RB";
-                break;
-            case "3-5-2":
-                _frontRowLabel.Text = "ST          ST";
-                _attackBandLabel.Text = "AM";
-                _midfieldBandLabel.Text = "LWB   CM   CM   RWB";
-                _backLineLabel.Text = "CB    CB    CB";
-                break;
-            default:
-                _frontRowLabel.Text = "LW    ST    RW";
-                _attackBandLabel.Text = "AM";
-                _midfieldBandLabel.Text = "CM        CM";
-                _backLineLabel.Text = "LB    CB    CB    RB";
-                break;
-        }
-
-        _keeperLabel.Text = "GK";
+        _frontRowLabel.Text = string.Empty;
+        _attackBandLabel.Text = string.Empty;
+        _midfieldBandLabel.Text = string.Empty;
+        _backLineLabel.Text = string.Empty;
+        _keeperLabel.Text = string.Empty;
         _leftChannelLabel.Text = width >= 55 ? "LEFT OVERLOAD" : "LEFT HALF-SPACE";
         _centerChannelLabel.Text = width < 40 ? "COMPACT CENTRE" : "CENTRAL ACCESS";
         _rightChannelLabel.Text = width >= 55 ? "RIGHT OVERLOAD" : "RIGHT HALF-SPACE";
+        RenderTacticalBoard(formation);
+    }
+
+    private void RenderTacticalBoard(string formation)
+    {
+        if (_tacticalBoard == null)
+        {
+            return;
+        }
+
+        foreach (Node child in _tacticalBoard.GetChildren())
+        {
+            child.QueueFree();
+        }
+
+        if (GameState.Instance == null)
+        {
+            return;
+        }
+
+        var assigned = new HashSet<int>();
+        var slots = BuildTacticSlots(formation);
+        for (var slotIndex = 0; slotIndex < slots.Length; slotIndex++)
+        {
+            var slot = slots[slotIndex];
+            var playerIndex = FindPlayerForSlot(GameState.Instance, slot.Role, assigned);
+            if (playerIndex >= 0)
+            {
+                assigned.Add(playerIndex);
+                var player = GameState.Instance.SquadPlayers[playerIndex];
+                _tacticalBoard.AddChild(CreateTacticMarker(slot, player, slotIndex));
+            }
+            else
+            {
+                _tacticalBoard.AddChild(CreateEmptyTacticMarker(slot, slotIndex));
+            }
+        }
+
+        _tacticalBoard.QueueRedraw();
+    }
+
+    private Control CreateTacticMarker(TacticSlot slot, GameState.SquadPlayer player, int slotIndex)
+    {
+        var selected = _selectedTacticPlayerName == player.Name;
+        var panel = CreateMarkerPanel(slot, slotIndex, selected);
+        panel.Name = $"TacticMarker_{SanitizeNodeName(player.Name)}";
+        panel.TooltipText = $"{player.Name} | {player.Position} | Age {player.Age} | Form {player.Form} | Morale {player.Morale} | Fitness {player.Fitness}";
+        panel.SetMeta("player_name", player.Name);
+        panel.SetMeta("role", slot.Role);
+
+        var content = CreateMarkerContent();
+        panel.AddChild(content.margin);
+        content.nameLabel.Text = BuildShortPlayerName(player);
+        content.roleLabel.Text = slot.Role;
+
+        panel.GuiInput += @event =>
+        {
+            if (@event is InputEventMouseButton mouseButton && mouseButton.Pressed && mouseButton.ButtonIndex == MouseButton.Left)
+            {
+                _selectedTacticPlayerName = player.Name;
+                GameState.Instance?.SelectPlayerProfile(player.Name);
+                _statusLabel.Text = $"Selected marker: {player.Name} | {player.Position} | Age {player.Age} | Form {player.Form} | Morale {player.Morale} | Fitness {player.Fitness}";
+                RenderTacticalBoard(_formationOption.GetItemText(_formationOption.Selected));
+            }
+        };
+
+        return panel;
+    }
+
+    private Control CreateEmptyTacticMarker(TacticSlot slot, int slotIndex)
+    {
+        var panel = CreateMarkerPanel(slot, slotIndex, false);
+        panel.Name = $"TacticMarker_Empty_{slot.Role}_{slotIndex}";
+        panel.TooltipText = $"Empty {slot.Role} slot";
+        panel.SetMeta("empty_slot", true);
+
+        var content = CreateMarkerContent();
+        panel.AddChild(content.margin);
+        content.nameLabel.Text = "EMPTY";
+        content.roleLabel.Text = slot.Role;
+        content.nameLabel.AddThemeColorOverride("font_color", TouchlineTheme.TextQuiet);
+        return panel;
+    }
+
+    private static PanelContainer CreateMarkerPanel(TacticSlot slot, int slotIndex, bool selected)
+    {
+        var panel = new PanelContainer
+        {
+            CustomMinimumSize = new Vector2(86, 52),
+            MouseDefaultCursorShape = CursorShape.PointingHand,
+            ZIndex = 10 + slotIndex
+        };
+        panel.AnchorLeft = slot.Position.X;
+        panel.AnchorRight = slot.Position.X;
+        panel.AnchorTop = slot.Position.Y;
+        panel.AnchorBottom = slot.Position.Y;
+        panel.OffsetLeft = -43;
+        panel.OffsetRight = 43;
+        panel.OffsetTop = -26;
+        panel.OffsetBottom = 26;
+        TouchlineTheme.ApplyTokenStyle(panel, selected);
+        return panel;
+    }
+
+    private static (MarginContainer margin, Label nameLabel, Label roleLabel) CreateMarkerContent()
+    {
+        var margin = CreateMarginContainer(8, 5, 8, 5);
+        var stack = new VBoxContainer
+        {
+            SizeFlagsHorizontal = SizeFlags.ExpandFill,
+            SizeFlagsVertical = SizeFlags.ExpandFill
+        };
+        stack.AddThemeConstantOverride("separation", 1);
+        margin.AddChild(stack);
+
+        var nameLabel = new Label
+        {
+            Name = "PlayerNameLabel",
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center
+        };
+        nameLabel.AddThemeFontSizeOverride("font_size", 13);
+        nameLabel.AddThemeColorOverride("font_color", TouchlineTheme.TextPrimary);
+        stack.AddChild(nameLabel);
+
+        var roleLabel = new Label
+        {
+            Name = "RoleLabel",
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center
+        };
+        roleLabel.AddThemeFontSizeOverride("font_size", 10);
+        roleLabel.AddThemeColorOverride("font_color", TouchlineTheme.TextMuted);
+        stack.AddChild(roleLabel);
+        return (margin, nameLabel, roleLabel);
+    }
+
+    private static TacticSlot[] BuildTacticSlots(string formation)
+    {
+        return formation switch
+        {
+            "4-2-3-1" => new[]
+            {
+                new TacticSlot("GK", new Vector2(0.50f, 0.88f)),
+                new TacticSlot("LB", new Vector2(0.18f, 0.72f)),
+                new TacticSlot("CB", new Vector2(0.38f, 0.74f)),
+                new TacticSlot("CB", new Vector2(0.62f, 0.74f)),
+                new TacticSlot("RB", new Vector2(0.82f, 0.72f)),
+                new TacticSlot("CM", new Vector2(0.42f, 0.58f)),
+                new TacticSlot("CM", new Vector2(0.58f, 0.58f)),
+                new TacticSlot("LW", new Vector2(0.24f, 0.38f)),
+                new TacticSlot("AM", new Vector2(0.50f, 0.34f)),
+                new TacticSlot("RW", new Vector2(0.76f, 0.38f)),
+                new TacticSlot("ST", new Vector2(0.50f, 0.18f))
+            },
+            "3-5-2" => new[]
+            {
+                new TacticSlot("GK", new Vector2(0.50f, 0.88f)),
+                new TacticSlot("CB", new Vector2(0.32f, 0.72f)),
+                new TacticSlot("CB", new Vector2(0.50f, 0.74f)),
+                new TacticSlot("CB", new Vector2(0.68f, 0.72f)),
+                new TacticSlot("LWB", new Vector2(0.16f, 0.52f)),
+                new TacticSlot("CM", new Vector2(0.36f, 0.54f)),
+                new TacticSlot("CM", new Vector2(0.50f, 0.48f)),
+                new TacticSlot("AM", new Vector2(0.64f, 0.54f)),
+                new TacticSlot("RWB", new Vector2(0.84f, 0.52f)),
+                new TacticSlot("ST", new Vector2(0.43f, 0.20f)),
+                new TacticSlot("ST", new Vector2(0.57f, 0.20f))
+            },
+            _ => new[]
+            {
+                new TacticSlot("GK", new Vector2(0.50f, 0.88f)),
+                new TacticSlot("LB", new Vector2(0.18f, 0.72f)),
+                new TacticSlot("CB", new Vector2(0.38f, 0.74f)),
+                new TacticSlot("CB", new Vector2(0.62f, 0.74f)),
+                new TacticSlot("RB", new Vector2(0.82f, 0.72f)),
+                new TacticSlot("CM", new Vector2(0.38f, 0.56f)),
+                new TacticSlot("CM", new Vector2(0.62f, 0.56f)),
+                new TacticSlot("AM", new Vector2(0.50f, 0.42f)),
+                new TacticSlot("LW", new Vector2(0.24f, 0.24f)),
+                new TacticSlot("ST", new Vector2(0.50f, 0.18f)),
+                new TacticSlot("RW", new Vector2(0.76f, 0.24f))
+            }
+        };
+    }
+
+    private static int FindPlayerForSlot(GameState state, string role, HashSet<int> assigned)
+    {
+        var exact = FindStarterByPredicate(state, assigned, player => PositionFitsRole(player.Position, role));
+        if (exact >= 0)
+        {
+            return exact;
+        }
+
+        var family = RoleFamily(role);
+        var familyMatch = FindStarterByPredicate(state, assigned, player => PositionFamily(player.Position) == family);
+        if (familyMatch >= 0)
+        {
+            return familyMatch;
+        }
+
+        return FindStarterByPredicate(state, assigned, _ => true);
+    }
+
+    private static int FindStarterByPredicate(GameState state, HashSet<int> assigned, Func<GameState.SquadPlayer, bool> predicate)
+    {
+        for (var index = 0; index < state.SquadPlayers.Length; index++)
+        {
+            var player = state.SquadPlayers[index];
+            if (!player.IsStarting || assigned.Contains(index) || !predicate(player))
+            {
+                continue;
+            }
+
+            return index;
+        }
+
+        return -1;
+    }
+
+    private static bool PositionFitsRole(string position, string role)
+    {
+        if (position == role)
+        {
+            return true;
+        }
+
+        return role switch
+        {
+            "LWB" => position == "LB",
+            "RWB" => position == "RB",
+            "AM" => position is "AM" or "CM",
+            _ => false
+        };
+    }
+
+    private static string RoleFamily(string role)
+    {
+        return role switch
+        {
+            "GK" => "GK",
+            "LB" or "CB" or "RB" or "LWB" or "RWB" => "DEF",
+            "CM" or "AM" => "MID",
+            _ => "FWD"
+        };
+    }
+
+    private static string PositionFamily(string position)
+    {
+        return position switch
+        {
+            "GK" => "GK",
+            "LB" or "CB" or "RB" => "DEF",
+            "CM" or "AM" => "MID",
+            _ => "FWD"
+        };
+    }
+
+    private static string BuildShortPlayerName(GameState.SquadPlayer player)
+    {
+        var parts = player.Name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length == 0)
+        {
+            return player.Position;
+        }
+
+        var surname = parts[^1];
+        if (surname.Length <= 8)
+        {
+            return surname;
+        }
+
+        return $"{char.ToUpperInvariant(parts[0][0])}. {surname[..Math.Min(6, surname.Length)]}";
+    }
+
+    private static string SanitizeNodeName(string text)
+    {
+        var chars = text.ToCharArray();
+        for (var index = 0; index < chars.Length; index++)
+        {
+            if (!char.IsLetterOrDigit(chars[index]))
+            {
+                chars[index] = '_';
+            }
+        }
+
+        return new string(chars);
+    }
+
+    private readonly struct TacticSlot
+    {
+        public TacticSlot(string role, Vector2 position)
+        {
+            Role = role;
+            Position = position;
+        }
+
+        public string Role { get; }
+        public Vector2 Position { get; }
+    }
+
+    private static MarginContainer CreateMarginContainer(int left, int top, int right, int bottom)
+    {
+        var margin = new MarginContainer();
+        margin.AddThemeConstantOverride("margin_left", left);
+        margin.AddThemeConstantOverride("margin_top", top);
+        margin.AddThemeConstantOverride("margin_right", right);
+        margin.AddThemeConstantOverride("margin_bottom", bottom);
+        return margin;
     }
 
     private void OnSavePressed()
@@ -383,7 +694,7 @@ public partial class TacticsScreen : Control
         GameState.Instance.UpdateTactics(formation, press, tempo, width, risk);
         _savedPlanLabel.Text = BuildSavedPlanSummary(GameState.Instance);
         RefreshBoard();
-        _statusLabel.Text = $"Saved tactical setup applied to the shared match engine: {formation} | Press {press} | Tempo {tempo} | Width {width} | Risk {risk}";
+        _statusLabel.Text = $"Saved tactical setup applied to the shared match engine: {formation} | Pressing {press} | Tempo {tempo} | Width {width} | Mentality {risk}";
         _saveHintLabel.Text = "Saved plan is now the matchday tactical setup.";
         SetReadinessChip("PLAN SAVED", true);
     }
@@ -479,7 +790,7 @@ public partial class TacticsScreen : Control
 
     private static string BuildSavedPlanSummary(GameState state)
     {
-        return $"Saved tactical setup: {state.BuildTacticalPlanSummary()} | Shared match engine input: Formation {state.TacticalFormation} | Press {state.PressIntensity} | Tempo {state.Tempo} | Width {state.Width} | Risk {state.Risk}";
+        return $"Saved tactical setup: {state.BuildTacticalPlanSummary()} | Shared match engine input: Formation {state.TacticalFormation} | Pressing {state.PressIntensity} | Tempo {state.Tempo} | Width {state.Width} | Mentality {state.Risk}";
     }
 
     private static string BuildClubMonogram(string clubName)
@@ -604,12 +915,12 @@ public partial class TacticsScreen : Control
 
     private static string BuildPreviewSummary(string formation, int press, int tempo, int width, int risk)
     {
-        return $"Shared match engine preview: {formation} with press {press} ({DescribePress(press).ToLowerInvariant()}), tempo {tempo} ({DescribeTempo(tempo).ToLowerInvariant()}), width {width} ({DescribeWidth(width).ToLowerInvariant()}), and risk {risk} ({DescribeRisk(risk).ToLowerInvariant()}).";
+        return $"Shared match engine preview: {formation} with pressing {press} ({DescribePress(press).ToLowerInvariant()}), tempo {tempo} ({DescribeTempo(tempo).ToLowerInvariant()}), width {width} ({DescribeWidth(width).ToLowerInvariant()}), and mentality {risk} ({DescribeRisk(risk).ToLowerInvariant()}).";
     }
 
     private static string BuildControlSummary(string formation, int press, int tempo, int width, int risk)
     {
-        return $"Preview values | Formation {formation} | Press {press} ({DescribePress(press)}) | Tempo {tempo} ({DescribeTempo(tempo)}) | Width {width} ({DescribeWidth(width)}) | Risk {risk} ({DescribeRisk(risk)})";
+        return $"Preview values | Formation {formation} | Pressing {press} ({DescribePress(press)}) | Tempo {tempo} ({DescribeTempo(tempo)}) | Width {width} ({DescribeWidth(width)}) | Mentality {risk} ({DescribeRisk(risk)})";
     }
 
     private static string DescribePress(int value)

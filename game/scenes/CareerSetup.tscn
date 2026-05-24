@@ -156,7 +156,7 @@ theme_override_constants/separation = 12
 
 [node name="PreviewHeading" type="Label" parent="RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent"]
 layout_mode = 2
-text = "World Preview"
+text = "Career Setup"
 
 [node name="PreviewHintLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent"]
 layout_mode = 2

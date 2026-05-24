@@ -131,7 +131,7 @@ public partial class PostMatchScene : Control
         _tacticalLabel.Text = $"{report.TacticalSummary}\nTactical read | {report.TacticalExplanation}\nCause | {report.CauseSummary}";
         _pressureLabel.Text = report.PressureSummary;
         _eventsLabel.Text = $"{string.Join("\n", report.KeyEvents)}\n\nKey moments\n{report.KeyPlayerMoments}";
-        _nextStepLabel.Text = "Advance to Club Dashboard and carry this result into the next planning cycle.";
+        _nextStepLabel.Text = "Advance to Manager Hub and carry this result into the next planning cycle.";
     }
 
     private void RenderUnavailableState()
@@ -151,7 +151,7 @@ public partial class PostMatchScene : Control
         _tacticalLabel.Text = "Tactical summary unavailable.";
         _pressureLabel.Text = "Pressure summary unavailable.";
         _eventsLabel.Text = "No key events recorded.";
-        _nextStepLabel.Text = "Advance to Club Dashboard";
+        _nextStepLabel.Text = "Advance to Manager Hub";
     }
 
     private void OnContinuePressed()

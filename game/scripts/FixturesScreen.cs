@@ -128,14 +128,13 @@ public partial class FixturesScreen : Control
         TouchlineTheme.ApplyPanelVariant(GetNode<PanelContainer>("RootMargin/Shell/MainColumn/SummaryGrid/FormCard"), TouchlineSurfaceVariant.Positive, 20);
         TouchlineTheme.ApplyPanelVariant(GetNode<PanelContainer>("RootMargin/Shell/MainColumn/SummaryGrid/TableCard"), TouchlineSurfaceVariant.Card, 20);
 
-        TouchlineTheme.ApplyButtonVariant(_dashboardButton, TouchlineButtonVariant.Secondary);
-        TouchlineTheme.ApplyButtonVariant(_squadButton, TouchlineButtonVariant.Secondary);
-        TouchlineTheme.ApplyButtonVariant(_tacticsButton, TouchlineButtonVariant.Secondary);
-        TouchlineTheme.ApplyButtonVariant(_fixturesButton, TouchlineButtonVariant.Secondary);
-        TouchlineTheme.ApplyButtonVariant(_standingsButton, TouchlineButtonVariant.Secondary);
-        TouchlineTheme.ApplyButtonVariant(_matchdayButton, TouchlineButtonVariant.Primary);
+        TouchlineTheme.ApplyNavigationButton(_dashboardButton, false);
+        TouchlineTheme.ApplyNavigationButton(_squadButton, false);
+        TouchlineTheme.ApplyNavigationButton(_tacticsButton, false);
+        TouchlineTheme.ApplyNavigationButton(_fixturesButton, true);
+        TouchlineTheme.ApplyNavigationButton(_standingsButton, false);
+        TouchlineTheme.ApplyMatchdayCta(_matchdayButton);
         TouchlineTheme.ApplyButtonVariant(_backButton, TouchlineButtonVariant.Tertiary);
-        _fixturesButton.Disabled = true;
 
         TouchlineTheme.ApplyTitleStyle(_clubNameLabel, 28);
         TouchlineTheme.ApplyMutedStyle(_managerLabel, 15);
@@ -198,7 +197,7 @@ public partial class FixturesScreen : Control
         _managerLabel.Text = $"Manager {state.ManagerName}";
         _seasonLabel.Text = $"Season {state.SeasonLabel}";
         _competitionChipLabel.Text = state.CompetitionName.ToUpperInvariant();
-        _competitionLabel.Text = $"{state.CompetitionName} fixture desk";
+        _competitionLabel.Text = $"{state.CompetitionName} Fixture List";
         _scheduleStatusLabel.Text = $"Season {state.SeasonLabel} | {state.CurrentDateLabel} | Matchday {state.CurrentMatchday}";
         _weekChipLabel.Text = $"MD {state.CurrentMatchday}";
         SetStateChip(currentClubFixture);
@@ -223,7 +222,7 @@ public partial class FixturesScreen : Control
             : currentClubFixture.IsComplete
                 ? $"Completed fixture logged for {clubName}: {currentClubFixture.Scoreline}."
                 : $"Next fixture for {clubName} is still open. Upcoming rounds remain below.";
-        _railHintLabel.Text = "Use fixtures to track the round, then move into standings or Matchday.";
+        _railHintLabel.Text = "Use the fixture list to track the round, then move into standings or Matchday.";
 
         _matchdayButton.Disabled = false;
         PopulateFixtureSections();
@@ -240,7 +239,7 @@ public partial class FixturesScreen : Control
         _scheduleStatusLabel.Text = "Fixture status unavailable.";
         _weekChipLabel.Text = "NO WEEK";
         _stateChipLabel.Text = "NO FIXTURE";
-        _headerStatusLabel.Text = "Load a career to open the fixture desk.";
+        _headerStatusLabel.Text = "Load a career to open the fixture list.";
         _nextMatchValueLabel.Text = "--";
         _nextMatchMetaLabel.Text = "Fixture unavailable.";
         _matchdayValueLabel.Text = "--";
@@ -255,7 +254,7 @@ public partial class FixturesScreen : Control
         _formLabel.Text = "Form unavailable.";
         _statusLabel.Text = "Status unavailable.";
         _timelineNoteLabel.Text = "Fixture note unavailable.";
-        _railHintLabel.Text = "Return to the dashboard once a club is active.";
+        _railHintLabel.Text = "Return to the Manager Hub once a club is active.";
         _matchdayButton.Disabled = true;
         ClearContainer(_clubFixtureRows);
         ClearContainer(_leagueFixtureRows);

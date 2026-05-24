@@ -73,17 +73,17 @@ func _has_operations_rail(scene: Node) -> bool:
 
 func _validate_operations_rail(scene: Node) -> void:
     var expected := {
-        "DashboardButton": "Dashboard",
+        "DashboardButton": "Manager Hub",
         "SquadButton": "Squad",
         "TacticsButton": "Tactics",
         "FixturesButton": "Fixtures",
         "StandingsButton": "Standings",
-        "MatchdayButton": "Matchday"
+        "MatchdayButton": "Go to Matchday"
     }
 
     var section_label := scene.get_node_or_null("RootMargin/Shell/RailCard/RailPadding/RailContent/SectionLabel") as Label
-    if section_label == null or section_label.text != "OPERATIONS":
-        _fail("Operations rail section label is inconsistent on %s" % scene.name)
+    if section_label == null or section_label.text != "CLUB OFFICE":
+        _fail("Club office rail section label is inconsistent on %s" % scene.name)
         return
 
     for button_name in expected.keys():

@@ -14,7 +14,9 @@ public enum TouchlineButtonVariant
 {
     Primary,
     Secondary,
-    Tertiary
+    Tertiary,
+    Selected,
+    MatchdayCta
 }
 
 public partial class TouchlineTheme : Node
@@ -35,6 +37,12 @@ public partial class TouchlineTheme : Node
     public static Color PositiveGreen => new(0.235f, 0.671f, 0.439f);
     public static Color PositiveGreenHover => new(0.298f, 0.737f, 0.498f);
     public static Color PositiveGreenPressed => new(0.188f, 0.549f, 0.357f);
+    public static Color PitchGrass => new(0.064f, 0.235f, 0.137f);
+    public static Color PitchGrassDark => new(0.044f, 0.161f, 0.102f);
+    public static Color PitchLine => new(0.780f, 0.890f, 0.800f, 0.82f);
+    public static Color HomeToken => new(0.129f, 0.365f, 0.694f);
+    public static Color AwayToken => new(0.663f, 0.160f, 0.180f);
+    public static Color BallColor => new(0.980f, 0.955f, 0.820f);
     public static Color BorderSoft => new(0.239f, 0.333f, 0.431f);
     public static Color BorderAccent => new(0.329f, 0.604f, 0.898f);
     public static Color BorderPositive => new(0.267f, 0.639f, 0.443f);
@@ -70,6 +78,25 @@ public partial class TouchlineTheme : Node
         button.AddThemeStyleboxOverride("pressed", CreateButtonStyle(palette.pressedBackground, palette.pressedBorder));
         button.AddThemeStyleboxOverride("focus", CreateButtonStyle(palette.hoverBackground, BorderAccent));
         button.AddThemeStyleboxOverride("disabled", CreateButtonStyle(SurfaceMuted, BorderSoft));
+    }
+
+    public static void ApplyNavigationButton(Button button, bool selected)
+    {
+        ApplyButtonVariant(button, selected ? TouchlineButtonVariant.Selected : TouchlineButtonVariant.Secondary);
+        button.Disabled = selected;
+    }
+
+    public static void ApplyMatchdayCta(Button button)
+    {
+        button.Text = "Go to Matchday";
+        ApplyButtonVariant(button, TouchlineButtonVariant.MatchdayCta);
+    }
+
+    public static void ApplyTokenStyle(Control control, bool active = false, bool away = false)
+    {
+        var background = away ? AwayToken : HomeToken;
+        var border = active ? BallColor : PitchLine;
+        control.AddThemeStyleboxOverride("panel", CreateTokenStyle(background, border, active));
     }
 
     public static void ApplyEyebrowStyle(Label label)
@@ -204,6 +231,27 @@ public partial class TouchlineTheme : Node
         };
     }
 
+    private static StyleBoxFlat CreateTokenStyle(Color background, Color border, bool active)
+    {
+        return new StyleBoxFlat
+        {
+            BgColor = active ? background.Lightened(0.12f) : background,
+            BorderColor = border,
+            BorderWidthLeft = active ? 3 : 2,
+            BorderWidthTop = active ? 3 : 2,
+            BorderWidthRight = active ? 3 : 2,
+            BorderWidthBottom = active ? 3 : 2,
+            CornerRadiusTopLeft = 999,
+            CornerRadiusTopRight = 999,
+            CornerRadiusBottomRight = 999,
+            CornerRadiusBottomLeft = 999,
+            ContentMarginLeft = 10,
+            ContentMarginTop = 8,
+            ContentMarginRight = 10,
+            ContentMarginBottom = 8
+        };
+    }
+
     private static StyleBoxFlat CreateInputStyle(Color background, Color border)
     {
         return new StyleBoxFlat
@@ -259,6 +307,8 @@ public partial class TouchlineTheme : Node
         return variant switch
         {
             TouchlineButtonVariant.Primary => (AccentBlue, BorderAccent, AccentBlueHover, BorderAccent, AccentBluePressed, BorderAccent),
+            TouchlineButtonVariant.Selected => (PositiveSurface, BorderPositive, PositiveSurface.Lightened(0.08f), BorderPositive, PositiveSurface.Darkened(0.08f), BorderPositive),
+            TouchlineButtonVariant.MatchdayCta => (PositiveGreen, BorderPositive, PositiveGreenHover, BorderPositive, PositiveGreenPressed, BorderPositive),
             TouchlineButtonVariant.Tertiary => (new Color(0f, 0f, 0f, 0f), BorderSoft, SurfaceMuted, BorderSoft, SurfaceMuted, BorderSoft),
             _ => (SurfaceRaised, BorderSoft, new Color(0.136f, 0.186f, 0.247f), BorderAccent, SurfaceMuted, BorderSoft)
         };

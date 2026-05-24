@@ -6,19 +6,23 @@ public partial class LiveMatchScene : Control
 {
     private const string MatchdayScenePath = "res://scenes/MatchdayScene.tscn";
     private const string PostMatchScenePath = "res://scenes/PostMatchScene.tscn";
-    private const float SimulatedMinutesPerSecond = 6.0f;
-    private const float MarkerSize = 30.0f;
-    private const float BallSize = 18.0f;
-    private const float BallHaloSize = 34.0f;
+    private const float MarkerSize = 34.0f;
+    private const float BallSize = 22.0f;
+    private const float BallHaloSize = 42.0f;
     private const float ActionLineThickness = 5.0f;
 
     private readonly List<Button> _markerNodes = new();
     private readonly List<string> _markerPlayerIds = new();
+    private readonly List<PlaybackSegment> _segments = new();
     private MatchPlaybackResult? _playback;
-    private ColorRect? _actionLineNode;
+    private Line2D? _actionTrailNode;
+    private PanelContainer? _receiverTargetNode;
+    private PanelContainer? _actionBannerPanel;
+    private Label? _actionBannerLabel;
     private PanelContainer? _ballHaloNode;
     private PanelContainer? _ballNode;
     private float _elapsedSeconds;
+    private float _totalPlaybackSeconds;
     private int _appliedEventCount;
     private bool _matchComplete;
 
@@ -67,15 +71,16 @@ public partial class LiveMatchScene : Control
         _tacticalLabel.Text = _playback.TacticalSummary;
         _momentumLabel.Text = "Possession: opening restart";
         _statusLabel.Text = "Playback model loaded. Rendering engine frames.";
-        _controlLabel.Text = "Action | kickoff\nPossession | opening restart\nBall | carried | Carrier | loading";
+        _controlLabel.Text = "Carrier | loading\nTarget | opening restart\nTempo | readable action pacing";
         _eventFeedLabel.Text = "1' Kick-off.";
         _homeTagLabel.Text = _playback.HomeClubName;
         _pitchStateLabel.Text = "Kickoff";
         _awayTagLabel.Text = _playback.AwayClubName;
-        _pitchNoteLabel.Text = "The pitch now renders frame-based player and ball state from the match engine.";
+        _pitchNoteLabel.Text = "Readable 2D match playback: carrier, target, trail, and key moment stay visible.";
 
+        BuildPlaybackSegments();
         CreateMarkers();
-        RenderPlaybackSecond(0);
+        RenderPlaybackSecond(0, null, 0.0f);
         SetProcess(true);
     }
 
@@ -87,12 +92,10 @@ public partial class LiveMatchScene : Control
         }
 
         _elapsedSeconds += (float)delta;
-        var simulatedSecond = Math.Min(
-            _playback.Timeline.DurationSeconds,
-            (int)MathF.Floor(_elapsedSeconds * SimulatedMinutesPerSecond * 60.0f));
-        RenderPlaybackSecond(simulatedSecond);
+        var playbackPosition = ResolvePlaybackPosition(_elapsedSeconds);
+        RenderPlaybackSecond(playbackPosition.simulatedSecond, playbackPosition.action, playbackPosition.progress);
 
-        if (simulatedSecond >= _playback.Timeline.DurationSeconds)
+        if (_elapsedSeconds >= _totalPlaybackSeconds)
         {
             FinalizeMatch();
             SetProcess(false);
@@ -128,14 +131,37 @@ public partial class LiveMatchScene : Control
         }
 
         var initialFrame = _playback.Timeline.Frames[0];
-        _actionLineNode = new ColorRect
+        var pitchMarkings = new PitchDrawingControl
         {
-            Name = "PlaybackActionLine",
+            Name = "PitchMarkings",
+            MouseFilter = MouseFilterEnum.Ignore,
+            ZIndex = -20
+        };
+        pitchMarkings.SetAnchorsPreset(LayoutPreset.FullRect);
+        _markersLayer.AddChild(pitchMarkings);
+
+        _actionTrailNode = new Line2D
+        {
+            Name = "PlaybackActionTrail",
+            Visible = false,
+            Width = ActionLineThickness,
+            DefaultColor = new Color(1.0f, 0.96f, 0.58f, 0.72f),
+            ZIndex = 4
+        };
+        _markersLayer.AddChild(_actionTrailNode);
+
+        _receiverTargetNode = new PanelContainer
+        {
+            Name = "PlaybackReceiverTarget",
+            CustomMinimumSize = new Vector2(32, 32),
             MouseFilter = MouseFilterEnum.Ignore,
             Visible = false,
-            Color = new Color(1.0f, 0.96f, 0.58f, 0.72f)
+            ZIndex = 5
         };
-        _markersLayer.AddChild(_actionLineNode);
+        _receiverTargetNode.AddThemeStyleboxOverride("panel", BuildTargetStyle());
+        _markersLayer.AddChild(_receiverTargetNode);
+
+        CreateActionBanner();
 
         foreach (var player in initialFrame.PlayerStates)
         {
@@ -178,7 +204,7 @@ public partial class LiveMatchScene : Control
         _markersLayer.AddChild(_ballNode);
     }
 
-    private void RenderPlaybackSecond(int simulatedSecond)
+    private void RenderPlaybackSecond(int simulatedSecond, MatchAction? displayAction, float displayProgress)
     {
         if (_playback == null || _markersLayer == null)
         {
@@ -186,16 +212,17 @@ public partial class LiveMatchScene : Control
         }
 
         var (currentFrame, nextFrame, progress) = ResolveFramePair(simulatedSecond);
+        var frameAction = ResolveActionAtSecond(simulatedSecond) ?? displayAction;
         var carrierLabel = ResolveCarrierLabel(currentFrame);
         var involvedLabel = ResolveInvolvedPlayerLabel(currentFrame);
         var hasEvent = !string.IsNullOrWhiteSpace(currentFrame.EventSummary);
 
         _scoreLabel!.Text = $"{currentFrame.HomeScore} - {currentFrame.AwayScore}";
         _clockLabel!.Text = $"{currentFrame.Minute:00}'";
-        _statusLabel!.Text = currentFrame.EventSummary ?? currentFrame.CurrentActionLabel;
+        _statusLabel!.Text = currentFrame.EventSummary ?? BuildActionBanner(frameAction, currentFrame);
         _statusLabel.AddThemeColorOverride("font_color", hasEvent ? new Color(1.0f, 0.84f, 0.32f) : TouchlineTheme.TextPrimary);
         _controlLabel!.Text =
-            $"Action | {currentFrame.CurrentActionLabel}\nPossession | {currentFrame.PossessionTeam}\nBall | {FormatBallMovement(currentFrame.Ball.MovementState)} | Carrier | {carrierLabel}\nFocus | {involvedLabel}";
+            $"Carrier | {carrierLabel}\nTarget | {ResolveTargetLabel(frameAction, currentFrame)}\nTempo | readable action pacing";
         _momentumLabel!.Text = $"Possession\n{currentFrame.PossessionTeam}\nBall: {FormatBallMovement(currentFrame.Ball.MovementState)}";
         _pitchStateLabel!.Text = hasEvent ? "Key Moment" : FormatBallMovement(currentFrame.Ball.MovementState);
         _pitchStateLabel.AddThemeColorOverride("font_color", hasEvent ? new Color(1.0f, 0.84f, 0.32f) : TouchlineTheme.TextMuted);
@@ -206,7 +233,220 @@ public partial class LiveMatchScene : Control
         UpdateEventFeed(simulatedSecond, currentFrame.EventId);
         UpdateMarkerPositions(currentFrame, nextFrame, progress);
         UpdateBallPosition(currentFrame, nextFrame, progress);
-        UpdateActionLine(currentFrame, nextFrame, progress);
+        UpdateActionBanner(frameAction, currentFrame, hasEvent);
+        UpdateReceiverTarget(frameAction, currentFrame, nextFrame, progress);
+        UpdateActionTrail(currentFrame, nextFrame, progress, frameAction);
+    }
+
+    private MatchAction? ResolveActionAtSecond(int simulatedSecond)
+    {
+        if (_playback == null)
+        {
+            return null;
+        }
+
+        foreach (var action in _playback.Timeline.Actions)
+        {
+            if (simulatedSecond >= action.StartSecond && simulatedSecond <= action.EndSecond)
+            {
+                return action;
+            }
+        }
+
+        return null;
+    }
+
+    private void BuildPlaybackSegments()
+    {
+        _segments.Clear();
+        _totalPlaybackSeconds = 0.0f;
+        if (_playback == null)
+        {
+            return;
+        }
+
+        foreach (var action in _playback.Timeline.Actions)
+        {
+            var duration = ResolveDisplayDuration(action.Kind);
+            _segments.Add(new PlaybackSegment(action, _totalPlaybackSeconds, duration));
+            _totalPlaybackSeconds += duration;
+        }
+
+        if (_segments.Count == 0)
+        {
+            _totalPlaybackSeconds = Math.Max(1.0f, _playback.Timeline.DurationSeconds / 180.0f);
+        }
+    }
+
+    private (int simulatedSecond, MatchAction? action, float progress) ResolvePlaybackPosition(float elapsedSeconds)
+    {
+        if (_playback == null)
+        {
+            return (0, null, 0.0f);
+        }
+
+        if (_segments.Count == 0)
+        {
+            var fallbackProgress = Math.Clamp(elapsedSeconds / Math.Max(1.0f, _totalPlaybackSeconds), 0.0f, 1.0f);
+            return ((int)MathF.Round(_playback.Timeline.DurationSeconds * fallbackProgress), null, fallbackProgress);
+        }
+
+        foreach (var segment in _segments)
+        {
+            if (elapsedSeconds < segment.StartSeconds + segment.DurationSeconds)
+            {
+                var progress = Math.Clamp((elapsedSeconds - segment.StartSeconds) / segment.DurationSeconds, 0.0f, 1.0f);
+                var actionProgress = ResolveActionProgress(segment.Action.Kind, progress);
+                var simulatedSecond = (int)MathF.Round(Mathf.Lerp(segment.Action.StartSecond, segment.Action.EndSecond, actionProgress));
+                return (simulatedSecond, segment.Action, progress);
+            }
+        }
+
+        var last = _segments[^1].Action;
+        return (_playback.Timeline.DurationSeconds, last, 1.0f);
+    }
+
+    private void CreateActionBanner()
+    {
+        if (_markersLayer == null)
+        {
+            return;
+        }
+
+        _actionBannerPanel = new PanelContainer
+        {
+            Name = "ActionBanner",
+            MouseFilter = MouseFilterEnum.Ignore,
+            ZIndex = 30
+        };
+        _actionBannerPanel.AnchorLeft = 0.18f;
+        _actionBannerPanel.AnchorRight = 0.82f;
+        _actionBannerPanel.AnchorTop = 0.025f;
+        _actionBannerPanel.AnchorBottom = 0.025f;
+        _actionBannerPanel.OffsetTop = 0;
+        _actionBannerPanel.OffsetBottom = 44;
+        TouchlineTheme.ApplyPanelVariant(_actionBannerPanel, TouchlineSurfaceVariant.Rail, 14);
+        _markersLayer.AddChild(_actionBannerPanel);
+
+        var margin = new MarginContainer();
+        margin.AddThemeConstantOverride("margin_left", 12);
+        margin.AddThemeConstantOverride("margin_top", 8);
+        margin.AddThemeConstantOverride("margin_right", 12);
+        margin.AddThemeConstantOverride("margin_bottom", 8);
+        _actionBannerPanel.AddChild(margin);
+
+        _actionBannerLabel = new Label
+        {
+            Name = "ActionBannerLabel",
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center,
+            Text = "KICKOFF"
+        };
+        _actionBannerLabel.AddThemeColorOverride("font_color", TouchlineTheme.TextPrimary);
+        _actionBannerLabel.AddThemeFontSizeOverride("font_size", 18);
+        margin.AddChild(_actionBannerLabel);
+    }
+
+    private void UpdateActionBanner(MatchAction? action, MatchFrame frame, bool keyMoment)
+    {
+        if (_actionBannerLabel == null || _actionBannerPanel == null)
+        {
+            return;
+        }
+
+        _actionBannerLabel.Text = BuildActionBanner(action, frame);
+        _actionBannerLabel.AddThemeColorOverride("font_color", keyMoment ? new Color(1.0f, 0.84f, 0.32f) : TouchlineTheme.TextPrimary);
+        TouchlineTheme.ApplyPanelVariant(_actionBannerPanel, keyMoment ? TouchlineSurfaceVariant.Accent : TouchlineSurfaceVariant.Rail, 14);
+    }
+
+    private void UpdateReceiverTarget(MatchAction? action, MatchFrame currentFrame, MatchFrame nextFrame, float progress)
+    {
+        if (_markersLayer == null || _receiverTargetNode == null)
+        {
+            return;
+        }
+
+        if (action == null || action.Kind is MatchActionKind.Carry or MatchActionKind.Kickoff or MatchActionKind.Reset)
+        {
+            _receiverTargetNode.Visible = false;
+            return;
+        }
+
+        var layerSize = _markersLayer.Size;
+        var target = ToPitchPixel(action.ToPosition, layerSize);
+        var size = action.Kind is MatchActionKind.Shot or MatchActionKind.Goal ? 40.0f : 32.0f;
+        _receiverTargetNode.Visible = true;
+        _receiverTargetNode.CustomMinimumSize = new Vector2(size, size);
+        _receiverTargetNode.Size = new Vector2(size, size);
+        _receiverTargetNode.Position = new Vector2(target.X - size * 0.5f, target.Y - size * 0.5f);
+    }
+
+    private string BuildActionBanner(MatchAction? action, MatchFrame frame)
+    {
+        var frameLabel = NormalizeFrameActionLabel(frame.CurrentActionLabel);
+        if (!string.IsNullOrWhiteSpace(frameLabel))
+        {
+            return frameLabel;
+        }
+
+        if (action == null)
+        {
+            return frame.CurrentActionLabel.ToUpperInvariant();
+        }
+
+        return action.Kind switch
+        {
+            MatchActionKind.Pass => $"PASS: {ResolveActionName(frame, action.FromPlayerId ?? action.Participants.PasserPlayerId)} -> {ResolveActionName(frame, action.ToPlayerId ?? action.Participants.ReceiverPlayerId)}",
+            MatchActionKind.Carry => $"CARRY: {ResolveActionName(frame, action.FromPlayerId ?? action.Participants.CarrierPlayerId)}",
+            MatchActionKind.Shot => $"SHOT: {ResolveActionName(frame, action.FromPlayerId ?? action.Participants.ShooterPlayerId)}",
+            MatchActionKind.Save => $"SAVE: {ResolveActionName(frame, action.Participants.GoalkeeperPlayerId ?? action.ToPlayerId)}",
+            MatchActionKind.Clearance => $"CLEARANCE: {ResolveActionName(frame, action.Participants.ClearerPlayerId ?? action.FromPlayerId)}",
+            MatchActionKind.Interception => $"INTERCEPTION: {ResolveActionName(frame, action.Participants.InterceptorPlayerId ?? action.FromPlayerId)}",
+            MatchActionKind.Goal => $"GOAL: {ResolveActionName(frame, action.Participants.ScorerPlayerId ?? action.FromPlayerId)}",
+            MatchActionKind.Kickoff => "KICKOFF",
+            _ => action.Label.ToUpperInvariant()
+        };
+    }
+
+    private static string NormalizeFrameActionLabel(string label)
+    {
+        if (string.IsNullOrWhiteSpace(label))
+        {
+            return string.Empty;
+        }
+
+        var trimmed = label.Trim().TrimEnd('.');
+        var colonIndex = trimmed.IndexOf(':');
+        if (colonIndex <= 0)
+        {
+            return string.Empty;
+        }
+
+        var kind = trimmed[..colonIndex].ToUpperInvariant();
+        var detail = trimmed[(colonIndex + 1)..].Trim();
+        detail = detail.Replace(" links play through ", " -> ", StringComparison.OrdinalIgnoreCase);
+        detail = detail.Replace(" carries into space", string.Empty, StringComparison.OrdinalIgnoreCase);
+        detail = detail.Replace(" takes aim", string.Empty, StringComparison.OrdinalIgnoreCase);
+        detail = detail.Replace(" clears the danger", string.Empty, StringComparison.OrdinalIgnoreCase);
+        return string.IsNullOrWhiteSpace(detail) ? kind : $"{kind}: {detail}";
+    }
+
+    private string ResolveTargetLabel(MatchAction? action, MatchFrame frame)
+    {
+        if (action == null)
+        {
+            return FormatPitchPoint(frame.Ball.TargetPosition);
+        }
+
+        return action.Kind switch
+        {
+            MatchActionKind.Pass => ResolveActionName(frame, action.ToPlayerId ?? action.Participants.ReceiverPlayerId),
+            MatchActionKind.Shot => "goal",
+            MatchActionKind.Goal => "goal",
+            MatchActionKind.Clearance => "clearance zone",
+            MatchActionKind.Interception => ResolveActionName(frame, action.Participants.InterceptorPlayerId ?? action.ToPlayerId),
+            _ => FormatPitchPoint(action.ToPosition)
+        };
     }
 
     private (MatchFrame currentFrame, MatchFrame nextFrame, float progress) ResolveFramePair(int simulatedSecond)
@@ -300,37 +540,34 @@ public partial class LiveMatchScene : Control
         _ballNode.AddThemeStyleboxOverride("panel", BuildBallStyle(currentFrame.Ball.MovementState));
     }
 
-    private void UpdateActionLine(MatchFrame currentFrame, MatchFrame nextFrame, float progress)
+    private void UpdateActionTrail(MatchFrame currentFrame, MatchFrame nextFrame, float progress, MatchAction? displayAction)
     {
-        if (_markersLayer == null || _actionLineNode == null)
+        if (_markersLayer == null || _actionTrailNode == null)
         {
             return;
         }
 
-        if (!ShouldShowActionLine(currentFrame.Ball.MovementState))
+        if (!ShouldShowActionLine(currentFrame.Ball.MovementState) || displayAction == null)
         {
-            _actionLineNode.Visible = false;
+            _actionTrailNode.Visible = false;
             return;
         }
 
         var layerSize = _markersLayer.Size;
+        var start = ToPitchPixel(displayAction.FromPosition, layerSize);
         var currentBallPosition = currentFrame.Ball.Position.Lerp(nextFrame.Ball.Position, progress);
-        var start = ToPitchPixel(currentBallPosition, layerSize);
-        var target = ToPitchPixel(currentFrame.Ball.TargetPosition, layerSize);
+        var target = ToPitchPixel(currentBallPosition, layerSize);
         var delta = target - start;
-        var length = delta.Length();
-        if (length < 8.0f)
+        if (delta.Length() < 8.0f)
         {
-            _actionLineNode.Visible = false;
+            _actionTrailNode.Visible = false;
             return;
         }
 
-        _actionLineNode.Visible = true;
-        _actionLineNode.Position = start;
-        _actionLineNode.Size = new Vector2(length, ResolveActionLineThickness(currentFrame.Ball.MovementState));
-        _actionLineNode.PivotOffset = new Vector2(0.0f, _actionLineNode.Size.Y * 0.5f);
-        _actionLineNode.Rotation = delta.Angle();
-        _actionLineNode.Color = ResolveActionLineColor(currentFrame.Ball.MovementState, !string.IsNullOrWhiteSpace(currentFrame.EventSummary));
+        _actionTrailNode.Visible = true;
+        _actionTrailNode.Width = ResolveActionLineThickness(currentFrame.Ball.MovementState);
+        _actionTrailNode.DefaultColor = ResolveActionLineColor(currentFrame.Ball.MovementState, !string.IsNullOrWhiteSpace(currentFrame.EventSummary));
+        _actionTrailNode.Points = new[] { start, target };
     }
 
     private void UpdateEventFeed(int simulatedSecond, string? activeEventId)
@@ -351,12 +588,12 @@ public partial class LiveMatchScene : Control
             _appliedEventCount = activeEventIndex + 1;
         }
 
-        var startIndex = Math.Max(0, _appliedEventCount - 5);
+        var startIndex = Math.Max(0, _appliedEventCount - 4);
         var feedLines = new List<string>();
         for (var index = startIndex; index < _appliedEventCount; index++)
         {
             var matchEvent = _playback.EventFeed[index];
-            var prefix = matchEvent.Id == activeEventId ? "> " : "  ";
+            var prefix = matchEvent.Id == activeEventId ? "KEY  " : "     ";
             feedLines.Add($"{prefix}{matchEvent.Summary}");
         }
 
@@ -557,6 +794,23 @@ public partial class LiveMatchScene : Control
         };
     }
 
+    private static StyleBoxFlat BuildTargetStyle()
+    {
+        return new StyleBoxFlat
+        {
+            BgColor = new Color(1.0f, 0.96f, 0.58f, 0.10f),
+            CornerRadiusTopLeft = 999,
+            CornerRadiusTopRight = 999,
+            CornerRadiusBottomRight = 999,
+            CornerRadiusBottomLeft = 999,
+            BorderWidthLeft = 3,
+            BorderWidthTop = 3,
+            BorderWidthRight = 3,
+            BorderWidthBottom = 3,
+            BorderColor = new Color(1.0f, 0.96f, 0.58f, 0.88f)
+        };
+    }
+
     private static bool ShouldShowActionLine(BallMovementState movementState)
     {
         return movementState is BallMovementState.Passed
@@ -584,6 +838,43 @@ public partial class LiveMatchScene : Control
             BallMovementState.Loose => new Color(1.0f, 0.42f, 0.28f, alpha),
             _ => new Color(1.0f, 1.0f, 0.86f, alpha)
         };
+    }
+
+    private static float ResolveDisplayDuration(MatchActionKind kind)
+    {
+        return kind switch
+        {
+            MatchActionKind.Pass => 1.25f,
+            MatchActionKind.Carry => 1.85f,
+            MatchActionKind.Shot => 1.35f,
+            MatchActionKind.Save => 1.45f,
+            MatchActionKind.Goal => 1.55f,
+            MatchActionKind.Clearance => 1.25f,
+            MatchActionKind.Interception => 1.25f,
+            MatchActionKind.Kickoff => 0.9f,
+            _ => 0.85f
+        };
+    }
+
+    private static float ResolveActionProgress(MatchActionKind kind, float progress)
+    {
+        if (kind is MatchActionKind.Shot or MatchActionKind.Save or MatchActionKind.Goal)
+        {
+            return Math.Clamp(progress / 0.72f, 0.0f, 1.0f);
+        }
+
+        return progress;
+    }
+
+    private static string ResolveActionName(MatchFrame frame, string? playerId)
+    {
+        var player = FindPlayerState(frame, playerId);
+        if (player != null)
+        {
+            return player.Name;
+        }
+
+        return string.IsNullOrWhiteSpace(playerId) ? "player" : playerId;
     }
 
     private static float ResolveMarkerSize(PlayerIntent intent, bool hasBall)
@@ -685,6 +976,35 @@ public partial class LiveMatchScene : Control
         _pitchStateLabel.AddThemeColorOverride("font_color", new Color(1.0f, 0.84f, 0.32f));
         _pitchNoteLabel!.Text = "Playback complete. Continue to the post-match screen for the aftermath.";
         _backButton!.Text = "Continue to Post-Match";
+        if (_actionBannerLabel != null)
+        {
+            _actionBannerLabel.Text = "FULL TIME";
+        }
+
+        if (_actionTrailNode != null)
+        {
+            _actionTrailNode.Visible = false;
+        }
+
+        if (_receiverTargetNode != null)
+        {
+            _receiverTargetNode.Visible = false;
+        }
+
         _matchComplete = true;
+    }
+
+    private sealed class PlaybackSegment
+    {
+        public PlaybackSegment(MatchAction action, float startSeconds, float durationSeconds)
+        {
+            Action = action;
+            StartSeconds = startSeconds;
+            DurationSeconds = durationSeconds;
+        }
+
+        public MatchAction Action { get; }
+        public float StartSeconds { get; }
+        public float DurationSeconds { get; }
     }
 }

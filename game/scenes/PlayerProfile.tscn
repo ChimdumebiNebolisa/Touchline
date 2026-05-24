@@ -154,12 +154,12 @@ theme_override_font_sizes/font_size = 36
 
 [node name="StatusLabel" type="Label" parent="RootMargin/Shell/MainColumn/HeaderCard/HeaderPadding/HeaderContent"]
 layout_mode = 2
-text = "Select a player from the squad workspace."
+text = "Select a player from the team sheet."
 autowrap_mode = 3
 
 [node name="SummaryGrid" type="GridContainer" parent="RootMargin/Shell/MainColumn"]
 layout_mode = 2
-columns = 4
+columns = 2
 theme_override_constants/h_separation = 14
 theme_override_constants/v_separation = 14
 

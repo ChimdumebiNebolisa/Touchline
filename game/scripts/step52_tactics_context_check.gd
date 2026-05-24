@@ -64,12 +64,12 @@ func _validate_initial_tactics_context() -> void:
         _fail("Preview summary does not connect tactics to the shared match engine: %s" % preview_summary)
         return
 
-    for token in ["Formation", "Press", "Tempo", "Width", "Risk"]:
+    for token in ["Formation", "Pressing", "Tempo", "Width", "Mentality"]:
         if control_summary.find(token) == -1:
             _fail("Control summary is missing %s: %s" % [token, control_summary])
             return
 
-    if press_note.find("Press line") == -1 or tempo_note.find("Ball speed") == -1 or width_note.find("Pitch use") == -1 or risk_note.find("Commitment") == -1:
+    if press_note.find("Pressing Intensity") == -1 or tempo_note.find("Tempo") == -1 or width_note.find("Pitch use") == -1 or risk_note.find("Mentality") == -1:
         _fail("Tactical interpretation notes are incomplete")
         return
 
@@ -126,7 +126,7 @@ func _validate_saved_tactics_context() -> void:
     var save_hint := _label_text("RootMargin/Shell/RailCard/RailPadding/RailContent/FooterActions/SaveHintLabel")
     var control_summary := _label_text("RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/ControlSummaryLabel")
 
-    if saved_plan.find("Formation 3-5-2") == -1 or saved_plan.find("Press 82") == -1 or saved_plan.find("Tempo 77") == -1 or saved_plan.find("Width 68") == -1 or saved_plan.find("Risk 73") == -1:
+    if saved_plan.find("Formation 3-5-2") == -1 or saved_plan.find("Pressing 82") == -1 or saved_plan.find("Tempo 77") == -1 or saved_plan.find("Width 68") == -1 or saved_plan.find("Mentality 73") == -1:
         _fail("Saved plan label does not show all persisted tactical values: %s" % saved_plan)
         return
 
@@ -138,7 +138,7 @@ func _validate_saved_tactics_context() -> void:
         _fail("Save hint does not confirm saved/apply state: %s" % save_hint)
         return
 
-    if control_summary.find("Press 82") == -1 or control_summary.find("Tempo 77") == -1 or control_summary.find("Width 68") == -1 or control_summary.find("Risk 73") == -1:
+    if control_summary.find("Pressing 82") == -1 or control_summary.find("Tempo 77") == -1 or control_summary.find("Width 68") == -1 or control_summary.find("Mentality 73") == -1:
         _fail("Control summary does not show saved preview values: %s" % control_summary)
         return
 

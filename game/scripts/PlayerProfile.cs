@@ -116,7 +116,7 @@ public partial class PlayerProfile : Control
     {
         if (GameState.Instance == null || string.IsNullOrWhiteSpace(GameState.Instance.SelectedClubName))
         {
-            RenderUnavailableState("Player Profile", "Select a player from the squad workspace.");
+            RenderUnavailableState("Player Profile", "Select a player from the team sheet.");
             return;
         }
 
@@ -125,21 +125,21 @@ public partial class PlayerProfile : Control
         {
             RenderUnavailableState("Player Profile", "No player is currently selected for inspection.");
             _clubNameLabel.Text = GameState.Instance.SelectedClubName!;
-            _clubContextLabel.Text = $"{GameState.Instance.SelectedClubName} | Squad context only";
+            _clubContextLabel.Text = $"{GameState.Instance.SelectedClubName} | Player dossier context only";
             _badgeLabel.Text = BuildClubMonogram(GameState.Instance.SelectedClubName!);
             return;
         }
 
-        var lineupStatus = player.IsStarting ? "STARTING XI" : "NON-STARTER";
+        var lineupStatus = player.IsStarting ? "STARTING XI" : "BENCH/RESERVE";
         _badgeLabel.Text = BuildClubMonogram(GameState.Instance.SelectedClubName!);
         _clubNameLabel.Text = GameState.Instance.SelectedClubName!;
         _roleChipLabel.Text = lineupStatus;
-        _clubContextLabel.Text = $"{GameState.Instance.SelectedClubName} | {player.Position} | Age {player.Age} | Lineup status {lineupStatus}";
+        _clubContextLabel.Text = $"{GameState.Instance.SelectedClubName} | {player.Position} | Age {player.Age} | Squad status {lineupStatus}";
         _pageTitleLabel.Text = player.Name;
         _statusLabel.Text = BuildStatusSummary(player);
 
         _positionValueLabel.Text = player.Position;
-        _positionMetaLabel.Text = player.IsStarting ? "Current starter in the active shape." : "Non-starter in the bench/reserve group.";
+        _positionMetaLabel.Text = player.IsStarting ? "Current starter in the active shape." : "Bench/reserve option outside the XI.";
         _ageValueLabel.Text = player.Age.ToString();
         _ageMetaLabel.Text = DescribeAgeBand(player.Age);
         _formValueLabel.Text = player.Form.ToString();
@@ -147,9 +147,9 @@ public partial class PlayerProfile : Control
         _fitnessValueLabel.Text = player.Fitness.ToString();
         _fitnessMetaLabel.Text = DescribeFitness(player.Fitness);
 
-        _identityLabel.Text = $"Identity | {player.Name} | {GameState.Instance.SelectedClubName} | {player.Position} | Age {player.Age}";
-        _roleLabel.Text = $"Lineup status | {lineupStatus} | Matchday contribution follows this selection state.";
-        _conditionLabel.Text = $"Condition | Fitness {player.Fitness} | Morale {player.Morale} | Form {player.Form}";
+        _identityLabel.Text = $"Player dossier | {player.Name} | {GameState.Instance.SelectedClubName} | {player.Position} | Age {player.Age}";
+        _roleLabel.Text = $"Squad status | {lineupStatus} | Matchday contribution follows this selection state.";
+        _conditionLabel.Text = $"Match sharpness | Form {player.Form} | Morale {player.Morale} | Fitness {player.Fitness}";
         _pathwayLabel.Text = BuildTrajectorySummary(player, GameState.Instance);
         _readinessLabel.Text = BuildReadinessSummary(player);
     }
@@ -203,7 +203,7 @@ public partial class PlayerProfile : Control
 
     private static string BuildReadinessSummary(GameState.SquadPlayer player)
     {
-        var lineupStatus = player.IsStarting ? "Starting XI" : "Non-starter";
+        var lineupStatus = player.IsStarting ? "Starting XI" : "Bench/reserve";
         if (player.Fitness >= 85 && player.Morale >= 65)
         {
             return $"Match readiness | Green | {lineupStatus}. Ready for heavy minutes in the next fixture.";
@@ -219,7 +219,7 @@ public partial class PlayerProfile : Control
 
     private static string BuildStatusSummary(GameState.SquadPlayer player)
     {
-        var role = player.IsStarting ? "Starting XI" : "Non-starter";
+        var role = player.IsStarting ? "Starting XI" : "Bench/reserve";
         return $"{player.Position} | {role} | Age {player.Age} | Form {player.Form} | Morale {player.Morale} | Fitness {player.Fitness}";
     }
 

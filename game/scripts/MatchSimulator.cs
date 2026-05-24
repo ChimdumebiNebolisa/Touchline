@@ -82,7 +82,7 @@ public static class MatchSimulator
             HomeClubName = homeClubName,
             AwayClubName = awayClubName,
             TacticalSummary =
-                $"Shape {state.TacticalFormation} | Press {state.PressIntensity} | Tempo {state.Tempo} | Width {state.Width} | Risk {state.Risk}",
+                $"Shape {state.TacticalFormation} | Pressing {state.PressIntensity} | Tempo {state.Tempo} | Width {state.Width} | Mentality {state.Risk}",
             FinalHomeScore = finalFrame.HomeScore,
             FinalAwayScore = finalFrame.AwayScore,
             Timeline = new MatchTimeline

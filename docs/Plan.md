@@ -76,6 +76,12 @@
 - Step 58: Demo asset plan
 - Step 59: Final product boundary and limitations pass
 - Step 60: Rewrite README in final project format
+- Step 61: Football vocabulary and navigation framing pass
+- Step 62: Squad/player-profile football layout pass
+- Step 63: Tactics board redesign with real player markers
+- Step 64: Matchday dressing-room/match-centre redesign
+- Step 65: Live match readability and pitch redesign
+- Step 66: Layout, wrapping, and demo recapture pass
 
 ## 1.5 Final Product Boundary
 
@@ -1216,3 +1222,165 @@ Rewrite `README.md` into the final project format exactly, with no extra section
 - README is accurate to the current app
 - README helps someone run, understand, and evaluate the project
 - no extra sections are added
+
+## 53. Step 61: Football vocabulary and navigation framing pass
+
+### Objective
+
+Replace dashboard/admin wording with football management language and fix active navigation versus primary matchday CTA confusion.
+
+### Allowed Subtasks
+
+- replace generic UI terms with football-native labels such as Manager Hub, Club Office, Manager Brief, Club Brief, Club Shortlist, Dressing Room Brief, Match Controls, Fixture List, League Table, Tempo, Mentality/Risk, and Pressing Intensity
+- make current page navigation visually distinct from ordinary navigation
+- visually separate the Matchday CTA and label it `Go to Matchday` when it is not the active page
+- preserve the existing scene flow and shared match-engine ownership boundaries
+
+### Verification
+
+- `dotnet build game/Touchline.sln`
+- focused navigation/vocabulary check
+- representative route checks that depend on navigation labels
+
+### Exit Criteria
+
+- UI copy sounds like a football management game
+- current page state is obvious
+- primary matchday action is visually distinct from navigation
+- no domain rules move into UI scenes
+
+## 54. Step 62: Squad/player-profile football layout pass
+
+### Objective
+
+Make Squad feel like a team sheet and Player Profile feel like a player dossier.
+
+### Allowed Subtasks
+
+- reframe Squad around `Team Sheet`, `Starting XI`, `Bench`, and `Reserves`
+- show player rows with name, position, age, form, morale, fitness, and status
+- preserve existing lineup actions and player-profile handoff
+- rebuild Player Profile around wider dossier/stat rows for identity, status, form, morale, fitness, and readiness
+- remove skinny vertical stat cards that cause bad wrapping
+
+### Verification
+
+- `dotnet build game/Touchline.sln`
+- focused squad/profile layout check
+- existing squad/profile and navigation checks
+
+### Exit Criteria
+
+- Squad reads as a team sheet
+- Player Profile reads as a player dossier
+- no word-by-word wrapping in stat cards
+- existing player/profile navigation still works
+
+## 55. Step 63: Tactics board redesign with real player markers
+
+### Objective
+
+Replace the role-letter board with a real tactical board using the active Starting XI.
+
+### Allowed Subtasks
+
+- draw or construct a proper tactical board with pitch markings
+- render active Starting XI players from `GameState`
+- show player initials or short names plus subtle position/role labels
+- provide click-to-inspect marker behavior and an explicit empty-slot state
+- keep tactic settings and lineup state separate unless existing runtime logic already supports a safe handoff
+- use football-native tactical labels for formation, pressing intensity, tempo, width, and mentality/risk
+
+### Verification
+
+- `dotnet build game/Touchline.sln`
+- focused tactics-board player marker check
+- tactics persistence and shared-engine checks
+
+### Exit Criteria
+
+- tactics board no longer uses only role letters as the primary visual
+- every occupied slot shows a real player identity
+- user can understand who is playing, where they are playing, and what the tactical setup is
+- tactics still save and affect the shared match engine
+
+## 56. Step 64: Matchday dressing-room/match-centre redesign
+
+### Objective
+
+Make Matchday feel like a football pre-match screen, not a dashboard.
+
+### Allowed Subtasks
+
+- add a compact fixture header with clubs, matchday, date, and competition
+- restructure sections into Dressing Room Brief, Team News, Match Plan, Club Mood, and Match Controls
+- make Watch Live Match the primary match action and Instant Result the secondary action
+- show clear disabled state and explanation for unavailable or completed fixtures
+
+### Verification
+
+- `dotnet build game/Touchline.sln`
+- focused match-centre check
+- matchday preparation and end-to-end flow checks
+
+### Exit Criteria
+
+- Matchday feels like a dressing-room or match-centre screen
+- large paragraph-heavy cards are reduced
+- match actions are visible and clear
+- no match rules move into the scene
+
+## 57. Step 65: Live match readability and pitch redesign
+
+### Objective
+
+Make live playback understandable and football-like.
+
+### Allowed Subtasks
+
+- map existing match timeline actions onto readable presentation durations
+- add an action banner with named player context
+- improve pitch markings, ball contrast, carrier emphasis, receiver/target visibility, and player token presentation
+- use `Line2D` or clean custom drawing for pass/shot trails
+- reduce sidebar event text to recent important events
+- keep LiveMatchScene as a renderer/controller of existing playback state, not a second rules engine
+
+### Verification
+
+- `dotnet build game/Touchline.sln`
+- focused live readability check
+- live renderer, shared-engine, match playback, and post-match checks
+
+### Exit Criteria
+
+- viewer can identify score, minute, action type, ball carrier, target/receiver, and key event from a screenshot
+- live match no longer feels like dots snapping around too fast
+- existing live/instant shared-engine checks still pass
+
+## 58. Step 66: Layout, wrapping, and demo recapture pass
+
+### Objective
+
+Fix remaining layout defects and recapture demo assets.
+
+### Allowed Subtasks
+
+- fix wrapping and clipping on main menu, dashboard, squad, player profile, save/load, and side panels
+- use Godot containers, better minimum sizes, label autowrap/overrun behavior, and intentional scroll containers
+- visually smoke test at 1280x720 and 1440x900
+- recapture demo screenshots for the supported flow under `docs/demo/screenshots`
+- keep existing audit artifacts local and uncommitted
+
+### Verification
+
+- `dotnet build game/Touchline.sln`
+- focused layout/demo check
+- full compatible Step 22 through Step 57 regression pass
+- manual visual smoke with updated screenshots
+
+### Exit Criteria
+
+- demo screenshots look like a football management game, not a generic dashboard
+- no major text wrapping or clipping defects remain
+- updated screenshots are saved
+- README demo links remain accurate if touched

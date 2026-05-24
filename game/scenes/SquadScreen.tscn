@@ -144,7 +144,7 @@ horizontal_alignment = 1
 
 [node name="SectionLabel" type="Label" parent="RootMargin/Shell/RailCard/RailPadding/RailContent"]
 layout_mode = 2
-text = "OPERATIONS"
+text = "CLUB OFFICE"
 
 [node name="NavButtons" type="VBoxContainer" parent="RootMargin/Shell/RailCard/RailPadding/RailContent"]
 layout_mode = 2
@@ -152,7 +152,7 @@ theme_override_constants/separation = 10
 
 [node name="DashboardButton" type="Button" parent="RootMargin/Shell/RailCard/RailPadding/RailContent/NavButtons"]
 layout_mode = 2
-text = "Dashboard"
+text = "Manager Hub"
 
 [node name="SquadButton" type="Button" parent="RootMargin/Shell/RailCard/RailPadding/RailContent/NavButtons"]
 layout_mode = 2
@@ -172,7 +172,7 @@ text = "Standings"
 
 [node name="MatchdayButton" type="Button" parent="RootMargin/Shell/RailCard/RailPadding/RailContent/NavButtons"]
 layout_mode = 2
-text = "Matchday"
+text = "Go to Matchday"
 
 [node name="Spacer" type="Control" parent="RootMargin/Shell/RailCard/RailPadding/RailContent"]
 layout_mode = 2
@@ -184,12 +184,12 @@ theme_override_constants/separation = 10
 
 [node name="RailHintLabel" type="Label" parent="RootMargin/Shell/RailCard/RailPadding/RailContent/FooterActions"]
 layout_mode = 2
-text = "Squad desk unavailable."
+text = "Team sheet unavailable."
 autowrap_mode = 3
 
 [node name="BackButton" type="Button" parent="RootMargin/Shell/RailCard/RailPadding/RailContent/FooterActions"]
 layout_mode = 2
-text = "Back to Club Dashboard"
+text = "Back to Manager Hub"
 
 [node name="MainColumn" type="VBoxContainer" parent="RootMargin/Shell"]
 layout_mode = 2
@@ -217,11 +217,11 @@ theme_override_constants/separation = 6
 
 [node name="PageEyebrow" type="Label" parent="RootMargin/Shell/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderInfo"]
 layout_mode = 2
-text = "SQUAD CONTROL"
+text = "TEAM SHEET"
 
 [node name="PageTitleLabel" type="Label" parent="RootMargin/Shell/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderInfo"]
 layout_mode = 2
-text = "Squad Workspace"
+text = "Team Sheet"
 theme_override_font_sizes/font_size = 36
 
 [node name="ClubContextLabel" type="Label" parent="RootMargin/Shell/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderInfo"]
@@ -442,11 +442,11 @@ theme_override_constants/separation = 12
 
 [node name="SelectionHeading" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/SelectionCard/SelectionPadding/SelectionContent"]
 layout_mode = 2
-text = "Starting XI / Non-Starters"
+text = "Starting XI / Bench / Reserves"
 
 [node name="SelectionHintLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/SelectionCard/SelectionPadding/SelectionContent"]
 layout_mode = 2
-text = "Rows separate the Starting XI from non-starters, with bench and reserve depth shown through role, condition, and readiness."
+text = "Rows separate starters, bench options, and reserves with position, age, form, morale, fitness, and status."
 autowrap_mode = 3
 
 [node name="FilterRow" type="HBoxContainer" parent="RootMargin/Shell/MainColumn/ContentRow/SelectionCard/SelectionPadding/SelectionContent"]

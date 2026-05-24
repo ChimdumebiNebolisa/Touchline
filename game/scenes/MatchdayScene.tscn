@@ -75,7 +75,7 @@ theme_override_constants/separation = 8
 
 [node name="PageEyebrow" type="Label" parent="RootMargin/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderInfo"]
 layout_mode = 2
-text = "MATCH COMMAND"
+text = "MATCH CENTRE"
 
 [node name="PageTitleLabel" type="Label" parent="RootMargin/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderInfo"]
 layout_mode = 2
@@ -255,7 +255,7 @@ theme_override_constants/separation = 12
 
 [node name="ContextEyebrow" type="Label" parent="RootMargin/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent"]
 layout_mode = 2
-text = "KICKOFF CONTEXT"
+text = "DRESSING ROOM BRIEF"
 
 [node name="KickoffContextLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent"]
 layout_mode = 2
@@ -335,7 +335,7 @@ theme_override_constants/separation = 12
 
 [node name="ActionEyebrow" type="Label" parent="RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent"]
 layout_mode = 2
-text = "MATCH ACTIONS"
+text = "MATCH CONTROLS"
 
 [node name="StatusLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent"]
 layout_mode = 2
@@ -344,7 +344,7 @@ autowrap_mode = 3
 
 [node name="BackButton" type="Button" parent="RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent"]
 layout_mode = 2
-text = "Back to Club Dashboard"
+text = "Back to Manager Hub"
 
 [node name="InstantResultButton" type="Button" parent="RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent"]
 layout_mode = 2
@@ -352,7 +352,7 @@ text = "Instant Result"
 
 [node name="StartMatchButton" type="Button" parent="RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent"]
 layout_mode = 2
-text = "Start Live Match"
+text = "Watch Live Match"
 
 [connection signal="pressed" from="RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/BackButton" to="." method="OnBackPressed"]
 [connection signal="pressed" from="RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/InstantResultButton" to="." method="OnInstantResultPressed"]

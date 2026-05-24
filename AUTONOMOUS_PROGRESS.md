@@ -1,36 +1,32 @@
 # Autonomous Progress
 
 ## Current active Plan step
-- None. Final implementation is complete through Step 60.
+- None. Final implementation is complete through Step 66.
 
 ## Last completed verified task
-- Step 60 README rewrite complete: README now uses only the required final section structure, presents Godot + C# as the active local-first product path, includes setup/verification commands and an architecture diagram, and labels demo assets as placeholders.
+- Steps 61-66 football-feel redesign pass complete: vocabulary/navigation, team sheet and player dossier, real-player tactics board, match-centre framing, readable live match playback, layout cleanup, focused checks, and demo screenshot recapture.
 
 ## Current subtask in progress
-- Final verification and submission readiness.
+- Final commit and push for Steps 61-66.
 
 ## Next queued subtasks
-- Capture demo screenshots/video using `docs/Demo.md`.
-- Execute the manual visual smoke checklist in `docs/QA.md` during capture.
-- Publish a demo executable only after a manual Godot export is produced.
+- None for the current implementation request.
 
 ## Known blockers
 - No active blockers.
-- Godot Mono is available locally. Headless checks were run as individual processes to avoid unrelated process-teardown noise from large shell batches.
+- Godot Mono is available locally. `docs/audit/` remains untracked and intentionally excluded from the implementation commit.
 
 ## Last verification run
-- Step 60 verification:
-  - README heading order check passed with exactly the required final section list.
-  - `rg -n -i "npm run|web-dashboard prototype|TransferSystem|hosted backend|online account" README.md docs/PRD.md docs/Architecture.md docs/Guardrails.md docs/Plan.md` returned no matches.
+- Steps 61-66 verification:
   - `dotnet build game/Touchline.sln` passed.
-  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step57_final_regression_check.gd` passed with `STEP57_FINAL_REGRESSION_PASS`.
-  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step50_end_to_end_user_flow_check.gd` passed with `STEP50_END_TO_END_USER_FLOW_PASS`.
+  - Compatible Step 22-57 Godot checks passed, including Step 35 after the live playback pacing change and Step 57 final regression.
+  - Focused checks passed: `STEP61_FOOTBALL_VOCABULARY_NAV_PASS`, `STEP62_SQUAD_PROFILE_LAYOUT_PASS`, `STEP63_TACTICS_BOARD_PLAYERS_PASS`, `STEP64_MATCHDAY_CENTRE_PASS`, `STEP65_LIVE_MATCH_READABILITY_PASS`, and `STEP66_LAYOUT_DEMO_PASS`.
+  - Demo screenshots were recaptured under `docs/demo/screenshots/` using Godot runtime at 1280x720 with manager Mitch, seed 999999, and Riverton Athletic.
 
 ## Last commit hash
-- 8868812
+- Pending Steps 61-66 commit.
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`.
-- No active implementation step remains.
+- No active implementation step remains after the Steps 61-66 commit is pushed.
 - Do not reopen feature scope unless PRD, Architecture, Guardrails, and Plan are explicitly changed first.
-- Next work should be demo capture, manual visual QA, executable export, or submission packaging.

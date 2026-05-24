@@ -98,7 +98,7 @@ theme_override_constants/separation = 12
 
 [node name="ListHeading" type="Label" parent="RootMargin/MainColumn/ContentRow/ListCard/ListPadding/ListContent"]
 layout_mode = 2
-text = "Available Clubs"
+text = "Club Shortlist"
 
 [node name="ListHintLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/ListCard/ListPadding/ListContent"]
 layout_mode = 2
@@ -152,7 +152,7 @@ theme_override_constants/separation = 12
 
 [node name="PreviewHeading" type="Label" parent="RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent"]
 layout_mode = 2
-text = "Club Snapshot"
+text = "Club Brief"
 
 [node name="PreviewHintLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent"]
 layout_mode = 2

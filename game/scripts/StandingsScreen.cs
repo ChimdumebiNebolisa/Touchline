@@ -123,14 +123,13 @@ public partial class StandingsScreen : Control
         TouchlineTheme.ApplyPanelVariant(GetNode<PanelContainer>("RootMargin/Shell/MainColumn/SummaryGrid/PaceCard"), TouchlineSurfaceVariant.Card, 20);
         TouchlineTheme.ApplyPanelVariant(GetNode<PanelContainer>("RootMargin/Shell/MainColumn/SummaryGrid/NextMatchCard"), TouchlineSurfaceVariant.Card, 20);
 
-        TouchlineTheme.ApplyButtonVariant(_dashboardButton, TouchlineButtonVariant.Secondary);
-        TouchlineTheme.ApplyButtonVariant(_squadButton, TouchlineButtonVariant.Secondary);
-        TouchlineTheme.ApplyButtonVariant(_tacticsButton, TouchlineButtonVariant.Secondary);
-        TouchlineTheme.ApplyButtonVariant(_fixturesButton, TouchlineButtonVariant.Secondary);
-        TouchlineTheme.ApplyButtonVariant(_standingsButton, TouchlineButtonVariant.Secondary);
-        TouchlineTheme.ApplyButtonVariant(_matchdayButton, TouchlineButtonVariant.Primary);
+        TouchlineTheme.ApplyNavigationButton(_dashboardButton, false);
+        TouchlineTheme.ApplyNavigationButton(_squadButton, false);
+        TouchlineTheme.ApplyNavigationButton(_tacticsButton, false);
+        TouchlineTheme.ApplyNavigationButton(_fixturesButton, false);
+        TouchlineTheme.ApplyNavigationButton(_standingsButton, true);
+        TouchlineTheme.ApplyMatchdayCta(_matchdayButton);
         TouchlineTheme.ApplyButtonVariant(_backButton, TouchlineButtonVariant.Tertiary);
-        _standingsButton.Disabled = true;
 
         TouchlineTheme.ApplyTitleStyle(_clubNameLabel, 28);
         TouchlineTheme.ApplyMutedStyle(_managerLabel, 15);
@@ -211,7 +210,7 @@ public partial class StandingsScreen : Control
         _managerLabel.Text = $"Manager {state.ManagerName}";
         _seasonLabel.Text = $"Season {state.SeasonLabel}";
         _competitionChipLabel.Text = state.CompetitionName.ToUpperInvariant();
-        _competitionLabel.Text = $"{state.CompetitionName} standings desk";
+        _competitionLabel.Text = $"{state.CompetitionName} League Table";
         _tableStatusLabel.Text = $"Season {state.SeasonLabel} | {state.CurrentDateLabel} | Matchday {state.CurrentMatchday}";
         SetPositionChip(position, tableSize);
         SetStateChip(row);
@@ -251,7 +250,7 @@ public partial class StandingsScreen : Control
         _tableStatusLabel.Text = "Table status unavailable.";
         _positionChipLabel.Text = "OFFLINE";
         _stateChipLabel.Text = "NO TABLE";
-        _headerStatusLabel.Text = "Load a career to open the standings desk.";
+        _headerStatusLabel.Text = "Load a career to open the league table.";
         _positionValueLabel.Text = "--";
         _positionMetaLabel.Text = "Position unavailable.";
         _pointsValueLabel.Text = "--";
@@ -266,7 +265,7 @@ public partial class StandingsScreen : Control
         _formLabel.Text = "Form unavailable.";
         _nextFixtureLabel.Text = "Next fixture unavailable.";
         _tableNoteLabel.Text = "Table note unavailable.";
-        _railHintLabel.Text = "Return to the dashboard after a career is active.";
+        _railHintLabel.Text = "Return to the Manager Hub after a career is active.";
         _matchdayButton.Disabled = true;
         ClearContainer(_tableRows);
         TouchlineTheme.ApplyPanelVariant(_positionChip, TouchlineSurfaceVariant.Muted, 999);

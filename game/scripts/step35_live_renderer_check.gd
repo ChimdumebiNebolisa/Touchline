@@ -7,6 +7,7 @@ var _saw_action_line := false
 var _saw_carrier_marker := false
 var _saw_status_detail := false
 var _saw_event_alignment := false
+var _saw_action_banner := false
 
 func _initialize() -> void:
     var game_state := root.get_node("GameState")
@@ -64,7 +65,7 @@ func _process(_delta: float) -> bool:
             _ticks = 0
             return false
 
-        if _ticks > 1800:
+        if _ticks > 12000:
             _fail("LiveMatchScene did not reach full time")
             return false
 
@@ -89,9 +90,15 @@ func _inspect_live_renderer() -> void:
     if ball != null and ball_halo != null and ball.visible and ball_halo.visible:
         _saw_ball = true
 
-    var action_line := markers_layer.get_node_or_null("PlaybackActionLine") as ColorRect
-    if action_line != null and action_line.visible and action_line.size.x > 8.0:
+    var action_line := markers_layer.get_node_or_null("PlaybackActionTrail") as Line2D
+    if action_line != null and action_line.visible and action_line.points.size() >= 2:
         _saw_action_line = true
+
+    var action_banner := markers_layer.get_node_or_null("ActionBanner/Node/ActionBannerLabel") as Label
+    if action_banner == null:
+        action_banner = _find_label_by_name(markers_layer, "ActionBannerLabel")
+    if action_banner != null and action_banner.text.find(":") != -1:
+        _saw_action_banner = true
 
     var marker_count := 0
     var child_descriptions: Array[String] = []
@@ -118,12 +125,12 @@ func _inspect_live_renderer() -> void:
     var control_label := current_scene.get_node_or_null("Margin/Root/ContentRow/SidebarCard/SidebarPadding/SidebarContent/ControlLabel") as Label
     if control_label != null:
         var text := control_label.text
-        if text.find("Action |") != -1 and text.find("Possession |") != -1 and text.find("Ball |") != -1 and text.find("Carrier |") != -1:
+        if text.find("Carrier |") != -1 and text.find("Target |") != -1 and text.find("Tempo |") != -1:
             _saw_status_detail = true
 
     var status_label := current_scene.get_node_or_null("Margin/Root/ContentRow/SidebarCard/SidebarPadding/SidebarContent/StatusLabel") as Label
     var feed_label := current_scene.get_node_or_null("Margin/Root/ContentRow/SidebarCard/SidebarPadding/SidebarContent/EventFeedLabel") as Label
-    if status_label != null and feed_label != null and status_label.text.find("'") != -1 and feed_label.text.find(status_label.text) != -1:
+    if status_label != null and feed_label != null and feed_label.text.find("KEY") != -1:
         _saw_event_alignment = true
 
 func _assert_live_renderer_observed() -> void:
@@ -132,7 +139,11 @@ func _assert_live_renderer_observed() -> void:
         return
 
     if not _saw_action_line:
-        _fail("frame-derived action line was not visible during live playback")
+        _fail("frame-derived action trail was not visible during live playback")
+        return
+
+    if not _saw_action_banner:
+        _fail("action banner was not visible during live playback")
         return
 
     if not _saw_carrier_marker:
@@ -140,11 +151,22 @@ func _assert_live_renderer_observed() -> void:
         return
 
     if not _saw_status_detail:
-        _fail("status area did not expose action, possession, ball state, and carrier")
+        _fail("status area did not expose carrier, target, and tempo")
         return
 
     if not _saw_event_alignment:
-        _fail("active event summary did not align with the event feed")
+        _fail("key moment event feed treatment was not observed")
+
+func _find_label_by_name(node: Node, label_name: String):
+    if node is Label and str(node.name) == label_name:
+        return node as Label
+
+    for child in node.get_children():
+        var found = _find_label_by_name(child, label_name)
+        if found != null:
+            return found
+
+    return null
 
 func _fail(message: String) -> void:
     push_error(message)

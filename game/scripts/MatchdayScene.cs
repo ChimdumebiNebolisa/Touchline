@@ -124,6 +124,9 @@ public partial class MatchdayScene : Control
         TouchlineTheme.ApplyButtonVariant(_backButton, TouchlineButtonVariant.Tertiary);
         TouchlineTheme.ApplyButtonVariant(_instantResultButton, TouchlineButtonVariant.Secondary);
         TouchlineTheme.ApplyButtonVariant(_startMatchButton, TouchlineButtonVariant.Primary);
+        _backButton.Text = "Back to Manager Hub";
+        _instantResultButton.Text = "Instant Result";
+        _startMatchButton.Text = "Watch Live Match";
     }
 
     private void RenderState()
@@ -155,8 +158,8 @@ public partial class MatchdayScene : Control
         var fixtureComplete = IsCurrentFixtureComplete();
         var readinessValue = startingCount >= 11 ? "XI READY" : $"XI {startingCount}/11";
 
-        _competitionLabel.Text = $"{state.CompetitionName} | Season {state.SeasonLabel}";
-        _fixtureLabel.Text = $"{state.SelectedClubName} vs {state.CurrentOpponentName} | {state.CurrentDateLabel} | Matchday {state.CurrentMatchday}";
+        _competitionLabel.Text = $"Matchday {state.CurrentMatchday} | {state.CurrentDateLabel} | {state.CompetitionName}";
+        _fixtureLabel.Text = $"{state.SelectedClubName} vs {state.CurrentOpponentName}";
         _stakesLabel.Text = BuildStakesLabel();
         SetMatchStateChip(fixtureComplete ? "RECORDED" : "READY", fixtureComplete);
 
@@ -171,21 +174,21 @@ public partial class MatchdayScene : Control
             ? $"Avg fitness {averageFitness} | Bench {benchCount}"
             : $"Bench {benchCount} | Auto-fill active if launched";
 
-        _kickoffContextLabel.Text = $"{state.BuildCareerPhaseSummary()} Result feeds table, pressure, player condition, and the next dashboard state.";
-        _lineupLabel.Text = state.BuildLineupReadinessSummary();
-        _benchLabel.Text = $"Bench | {benchCount} options available behind the active XI.";
-        _pressureReasonsLabel.Text = PerceptionSystem.BuildPressureReasonSummary(state);
+        _kickoffContextLabel.Text = $"Dressing Room Brief | {state.BuildCareerPhaseSummary()} Keep the message tight before kickoff.";
+        _lineupLabel.Text = $"Team News | {state.BuildLineupReadinessSummary()}";
+        _benchLabel.Text = $"Team News | Bench {benchCount} | Average XI fitness {averageFitness} | Missing slots {System.Math.Max(0, 11 - startingCount)}";
+        _pressureReasonsLabel.Text = $"Club Mood | {PerceptionSystem.BuildPressureReasonSummary(state)}";
 
-        _pressureLabel.Text = $"Pressure context | Morale {state.TeamMorale} | Fans {state.FanSentiment} | Board {state.BoardConfidence}";
-        _tacticsLabel.Text = state.BuildTacticalPlanSummary();
-        _opponentFocusLabel.Text = state.BuildOpponentContextSummary();
+        _pressureLabel.Text = $"Club Mood | Morale {state.TeamMorale} | Fans {state.FanSentiment} | Board {state.BoardConfidence}";
+        _tacticsLabel.Text = $"Match Plan | {state.BuildTacticalPlanSummary()}";
+        _opponentFocusLabel.Text = $"Opponent Brief | {state.BuildOpponentContextSummary()}";
         _readinessLabel.Text = startingCount >= 11
             ? "Selection call | The XI is complete and ready for kickoff."
             : "Selection call | The engine will complete the XI from the remaining squad list.";
 
         _statusLabel.Text = fixtureComplete
-            ? "This fixture is already in the season record. Return to the dashboard and advance instead of replaying it."
-            : "Decision: Live Match shows the 2D playback; Instant Result resolves the same engine immediately. Both feed the same post-match report.";
+            ? "Fixture complete: this match is already in the season record. Return to the Manager Hub and advance instead of replaying it."
+            : "Match Controls | Watch Live Match uses the 2D replay; Instant Result resolves the same shared engine immediately.";
         _instantResultButton.Disabled = fixtureComplete;
         _startMatchButton.Disabled = fixtureComplete;
     }
@@ -203,15 +206,15 @@ public partial class MatchdayScene : Control
         _pulseMetaLabel.Text = "Pulse context unavailable.";
         _readinessValueLabel.Text = "--";
         _readinessMetaLabel.Text = "Selection state unavailable.";
-        _kickoffContextLabel.Text = "Kickoff context unavailable.";
-        _lineupLabel.Text = "Lineup readiness unavailable.";
-        _benchLabel.Text = "Bench context unavailable.";
-        _pressureReasonsLabel.Text = "Pressure reasons unavailable.";
-        _pressureLabel.Text = "Pressure context unavailable.";
-        _tacticsLabel.Text = "Tactics unavailable.";
+        _kickoffContextLabel.Text = "Dressing Room Brief unavailable.";
+        _lineupLabel.Text = "Team News unavailable.";
+        _benchLabel.Text = "Bench count unavailable.";
+        _pressureReasonsLabel.Text = "Club Mood unavailable.";
+        _pressureLabel.Text = "Club Mood unavailable.";
+        _tacticsLabel.Text = "Match Plan unavailable.";
         _opponentFocusLabel.Text = "Opponent focus unavailable.";
         _readinessLabel.Text = "Readiness unavailable.";
-        _statusLabel.Text = "Set up a career and club before entering matchday.";
+        _statusLabel.Text = "Match Controls unavailable until a career and club are active.";
         SetMatchStateChip("OFFLINE", false);
         _instantResultButton.Disabled = true;
         _startMatchButton.Disabled = true;

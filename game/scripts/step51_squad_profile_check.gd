@@ -62,8 +62,8 @@ func _validate_squad_screen() -> void:
     var player_name := _label_text("RootMargin/Shell/MainColumn/ContentRow/DetailCard/DetailPadding/DetailContent/PlayerNameLabel")
     var starters_value := _label_text("RootMargin/Shell/MainColumn/SummaryGrid/StartersCard/CardPadding/CardContent/CardValueLabel")
 
-    if heading.find("Starting XI") == -1 or heading.find("Non-Starters") == -1:
-        _fail("Squad heading does not separate starters and non-starters: %s" % heading)
+    if heading.find("Starting XI") == -1 or heading.find("Bench") == -1 or heading.find("Reserves") == -1:
+        _fail("Squad heading does not separate starters, bench, and reserves: %s" % heading)
         return
 
     var hint_lower := hint.to_lower()
@@ -71,7 +71,7 @@ func _validate_squad_screen() -> void:
         _fail("Squad hint does not explain bench and reserve depth: %s" % hint)
         return
 
-    if header_status.find("Starting XI") == -1 or header_status.find("non-starters") == -1:
+    if header_status.find("Starting XI") == -1 or header_status.find("bench") == -1 or header_status.find("reserves") == -1:
         _fail("Squad header does not explain lineup groups: %s" % header_status)
         return
 
@@ -79,14 +79,14 @@ func _validate_squad_screen() -> void:
         _fail("Squad screen does not expose post-match player-state visibility")
         return
 
-    if starters_meta.find("Starting XI") == -1 or bench_meta.find("Non-starters") == -1:
-        _fail("Squad summary cards do not label starters and non-starters")
+    if starters_meta.find("Starting XI") == -1 or bench_meta.find("Bench") == -1:
+        _fail("Squad summary cards do not label starters and bench/reserves")
         return
 
     var rows := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/SelectionCard/SelectionPadding/SelectionContent/PlayerScroll/PlayerRows")
     var row_text := _collect_text(rows)
-    if row_text.find("STARTING XI") == -1 or row_text.find("NON-STARTER") == -1:
-        _fail("Player rows do not show both Starting XI and non-starter labels")
+    if row_text.find("STARTING XI") == -1 or row_text.find("BENCH/RESERVE") == -1 or row_text.find("Reserves") == -1:
+        _fail("Player rows do not show Starting XI, bench/reserve labels, and reserve section")
         return
 
     if row_text.find("Fitness") == -1 or row_text.find("Morale") == -1 or row_text.find("Form") == -1:
@@ -97,7 +97,7 @@ func _validate_squad_screen() -> void:
         _fail("Selected player detail is missing role/form/morale/fitness")
         return
 
-    if readiness.find("lineup status") == -1 or profile_hint.find("form-morale-fitness") == -1:
+    if readiness.find("squad status") == -1 or profile_hint.find("form-morale-fitness") == -1:
         _fail("Selected player detail does not explain readiness and profile purpose")
         return
 
@@ -120,8 +120,8 @@ func _validate_squad_screen() -> void:
         return
 
     var role_after := _label_text("RootMargin/Shell/MainColumn/ContentRow/DetailCard/DetailPadding/DetailContent/ChipRow/RoleChip/RoleChipPadding/RoleChipLabel")
-    if role_after.find("NON-STARTER") == -1:
-        _fail("Lineup action did not move the selected starter into non-starter status: %s" % role_after)
+    if role_after.find("BENCH/RESERVE") == -1:
+        _fail("Lineup action did not move the selected starter into bench/reserve status: %s" % role_after)
         return
 
     var profile_button := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/OpenProfileButton") as Button
@@ -156,11 +156,11 @@ func _validate_player_profile() -> void:
         _fail("PlayerProfile status is missing age/form/morale/fitness: %s" % status)
         return
 
-    if role_chip.find("NON-STARTER") == -1 or club_context.find("Lineup status") == -1:
-        _fail("PlayerProfile does not expose lineup status after lineup action")
+    if role_chip.find("BENCH/RESERVE") == -1 or club_context.find("Squad status") == -1:
+        _fail("PlayerProfile does not expose squad status after lineup action")
         return
 
-    if identity.find(_selected_player) == -1 or role.find("Lineup status") == -1:
+    if identity.find(_selected_player) == -1 or role.find("Squad status") == -1:
         _fail("PlayerProfile identity or role summary is incomplete")
         return
 
@@ -172,7 +172,7 @@ func _validate_player_profile() -> void:
         _fail("PlayerProfile does not expose post-match state visibility")
         return
 
-    if readiness.find("Match readiness") == -1 or readiness.find("Non-starter") == -1:
+    if readiness.find("Match readiness") == -1 or readiness.find("Bench/reserve") == -1:
         _fail("PlayerProfile readiness summary is incomplete: %s" % readiness)
         return
 

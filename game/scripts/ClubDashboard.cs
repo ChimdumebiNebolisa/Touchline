@@ -149,15 +149,14 @@ public partial class ClubDashboard : Control
         TouchlineTheme.ApplyPanelVariant(GetNode<PanelContainer>("RootMargin/Shell/RailCard/RailPadding/RailContent/IdentityCard"), TouchlineSurfaceVariant.Shell, 22);
         TouchlineTheme.ApplyPanelVariant(GetNode<PanelContainer>("RootMargin/Shell/RailCard/RailPadding/RailContent/IdentityCard/IdentityPadding/IdentityContent/IdentityTopRow/Badge"), TouchlineSurfaceVariant.Accent, 20);
 
-        TouchlineTheme.ApplyButtonVariant(_dashboardButton, TouchlineButtonVariant.Secondary);
-        TouchlineTheme.ApplyButtonVariant(_squadButton, TouchlineButtonVariant.Secondary);
-        TouchlineTheme.ApplyButtonVariant(_tacticsButton, TouchlineButtonVariant.Secondary);
-        TouchlineTheme.ApplyButtonVariant(_fixturesButton, TouchlineButtonVariant.Secondary);
-        TouchlineTheme.ApplyButtonVariant(_standingsButton, TouchlineButtonVariant.Secondary);
-        TouchlineTheme.ApplyButtonVariant(_matchdayButton, TouchlineButtonVariant.Primary);
+        TouchlineTheme.ApplyNavigationButton(_dashboardButton, true);
+        TouchlineTheme.ApplyNavigationButton(_squadButton, false);
+        TouchlineTheme.ApplyNavigationButton(_tacticsButton, false);
+        TouchlineTheme.ApplyNavigationButton(_fixturesButton, false);
+        TouchlineTheme.ApplyNavigationButton(_standingsButton, false);
+        TouchlineTheme.ApplyMatchdayCta(_matchdayButton);
         TouchlineTheme.ApplyButtonVariant(_saveButton, TouchlineButtonVariant.Secondary);
         TouchlineTheme.ApplyButtonVariant(_backButton, TouchlineButtonVariant.Tertiary);
-        _dashboardButton.Disabled = true;
 
         TouchlineTheme.ApplyTitleStyle(_clubNameLabel, 28);
         TouchlineTheme.ApplyMutedStyle(_managerLabel, 15);
@@ -192,13 +191,13 @@ public partial class ClubDashboard : Control
     {
         if (GameState.Instance == null || !GameState.Instance.CareerInitialized)
         {
-            RenderUnavailableState("Career context unavailable.", "Start or load a career to open the club command view.");
+            RenderUnavailableState("Career context unavailable.", "Start or load a career to open the Manager Hub.");
             return;
         }
 
         if (string.IsNullOrWhiteSpace(GameState.Instance.SelectedClubName))
         {
-            RenderUnavailableState("Club selection missing.", "Choose a club before using the dashboard.");
+            RenderUnavailableState("Club selection missing.", "Choose a club before using the Manager Hub.");
             return;
         }
 
@@ -215,7 +214,7 @@ public partial class ClubDashboard : Control
         _managerLabel.Text = $"Manager {state.ManagerName}";
         _seasonLabel.Text = $"Season {state.SeasonLabel}";
         _competitionChipLabel.Text = state.CompetitionName.ToUpperInvariant();
-        _clubContextLabel.Text = $"{clubName} club command | Manager {state.ManagerName}";
+        _clubContextLabel.Text = $"{clubName} Manager Hub | Manager {state.ManagerName}";
         _dateLabel.Text = $"Season {state.SeasonLabel} | {state.CurrentDateLabel} | Matchday {state.CurrentMatchday}";
         _priorityChipLabel.Text = BuildPriorityTag(state);
         SetStateChip(hasMatchReport ? "POST-MATCH" : "MATCH WEEK", hasMatchReport);
@@ -238,8 +237,8 @@ public partial class ClubDashboard : Control
         _focusContextLabel.Text = $"{state.CompetitionName} | {state.BuildLeaguePositionSummary()}";
         _recommendedMoveLabel.Text = BuildPrioritySummary(state);
         _actionHintLabel.Text = state.IsCurrentClubFixtureComplete()
-            ? "Primary action: advance after the post-match review, not replay the completed fixture."
-            : "Primary action: open Matchday when squad and tactics feel set.";
+            ? "Next match: advance after the post-match review, not replay the completed fixture."
+            : "Next match: go to Matchday when squad and tactics feel set.";
 
         _formValueLabel.Text = BuildCompactForm(state.FormSummary);
         _lastResultLabel.Text = hasMatchReport
@@ -287,9 +286,9 @@ public partial class ClubDashboard : Control
         _shapeValueLabel.Text = "--";
         _shapeMetaLabel.Text = "Tactics unavailable.";
         _fixturePreviewLabel.Text = "No match context is active.";
-        _focusContextLabel.Text = "Club command data unavailable.";
+        _focusContextLabel.Text = "Manager Hub data unavailable.";
         _recommendedMoveLabel.Text = status;
-        _actionHintLabel.Text = "Activate a career flow to unlock the dashboard.";
+        _actionHintLabel.Text = "Activate a career flow to unlock the Manager Hub.";
         _formValueLabel.Text = "--";
         _lastResultLabel.Text = "No result context.";
         _tableImpactLabel.Text = "No competition context.";

@@ -328,7 +328,7 @@ public partial class GameState : Node
 
     public string BuildTacticalPlanSummary()
     {
-        return $"Tactical setup: {TacticalFormation} | press {PressIntensity} | tempo {Tempo} | width {Width} | risk {Risk}";
+        return $"Tactical setup: {TacticalFormation} | pressing {PressIntensity} | tempo {Tempo} | width {Width} | mentality {Risk}";
     }
 
     public string BuildOpponentContextSummary()
