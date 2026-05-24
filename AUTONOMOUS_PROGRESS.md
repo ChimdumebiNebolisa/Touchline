@@ -27,7 +27,7 @@
   - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step50_end_to_end_user_flow_check.gd` passed with `STEP50_END_TO_END_USER_FLOW_PASS`.
 
 ## Last commit hash
-- Pending Step 58 documentation commit.
+- 60718a4
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`.
