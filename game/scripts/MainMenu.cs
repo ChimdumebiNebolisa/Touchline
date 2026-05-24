@@ -86,8 +86,8 @@ public partial class MainMenu : Control
 
         if (!SaveSystem.Instance.TryGetSlotPreview(out var saveData, out var statusMessage))
         {
-            RenderUnavailableState("No saved career found.", "Start a new touchline career to create your first persistent club journey.");
-            _resumeStatusLabel.Text = statusMessage;
+            RenderUnavailableState("Slot 1 unavailable.", $"No complete local career can be resumed: {statusMessage}");
+            _resumeStatusLabel.Text = $"No complete local career can be resumed: {statusMessage}";
             _loadGameButton.Text = "Continue Career";
             _loadGameButton.Disabled = true;
             TouchlineTheme.ApplyButtonVariant(_newCareerButton, TouchlineButtonVariant.Primary);
@@ -98,10 +98,10 @@ public partial class MainMenu : Control
 
         _clubBadgeLabel.Text = BuildClubMonogram(saveData.SelectedClubName ?? "TC");
         _clubNameLabel.Text = saveData.SelectedClubName ?? "Club unavailable";
-        _resumeSummaryLabel.Text = $"Manager {saveData.ManagerName} | {saveData.CompetitionName}";
-        _resumeStatusLabel.Text = "Local career ready. Continue is the primary path back into the club week.";
+        _resumeSummaryLabel.Text = $"Slot 1 ready | Manager {saveData.ManagerName} | {saveData.CompetitionName}";
+        _resumeStatusLabel.Text = $"Local career ready for {saveData.SelectedClubName}. Continue returns to the club week.";
         _managerValueLabel.Text = saveData.ManagerName;
-        _seasonValueLabel.Text = $"{saveData.SeasonStartYear}/{((saveData.SeasonStartYear + 1) % 100):00} | {saveData.CurrentDateIso}";
+        _seasonValueLabel.Text = $"{saveData.SeasonStartYear}/{((saveData.SeasonStartYear + 1) % 100):00} | {saveData.CurrentDateIso} | MD {saveData.CurrentMatchday}";
         _fixtureValueLabel.Text = saveData.NextFixtureSummary;
         _tableValueLabel.Text = BuildTableValue(saveData);
         _formValueLabel.Text = saveData.FormSummary.StartsWith("Form: ") ? saveData.FormSummary["Form: ".Length..] : saveData.FormSummary;

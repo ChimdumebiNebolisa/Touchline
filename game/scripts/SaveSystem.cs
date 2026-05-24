@@ -241,8 +241,18 @@ public partial class SaveSystem : Node
                 return false;
             }
 
+            if (!TryValidateLoadablePayload(saveData, out statusMessage))
+            {
+                return false;
+            }
+
             statusMessage = "Save ready.";
             return true;
+        }
+        catch (JsonException ex)
+        {
+            statusMessage = $"Load failed: save JSON is corrupt or unreadable. {ex.Message}";
+            return false;
         }
         catch (Exception ex)
         {
@@ -260,6 +270,14 @@ public partial class SaveSystem : Node
         normalizedPayload = payload;
         migratedLegacySave = false;
 
+        if (payload.SaveVersion >= CurrentSaveVersion &&
+            (payload.CompetitionTable == null || payload.CompetitionFixtures == null))
+        {
+            normalizedPayload = new SaveSlotData();
+            statusMessage = "Save file is incomplete: current saves must include competition table and fixture state.";
+            return false;
+        }
+
         if (payload.CompetitionTable != null && payload.CompetitionFixtures != null)
         {
             normalizedPayload = BuildSaveCopy(payload);
@@ -275,6 +293,70 @@ public partial class SaveSystem : Node
         }
 
         migratedLegacySave = true;
+        return true;
+    }
+
+    private static bool TryValidateLoadablePayload(SaveSlotData payload, out string statusMessage)
+    {
+        if (payload.AvailableClubs == null || payload.AvailableClubs.Length == 0)
+        {
+            statusMessage = "Save file is incomplete: no available clubs were stored.";
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(payload.SelectedClubName) || Array.IndexOf(payload.AvailableClubs, payload.SelectedClubName) < 0)
+        {
+            statusMessage = "Save file is incomplete: the selected club is not part of the stored club list.";
+            return false;
+        }
+
+        if (payload.SquadPlayers == null || payload.SquadPlayers.Length == 0)
+        {
+            statusMessage = "Save file is incomplete: squad data is missing.";
+            return false;
+        }
+
+        if (payload.CompetitionTable == null || payload.CompetitionTable.Length == 0)
+        {
+            statusMessage = "Save file is incomplete: competition table data is missing.";
+            return false;
+        }
+
+        if (payload.CompetitionFixtures == null || payload.CompetitionFixtures.Length == 0)
+        {
+            statusMessage = "Save file is incomplete: fixture data is missing.";
+            return false;
+        }
+
+        if (payload.CurrentMatchday <= 0)
+        {
+            statusMessage = "Save file is incomplete: current matchday is invalid.";
+            return false;
+        }
+
+        if (payload.SeasonStartYear <= 0 || !DateTime.TryParse(payload.CurrentDateIso, out _))
+        {
+            statusMessage = "Save file is incomplete: season or date data is invalid.";
+            return false;
+        }
+
+        var selectedClubInTable = false;
+        foreach (var row in payload.CompetitionTable)
+        {
+            if (row.ClubName == payload.SelectedClubName)
+            {
+                selectedClubInTable = true;
+                break;
+            }
+        }
+
+        if (!selectedClubInTable)
+        {
+            statusMessage = "Save file is incomplete: the selected club is missing from the table.";
+            return false;
+        }
+
+        statusMessage = "Save ready.";
         return true;
     }
 

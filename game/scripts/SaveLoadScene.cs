@@ -77,8 +77,8 @@ public partial class SaveLoadScene : Control
 
         if (!SaveSystem.Instance.TryGetSlotPreview(out var saveData, out var statusMessage))
         {
-            _slotSummaryLabel.Text = statusMessage;
-            _statusLabel.Text = "No local save found yet. Start a career and save from the dashboard.";
+            _slotSummaryLabel.Text = $"Slot 1 unavailable | {statusMessage}";
+            _statusLabel.Text = "Load is disabled because no complete local career can be restored.";
             _managerValueLabel.Text = "--";
             _seasonValueLabel.Text = "--";
             _fixtureValueLabel.Text = "No live fixture";
@@ -88,10 +88,10 @@ public partial class SaveLoadScene : Control
             return;
         }
 
-        _slotSummaryLabel.Text = $"{saveData.SelectedClubName} | {saveData.CompetitionName}";
-        _statusLabel.Text = "Slot 1 is ready to continue from the latest local save.";
+        _slotSummaryLabel.Text = $"Slot 1 ready | {saveData.SelectedClubName} | {saveData.CompetitionName}";
+        _statusLabel.Text = $"Ready to load {saveData.SelectedClubName} with manager {saveData.ManagerName}.";
         _managerValueLabel.Text = saveData.ManagerName;
-        _seasonValueLabel.Text = $"{saveData.SeasonStartYear}/{((saveData.SeasonStartYear + 1) % 100):00} | {saveData.CurrentDateIso}";
+        _seasonValueLabel.Text = $"{saveData.SeasonStartYear}/{((saveData.SeasonStartYear + 1) % 100):00} | {saveData.CurrentDateIso} | MD {saveData.CurrentMatchday}";
         _fixtureValueLabel.Text = saveData.NextFixtureSummary;
         _tableValueLabel.Text = BuildTableValue(saveData);
         _loadButton.Text = "Continue Career";

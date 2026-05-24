@@ -4,11 +4,10 @@
 
 ### Active
 
-- Step 55: Save/load and empty/error-state polish
+- Step 56: Demo-ready build and release workflow
 
 ### Backlog
 
-- Step 56: Demo-ready build and release workflow
 - Step 57: Final regression and manual QA checklist
 - Step 58: Demo asset plan
 - Step 59: Final product boundary and limitations pass
@@ -74,6 +73,7 @@
 - Step 52: Polish tactics screen clarity
 - Step 53: Polish fixtures and standings presentation
 - Step 54: Full UI consistency and visual polish pass
+- Step 55: Save/load and empty/error-state polish
 
 ## 2. Plan Rules
 
@@ -455,7 +455,7 @@ Transform the current Godot shell from a centered prototype-card presentation in
 
 ## 24. Immediate Next Subtask
 
-- Active Step 55: polish save/load and empty/error states without silent crashes or fake successful state.
+- Active Step 56: document demo-ready build and release workflow without overbuilt release infrastructure.
 
 ## 25. Step 33: Rewrite repository documentation and README
 
