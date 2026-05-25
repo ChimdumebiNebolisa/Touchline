@@ -190,7 +190,7 @@ public partial class SaveSystem : Node
         WriteIndented = true,
         PropertyNameCaseInsensitive = true
     };
-    public const int CurrentSaveVersion = 11;
+    public const int CurrentSaveVersion = 12;
 
     public static SaveSystem? Instance { get; private set; }
     public string LastStatusMessage { get; private set; } = "Save system idle.";
@@ -978,6 +978,9 @@ public partial class SaveSystem : Node
                         Status = target.Status
                     }),
             TransferHistory = source.TransferHistory == null ? null : (string[])source.TransferHistory.Clone(),
+            TransferContractOffer = source.TransferContractOffer == null ? null : CloneContractOfferData(source.TransferContractOffer),
+            RenewalContractOffer = source.RenewalContractOffer == null ? null : CloneContractOfferData(source.RenewalContractOffer),
+            ContractHistory = source.ContractHistory == null ? null : (string[])source.ContractHistory.Clone(),
             PromiseRecords = source.PromiseRecords == null
                 ? null
                 : Array.ConvertAll(
@@ -1024,6 +1027,33 @@ public partial class SaveSystem : Node
             TransferPressure = source.TransferPressure,
             FinancialPressure = source.FinancialPressure,
             PerceptionHistory = source.PerceptionHistory == null ? null : (string[])source.PerceptionHistory.Clone()
+        };
+    }
+
+    private static SaveSlotContractOfferData CloneContractOfferData(SaveSlotContractOfferData source)
+    {
+        return new SaveSlotContractOfferData
+        {
+            OfferId = source.OfferId,
+            PlayerName = source.PlayerName,
+            IsRenewal = source.IsRenewal,
+            SourceType = source.SourceType,
+            AgentArchetype = source.AgentArchetype,
+            WageSummary = source.WageSummary,
+            ProposedWage = source.ProposedWage,
+            DurationSummary = source.DurationSummary,
+            DurationYears = source.DurationYears,
+            ExpirySummary = source.ExpirySummary,
+            SquadRole = source.SquadRole,
+            ClausesSummary = source.ClausesSummary,
+            RenewalStatus = source.RenewalStatus,
+            AgentMood = source.AgentMood,
+            PlayerInterest = source.PlayerInterest,
+            BoardApproval = source.BoardApproval,
+            PromiseSummary = source.PromiseSummary,
+            Status = source.Status,
+            OutcomeSummary = source.OutcomeSummary,
+            IsAccepted = source.IsAccepted
         };
     }
 

@@ -200,6 +200,30 @@ public sealed class RecruitmentTarget
     public required string Status { get; init; }
 }
 
+public sealed class ContractOffer
+{
+    public required string OfferId { get; init; }
+    public required string PlayerName { get; init; }
+    public required bool IsRenewal { get; init; }
+    public required string SourceType { get; init; }
+    public required string AgentArchetype { get; init; }
+    public required string WageSummary { get; init; }
+    public required int ProposedWage { get; init; }
+    public required string DurationSummary { get; init; }
+    public required int DurationYears { get; init; }
+    public required string ExpirySummary { get; init; }
+    public required string SquadRole { get; init; }
+    public required string ClausesSummary { get; init; }
+    public required string RenewalStatus { get; init; }
+    public required string AgentMood { get; init; }
+    public required string PlayerInterest { get; init; }
+    public required string BoardApproval { get; init; }
+    public required string PromiseSummary { get; init; }
+    public required string Status { get; init; }
+    public required string OutcomeSummary { get; init; }
+    public required bool IsAccepted { get; init; }
+}
+
 public sealed class PromiseRecord
 {
     public required string PromiseType { get; init; }

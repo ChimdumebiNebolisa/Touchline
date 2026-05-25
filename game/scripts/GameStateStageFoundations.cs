@@ -31,6 +31,9 @@ public sealed class SaveSlotStageFoundationData
     public SaveSlotRecruitmentTargetData? RecruitmentTarget { get; set; }
     public SaveSlotRecruitmentTargetData[]? RecruitmentShortlist { get; set; }
     public string[]? TransferHistory { get; set; }
+    public SaveSlotContractOfferData? TransferContractOffer { get; set; }
+    public SaveSlotContractOfferData? RenewalContractOffer { get; set; }
+    public string[]? ContractHistory { get; set; }
     public SaveSlotPromiseRecordData[]? PromiseRecords { get; set; }
     public string JobSecurityName { get; set; } = "Stable";
     public SaveSlotJobOfferEventData? JobOffer { get; set; }
@@ -121,6 +124,30 @@ public sealed class SaveSlotRecruitmentTargetData
     public string Status { get; set; } = string.Empty;
 }
 
+public sealed class SaveSlotContractOfferData
+{
+    public string OfferId { get; set; } = string.Empty;
+    public string PlayerName { get; set; } = string.Empty;
+    public bool IsRenewal { get; set; }
+    public string SourceType { get; set; } = string.Empty;
+    public string AgentArchetype { get; set; } = string.Empty;
+    public string WageSummary { get; set; } = string.Empty;
+    public int ProposedWage { get; set; }
+    public string DurationSummary { get; set; } = string.Empty;
+    public int DurationYears { get; set; }
+    public string ExpirySummary { get; set; } = string.Empty;
+    public string SquadRole { get; set; } = string.Empty;
+    public string ClausesSummary { get; set; } = string.Empty;
+    public string RenewalStatus { get; set; } = string.Empty;
+    public string AgentMood { get; set; } = string.Empty;
+    public string PlayerInterest { get; set; } = string.Empty;
+    public string BoardApproval { get; set; } = string.Empty;
+    public string PromiseSummary { get; set; } = string.Empty;
+    public string Status { get; set; } = string.Empty;
+    public string OutcomeSummary { get; set; } = string.Empty;
+    public bool IsAccepted { get; set; }
+}
+
 public sealed class SaveSlotPromiseRecordData
 {
     public string PromiseType { get; set; } = string.Empty;
@@ -155,6 +182,14 @@ public partial class GameState
     private readonly List<string> _careerHistory = new();
     private readonly List<string> _perceptionHistory = new();
     private readonly List<string> _transferHistory = new();
+    private readonly List<string> _contractHistory = new();
+
+    private readonly record struct ContractResolution(
+        ContractOffer Offer,
+        int PressureDelta,
+        int FinancialDelta,
+        int ReputationDelta,
+        int TrustDelta);
 
     public TacticalTeamStyle TeamStyle { get; private set; } = TacticalTeamStyle.Balanced;
     public int PassingDirectness { get; private set; } = 52;
@@ -179,6 +214,8 @@ public partial class GameState
     public string TrainingStatusSummary { get; private set; } = "Training foundation ready: team cohesion is the default weekly focus.";
     public ScoutingAssignment? CurrentScoutingAssignment { get; private set; }
     public RecruitmentTarget? CurrentRecruitmentTarget { get; private set; }
+    public ContractOffer? CurrentTransferContractOffer { get; private set; }
+    public ContractOffer? CurrentRenewalContractOffer { get; private set; }
     public JobSecurityState JobSecurity { get; private set; } = JobSecurityState.Stable;
     public JobOfferEvent? CurrentJobOffer { get; private set; }
     public string LicenseOpportunitySummary { get; private set; } = "License progression will be reviewed after sustained progress.";
@@ -214,9 +251,10 @@ public partial class GameState
     public string DecisionEventSummary => BuildDecisionEventSummary();
     public string RecruitmentShortlistSummary => BuildRecruitmentShortlistSummary();
     public string TransferHistorySummary => _transferHistory.Count == 0 ? "Transfer history starts when a recommendation, request, approach, or loan review is recorded." : string.Join("\n", _transferHistory);
+    public string ContractFoundationSummary => BuildContractFoundationSummary();
     public string RecruitmentFoundationSummary => CurrentRecruitmentTarget == null
         ? "Recruitment foundation pending scouting target."
-        : $"{CurrentRecruitmentTarget.PlayerName} ({CurrentRecruitmentTarget.Position}) | {CurrentRecruitmentTarget.InformationSummary} | {CurrentRecruitmentTarget.InterestSummary} | {CurrentRecruitmentTarget.TacticalFitSummary} | Fee {CurrentRecruitmentTarget.EstimatedFeeRange} | Wage {CurrentRecruitmentTarget.EstimatedWageRange} | Status {CurrentRecruitmentTarget.TargetStatus} | Valuation {CurrentRecruitmentTarget.ClubValuation} | Agent {CurrentRecruitmentTarget.AgentMood} | Rival {CurrentRecruitmentTarget.RivalInterest} | Board {CurrentRecruitmentTarget.BoardStance} | Director {CurrentRecruitmentTarget.DirectorStance} | Outcome {CurrentRecruitmentTarget.OutcomeState} | {CurrentRecruitmentTarget.Status}\nShortlist\n{RecruitmentShortlistSummary}\nTransfer history\n{TransferHistorySummary}";
+        : $"{CurrentRecruitmentTarget.PlayerName} ({CurrentRecruitmentTarget.Position}) | {CurrentRecruitmentTarget.InformationSummary} | {CurrentRecruitmentTarget.InterestSummary} | {CurrentRecruitmentTarget.TacticalFitSummary} | Fee {CurrentRecruitmentTarget.EstimatedFeeRange} | Wage {CurrentRecruitmentTarget.EstimatedWageRange} | Status {CurrentRecruitmentTarget.TargetStatus} | Valuation {CurrentRecruitmentTarget.ClubValuation} | Agent {CurrentRecruitmentTarget.AgentMood} | Rival {CurrentRecruitmentTarget.RivalInterest} | Board {CurrentRecruitmentTarget.BoardStance} | Director {CurrentRecruitmentTarget.DirectorStance} | Outcome {CurrentRecruitmentTarget.OutcomeState} | {CurrentRecruitmentTarget.Status}\nShortlist\n{RecruitmentShortlistSummary}\nContracts\n{ContractFoundationSummary}\nTransfer history\n{TransferHistorySummary}";
     public string TrainingScoutingSummary => $"{TrainingFocusName} ({TrainingIntensityName}): {TrainingStatusSummary}\nScouting depth: {ScoutingReportDepthName}\nScouting: {BuildScoutingSummary()}";
     public string CareerMarketSummary => $"Job security: {JobSecurityName}\n{TrustSummary}\n{ReputationSummary}\n{PressureCategorySummary}\nLicense: {LicenseOpportunitySummary}\nJob market: {BuildJobOfferSummary()}";
     public string TacticsFoundationSummary => $"{TeamStyleName} | {TeamInstructionsSummary}\n{SetPieceSummary}\n{OpponentPreparationSummary}\n{PlayerRolesSummary}\n{PlayerInstructionsSummary}\n{TacticalRoleFitSummary}\n{PlayerFamiliaritySummary}\n{TacticalFitNotes}\n{TacticalRiskNotes}";
@@ -460,6 +498,88 @@ public partial class GameState
         return status;
     }
 
+    public string AttemptBasicContractNegotiation()
+    {
+        EnsureContractOffers();
+        if (CurrentTransferContractOffer == null || CurrentRenewalContractOffer == null)
+        {
+            return "Contract offer unavailable.";
+        }
+
+        if (CareerProfile.Role == ManagerRole.AssistantManager)
+        {
+            CurrentTransferContractOffer = CloneContractOffer(
+                CurrentTransferContractOffer,
+                "Recommended",
+                "Assistant Manager recommended terms; final authority remains with senior staff.",
+                "Terms recommended, not offered.");
+            CurrentRenewalContractOffer = CloneContractOffer(
+                CurrentRenewalContractOffer,
+                "Recommended",
+                "Assistant Manager recommended a renewal structure; senior staff must approve.",
+                "Renewal recommended, not offered.");
+            RecordContractHistory("Assistant Manager recommended transfer and renewal terms without authority to offer.");
+            AddNews(
+                "Contract recommendation filed",
+                NewsCategory.Contract,
+                "Internal",
+                $"{ManagerName} recommended contract terms, but role authority prevents formal negotiation.",
+                2);
+            return "Assistant Manager contract recommendation logged; no formal wage or role promise was made.";
+        }
+
+        if (CareerProfile.Role == ManagerRole.HeadCoach)
+        {
+            CurrentTransferContractOffer = CloneContractOffer(
+                CurrentTransferContractOffer,
+                "Requested",
+                "Head Coach requested contract terms; board and Director review required.",
+                "Terms requested for review.");
+            CurrentRenewalContractOffer = CloneContractOffer(
+                CurrentRenewalContractOffer,
+                "Requested",
+                "Head Coach requested renewal talks; board wage control still applies.",
+                "Renewal requested for review.");
+            TransferPressure = Math.Clamp(TransferPressure + 2, 0, 100);
+            RefreshPressureCategories();
+            RecordContractHistory("Head Coach requested contract and renewal reviews; board/Director approval pending.");
+            AddNews(
+                "Contract request submitted",
+                NewsCategory.Contract,
+                "Internal",
+                $"{ManagerName} requested contract and renewal talks; final terms remain above Head Coach authority.",
+                3);
+            return "Head Coach contract request submitted; board and Director approval required.";
+        }
+
+        var transferResult = ResolveContractOffer(CurrentTransferContractOffer);
+        CurrentTransferContractOffer = transferResult.Offer;
+        var renewalResult = ResolveContractOffer(CurrentRenewalContractOffer);
+        CurrentRenewalContractOffer = renewalResult.Offer;
+        var financialDelta = transferResult.FinancialDelta + renewalResult.FinancialDelta;
+        TransferPressure = Math.Clamp(TransferPressure + transferResult.PressureDelta + renewalResult.PressureDelta, 0, 100);
+        FinancialPressure = Math.Clamp(FinancialPressure + financialDelta, 0, 100);
+        RecruitmentReputation = Math.Clamp(RecruitmentReputation + transferResult.ReputationDelta, 0, 100);
+        CareerProfile.PlayerTrust = Math.Clamp(CareerProfile.PlayerTrust + renewalResult.TrustDelta, 0, 100);
+        RefreshPressureCategories();
+        FinancialPressure = Math.Clamp(FinancialPressure + financialDelta, 0, 100);
+        RecordContractHistory($"{CurrentTransferContractOffer.PlayerName}: {CurrentTransferContractOffer.Status}; {CurrentTransferContractOffer.OutcomeSummary}");
+        RecordContractHistory($"{CurrentRenewalContractOffer.PlayerName}: {CurrentRenewalContractOffer.Status}; {CurrentRenewalContractOffer.OutcomeSummary}");
+        AddContractPromiseIfAccepted(CurrentTransferContractOffer);
+        AddContractPromiseIfAccepted(CurrentRenewalContractOffer);
+        AddNews(
+            "Contract talks updated",
+            NewsCategory.Contract,
+            "Agent briefing",
+            $"{CurrentTransferContractOffer.PlayerName}: {CurrentTransferContractOffer.Status}. {CurrentRenewalContractOffer.PlayerName}: {CurrentRenewalContractOffer.Status}.",
+            4,
+            sourceType: "Agent briefing",
+            relatedEntity: $"{CurrentTransferContractOffer.PlayerName}; {CurrentRenewalContractOffer.PlayerName}",
+            effectSummary: $"Transfer pressure {TransferPressure}; financial pressure {FinancialPressure}; player trust {CareerProfile.PlayerTrust}.",
+            cooldownKey: "contract-negotiation");
+        return $"Contract negotiation resolved: {CurrentTransferContractOffer.PlayerName} {CurrentTransferContractOffer.Status}; {CurrentRenewalContractOffer.PlayerName} {CurrentRenewalContractOffer.Status}.";
+    }
+
     public void GenerateJobMarketEvent()
     {
         var otherClub = ResolveDifferentClub(SelectedClubName);
@@ -555,6 +675,9 @@ public partial class GameState
                 : BuildRecruitmentTargetSaveData(CurrentRecruitmentTarget),
             RecruitmentShortlist = Array.ConvertAll(_recruitmentShortlist.ToArray(), BuildRecruitmentTargetSaveData),
             TransferHistory = _transferHistory.ToArray(),
+            TransferContractOffer = CurrentTransferContractOffer == null ? null : BuildContractOfferSaveData(CurrentTransferContractOffer),
+            RenewalContractOffer = CurrentRenewalContractOffer == null ? null : BuildContractOfferSaveData(CurrentRenewalContractOffer),
+            ContractHistory = _contractHistory.ToArray(),
             PromiseRecords = Array.ConvertAll(
                 _promiseRecords.ToArray(),
                 promise => new SaveSlotPromiseRecordData
@@ -698,6 +821,18 @@ public partial class GameState
             _transferHistory.AddRange(data.TransferHistory);
         }
 
+        CurrentTransferContractOffer = data.TransferContractOffer == null
+            ? null
+            : RestoreContractOffer(data.TransferContractOffer);
+        CurrentRenewalContractOffer = data.RenewalContractOffer == null
+            ? null
+            : RestoreContractOffer(data.RenewalContractOffer);
+        _contractHistory.Clear();
+        if (data.ContractHistory != null)
+        {
+            _contractHistory.AddRange(data.ContractHistory);
+        }
+
         _promiseRecords.Clear();
         if (data.PromiseRecords != null)
         {
@@ -788,6 +923,8 @@ public partial class GameState
         TrainingStatusSummary = "Training foundation ready: team cohesion is the default weekly focus.";
         CurrentScoutingAssignment = null;
         CurrentRecruitmentTarget = null;
+        CurrentTransferContractOffer = null;
+        CurrentRenewalContractOffer = null;
         JobSecurity = JobSecurityState.Stable;
         CurrentJobOffer = null;
         LicenseOpportunitySummary = "License progression will be reviewed after sustained progress.";
@@ -813,6 +950,7 @@ public partial class GameState
         _careerHistory.Clear();
         _perceptionHistory.Clear();
         _transferHistory.Clear();
+        _contractHistory.Clear();
     }
 
     public void InitializeStageFoundationsForClub()
@@ -834,6 +972,7 @@ public partial class GameState
         }
 
         EnsureRecruitmentTarget();
+        EnsureContractOffers();
         EnsureJobMarketFoundation();
         if (_careerHistory.Count == 0)
         {
@@ -1868,6 +2007,120 @@ public partial class GameState
         return MatchPlaybackContractValidator.PassMessage;
     }
 
+    public string ValidatePhase10ContractNegotiationContract()
+    {
+        InitializeStageFoundationsForClub();
+        EnsureContractOffers();
+        if (CurrentTransferContractOffer == null || CurrentRenewalContractOffer == null)
+        {
+            return "Contract negotiation foundation did not create transfer and renewal offers.";
+        }
+
+        if (!ContractFoundationSummary.Contains("Transfer signing", StringComparison.Ordinal) ||
+            !ContractFoundationSummary.Contains("Current-player renewal", StringComparison.Ordinal) ||
+            !ContractFoundationSummary.Contains("Agent", StringComparison.Ordinal) ||
+            !ContractFoundationSummary.Contains("Board", StringComparison.Ordinal))
+        {
+            return "Contract summary does not expose transfer, renewal, agent, and board terms.";
+        }
+
+        var beforePromiseCount = _promiseRecords.Count;
+        var beforeNewsCount = CurrentClub?.NewsFeed.Length ?? 0;
+        var beforeFinancialPressure = FinancialPressure;
+        var result = AttemptBasicContractNegotiation();
+        if (string.IsNullOrWhiteSpace(result) ||
+            CurrentTransferContractOffer == null ||
+            CurrentRenewalContractOffer == null)
+        {
+            return "Contract negotiation did not produce an outcome.";
+        }
+
+        if (CareerProfile.Role == ManagerRole.AssistantManager &&
+            (!CurrentTransferContractOffer.Status.Contains("Recommended", StringComparison.Ordinal) ||
+             CurrentTransferContractOffer.IsAccepted))
+        {
+            return "Assistant Manager contract authority was not limited to recommendation.";
+        }
+
+        if (CareerProfile.Role == ManagerRole.HeadCoach &&
+            (!CurrentTransferContractOffer.Status.Contains("Requested", StringComparison.Ordinal) ||
+             CurrentTransferContractOffer.IsAccepted))
+        {
+            return "Head Coach contract authority was not limited to request/recommendation.";
+        }
+
+        if (CareerProfile.Role == ManagerRole.Manager)
+        {
+            if (!CurrentTransferContractOffer.Status.Contains("Accepted", StringComparison.Ordinal))
+            {
+                return "Manager transfer contract did not reach an accepted state.";
+            }
+
+            if (!CurrentRenewalContractOffer.Status.Contains("countered", StringComparison.OrdinalIgnoreCase))
+            {
+                return "Manager renewal contract did not expose an agent counter state.";
+            }
+
+            var highRiskOffer = CloneContractOfferWithWage(
+                CurrentRenewalContractOffer,
+                GetHighestSquadWage() * 3,
+                $"{FormatWeeklyWage(GetHighestSquadWage() * 3)} proposed as wage-structure stress test.");
+            var rejected = ResolveContractOffer(highRiskOffer).Offer;
+            if (!rejected.Status.Contains("Board rejected", StringComparison.Ordinal))
+            {
+                return "Contract approval logic did not produce a board rejection for excessive wages.";
+            }
+
+            if (_promiseRecords.Count <= beforePromiseCount)
+            {
+                return "Accepted contract terms did not create a promise.";
+            }
+
+            if ((CurrentClub?.NewsFeed.Length ?? 0) <= beforeNewsCount)
+            {
+                return "Contract negotiation did not update the news feed.";
+            }
+
+            if (FinancialPressure <= beforeFinancialPressure)
+            {
+                return "Contract negotiation did not register wage-budget pressure.";
+            }
+        }
+
+        if (_contractHistory.Count == 0)
+        {
+            return "Contract negotiation did not record contract history.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
+    public string ValidatePhase10StoredContractNegotiationContract()
+    {
+        EnsureContractOffers();
+        if (CurrentTransferContractOffer == null ||
+            CurrentRenewalContractOffer == null ||
+            string.IsNullOrWhiteSpace(CurrentTransferContractOffer.AgentArchetype) ||
+            string.IsNullOrWhiteSpace(CurrentRenewalContractOffer.BoardApproval))
+        {
+            return "Saved contract offers did not restore.";
+        }
+
+        if (_contractHistory.Count == 0 ||
+            !ContractFoundationSummary.Contains("Contract history", StringComparison.Ordinal) ||
+            !ContractFoundationSummary.Contains("Accepted", StringComparison.Ordinal))
+        {
+            return "Saved contract history or accepted terms did not restore.";
+        }
+
+        if (_promiseRecords.Count == 0)
+        {
+            return "Saved contract-created promise did not restore.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
     public string ValidatePhase3PromiseLifecycleContract()
     {
         InitializeStageFoundationsForClub();
@@ -2640,6 +2893,66 @@ public partial class GameState
         };
     }
 
+    private static SaveSlotContractOfferData BuildContractOfferSaveData(ContractOffer offer)
+    {
+        return new SaveSlotContractOfferData
+        {
+            OfferId = offer.OfferId,
+            PlayerName = offer.PlayerName,
+            IsRenewal = offer.IsRenewal,
+            SourceType = offer.SourceType,
+            AgentArchetype = offer.AgentArchetype,
+            WageSummary = offer.WageSummary,
+            ProposedWage = offer.ProposedWage,
+            DurationSummary = offer.DurationSummary,
+            DurationYears = offer.DurationYears,
+            ExpirySummary = offer.ExpirySummary,
+            SquadRole = offer.SquadRole,
+            ClausesSummary = offer.ClausesSummary,
+            RenewalStatus = offer.RenewalStatus,
+            AgentMood = offer.AgentMood,
+            PlayerInterest = offer.PlayerInterest,
+            BoardApproval = offer.BoardApproval,
+            PromiseSummary = offer.PromiseSummary,
+            Status = offer.Status,
+            OutcomeSummary = offer.OutcomeSummary,
+            IsAccepted = offer.IsAccepted
+        };
+    }
+
+    private static ContractOffer RestoreContractOffer(SaveSlotContractOfferData data)
+    {
+        var playerName = string.IsNullOrWhiteSpace(data.PlayerName) ? "Unknown player" : data.PlayerName;
+        var source = string.IsNullOrWhiteSpace(data.SourceType)
+            ? data.IsRenewal ? "Current-player renewal" : "Transfer signing"
+            : data.SourceType;
+        var wage = data.ProposedWage <= 0 ? 52000 : data.ProposedWage;
+        var duration = data.DurationYears <= 0 ? data.IsRenewal ? 2 : 3 : data.DurationYears;
+        return new ContractOffer
+        {
+            OfferId = string.IsNullOrWhiteSpace(data.OfferId) ? BuildOfferId(playerName, source) : data.OfferId,
+            PlayerName = playerName,
+            IsRenewal = data.IsRenewal,
+            SourceType = source,
+            AgentArchetype = string.IsNullOrWhiteSpace(data.AgentArchetype) ? "Pragmatic agent" : data.AgentArchetype,
+            WageSummary = string.IsNullOrWhiteSpace(data.WageSummary) ? $"{FormatWeeklyWage(wage)} proposed." : data.WageSummary,
+            ProposedWage = wage,
+            DurationSummary = string.IsNullOrWhiteSpace(data.DurationSummary) ? $"{duration} years" : data.DurationSummary,
+            DurationYears = duration,
+            ExpirySummary = string.IsNullOrWhiteSpace(data.ExpirySummary) ? $"Expires after {duration} years" : data.ExpirySummary,
+            SquadRole = string.IsNullOrWhiteSpace(data.SquadRole) ? "Squad Player" : data.SquadRole,
+            ClausesSummary = string.IsNullOrWhiteSpace(data.ClausesSummary) ? "Standard bonus and role review." : data.ClausesSummary,
+            RenewalStatus = string.IsNullOrWhiteSpace(data.RenewalStatus) ? "Saved contract terms restored." : data.RenewalStatus,
+            AgentMood = string.IsNullOrWhiteSpace(data.AgentMood) ? "Neutral" : data.AgentMood,
+            PlayerInterest = string.IsNullOrWhiteSpace(data.PlayerInterest) ? "Player interest pending." : data.PlayerInterest,
+            BoardApproval = string.IsNullOrWhiteSpace(data.BoardApproval) ? "Board approval pending." : data.BoardApproval,
+            PromiseSummary = string.IsNullOrWhiteSpace(data.PromiseSummary) ? "Role promise pending." : data.PromiseSummary,
+            Status = string.IsNullOrWhiteSpace(data.Status) ? "Draft" : data.Status,
+            OutcomeSummary = string.IsNullOrWhiteSpace(data.OutcomeSummary) ? "Saved contract terms restored." : data.OutcomeSummary,
+            IsAccepted = data.IsAccepted
+        };
+    }
+
     private static RecruitmentTarget RestoreRecruitmentTarget(SaveSlotRecruitmentTargetData data)
     {
         var information = string.IsNullOrWhiteSpace(data.InformationSummary)
@@ -2711,6 +3024,387 @@ public partial class GameState
         }
 
         return string.Join("\n", lines);
+    }
+
+    private string BuildContractFoundationSummary()
+    {
+        EnsureContractOffers();
+        var transfer = CurrentTransferContractOffer == null ? "Transfer contract: not prepared." : BuildContractOfferLine(CurrentTransferContractOffer);
+        var renewal = CurrentRenewalContractOffer == null ? "Renewal contract: not prepared." : BuildContractOfferLine(CurrentRenewalContractOffer);
+        var history = _contractHistory.Count == 0
+            ? "Contract history starts when terms are recommended, requested, countered, accepted, or rejected."
+            : string.Join("\n", _contractHistory);
+        return $"{transfer}\n{renewal}\nContract history\n{history}";
+    }
+
+    private static string BuildContractOfferLine(ContractOffer offer)
+    {
+        return $"{offer.SourceType}: {offer.PlayerName} | {offer.Status} | {offer.AgentArchetype} | {offer.WageSummary} | {offer.DurationSummary} | {offer.SquadRole} | {offer.ClausesSummary} | Agent {offer.AgentMood} | Player {offer.PlayerInterest} | Board {offer.BoardApproval} | Promise {offer.PromiseSummary} | {offer.OutcomeSummary}";
+    }
+
+    private void EnsureContractOffers()
+    {
+        EnsureRecruitmentTarget();
+        if (CurrentTransferContractOffer == null && CurrentRecruitmentTarget != null)
+        {
+            CurrentTransferContractOffer = BuildTransferContractOffer(CurrentRecruitmentTarget);
+        }
+
+        if (CurrentRenewalContractOffer == null)
+        {
+            var player = FindRenewalCandidate();
+            if (player != null)
+            {
+                CurrentRenewalContractOffer = BuildRenewalContractOffer(player);
+            }
+        }
+    }
+
+    private ContractOffer BuildTransferContractOffer(RecruitmentTarget target)
+    {
+        var wage = EstimateWageFromSummary(target.EstimatedWageRange, 52000);
+        var durationYears = target.AgentMood.Contains("ambitious", StringComparison.OrdinalIgnoreCase) ? 4 : 3;
+        var role = target.TacticalFitSummary.Contains("Strong", StringComparison.Ordinal)
+            ? "Important Player"
+            : "Rotation Player";
+        var agent = BuildAgentArchetype(target.PlayerName, target.AgentMood);
+        return new ContractOffer
+        {
+            OfferId = BuildOfferId(target.PlayerName, "transfer"),
+            PlayerName = target.PlayerName,
+            IsRenewal = false,
+            SourceType = "Transfer signing",
+            AgentArchetype = agent,
+            WageSummary = $"{FormatWeeklyWage(wage)} proposed within target range {target.EstimatedWageRange}",
+            ProposedWage = wage,
+            DurationSummary = $"{durationYears} years",
+            DurationYears = durationYears,
+            ExpirySummary = $"Expires {CurrentDate.Year + durationYears}",
+            SquadRole = role,
+            ClausesSummary = BuildContractClauseSummary(agent, false),
+            RenewalStatus = "New signing terms",
+            AgentMood = target.AgentMood,
+            PlayerInterest = target.InterestSummary,
+            BoardApproval = BuildContractBoardApproval(wage, role, false),
+            PromiseSummary = $"{role} pathway before completion.",
+            Status = "Draft",
+            OutcomeSummary = "Offer prepared; no terms accepted yet.",
+            IsAccepted = false
+        };
+    }
+
+    private ContractOffer BuildRenewalContractOffer(SquadPlayer player)
+    {
+        var wage = Math.Clamp(player.Wage + Math.Max(5000, player.Wage / 5), player.Wage + 3000, player.Wage + 22000);
+        var durationYears = player.Age >= 30 ? 1 : 2;
+        var agent = player.IsStarting ? "Wage maximizer" : BuildAgentArchetype(player.Name, player.Personality);
+        return new ContractOffer
+        {
+            OfferId = BuildOfferId(player.Name, "renewal"),
+            PlayerName = player.Name,
+            IsRenewal = true,
+            SourceType = "Current-player renewal",
+            AgentArchetype = agent,
+            WageSummary = $"{FormatWeeklyWage(wage)} proposed; current wage {FormatWeeklyWage(player.Wage)}",
+            ProposedWage = wage,
+            DurationSummary = $"{durationYears} years",
+            DurationYears = durationYears,
+            ExpirySummary = $"Extends to {player.ContractExpiryYear + durationYears}",
+            SquadRole = player.ContractRole,
+            ClausesSummary = BuildContractClauseSummary(agent, true),
+            RenewalStatus = "Renewal draft",
+            AgentMood = player.Morale >= 66 ? "Open but watching squad direction." : "Concerned; wants trust rebuilt before signing.",
+            PlayerInterest = player.Morale >= 66 ? "Player open to renewal if role is respected." : "Player interest is fragile because morale is low.",
+            BoardApproval = BuildContractBoardApproval(wage, player.ContractRole, true),
+            PromiseSummary = $"Contract renewal and {player.ContractRole.ToLowerInvariant()} role clarity.",
+            Status = "Draft",
+            OutcomeSummary = "Renewal terms prepared; no agreement yet.",
+            IsAccepted = false
+        };
+    }
+
+    private SquadPlayer? FindRenewalCandidate()
+    {
+        if (SquadPlayers.Length == 0)
+        {
+            return null;
+        }
+
+        var candidate = SquadPlayers[0];
+        foreach (var player in SquadPlayers)
+        {
+            if (player.ContractExpiryYear < candidate.ContractExpiryYear ||
+                (player.ContractExpiryYear == candidate.ContractExpiryYear && player.IsStarting && !candidate.IsStarting))
+            {
+                candidate = player;
+            }
+        }
+
+        return candidate;
+    }
+
+    private ContractResolution ResolveContractOffer(ContractOffer offer)
+    {
+        var score = BuildContractApprovalScore(offer);
+        if (score < 42)
+        {
+            var rejected = CloneContractOffer(
+                offer,
+                "Board rejected",
+                $"Board rejected the terms: wage structure, role, and trust score {score}/100 are not aligned.",
+                "Rejected by board",
+                "Board rejected because wage structure risk is too high.");
+            return new ContractResolution(rejected, 5, 4, -1, offer.IsRenewal ? -1 : 0);
+        }
+
+        if (offer.IsRenewal &&
+            (offer.AgentArchetype == "Wage maximizer" || offer.AgentArchetype == "Release-clause specialist"))
+        {
+            var countered = CloneContractOffer(
+                offer,
+                "Agent countered",
+                $"Agent countered: {offer.AgentArchetype.ToLowerInvariant()} wants stronger wage or clause protection despite board score {score}/100.",
+                "Countered by agent",
+                "Board allows a revised offer inside wage structure.");
+            return new ContractResolution(countered, 3, 2, 0, offer.IsRenewal ? 0 : 0);
+        }
+
+        var accepted = CloneContractOffer(
+            offer,
+            "Accepted",
+            $"Terms accepted: wage, duration, role, clauses, player interest, and board approval score {score}/100 aligned.",
+            "Accepted",
+            "Board approved within wage structure.",
+            isAccepted: true);
+        return new ContractResolution(accepted, offer.IsRenewal ? -1 : 2, 1, offer.IsRenewal ? 0 : 1, offer.IsRenewal ? 2 : 0);
+    }
+
+    private int BuildContractApprovalScore(ContractOffer offer)
+    {
+        var score = 50 + CareerProfile.BoardTrust / 5 + CareerProfile.PlayerTrust / 10;
+        var highestWage = GetHighestSquadWage();
+        if (offer.ProposedWage > highestWage * 13 / 10)
+        {
+            score -= 18;
+        }
+
+        if (offer.ProposedWage > highestWage * 2)
+        {
+            score -= 35;
+        }
+
+        if (CurrentClub?.BoardPhilosophy == BoardPhilosophy.FinanciallyStrictBoard)
+        {
+            score -= offer.ProposedWage > highestWage ? 10 : 2;
+        }
+
+        if (offer.SquadRole.Contains("Important", StringComparison.Ordinal) && !offer.PlayerInterest.Contains("open", StringComparison.OrdinalIgnoreCase))
+        {
+            score -= 8;
+        }
+
+        if (!offer.IsRenewal && CurrentRecruitmentTarget?.TargetStatus == "Approved")
+        {
+            score += 8;
+        }
+
+        if (offer.IsRenewal && offer.AgentMood.Contains("Open", StringComparison.OrdinalIgnoreCase))
+        {
+            score += 6;
+        }
+
+        return Math.Clamp(score, 0, 100);
+    }
+
+    private int GetHighestSquadWage()
+    {
+        var highest = 1;
+        foreach (var player in SquadPlayers)
+        {
+            highest = Math.Max(highest, player.Wage);
+        }
+
+        return highest;
+    }
+
+    private string BuildContractBoardApproval(int wage, string role, bool isRenewal)
+    {
+        var highestWage = GetHighestSquadWage();
+        var wageLine = wage > highestWage * 13 / 10
+            ? "breaks current wage structure"
+            : "fits current wage structure";
+        var boardLine = CurrentClub?.BoardPhilosophy == BoardPhilosophy.FinanciallyStrictBoard
+            ? "strict board scrutiny applies"
+            : "board approval depends on trust and role logic";
+        var source = isRenewal ? "renewal" : "signing";
+        return $"{source} {wageLine}; {role}; {boardLine}.";
+    }
+
+    private static string BuildContractClauseSummary(string agentArchetype, bool isRenewal)
+    {
+        return agentArchetype switch
+        {
+            "Wage maximizer" => "Appearance bonus and wage-review clause.",
+            "Release-clause specialist" => "Release-clause request and loyalty bonus placeholder.",
+            "Career planner" => isRenewal ? "Role review and optional renewal year." : "Development review and role pathway.",
+            "Loyalty builder" => "Modest loyalty bonus and squad-role review.",
+            _ => "Standard bonus and role review."
+        };
+    }
+
+    private static string BuildAgentArchetype(string playerName, string context)
+    {
+        if (context.Contains("ambitious", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Release-clause specialist";
+        }
+
+        if (context.Contains("pathway", StringComparison.OrdinalIgnoreCase) || context.Contains("development", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Career planner";
+        }
+
+        var hash = BuildStableTextHash(playerName);
+        return (hash % 4) switch
+        {
+            0 => "Pragmatic agent",
+            1 => "Wage maximizer",
+            2 => "Career planner",
+            _ => "Loyalty builder"
+        };
+    }
+
+    private static int EstimateWageFromSummary(string wageSummary, int fallback)
+    {
+        var digits = string.Empty;
+        foreach (var character in wageSummary)
+        {
+            if (char.IsDigit(character))
+            {
+                digits += character;
+            }
+            else if (digits.Length > 0)
+            {
+                break;
+            }
+        }
+
+        return int.TryParse(digits, out var wageInThousands) && wageInThousands > 0
+            ? wageInThousands * 1000
+            : fallback;
+    }
+
+    private static int BuildStableTextHash(string value)
+    {
+        var hash = 17;
+        foreach (var character in value)
+        {
+            hash = hash * 31 + character;
+        }
+
+        return Math.Abs(hash);
+    }
+
+    private static string BuildOfferId(string playerName, string source)
+    {
+        return $"{source}-{BuildStableTextHash(playerName):x8}";
+    }
+
+    private static string FormatWeeklyWage(int wage)
+    {
+        return $"${wage / 1000}k/w";
+    }
+
+    private void RecordContractHistory(string detail)
+    {
+        _contractHistory.Insert(0, $"{CurrentDateLabel}: {detail}");
+        if (_contractHistory.Count > 12)
+        {
+            _contractHistory.RemoveAt(_contractHistory.Count - 1);
+        }
+    }
+
+    private void AddContractPromiseIfAccepted(ContractOffer offer)
+    {
+        if (!offer.IsAccepted)
+        {
+            return;
+        }
+
+        _promiseRecords.Add(new PromiseRecord
+        {
+            PromiseType = offer.IsRenewal ? "Contract renewal" : "Squad role",
+            Recipient = offer.PlayerName,
+            Source = offer.SourceType,
+            IsPublic = false,
+            ExpectedAction = offer.PromiseSummary,
+            DeadlineSummary = offer.IsRenewal ? "Next contract review" : "Before integration review",
+            DaysRemaining = offer.IsRenewal ? 28 : 21,
+            Status = PromiseStatus.Active,
+            CurrentEvidence = $"Promise created from accepted contract terms: {offer.SquadRole}.",
+            AgentMood = offer.AgentMood,
+            ConsequenceRisk = "Broken contract promises affect player trust, agent mood, squad trust, and pressure."
+        });
+    }
+
+    private static ContractOffer CloneContractOffer(
+        ContractOffer offer,
+        string status,
+        string outcomeSummary,
+        string renewalStatus,
+        string? boardApproval = null,
+        bool? isAccepted = null)
+    {
+        return new ContractOffer
+        {
+            OfferId = offer.OfferId,
+            PlayerName = offer.PlayerName,
+            IsRenewal = offer.IsRenewal,
+            SourceType = offer.SourceType,
+            AgentArchetype = offer.AgentArchetype,
+            WageSummary = offer.WageSummary,
+            ProposedWage = offer.ProposedWage,
+            DurationSummary = offer.DurationSummary,
+            DurationYears = offer.DurationYears,
+            ExpirySummary = offer.ExpirySummary,
+            SquadRole = offer.SquadRole,
+            ClausesSummary = offer.ClausesSummary,
+            RenewalStatus = renewalStatus,
+            AgentMood = status == "Agent countered" ? "Countering for stronger terms." : offer.AgentMood,
+            PlayerInterest = offer.PlayerInterest,
+            BoardApproval = boardApproval ?? offer.BoardApproval,
+            PromiseSummary = offer.PromiseSummary,
+            Status = status,
+            OutcomeSummary = outcomeSummary,
+            IsAccepted = isAccepted ?? offer.IsAccepted
+        };
+    }
+
+    private static ContractOffer CloneContractOfferWithWage(ContractOffer offer, int proposedWage, string wageSummary)
+    {
+        return new ContractOffer
+        {
+            OfferId = offer.OfferId,
+            PlayerName = offer.PlayerName,
+            IsRenewal = offer.IsRenewal,
+            SourceType = offer.SourceType,
+            AgentArchetype = offer.AgentArchetype,
+            WageSummary = wageSummary,
+            ProposedWage = proposedWage,
+            DurationSummary = offer.DurationSummary,
+            DurationYears = offer.DurationYears,
+            ExpirySummary = offer.ExpirySummary,
+            SquadRole = offer.SquadRole,
+            ClausesSummary = offer.ClausesSummary,
+            RenewalStatus = offer.RenewalStatus,
+            AgentMood = offer.AgentMood,
+            PlayerInterest = offer.PlayerInterest,
+            BoardApproval = offer.BoardApproval,
+            PromiseSummary = offer.PromiseSummary,
+            Status = offer.Status,
+            OutcomeSummary = offer.OutcomeSummary,
+            IsAccepted = offer.IsAccepted
+        };
     }
 
     private void GenerateContextDecisionEvent(string trigger)
