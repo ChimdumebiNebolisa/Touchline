@@ -68,6 +68,14 @@ public partial class ClubDashboard : Control
     private Button _standingsButton = default!;
     private Button _matchdayButton = default!;
     private Button _saveButton = default!;
+    private OptionButton _trainingFocusOption = default!;
+    private OptionButton _trainingIntensityOption = default!;
+    private Button _applyTrainingButton = default!;
+    private OptionButton _scoutingTargetOption = default!;
+    private OptionButton _scoutingDepthOption = default!;
+    private Button _startScoutingButton = default!;
+    private Button _advanceDayButton = default!;
+    private Button _advanceWeekButton = default!;
     private Button _recruitmentButton = default!;
     private Button _jobMarketButton = default!;
     private Button _backButton = default!;
@@ -145,6 +153,14 @@ public partial class ClubDashboard : Control
         _staffLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/StaffLabel");
         _newsFeedLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/NewsFeedLabel");
         _trainingScoutingLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/TrainingScoutingLabel");
+        _trainingFocusOption = GetNode<OptionButton>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/TrainingFocusOption");
+        _trainingIntensityOption = GetNode<OptionButton>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/TrainingIntensityOption");
+        _applyTrainingButton = GetNode<Button>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/ApplyTrainingButton");
+        _scoutingTargetOption = GetNode<OptionButton>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/ScoutingTargetOption");
+        _scoutingDepthOption = GetNode<OptionButton>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/ScoutingDepthOption");
+        _startScoutingButton = GetNode<Button>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/StartScoutingButton");
+        _advanceDayButton = GetNode<Button>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/AdvanceDayButton");
+        _advanceWeekButton = GetNode<Button>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/AdvanceWeekButton");
         _recruitmentLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/RecruitmentLabel");
         _careerMarketLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/CareerMarketLabel");
         _recruitmentButton = GetNode<Button>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/RecruitmentButton");
@@ -169,6 +185,14 @@ public partial class ClubDashboard : Control
         EnsureLabel(insightContent, ref insightInsertIndex, "StaffLabel");
         EnsureLabel(insightContent, ref insightInsertIndex, "NewsFeedLabel");
         EnsureLabel(insightContent, ref insightInsertIndex, "TrainingScoutingLabel");
+        EnsureOptionButton(insightContent, ref insightInsertIndex, "TrainingFocusOption");
+        EnsureOptionButton(insightContent, ref insightInsertIndex, "TrainingIntensityOption");
+        EnsureButton(insightContent, ref insightInsertIndex, "ApplyTrainingButton", "Apply Training Plan");
+        EnsureOptionButton(insightContent, ref insightInsertIndex, "ScoutingTargetOption");
+        EnsureOptionButton(insightContent, ref insightInsertIndex, "ScoutingDepthOption");
+        EnsureButton(insightContent, ref insightInsertIndex, "StartScoutingButton", "Start Scouting Assignment");
+        EnsureButton(insightContent, ref insightInsertIndex, "AdvanceDayButton", "Advance Day");
+        EnsureButton(insightContent, ref insightInsertIndex, "AdvanceWeekButton", "Advance Week");
         EnsureLabel(insightContent, ref insightInsertIndex, "RecruitmentLabel");
         EnsureButton(insightContent, ref insightInsertIndex, "RecruitmentButton", "Progress Recruitment Foundation");
         EnsureLabel(insightContent, ref insightInsertIndex, "CareerMarketLabel");
@@ -208,6 +232,23 @@ public partial class ClubDashboard : Control
         };
         container.AddChild(button);
         container.MoveChild(button, insertIndex++);
+    }
+
+    private static void EnsureOptionButton(VBoxContainer container, ref int insertIndex, string optionName)
+    {
+        var option = container.GetNodeOrNull<OptionButton>(optionName);
+        if (option != null)
+        {
+            return;
+        }
+
+        option = new OptionButton
+        {
+            Name = optionName,
+            SizeFlagsHorizontal = SizeFlags.ExpandFill
+        };
+        container.AddChild(option);
+        container.MoveChild(option, insertIndex++);
     }
 
     private void ApplyShellStyles()
@@ -274,8 +315,16 @@ public partial class ClubDashboard : Control
         TouchlineTheme.ApplyMutedStyle(_trainingScoutingLabel, 14);
         TouchlineTheme.ApplyMutedStyle(_recruitmentLabel, 14);
         TouchlineTheme.ApplyMutedStyle(_careerMarketLabel, 14);
+        TouchlineTheme.ApplyButtonVariant(_applyTrainingButton, TouchlineButtonVariant.Secondary);
+        TouchlineTheme.ApplyButtonVariant(_startScoutingButton, TouchlineButtonVariant.Secondary);
+        TouchlineTheme.ApplyButtonVariant(_advanceDayButton, TouchlineButtonVariant.Secondary);
+        TouchlineTheme.ApplyButtonVariant(_advanceWeekButton, TouchlineButtonVariant.Secondary);
         TouchlineTheme.ApplyButtonVariant(_recruitmentButton, TouchlineButtonVariant.Secondary);
         TouchlineTheme.ApplyButtonVariant(_jobMarketButton, TouchlineButtonVariant.Secondary);
+        _applyTrainingButton.Pressed += OnApplyTrainingPressed;
+        _startScoutingButton.Pressed += OnStartScoutingPressed;
+        _advanceDayButton.Pressed += OnAdvanceDayPressed;
+        _advanceWeekButton.Pressed += OnAdvanceWeekPressed;
         _recruitmentButton.Pressed += OnRecruitmentPressed;
         _jobMarketButton.Pressed += OnJobMarketPressed;
     }
@@ -356,6 +405,7 @@ public partial class ClubDashboard : Control
         _staffLabel.Text = $"Starting staff\n{state.StaffSummary}";
         _newsFeedLabel.Text = $"News feed\n{state.NewsFeedSummary}";
         _trainingScoutingLabel.Text = $"Training and scouting\n{state.TrainingScoutingSummary}";
+        PopulateTrainingScoutingControls(state);
         _recruitmentLabel.Text = $"Recruitment and contracts\n{state.RecruitmentFoundationSummary}\nPromises\n{state.PromiseSummary}";
         _careerMarketLabel.Text = $"Career and job market\n{state.CareerMarketSummary}\nCareer history\n{state.CareerHistorySummary}";
         _priorityLabel.Text = BuildPrioritySummary(state);
@@ -407,6 +457,14 @@ public partial class ClubDashboard : Control
         _staffLabel.Text = "Staff foundation unavailable.";
         _newsFeedLabel.Text = "News feed unavailable.";
         _trainingScoutingLabel.Text = "Training and scouting unavailable.";
+        _trainingFocusOption.Disabled = true;
+        _trainingIntensityOption.Disabled = true;
+        _applyTrainingButton.Disabled = true;
+        _scoutingTargetOption.Disabled = true;
+        _scoutingDepthOption.Disabled = true;
+        _startScoutingButton.Disabled = true;
+        _advanceDayButton.Disabled = true;
+        _advanceWeekButton.Disabled = true;
         _recruitmentLabel.Text = "Recruitment unavailable.";
         _careerMarketLabel.Text = "Career market unavailable.";
         _priorityLabel.Text = status;
@@ -416,6 +474,74 @@ public partial class ClubDashboard : Control
         _recruitmentButton.Disabled = true;
         _jobMarketButton.Disabled = true;
         _matchdayButton.Disabled = true;
+    }
+
+    private void PopulateTrainingScoutingControls(GameState state)
+    {
+        PopulateOptionButton(
+            _trainingFocusOption,
+            state.TrainingFocusName,
+            "Attacking movement",
+            "Defensive shape",
+            "Pressing",
+            "Possession",
+            "Counterattack",
+            "Set pieces",
+            "Fitness",
+            "Recovery",
+            "Team cohesion",
+            "Youth integration");
+        PopulateOptionButton(
+            _trainingIntensityOption,
+            state.TrainingIntensityName,
+            "Controlled",
+            "Standard",
+            "Demanding");
+        PopulateOptionButton(
+            _scoutingTargetOption,
+            state.CurrentScoutingAssignment?.Target ?? "Position need: versatile midfielder",
+            "Position need: versatile midfielder",
+            "Specific player: pressing winger",
+            "Specific player: central midfielder",
+            "Opponent style: next fixture",
+            "Loan watch: young forward");
+        PopulateOptionButton(
+            _scoutingDepthOption,
+            state.ScoutingReportDepthName,
+            "Quick look",
+            "Standard report",
+            "Full report");
+
+        _trainingFocusOption.Disabled = false;
+        _trainingIntensityOption.Disabled = false;
+        _applyTrainingButton.Disabled = false;
+        _scoutingTargetOption.Disabled = false;
+        _scoutingDepthOption.Disabled = false;
+        _startScoutingButton.Disabled = false;
+        _advanceDayButton.Disabled = false;
+        _advanceWeekButton.Disabled = false;
+    }
+
+    private static void PopulateOptionButton(OptionButton option, string selectedValue, params string[] values)
+    {
+        option.Clear();
+        var selectedIndex = 0;
+        for (var index = 0; index < values.Length; index++)
+        {
+            option.AddItem(values[index], index);
+            if (values[index] == selectedValue)
+            {
+                selectedIndex = index;
+            }
+        }
+
+        option.Select(selectedIndex);
+    }
+
+    private static string GetSelectedOptionText(OptionButton option)
+    {
+        var selectedIndex = option.Selected;
+        return selectedIndex < 0 ? string.Empty : option.GetItemText(selectedIndex);
     }
 
     private void SetStateChip(string text, bool positive)
@@ -586,6 +712,60 @@ public partial class ClubDashboard : Control
         _statusLabel.Text = statusMessage;
         _saveHintLabel.Text = statusMessage;
         SetStateChip("CAREER SAVED", true);
+    }
+
+    private void OnApplyTrainingPressed()
+    {
+        if (GameState.Instance == null)
+        {
+            return;
+        }
+
+        GameState.Instance.SetTrainingPlanByName(
+            GetSelectedOptionText(_trainingFocusOption),
+            GetSelectedOptionText(_trainingIntensityOption));
+        _statusLabel.Text = "Training plan updated from dashboard controls.";
+        RenderState();
+    }
+
+    private void OnStartScoutingPressed()
+    {
+        if (GameState.Instance == null)
+        {
+            return;
+        }
+
+        GameState.Instance.StartScoutingAssignment(
+            GetSelectedOptionText(_scoutingTargetOption),
+            GetSelectedOptionText(_scoutingDepthOption));
+        _statusLabel.Text = "Scouting assignment updated from dashboard controls.";
+        RenderState();
+    }
+
+    private void OnAdvanceDayPressed()
+    {
+        if (GameState.Instance == null)
+        {
+            return;
+        }
+
+        _statusLabel.Text = GameState.Instance.AdvanceOneCareerDay()
+            ? "Advanced one career day; training and scouting state progressed."
+            : "Career day could not advance without an active club.";
+        RenderState();
+    }
+
+    private void OnAdvanceWeekPressed()
+    {
+        if (GameState.Instance == null)
+        {
+            return;
+        }
+
+        _statusLabel.Text = GameState.Instance.AdvanceOneCareerWeek()
+            ? "Advanced one career week; training, scouting, pressure, and news updated."
+            : "Career week could not advance without an active club.";
+        RenderState();
     }
 
     private void OnRecruitmentPressed()

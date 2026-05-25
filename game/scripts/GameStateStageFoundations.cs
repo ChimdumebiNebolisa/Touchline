@@ -14,7 +14,9 @@ public sealed class SaveSlotStageFoundationData
     public string TacticalFitNotes { get; set; } = string.Empty;
     public string TacticalRiskNotes { get; set; } = string.Empty;
     public string TrainingFocusName { get; set; } = "Team cohesion";
+    public string TrainingIntensityName { get; set; } = "Standard";
     public string TrainingStatusSummary { get; set; } = string.Empty;
+    public string ScoutingReportDepthName { get; set; } = "Standard report";
     public SaveSlotScoutingAssignmentData? ScoutingAssignment { get; set; }
     public SaveSlotNewsEventData[]? NewsEvents { get; set; }
     public SaveSlotRecruitmentTargetData? RecruitmentTarget { get; set; }
@@ -97,6 +99,8 @@ public partial class GameState
     public string TacticalFitNotes { get; private set; } = "Fit notes pending.";
     public string TacticalRiskNotes { get; private set; } = "Risk notes pending.";
     public TrainingFocus CurrentTrainingFocus { get; private set; } = TrainingFocus.TeamCohesion;
+    public TrainingIntensity CurrentTrainingIntensity { get; private set; } = TrainingIntensity.Standard;
+    public ScoutingReportDepth CurrentScoutingReportDepth { get; private set; } = ScoutingReportDepth.StandardReport;
     public string TrainingStatusSummary { get; private set; } = "Training foundation ready: team cohesion is the default weekly focus.";
     public ScoutingAssignment? CurrentScoutingAssignment { get; private set; }
     public RecruitmentTarget? CurrentRecruitmentTarget { get; private set; }
@@ -112,13 +116,15 @@ public partial class GameState
     public string TeamStyleName => StageFoundationText.GetDisplayName(TeamStyle);
     public string TacticalFamiliarityName => StageFoundationText.GetDisplayName(TacticsFoundation.FamiliarityFromScore(TacticalFamiliarityScore));
     public string TrainingFocusName => StageFoundationText.GetDisplayName(CurrentTrainingFocus);
+    public string TrainingIntensityName => StageFoundationText.GetDisplayName(CurrentTrainingIntensity);
+    public string ScoutingReportDepthName => StageFoundationText.GetDisplayName(CurrentScoutingReportDepth);
     public string JobSecurityName => StageFoundationText.GetDisplayName(JobSecurity);
     public string CareerHistorySummary => _careerHistory.Count == 0 ? "Career history starts when a club is selected." : string.Join("\n", _careerHistory);
     public string PromiseSummary => _promiseRecords.Count == 0 ? "No active promises." : BuildPromiseSummary();
     public string RecruitmentFoundationSummary => CurrentRecruitmentTarget == null
         ? "Recruitment foundation pending scouting target."
         : $"{CurrentRecruitmentTarget.PlayerName} ({CurrentRecruitmentTarget.Position}) | {CurrentRecruitmentTarget.InformationSummary} | {CurrentRecruitmentTarget.InterestSummary} | {CurrentRecruitmentTarget.TacticalFitSummary} | Fee {CurrentRecruitmentTarget.EstimatedFeeRange} | Wage {CurrentRecruitmentTarget.EstimatedWageRange} | {CurrentRecruitmentTarget.Status}";
-    public string TrainingScoutingSummary => $"{TrainingFocusName}: {TrainingStatusSummary}\nScouting: {BuildScoutingSummary()}";
+    public string TrainingScoutingSummary => $"{TrainingFocusName} ({TrainingIntensityName}): {TrainingStatusSummary}\nScouting depth: {ScoutingReportDepthName}\nScouting: {BuildScoutingSummary()}";
     public string CareerMarketSummary => $"Job security: {JobSecurityName} | Reputation {WorldReputation} | Fan trust {FanTrust} | Dressing-room pressure {DressingRoomPressure} | Transfer pressure {TransferPressure}\nLicense: {LicenseOpportunitySummary}\nJob market: {BuildJobOfferSummary()}";
     public string TacticsFoundationSummary => $"{TeamStyleName} | {TeamInstructionsSummary}\n{PlayerRolesSummary}\n{PlayerInstructionsSummary}\n{TacticalFitNotes}\n{TacticalRiskNotes}";
 
@@ -154,32 +160,56 @@ public partial class GameState
 
     public void SetTrainingFocusByName(string trainingFocusName)
     {
+        SetTrainingPlanByName(trainingFocusName, TrainingIntensityName);
+    }
+
+    public void SetTrainingPlanByName(string trainingFocusName, string trainingIntensityName)
+    {
         CurrentTrainingFocus = StageFoundationText.ParseTrainingFocus(trainingFocusName);
-        TrainingStatusSummary = $"Next weekly block set to {TrainingFocusName.ToLowerInvariant()}.";
+        CurrentTrainingIntensity = StageFoundationText.ParseTrainingIntensity(trainingIntensityName);
+        TrainingStatusSummary = $"Next weekly block set to {TrainingFocusName.ToLowerInvariant()} at {TrainingIntensityName.ToLowerInvariant()} intensity.";
         AddNews(
             "Training focus updated",
             NewsCategory.Training,
             "Confirmed",
-            $"{SelectedClubName} staff prepare a {TrainingFocusName.ToLowerInvariant()} training block.",
+            $"{SelectedClubName} staff prepare a {TrainingFocusName.ToLowerInvariant()} block at {TrainingIntensityName.ToLowerInvariant()} intensity.",
             3);
     }
 
     public void StartBasicScoutingAssignment(string target)
     {
+        StartScoutingAssignment(target, ScoutingReportDepthName);
+    }
+
+    public void StartScoutingAssignment(string target, string reportDepthName)
+    {
         var quality = Math.Clamp(GetStaffQuality(StaffRole.Scout) + GetStaffQuality(StaffRole.DataAnalyst) / 4, 35, 95);
+        CurrentScoutingReportDepth = StageFoundationText.ParseScoutingReportDepth(reportDepthName);
+        var delay = CurrentScoutingReportDepth switch
+        {
+            ScoutingReportDepth.QuickLook => 5,
+            ScoutingReportDepth.FullReport => 18,
+            _ => 10
+        };
+        var qualityModifier = CurrentScoutingReportDepth switch
+        {
+            ScoutingReportDepth.QuickLook => -10,
+            ScoutingReportDepth.FullReport => 10,
+            _ => 0
+        };
         CurrentScoutingAssignment = new ScoutingAssignment
         {
             Target = string.IsNullOrWhiteSpace(target) ? "Position need: versatile midfielder" : target,
-            DaysRemaining = 14,
-            ReportQuality = quality,
-            DiscoverySummary = "Initial view: exact current role unknown, attribute ranges pending.",
+            DaysRemaining = delay,
+            ReportQuality = Math.Clamp(quality + qualityModifier, 25, 98),
+            DiscoverySummary = $"Initial {ScoutingReportDepthName.ToLowerInvariant()}: exact current role unknown, attribute ranges pending, personality ?.",
             ReportReady = false
         };
         AddNews(
             "Scouting assignment opened",
             NewsCategory.Scouting,
             "Confirmed",
-            $"Recruitment staff started a report on {CurrentScoutingAssignment.Target}.",
+            $"Recruitment staff started a {ScoutingReportDepthName.ToLowerInvariant()} on {CurrentScoutingAssignment.Target}.",
             3);
     }
 
@@ -213,6 +243,24 @@ public partial class GameState
             "Staff report",
             $"{TrainingFocusName} affected player condition and tactical familiarity.",
             3);
+    }
+
+    public bool AdvanceOneCareerWeek()
+    {
+        if (string.IsNullOrWhiteSpace(SelectedClubName))
+        {
+            return false;
+        }
+
+        CurrentDate = CurrentDate.AddDays(7);
+        ApplyWeeklyFoundationProgress();
+        AddNews(
+            "Weekly advance",
+            NewsCategory.Club,
+            "Confirmed",
+            $"{SelectedClubName} advanced one week to {CurrentDateLabel}.",
+            2);
+        return true;
     }
 
     public string AttemptBasicRecruitmentAction()
@@ -332,7 +380,9 @@ public partial class GameState
             TacticalFitNotes = TacticalFitNotes,
             TacticalRiskNotes = TacticalRiskNotes,
             TrainingFocusName = TrainingFocusName,
+            TrainingIntensityName = TrainingIntensityName,
             TrainingStatusSummary = TrainingStatusSummary,
+            ScoutingReportDepthName = ScoutingReportDepthName,
             ScoutingAssignment = CurrentScoutingAssignment == null
                 ? null
                 : new SaveSlotScoutingAssignmentData
@@ -419,7 +469,9 @@ public partial class GameState
         TacticalFitNotes = string.IsNullOrWhiteSpace(data.TacticalFitNotes) ? "Fit notes restored from saved tactic state." : data.TacticalFitNotes;
         TacticalRiskNotes = string.IsNullOrWhiteSpace(data.TacticalRiskNotes) ? "Risk notes restored from saved tactic state." : data.TacticalRiskNotes;
         CurrentTrainingFocus = StageFoundationText.ParseTrainingFocus(data.TrainingFocusName);
+        CurrentTrainingIntensity = StageFoundationText.ParseTrainingIntensity(data.TrainingIntensityName);
         TrainingStatusSummary = string.IsNullOrWhiteSpace(data.TrainingStatusSummary) ? "Training state restored." : data.TrainingStatusSummary;
+        CurrentScoutingReportDepth = StageFoundationText.ParseScoutingReportDepth(data.ScoutingReportDepthName);
         CurrentScoutingAssignment = data.ScoutingAssignment == null
             ? null
             : new ScoutingAssignment
@@ -522,6 +574,8 @@ public partial class GameState
         TacticalFitNotes = "Fit notes pending.";
         TacticalRiskNotes = "Risk notes pending.";
         CurrentTrainingFocus = TrainingFocus.TeamCohesion;
+        CurrentTrainingIntensity = TrainingIntensity.Standard;
+        CurrentScoutingReportDepth = ScoutingReportDepth.StandardReport;
         TrainingStatusSummary = "Training foundation ready: team cohesion is the default weekly focus.";
         CurrentScoutingAssignment = null;
         CurrentRecruitmentTarget = null;
@@ -839,6 +893,92 @@ public partial class GameState
         return MatchPlaybackContractValidator.PassMessage;
     }
 
+    public string ValidatePhase2TrainingScoutingControlsContract()
+    {
+        InitializeStageFoundationsForClub();
+        SetTrainingPlanByName("Pressing", "Demanding");
+        StartScoutingAssignment("Specific player: pressing winger", "Full report");
+        var startingDate = CurrentDate;
+        var startingFamiliarity = TacticalFamiliarityScore;
+        var startingFatigue = SquadPlayers.Length == 0 ? 0 : SquadPlayers[0].Fatigue;
+        var startingFamiliarityWithPlayer = SquadPlayers.Length == 0 ? 0 : SquadPlayers[0].PlayerFamiliarity;
+
+        if (TrainingFocusName != "Pressing" ||
+            TrainingIntensityName != "Demanding" ||
+            ScoutingReportDepthName != "Full report" ||
+            CurrentScoutingAssignment == null ||
+            CurrentScoutingAssignment.DaysRemaining != 18)
+        {
+            return "Training/scouting controls did not store focus, intensity, report depth, or assignment delay.";
+        }
+
+        if (!AdvanceOneCareerDay())
+        {
+            return "Daily advancement failed from training/scouting controls.";
+        }
+
+        if (!AdvanceOneCareerWeek())
+        {
+            return "Weekly advancement failed from training/scouting controls.";
+        }
+
+        if (CurrentDate != startingDate.AddDays(8))
+        {
+            return "Daily plus weekly advancement did not update the date correctly.";
+        }
+
+        if (TacticalFamiliarityScore <= startingFamiliarity ||
+            SquadPlayers.Length == 0 ||
+            SquadPlayers[0].Fatigue <= startingFatigue ||
+            SquadPlayers[0].PlayerFamiliarity <= startingFamiliarityWithPlayer)
+        {
+            return "Demanding pressing training did not affect familiarity, fatigue, and player familiarity.";
+        }
+
+        if (CurrentScoutingAssignment == null ||
+            CurrentScoutingAssignment.DaysRemaining >= 18 ||
+            !CurrentScoutingAssignment.DiscoverySummary.Contains("confidence", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Scouting report depth did not progress with a confidence summary.";
+        }
+
+        if (!NewsFeedSummary.Contains("Training", StringComparison.OrdinalIgnoreCase) ||
+            !NewsFeedSummary.Contains("Scouting", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Training/scouting controls did not create visible news updates.";
+        }
+
+        if (SaveSystem.Instance == null)
+        {
+            return "Save system unavailable for training/scouting validation.";
+        }
+
+        var expectedFocus = TrainingFocusName;
+        var expectedIntensity = TrainingIntensityName;
+        var expectedDepth = ScoutingReportDepthName;
+        var expectedDaysRemaining = CurrentScoutingAssignment.DaysRemaining;
+        if (!SaveSystem.Instance.SaveGame(out var saveStatus))
+        {
+            return saveStatus;
+        }
+
+        if (!SaveSystem.Instance.LoadGame(out var loadStatus))
+        {
+            return loadStatus;
+        }
+
+        if (TrainingFocusName != expectedFocus ||
+            TrainingIntensityName != expectedIntensity ||
+            ScoutingReportDepthName != expectedDepth ||
+            CurrentScoutingAssignment == null ||
+            CurrentScoutingAssignment.DaysRemaining != expectedDaysRemaining)
+        {
+            return "Save/load did not preserve training intensity or scouting report depth state.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
     public string ValidateStage5MatchEngineAlignmentContract()
     {
         InitializeStageFoundationsForClub();
@@ -1085,42 +1225,52 @@ public partial class GameState
 
     private void ApplyTrainingEffects()
     {
-        var familiarityDelta = CurrentTrainingFocus switch
+        var baseFamiliarityDelta = CurrentTrainingFocus switch
         {
             TrainingFocus.Pressing or TrainingFocus.Possession or TrainingFocus.Counterattack or TrainingFocus.DefensiveShape or TrainingFocus.AttackingMovement => 4,
             TrainingFocus.TeamCohesion => 3,
             TrainingFocus.Recovery => 1,
             _ => 2
         };
+        var intensityFamiliarityDelta = CurrentTrainingIntensity switch
+        {
+            TrainingIntensity.Controlled => -1,
+            TrainingIntensity.Demanding => 2,
+            _ => 0
+        };
+        var familiarityDelta = Math.Max(0, baseFamiliarityDelta + intensityFamiliarityDelta);
         TacticalFamiliarityScore = Math.Clamp(TacticalFamiliarityScore + familiarityDelta, 0, 100);
 
         for (var index = 0; index < SquadPlayers.Length; index++)
         {
             var player = SquadPlayers[index];
-            var fitnessDelta = CurrentTrainingFocus switch
+            var baseFitnessDelta = CurrentTrainingFocus switch
             {
                 TrainingFocus.Fitness => 2,
                 TrainingFocus.Recovery => 6,
                 _ => -1
             };
-            var fatigueDelta = CurrentTrainingFocus switch
+            var baseFatigueDelta = CurrentTrainingFocus switch
             {
                 TrainingFocus.Fitness or TrainingFocus.Pressing => 5,
                 TrainingFocus.Recovery => -12,
                 _ => 2
             };
-            var moraleDelta = CurrentTrainingFocus == TrainingFocus.TeamCohesion ? 2 : 0;
-            var injuryDelta = fatigueDelta > 0 ? 1 : -2;
+            var fitnessDelta = baseFitnessDelta + (CurrentTrainingIntensity == TrainingIntensity.Controlled ? 2 : CurrentTrainingIntensity == TrainingIntensity.Demanding ? -2 : 0);
+            var fatigueDelta = baseFatigueDelta + (CurrentTrainingIntensity == TrainingIntensity.Controlled ? -4 : CurrentTrainingIntensity == TrainingIntensity.Demanding ? 6 : 0);
+            var moraleDelta = CurrentTrainingFocus == TrainingFocus.TeamCohesion ? 2 : CurrentTrainingIntensity == TrainingIntensity.Demanding ? -1 : 0;
+            var injuryDelta = fatigueDelta > 0 ? 1 + (CurrentTrainingIntensity == TrainingIntensity.Demanding ? 2 : 0) : -2;
             SquadPlayers[index] = player.With(
                 fitness: Math.Clamp(player.Fitness + fitnessDelta, 35, 99),
                 morale: Math.Clamp(player.Morale + moraleDelta, 0, 100),
                 fatigue: Math.Clamp(player.Fatigue + fatigueDelta, 0, 100),
                 injuryRisk: Math.Clamp(player.InjuryRisk + injuryDelta, 0, 100),
-                tacticalFitScore: Math.Clamp(player.TacticalFitScore + familiarityDelta / 2, 0, 100));
+                tacticalFitScore: Math.Clamp(player.TacticalFitScore + familiarityDelta / 2, 0, 100),
+                playerFamiliarity: Math.Clamp(player.PlayerFamiliarity + 2 + familiarityDelta / 2, 0, 100));
         }
 
         RefreshTacticFoundation(TacticalFormation, TeamStyle);
-        TrainingStatusSummary = $"{TrainingFocusName} changed tactical familiarity to {TacticalFamiliarityName} and updated squad condition.";
+        TrainingStatusSummary = $"{TrainingFocusName} at {TrainingIntensityName.ToLowerInvariant()} intensity changed tactical familiarity to {TacticalFamiliarityName}, updated condition, and raised staff familiarity with the squad.";
         SquadStatusSummary = BuildSquadStatusSummary();
     }
 

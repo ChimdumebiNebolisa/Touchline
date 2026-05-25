@@ -39,6 +39,20 @@ public enum TrainingFocus
     YouthIntegration
 }
 
+public enum TrainingIntensity
+{
+    Controlled,
+    Standard,
+    Demanding
+}
+
+public enum ScoutingReportDepth
+{
+    QuickLook,
+    StandardReport,
+    FullReport
+}
+
 public enum NewsCategory
 {
     Club,
@@ -210,6 +224,46 @@ public static class StageFoundationText
             TrainingFocus.Recovery => "Recovery",
             TrainingFocus.YouthIntegration => "Youth integration",
             _ => "Team cohesion"
+        };
+    }
+
+    public static string GetDisplayName(TrainingIntensity value)
+    {
+        return value switch
+        {
+            TrainingIntensity.Controlled => "Controlled",
+            TrainingIntensity.Demanding => "Demanding",
+            _ => "Standard"
+        };
+    }
+
+    public static TrainingIntensity ParseTrainingIntensity(string value)
+    {
+        return value switch
+        {
+            "Controlled" => TrainingIntensity.Controlled,
+            "Demanding" => TrainingIntensity.Demanding,
+            _ => TrainingIntensity.Standard
+        };
+    }
+
+    public static string GetDisplayName(ScoutingReportDepth value)
+    {
+        return value switch
+        {
+            ScoutingReportDepth.QuickLook => "Quick look",
+            ScoutingReportDepth.FullReport => "Full report",
+            _ => "Standard report"
+        };
+    }
+
+    public static ScoutingReportDepth ParseScoutingReportDepth(string value)
+    {
+        return value switch
+        {
+            "Quick look" => ScoutingReportDepth.QuickLook,
+            "Full report" => ScoutingReportDepth.FullReport,
+            _ => ScoutingReportDepth.StandardReport
         };
     }
 
