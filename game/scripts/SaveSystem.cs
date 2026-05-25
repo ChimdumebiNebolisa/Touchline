@@ -197,7 +197,7 @@ public partial class SaveSystem : Node
         WriteIndented = true,
         PropertyNameCaseInsensitive = true
     };
-    public const int CurrentSaveVersion = 16;
+    public const int CurrentSaveVersion = 17;
 
     public static SaveSystem? Instance { get; private set; }
     public string LastStatusMessage { get; private set; } = "Save system idle.";
@@ -1069,7 +1069,25 @@ public partial class SaveSystem : Node
             YouthProspects = source.YouthProspects == null ? null : Array.ConvertAll(source.YouthProspects, CloneYouthProspectData),
             YouthHistory = source.YouthHistory == null ? null : (string[])source.YouthHistory.Clone(),
             PlayerDevelopmentSummary = source.PlayerDevelopmentSummary,
-            PlayerDevelopmentHistory = source.PlayerDevelopmentHistory == null ? null : (string[])source.PlayerDevelopmentHistory.Clone()
+            PlayerDevelopmentHistory = source.PlayerDevelopmentHistory == null ? null : (string[])source.PlayerDevelopmentHistory.Clone(),
+            FinanceTransferBudgetRemaining = source.FinanceTransferBudgetRemaining,
+            FinanceWageBudget = source.FinanceWageBudget,
+            FinanceCurrentWageBill = source.FinanceCurrentWageBill,
+            FinanceTransferCommitments = source.FinanceTransferCommitments,
+            FinanceDebt = source.FinanceDebt,
+            FinanceRevenue = source.FinanceRevenue,
+            FinanceExpenses = source.FinanceExpenses,
+            FinanceProjectedBalance = source.FinanceProjectedBalance,
+            FinanceTicketIncome = source.FinanceTicketIncome,
+            FinanceCommercialIncome = source.FinanceCommercialIncome,
+            FinancePrizeMoney = source.FinancePrizeMoney,
+            FinanceBoardInjection = source.FinanceBoardInjection,
+            FinanceBudgetCut = source.FinanceBudgetCut,
+            WageStructurePressure = source.WageStructurePressure,
+            FinanceSummary = source.FinanceSummary,
+            ProfitExpectationSummary = source.ProfitExpectationSummary,
+            BoardFinanceActionSummary = source.BoardFinanceActionSummary,
+            FinanceHistory = source.FinanceHistory == null ? null : (string[])source.FinanceHistory.Clone()
         };
     }
 

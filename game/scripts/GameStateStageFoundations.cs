@@ -76,6 +76,24 @@ public sealed class SaveSlotStageFoundationData
     public string[]? YouthHistory { get; set; }
     public string PlayerDevelopmentSummary { get; set; } = string.Empty;
     public string[]? PlayerDevelopmentHistory { get; set; }
+    public int FinanceTransferBudgetRemaining { get; set; }
+    public int FinanceWageBudget { get; set; }
+    public int FinanceCurrentWageBill { get; set; }
+    public int FinanceTransferCommitments { get; set; }
+    public int FinanceDebt { get; set; }
+    public int FinanceRevenue { get; set; }
+    public int FinanceExpenses { get; set; }
+    public int FinanceProjectedBalance { get; set; }
+    public int FinanceTicketIncome { get; set; }
+    public int FinanceCommercialIncome { get; set; }
+    public int FinancePrizeMoney { get; set; }
+    public int FinanceBoardInjection { get; set; }
+    public int FinanceBudgetCut { get; set; }
+    public int WageStructurePressure { get; set; }
+    public string FinanceSummary { get; set; } = string.Empty;
+    public string ProfitExpectationSummary { get; set; } = string.Empty;
+    public string BoardFinanceActionSummary { get; set; } = string.Empty;
+    public string[]? FinanceHistory { get; set; }
 }
 
 public sealed class SaveSlotStaffMarketCandidateData
@@ -246,6 +264,7 @@ public partial class GameState
     private readonly List<YouthProspect> _youthProspects = new();
     private readonly List<string> _youthHistory = new();
     private readonly List<string> _playerDevelopmentHistory = new();
+    private readonly List<string> _financeHistory = new();
 
     private readonly record struct ContractResolution(
         ContractOffer Offer,
@@ -313,6 +332,23 @@ public partial class GameState
     public string YouthBoardExpectation { get; private set; } = "Youth board expectation pending.";
     public string YouthFanExpectation { get; private set; } = "Youth fan expectation pending.";
     public string PlayerDevelopmentSummary { get; private set; } = "Player development cadence pending.";
+    public int FinanceTransferBudgetRemaining { get; private set; }
+    public int FinanceWageBudget { get; private set; }
+    public int FinanceCurrentWageBill { get; private set; }
+    public int FinanceTransferCommitments { get; private set; }
+    public int FinanceDebt { get; private set; }
+    public int FinanceRevenue { get; private set; }
+    public int FinanceExpenses { get; private set; }
+    public int FinanceProjectedBalance { get; private set; }
+    public int FinanceTicketIncome { get; private set; }
+    public int FinanceCommercialIncome { get; private set; }
+    public int FinancePrizeMoney { get; private set; }
+    public int FinanceBoardInjection { get; private set; }
+    public int FinanceBudgetCut { get; private set; }
+    public int WageStructurePressure { get; private set; }
+    public string FinanceSummary { get; private set; } = "Finance foundation pending.";
+    public string ProfitExpectationSummary { get; private set; } = "Profit expectation pending.";
+    public string BoardFinanceActionSummary { get; private set; } = "Board finance action pending.";
 
     public string TeamStyleName => StageFoundationText.GetDisplayName(TeamStyle);
     public string TacticalFamiliarityName => StageFoundationText.GetDisplayName(TacticsFoundation.FamiliarityFromScore(TacticalFamiliarityScore));
@@ -336,11 +372,12 @@ public partial class GameState
     public string StaffImpactSummary => BuildStaffImpactSummary();
     public string YouthAcademySummary => BuildYouthAcademySummary();
     public string PlayerDevelopmentHistorySummary => _playerDevelopmentHistory.Count == 0 ? "Player development history starts after weekly training, match minutes, loan review, or season aging." : string.Join("\n", _playerDevelopmentHistory);
+    public string FinanceHistorySummary => _financeHistory.Count == 0 ? "Finance history starts after weekly revenue, transfer, contract, staff, board cut, or board injection events." : string.Join("\n", _financeHistory);
     public string RecruitmentFoundationSummary => CurrentRecruitmentTarget == null
         ? "Recruitment foundation pending scouting target."
         : $"{CurrentRecruitmentTarget.PlayerName} ({CurrentRecruitmentTarget.Position}) | {CurrentRecruitmentTarget.InformationSummary} | {CurrentRecruitmentTarget.InterestSummary} | {CurrentRecruitmentTarget.TacticalFitSummary} | Fee {CurrentRecruitmentTarget.EstimatedFeeRange} | Wage {CurrentRecruitmentTarget.EstimatedWageRange} | Status {CurrentRecruitmentTarget.TargetStatus} | Valuation {CurrentRecruitmentTarget.ClubValuation} | Agent {CurrentRecruitmentTarget.AgentMood} | Rival {CurrentRecruitmentTarget.RivalInterest} | Board {CurrentRecruitmentTarget.BoardStance} | Director {CurrentRecruitmentTarget.DirectorStance} | Outcome {CurrentRecruitmentTarget.OutcomeState} | {CurrentRecruitmentTarget.Status}\nDirector of Football\n{DirectorInfluenceSummary}\nShortlist\n{RecruitmentShortlistSummary}\nContracts\n{ContractFoundationSummary}\nTransfer history\n{TransferHistorySummary}";
     public string TrainingScoutingSummary => $"{TrainingFocusName} ({TrainingIntensityName}): {TrainingStatusSummary}\nScouting depth: {ScoutingReportDepthName}\nScouting: {BuildScoutingSummary()}\nDevelopment\n{PlayerDevelopmentSummary}\nDevelopment history\n{PlayerDevelopmentHistorySummary}\nStaff effects\n{StaffImpactSummary}";
-    public string CareerMarketSummary => $"Job security: {JobSecurityName}\n{TrustSummary}\n{ReputationSummary}\n{PressureCategorySummary}\nLicense: {LicenseOpportunitySummary}\nJob market: {BuildJobOfferSummary()}";
+    public string CareerMarketSummary => $"Job security: {JobSecurityName}\n{TrustSummary}\n{ReputationSummary}\n{PressureCategorySummary}\nFinance\n{FinanceSummary}\nFinance history\n{FinanceHistorySummary}\nLicense: {LicenseOpportunitySummary}\nJob market: {BuildJobOfferSummary()}";
     public string TacticsFoundationSummary => $"{TeamStyleName} | {TeamInstructionsSummary}\n{SetPieceSummary}\n{OpponentPreparationSummary}\n{PlayerRolesSummary}\n{PlayerInstructionsSummary}\n{TacticalRoleFitSummary}\n{PlayerFamiliaritySummary}\n{TacticalFitNotes}\n{TacticalRiskNotes}";
 
     public void UpdateTactics(string formation, string teamStyle, int pressIntensity, int tempo, int width, int risk)
@@ -454,6 +491,7 @@ public partial class GameState
         TickDecisionEventCooldowns(7);
         ApplyTrainingEffects();
         ApplyPlayerDevelopmentProgress();
+        ApplyWeeklyFinanceProgress();
         ApplyScoutingProgress(7);
         ReviewPromiseLifecycle("Weekly review", 7);
         EvaluateCareerFoundationState();
@@ -486,6 +524,7 @@ public partial class GameState
 
     public string AttemptBasicRecruitmentAction()
     {
+        EnsureFinanceState();
         EnsureRecruitmentTarget();
         if (CurrentRecruitmentTarget == null)
         {
@@ -541,15 +580,23 @@ public partial class GameState
         var trustSupport = CareerProfile.BoardTrust >= 62 || CareerProfile.DirectorTrust >= 62;
         var lowTrustBlock = CareerProfile.BoardTrust < 42 && !target.TacticalFitSummary.Contains("Strong", StringComparison.Ordinal);
         var marketScore = BuildRecruitmentMarketScore(target);
-        var approved = !lowTrustBlock && (marketScore >= 62 ||
+        var financeBlock = !CanFinanceRecruitmentTarget(target);
+        var approved = !financeBlock && !lowTrustBlock && (marketScore >= 62 ||
             trustSupport ||
             CurrentClub?.DirectorRelationshipState is DirectorRelationshipState.Ally or DirectorRelationshipState.Supportive);
         var status = approved
             ? "Board approval granted for a basic approach after fit, agent, rival, board, and Director review."
-            : "Board rejects the basic approach: fit, wage, agent mood, rival pressure, and Director confidence do not align.";
-        var outcomeState = approved ? "Approach approved" : "Blocked by review";
+            : financeBlock
+                ? "Board blocks the basic approach after agent, rival, Director, and finance review: transfer budget, wage budget, or wage structure cannot support the commitment."
+                : "Board rejects the basic approach: fit, wage, agent mood, rival pressure, and Director confidence do not align.";
+        var outcomeState = approved ? "Approach approved" : financeBlock ? "Blocked by finance" : "Blocked by review";
         CurrentRecruitmentTarget = CloneRecruitmentTarget(target, status, approved ? "Approved" : "Blocked", outcomeState);
         SyncCurrentRecruitmentTargetToShortlist();
+        if (approved)
+        {
+            ApplyRecruitmentFinanceImpact(target);
+        }
+
         if (approved && !target.IsLoanCandidate)
         {
             _promiseRecords.Add(new PromiseRecord
@@ -653,6 +700,8 @@ public partial class GameState
         RefreshPressureCategories();
         FinancialPressure = Math.Clamp(FinancialPressure + financialDelta, 0, 100);
         ApplyDirectorContractInfluence(CurrentTransferContractOffer, CurrentRenewalContractOffer);
+        ApplyContractFinanceImpact(CurrentTransferContractOffer);
+        ApplyContractFinanceImpact(CurrentRenewalContractOffer);
         RecordContractHistory($"{CurrentTransferContractOffer.PlayerName}: {CurrentTransferContractOffer.Status}; {CurrentTransferContractOffer.OutcomeSummary}");
         RecordContractHistory($"{CurrentRenewalContractOffer.PlayerName}: {CurrentRenewalContractOffer.Status}; {CurrentRenewalContractOffer.OutcomeSummary}");
         AddContractPromiseIfAccepted(CurrentTransferContractOffer);
@@ -722,6 +771,7 @@ public partial class GameState
         }
 
         HireStaffCandidate(candidate);
+        ApplyStaffFinanceImpact(candidate);
         CurrentStaffMarketCandidate = CloneStaffMarketCandidate(candidate, "Hired", $"Board approved staff hire with score {approvalScore}/100; staff reports and quality updated.");
         CareerProfile.StaffTrust = Math.Clamp(CareerProfile.StaffTrust + 2, 0, 100);
         FinancialPressure = Math.Clamp(FinancialPressure + 2, 0, 100);
@@ -916,7 +966,25 @@ public partial class GameState
             YouthProspects = Array.ConvertAll(_youthProspects.ToArray(), BuildYouthProspectSaveData),
             YouthHistory = _youthHistory.ToArray(),
             PlayerDevelopmentSummary = PlayerDevelopmentSummary,
-            PlayerDevelopmentHistory = _playerDevelopmentHistory.ToArray()
+            PlayerDevelopmentHistory = _playerDevelopmentHistory.ToArray(),
+            FinanceTransferBudgetRemaining = FinanceTransferBudgetRemaining,
+            FinanceWageBudget = FinanceWageBudget,
+            FinanceCurrentWageBill = FinanceCurrentWageBill,
+            FinanceTransferCommitments = FinanceTransferCommitments,
+            FinanceDebt = FinanceDebt,
+            FinanceRevenue = FinanceRevenue,
+            FinanceExpenses = FinanceExpenses,
+            FinanceProjectedBalance = FinanceProjectedBalance,
+            FinanceTicketIncome = FinanceTicketIncome,
+            FinanceCommercialIncome = FinanceCommercialIncome,
+            FinancePrizeMoney = FinancePrizeMoney,
+            FinanceBoardInjection = FinanceBoardInjection,
+            FinanceBudgetCut = FinanceBudgetCut,
+            WageStructurePressure = WageStructurePressure,
+            FinanceSummary = FinanceSummary,
+            ProfitExpectationSummary = ProfitExpectationSummary,
+            BoardFinanceActionSummary = BoardFinanceActionSummary,
+            FinanceHistory = _financeHistory.ToArray()
         };
     }
 
@@ -1140,6 +1208,30 @@ public partial class GameState
             _playerDevelopmentHistory.AddRange(data.PlayerDevelopmentHistory);
         }
 
+        FinanceTransferBudgetRemaining = data.FinanceTransferBudgetRemaining;
+        FinanceWageBudget = data.FinanceWageBudget;
+        FinanceCurrentWageBill = data.FinanceCurrentWageBill;
+        FinanceTransferCommitments = data.FinanceTransferCommitments;
+        FinanceDebt = data.FinanceDebt;
+        FinanceRevenue = data.FinanceRevenue;
+        FinanceExpenses = data.FinanceExpenses;
+        FinanceProjectedBalance = data.FinanceProjectedBalance;
+        FinanceTicketIncome = data.FinanceTicketIncome;
+        FinanceCommercialIncome = data.FinanceCommercialIncome;
+        FinancePrizeMoney = data.FinancePrizeMoney;
+        FinanceBoardInjection = data.FinanceBoardInjection;
+        FinanceBudgetCut = data.FinanceBudgetCut;
+        WageStructurePressure = data.WageStructurePressure;
+        FinanceSummary = string.IsNullOrWhiteSpace(data.FinanceSummary) ? "Finance foundation restored; current figures pending refresh." : data.FinanceSummary;
+        ProfitExpectationSummary = string.IsNullOrWhiteSpace(data.ProfitExpectationSummary) ? "Profit expectation restored from club profile." : data.ProfitExpectationSummary;
+        BoardFinanceActionSummary = string.IsNullOrWhiteSpace(data.BoardFinanceActionSummary) ? "Board finance action restored with no current intervention." : data.BoardFinanceActionSummary;
+        _financeHistory.Clear();
+        if (data.FinanceHistory != null)
+        {
+            _financeHistory.AddRange(data.FinanceHistory);
+        }
+
+        EnsureFinanceState();
         EnsureRecruitmentTarget();
         EnsureJobMarketFoundation();
         RefreshPressureCategories();
@@ -1206,6 +1298,23 @@ public partial class GameState
         YouthBoardExpectation = "Youth board expectation pending.";
         YouthFanExpectation = "Youth fan expectation pending.";
         PlayerDevelopmentSummary = "Player development cadence pending.";
+        FinanceTransferBudgetRemaining = 0;
+        FinanceWageBudget = 0;
+        FinanceCurrentWageBill = 0;
+        FinanceTransferCommitments = 0;
+        FinanceDebt = 0;
+        FinanceRevenue = 0;
+        FinanceExpenses = 0;
+        FinanceProjectedBalance = 0;
+        FinanceTicketIncome = 0;
+        FinanceCommercialIncome = 0;
+        FinancePrizeMoney = 0;
+        FinanceBoardInjection = 0;
+        FinanceBudgetCut = 0;
+        WageStructurePressure = 0;
+        FinanceSummary = "Finance foundation pending.";
+        ProfitExpectationSummary = "Profit expectation pending.";
+        BoardFinanceActionSummary = "Board finance action pending.";
         _foundationNewsEvents.Clear();
         _activeDecisionEvents.Clear();
         _resolvedDecisionEvents.Clear();
@@ -1220,6 +1329,7 @@ public partial class GameState
         _youthProspects.Clear();
         _youthHistory.Clear();
         _playerDevelopmentHistory.Clear();
+        _financeHistory.Clear();
     }
 
     public void InitializeStageFoundationsForClub()
@@ -1239,6 +1349,7 @@ public partial class GameState
         EnsureStaffImpactState();
         EnsureYouthAcademyState();
         EnsurePlayerDevelopmentState();
+        EnsureFinanceState();
         if (CurrentScoutingAssignment == null)
         {
             StartBasicScoutingAssignment("Position need: versatile midfielder");
@@ -2792,6 +2903,116 @@ public partial class GameState
         return MatchPlaybackContractValidator.PassMessage;
     }
 
+    public string ValidatePhase15FinanceContract()
+    {
+        InitializeStageFoundationsForClub();
+        EnsureFinanceState();
+        if (!FinanceSummary.Contains("Transfer budget remaining", StringComparison.Ordinal) ||
+            !FinanceSummary.Contains("wage bill", StringComparison.OrdinalIgnoreCase) ||
+            !FinanceSummary.Contains("debt", StringComparison.OrdinalIgnoreCase) ||
+            !FinanceSummary.Contains("ticket income", StringComparison.OrdinalIgnoreCase) ||
+            !FinanceSummary.Contains("commercial growth", StringComparison.OrdinalIgnoreCase) ||
+            !FinanceSummary.Contains("profit expectation", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Finance summary does not expose budget, wages, debt, revenue, and profit expectations.";
+        }
+
+        var beforeRevenue = FinanceRevenue;
+        var beforeHistory = _financeHistory.Count;
+        ApplyWeeklyFinanceProgress();
+        if (FinanceRevenue <= beforeRevenue ||
+            _financeHistory.Count <= beforeHistory ||
+            !FinanceHistorySummary.Contains("Weekly finance", StringComparison.Ordinal))
+        {
+            return "Weekly finance progress did not add revenue and history.";
+        }
+
+        EnsureRecruitmentTarget();
+        if (CurrentRecruitmentTarget == null)
+        {
+            return "Finance validation could not create a recruitment target.";
+        }
+
+        var stressTarget = CloneRecruitmentTarget(CurrentRecruitmentTarget, CurrentRecruitmentTarget.Status, CurrentRecruitmentTarget.TargetStatus, CurrentRecruitmentTarget.OutcomeState);
+        stressTarget = CloneRecruitmentTargetWithFinanceStress(stressTarget);
+        if (CanFinanceRecruitmentTarget(stressTarget))
+        {
+            return "Finance approval did not reject an excessive transfer/wage stress target.";
+        }
+
+        var beforeTransferBudget = FinanceTransferBudgetRemaining;
+        if (CanFinanceRecruitmentTarget(CurrentRecruitmentTarget))
+        {
+            ApplyRecruitmentFinanceImpact(CurrentRecruitmentTarget);
+            if (!CurrentRecruitmentTarget.IsLoanCandidate && FinanceTransferBudgetRemaining >= beforeTransferBudget)
+            {
+                return "Recruitment finance impact did not reserve transfer budget.";
+            }
+        }
+
+        EnsureContractOffers();
+        if (CurrentTransferContractOffer == null)
+        {
+            return "Finance validation could not create a contract offer.";
+        }
+
+        var highWageOffer = CloneContractOfferWithWage(
+            CurrentTransferContractOffer,
+            FinanceWageBudget * 2,
+            $"{FormatFinanceMoney(FinanceWageBudget * 2)} proposed as wage budget stress test.");
+        if (BuildFinanceContractPenalty(highWageOffer) <= 0)
+        {
+            return "Finance contract penalty did not detect wage-budget stress.";
+        }
+
+        var beforeWagePressure = WageStructurePressure;
+        CurrentTransferContractOffer = CloneContractOffer(CurrentTransferContractOffer, "Accepted", "Validation accepted finance-linked terms.", "Accepted", isAccepted: true);
+        ApplyContractFinanceImpact(CurrentTransferContractOffer);
+        if (WageStructurePressure < beforeWagePressure ||
+            !FinanceHistorySummary.Contains("accepted", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Accepted contract did not affect wage structure pressure or finance history.";
+        }
+
+        EnsureStaffImpactState();
+        if (CurrentStaffMarketCandidate == null)
+        {
+            return "Finance validation could not create a staff market candidate.";
+        }
+
+        var beforeExpenses = FinanceExpenses;
+        ApplyStaffFinanceImpact(CurrentStaffMarketCandidate);
+        if (FinanceExpenses <= beforeExpenses ||
+            !FinanceHistorySummary.Contains("staff hire", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Staff finance impact did not affect expenses and finance history.";
+        }
+
+        if (!CareerMarketSummary.Contains("Finance", StringComparison.Ordinal) ||
+            FinancialPressure < 0 ||
+            WageStructurePressure < 0)
+        {
+            return "Finance state is not surfaced or pressure state is invalid.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
+    public string ValidatePhase15StoredFinanceContract()
+    {
+        EnsureFinanceState();
+        if (string.IsNullOrWhiteSpace(FinanceSummary) ||
+            _financeHistory.Count == 0 ||
+            FinanceWageBudget <= 0 ||
+            FinanceCurrentWageBill <= 0 ||
+            !CareerMarketSummary.Contains("Finance history", StringComparison.Ordinal))
+        {
+            return "Saved finance state did not restore.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
     public string ValidatePhase3PromiseLifecycleContract()
     {
         InitializeStageFoundationsForClub();
@@ -4104,6 +4325,7 @@ public partial class GameState
             score += 6;
         }
 
+        score -= BuildFinanceContractPenalty(offer);
         return Math.Clamp(score, 0, 100);
     }
 
@@ -5035,6 +5257,235 @@ public partial class GameState
         }
     }
 
+    private void EnsureFinanceState()
+    {
+        FinanceWageBudget = FinanceWageBudget <= 0 ? CurrentClub?.WageBudget ?? 1 : FinanceWageBudget;
+        FinanceTransferBudgetRemaining = FinanceTransferBudgetRemaining <= 0 ? CurrentClub?.TransferBudget ?? 0 : FinanceTransferBudgetRemaining;
+        FinanceDebt = FinanceDebt <= 0 ? BuildStartingDebt() : FinanceDebt;
+        FinanceCurrentWageBill = CalculateCurrentWageBill();
+        ProfitExpectationSummary = string.IsNullOrWhiteSpace(ProfitExpectationSummary) || ProfitExpectationSummary.Contains("pending", StringComparison.OrdinalIgnoreCase)
+            ? BuildProfitExpectationSummary()
+            : ProfitExpectationSummary;
+        BoardFinanceActionSummary = string.IsNullOrWhiteSpace(BoardFinanceActionSummary) || BoardFinanceActionSummary.Contains("pending", StringComparison.OrdinalIgnoreCase)
+            ? "Board finance action: no intervention; budget discipline monitored."
+            : BoardFinanceActionSummary;
+        RefreshFinanceProjection();
+    }
+
+    private void ApplyWeeklyFinanceProgress()
+    {
+        EnsureFinanceState();
+        var ticketIncome = 60000 + FanMorale * 1200 + Math.Max(0, 10 - GetClubTablePosition(SelectedClubName ?? string.Empty)) * 2500;
+        var commercialIncome = 35000 + ClubReputation * 1100 + (CurrentClub?.BoardPhilosophy == BoardPhilosophy.CommercialGrowthBoard ? 20000 : 0);
+        FinanceTicketIncome += ticketIncome;
+        FinanceCommercialIncome += commercialIncome;
+        FinanceRevenue += ticketIncome + commercialIncome;
+        FinanceExpenses += FinanceCurrentWageBill;
+        RefreshFinanceProjection();
+
+        if (FinanceProjectedBalance < 0)
+        {
+            var cut = Math.Min(Math.Abs(FinanceProjectedBalance) / 5, Math.Max(0, FinanceTransferBudgetRemaining / 5));
+            FinanceBudgetCut += cut;
+            FinanceTransferBudgetRemaining = Math.Max(0, FinanceTransferBudgetRemaining - cut);
+            FinancialPressure = Math.Clamp(FinancialPressure + 3, 0, 100);
+            BoardFinanceActionSummary = $"Board finance action: budget cut risk triggered; projected balance {FormatFinanceMoney(FinanceProjectedBalance)}, cut watch {FormatFinanceMoney(FinanceBudgetCut)}.";
+        }
+        else if (CareerProfile.BoardTrust >= 70 && FinanceProjectedBalance > 2500000 && CurrentClub?.BoardPhilosophy != BoardPhilosophy.FinanciallyStrictBoard)
+        {
+            var injection = Math.Min(250000, FinanceProjectedBalance / 20);
+            FinanceBoardInjection += injection;
+            FinanceTransferBudgetRemaining += injection;
+            BoardFinanceActionSummary = $"Board finance action: modest injection {FormatFinanceMoney(injection)} after trust and projected balance review.";
+        }
+
+        RefreshFinanceProjection();
+        RecordFinanceHistory($"Weekly finance: ticket {FormatFinanceMoney(ticketIncome)}, commercial {FormatFinanceMoney(commercialIncome)}, wage cost {FormatFinanceMoney(FinanceCurrentWageBill)}, projected {FormatFinanceMoney(FinanceProjectedBalance)}.");
+    }
+
+    private void ApplyRecruitmentFinanceImpact(RecruitmentTarget target)
+    {
+        EnsureFinanceState();
+        if (target.IsLoanCandidate)
+        {
+            RecordFinanceHistory($"{target.PlayerName}: loan path reviewed; fee/wage impact remains conditional.");
+            return;
+        }
+
+        var fee = EstimateMoneyFromRange(target.EstimatedFeeRange, 0);
+        var wage = EstimateMoneyFromRange(target.EstimatedWageRange, 0);
+        FinanceTransferBudgetRemaining = Math.Max(0, FinanceTransferBudgetRemaining - fee);
+        FinanceTransferCommitments += fee;
+        FinanceExpenses += fee;
+        FinanceCurrentWageBill += wage;
+        RefreshFinanceProjection();
+        RecordFinanceHistory($"{target.PlayerName}: transfer approach reserved {FormatFinanceMoney(fee)} fee and {FormatFinanceMoney(wage)}/w wage; remaining transfer budget {FormatFinanceMoney(FinanceTransferBudgetRemaining)}.");
+    }
+
+    private bool CanFinanceRecruitmentTarget(RecruitmentTarget target)
+    {
+        EnsureFinanceState();
+        if (target.IsLoanCandidate && target.LoanDirection == "Outgoing loan")
+        {
+            return true;
+        }
+
+        var fee = EstimateMoneyFromRange(target.EstimatedFeeRange, 0);
+        var wage = EstimateMoneyFromRange(target.EstimatedWageRange, 0);
+        return fee <= FinanceTransferBudgetRemaining &&
+            FinanceCurrentWageBill + wage <= FinanceWageBudget * 11 / 10;
+    }
+
+    private void ApplyContractFinanceImpact(ContractOffer offer)
+    {
+        if (!offer.IsAccepted)
+        {
+            return;
+        }
+
+        EnsureFinanceState();
+        var wageImpact = offer.IsRenewal
+            ? Math.Max(0, offer.ProposedWage - GetHighestSquadWage() / 2)
+            : offer.ProposedWage;
+        FinanceCurrentWageBill += wageImpact;
+        FinanceExpenses += wageImpact * 4;
+        RefreshFinanceProjection();
+        RecordFinanceHistory($"{offer.PlayerName}: accepted {offer.SourceType.ToLowerInvariant()} added {FormatFinanceMoney(wageImpact)}/w wage pressure; wage structure pressure {WageStructurePressure}/100.");
+    }
+
+    private void ApplyStaffFinanceImpact(StaffMarketCandidate candidate)
+    {
+        EnsureFinanceState();
+        FinanceCurrentWageBill += candidate.Wage;
+        FinanceExpenses += candidate.Wage * 4;
+        RefreshFinanceProjection();
+        RecordFinanceHistory($"{candidate.Name}: staff hire added {FormatFinanceMoney(candidate.Wage)}/w; projected balance {FormatFinanceMoney(FinanceProjectedBalance)}.");
+    }
+
+    private int BuildFinanceContractPenalty(ContractOffer offer)
+    {
+        EnsureFinanceState();
+        var penalty = 0;
+        if (FinanceCurrentWageBill + offer.ProposedWage > FinanceWageBudget)
+        {
+            penalty += 12;
+        }
+
+        if (offer.ProposedWage > GetHighestSquadWage() * 13 / 10)
+        {
+            penalty += 8;
+        }
+
+        if (CurrentClub?.BoardPhilosophy == BoardPhilosophy.FinanciallyStrictBoard && WageStructurePressure >= 55)
+        {
+            penalty += 8;
+        }
+
+        return penalty;
+    }
+
+    private int BuildStartingDebt()
+    {
+        return CurrentClub?.Archetype switch
+        {
+            ClubArchetype.FinanciallyRestrictedClub => 1800000,
+            ClubArchetype.FallenGiant => 900000,
+            _ => CurrentClub?.BoardPhilosophy == BoardPhilosophy.FinanciallyStrictBoard ? 600000 : 0
+        };
+    }
+
+    private string BuildProfitExpectationSummary()
+    {
+        return CurrentClub?.BoardPhilosophy switch
+        {
+            BoardPhilosophy.FinanciallyStrictBoard => "Profit expectation: protect wage structure, avoid deficit, and justify every transfer commitment.",
+            BoardPhilosophy.CommercialGrowthBoard => "Profit expectation: grow commercial income while keeping wage pressure visible.",
+            BoardPhilosophy.YouthDevelopmentBoard => "Profit expectation: academy pathway and wage discipline should reduce transfer dependence.",
+            _ => "Profit expectation: stay within transfer and wage budget while results support revenue."
+        };
+    }
+
+    private void RefreshFinanceProjection()
+    {
+        FinanceCurrentWageBill = Math.Max(FinanceCurrentWageBill, CalculateCurrentWageBill());
+        WageStructurePressure = Math.Clamp((FinanceCurrentWageBill * 100 / Math.Max(1, FinanceWageBudget)) - 80 + Math.Max(0, FinancialPressure - 40) / 2, 0, 100);
+        FinanceProjectedBalance = FinanceTransferBudgetRemaining + FinanceRevenue + FinanceBoardInjection + FinancePrizeMoney - FinanceExpenses - FinanceTransferCommitments - FinanceDebt / 10 - FinanceBudgetCut;
+        FinanceSummary = $"Transfer budget remaining {FormatFinanceMoney(FinanceTransferBudgetRemaining)} | wage bill {FormatFinanceMoney(FinanceCurrentWageBill)}/w of {FormatFinanceMoney(FinanceWageBudget)}/w | debt {FormatFinanceMoney(FinanceDebt)} | revenue {FormatFinanceMoney(FinanceRevenue)} | expenses {FormatFinanceMoney(FinanceExpenses)} | ticket income {FormatFinanceMoney(FinanceTicketIncome)} | commercial growth {FormatFinanceMoney(FinanceCommercialIncome)} | prize money {FormatFinanceMoney(FinancePrizeMoney)} | projected balance {FormatFinanceMoney(FinanceProjectedBalance)} | wage structure pressure {WageStructurePressure}/100 | {ProfitExpectationSummary} | {BoardFinanceActionSummary}";
+    }
+
+    private int CalculateCurrentWageBill()
+    {
+        var total = 0;
+        foreach (var player in SquadPlayers)
+        {
+            total += player.Wage;
+        }
+
+        foreach (var staff in CurrentClub?.Staff ?? Array.Empty<StaffMember>())
+        {
+            total += staff.Wage;
+        }
+
+        return total;
+    }
+
+    private static int EstimateMoneyFromRange(string summary, int fallback)
+    {
+        var values = new List<int>();
+        for (var index = 0; index < summary.Length; index++)
+        {
+            if (summary[index] != '$')
+            {
+                continue;
+            }
+
+            var end = index + 1;
+            while (end < summary.Length && (char.IsDigit(summary[end]) || summary[end] == '.'))
+            {
+                end++;
+            }
+
+            if (end == index + 1 || !decimal.TryParse(summary[(index + 1)..end], out var number))
+            {
+                continue;
+            }
+
+            var multiplier = end < summary.Length && summary[end] == 'm' ? 1000000 : 1000;
+            values.Add((int)(number * multiplier));
+        }
+
+        if (values.Count == 0)
+        {
+            return fallback;
+        }
+
+        var total = 0;
+        foreach (var value in values)
+        {
+            total += value;
+        }
+
+        return total / values.Count;
+    }
+
+    private static string FormatFinanceMoney(int amount)
+    {
+        var sign = amount < 0 ? "-" : string.Empty;
+        var value = Math.Abs(amount);
+        return value >= 1000000
+            ? $"{sign}${value / 1000000.0:0.0}m"
+            : $"{sign}${value / 1000}k";
+    }
+
+    private void RecordFinanceHistory(string detail)
+    {
+        _financeHistory.Insert(0, $"{CurrentDateLabel}: {detail}");
+        if (_financeHistory.Count > 16)
+        {
+            _financeHistory.RemoveAt(_financeHistory.Count - 1);
+        }
+    }
+
     private void GenerateContextDecisionEvent(string trigger)
     {
         var eventType = ResolveContextDecisionEventType();
@@ -5823,6 +6274,36 @@ public partial class GameState
             LoanClubFit = target.LoanClubFit,
             LoanReviewSummary = target.LoanReviewSummary,
             Status = status
+        };
+    }
+
+    private static RecruitmentTarget CloneRecruitmentTargetWithFinanceStress(RecruitmentTarget target)
+    {
+        return new RecruitmentTarget
+        {
+            PlayerName = target.PlayerName,
+            Position = target.Position,
+            InformationSummary = target.InformationSummary,
+            InterestSummary = target.InterestSummary,
+            TacticalFitSummary = target.TacticalFitSummary,
+            EstimatedFeeRange = "$999.0m-$1000.0m",
+            EstimatedWageRange = "$999k-$1000k",
+            DirectorResponse = target.DirectorResponse,
+            BoardResponse = target.BoardResponse,
+            TargetStatus = target.TargetStatus,
+            ClubValuation = "Finance stress case: selling club valuation exceeds club budget.",
+            AgentMood = "Agent stress case: wage demand breaks wage structure.",
+            RivalInterest = target.RivalInterest,
+            BoardStance = "Board blocks because finance stress exceeds budget and wage structure.",
+            DirectorStance = target.DirectorStance,
+            OutcomeState = "Blocked by finance",
+            IsLoanCandidate = false,
+            LoanDirection = string.Empty,
+            DevelopmentLoanSuitability = "Not assessed: finance stress case.",
+            PlayingTimeExpectation = target.PlayingTimeExpectation,
+            LoanClubFit = "Not a loan pathway.",
+            LoanReviewSummary = "No loan review opened.",
+            Status = "Finance stress case."
         };
     }
 
