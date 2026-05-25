@@ -54,6 +54,13 @@ public sealed class SaveSlotStageFoundationData
     public int TransferPressure { get; set; } = 25;
     public int FinancialPressure { get; set; } = 25;
     public string[]? PerceptionHistory { get; set; }
+    public int DirectorCooperation { get; set; } = 55;
+    public int DirectorConflict { get; set; } = 25;
+    public string DirectorScoutingPriority { get; set; } = string.Empty;
+    public string DirectorTransferPreference { get; set; } = string.Empty;
+    public string DirectorSalesPressureSummary { get; set; } = string.Empty;
+    public string DirectorBoardReportSummary { get; set; } = string.Empty;
+    public string[]? DirectorActionHistory { get; set; }
 }
 public sealed class SaveSlotScoutingAssignmentData
 {
@@ -183,6 +190,7 @@ public partial class GameState
     private readonly List<string> _perceptionHistory = new();
     private readonly List<string> _transferHistory = new();
     private readonly List<string> _contractHistory = new();
+    private readonly List<string> _directorActionHistory = new();
 
     private readonly record struct ContractResolution(
         ContractOffer Offer,
@@ -233,6 +241,12 @@ public partial class GameState
     public int DressingRoomPressure { get; private set; } = 35;
     public int TransferPressure { get; private set; } = 25;
     public int FinancialPressure { get; private set; } = 25;
+    public int DirectorCooperation { get; private set; } = 55;
+    public int DirectorConflict { get; private set; } = 25;
+    public string DirectorScoutingPriority { get; private set; } = "Director scouting priority pending.";
+    public string DirectorTransferPreference { get; private set; } = "Director transfer preference pending.";
+    public string DirectorSalesPressureSummary { get; private set; } = "Director sales pressure pending.";
+    public string DirectorBoardReportSummary { get; private set; } = "Director board report pending.";
 
     public string TeamStyleName => StageFoundationText.GetDisplayName(TeamStyle);
     public string TacticalFamiliarityName => StageFoundationText.GetDisplayName(TacticsFoundation.FamiliarityFromScore(TacticalFamiliarityScore));
@@ -252,9 +266,10 @@ public partial class GameState
     public string RecruitmentShortlistSummary => BuildRecruitmentShortlistSummary();
     public string TransferHistorySummary => _transferHistory.Count == 0 ? "Transfer history starts when a recommendation, request, approach, or loan review is recorded." : string.Join("\n", _transferHistory);
     public string ContractFoundationSummary => BuildContractFoundationSummary();
+    public string DirectorInfluenceSummary => BuildDirectorInfluenceSummary();
     public string RecruitmentFoundationSummary => CurrentRecruitmentTarget == null
         ? "Recruitment foundation pending scouting target."
-        : $"{CurrentRecruitmentTarget.PlayerName} ({CurrentRecruitmentTarget.Position}) | {CurrentRecruitmentTarget.InformationSummary} | {CurrentRecruitmentTarget.InterestSummary} | {CurrentRecruitmentTarget.TacticalFitSummary} | Fee {CurrentRecruitmentTarget.EstimatedFeeRange} | Wage {CurrentRecruitmentTarget.EstimatedWageRange} | Status {CurrentRecruitmentTarget.TargetStatus} | Valuation {CurrentRecruitmentTarget.ClubValuation} | Agent {CurrentRecruitmentTarget.AgentMood} | Rival {CurrentRecruitmentTarget.RivalInterest} | Board {CurrentRecruitmentTarget.BoardStance} | Director {CurrentRecruitmentTarget.DirectorStance} | Outcome {CurrentRecruitmentTarget.OutcomeState} | {CurrentRecruitmentTarget.Status}\nShortlist\n{RecruitmentShortlistSummary}\nContracts\n{ContractFoundationSummary}\nTransfer history\n{TransferHistorySummary}";
+        : $"{CurrentRecruitmentTarget.PlayerName} ({CurrentRecruitmentTarget.Position}) | {CurrentRecruitmentTarget.InformationSummary} | {CurrentRecruitmentTarget.InterestSummary} | {CurrentRecruitmentTarget.TacticalFitSummary} | Fee {CurrentRecruitmentTarget.EstimatedFeeRange} | Wage {CurrentRecruitmentTarget.EstimatedWageRange} | Status {CurrentRecruitmentTarget.TargetStatus} | Valuation {CurrentRecruitmentTarget.ClubValuation} | Agent {CurrentRecruitmentTarget.AgentMood} | Rival {CurrentRecruitmentTarget.RivalInterest} | Board {CurrentRecruitmentTarget.BoardStance} | Director {CurrentRecruitmentTarget.DirectorStance} | Outcome {CurrentRecruitmentTarget.OutcomeState} | {CurrentRecruitmentTarget.Status}\nDirector of Football\n{DirectorInfluenceSummary}\nShortlist\n{RecruitmentShortlistSummary}\nContracts\n{ContractFoundationSummary}\nTransfer history\n{TransferHistorySummary}";
     public string TrainingScoutingSummary => $"{TrainingFocusName} ({TrainingIntensityName}): {TrainingStatusSummary}\nScouting depth: {ScoutingReportDepthName}\nScouting: {BuildScoutingSummary()}";
     public string CareerMarketSummary => $"Job security: {JobSecurityName}\n{TrustSummary}\n{ReputationSummary}\n{PressureCategorySummary}\nLicense: {LicenseOpportunitySummary}\nJob market: {BuildJobOfferSummary()}";
     public string TacticsFoundationSummary => $"{TeamStyleName} | {TeamInstructionsSummary}\n{SetPieceSummary}\n{OpponentPreparationSummary}\n{PlayerRolesSummary}\n{PlayerInstructionsSummary}\n{TacticalRoleFitSummary}\n{PlayerFamiliaritySummary}\n{TacticalFitNotes}\n{TacticalRiskNotes}";
@@ -418,6 +433,7 @@ public partial class GameState
             SyncCurrentRecruitmentTargetToShortlist();
             TransferPressure = Math.Clamp(TransferPressure + 1, 0, 100);
             RefreshPressureCategories();
+            ApplyDirectorRecruitmentInfluence(target, false, "Assistant recommendation");
             RecordTransferHistory($"{target.PlayerName}: Assistant Manager recommendation filed; board and Director approval still required.");
             RecordPerceptionHistory("Recruitment recommendation", $"role authority limited action; transfer pressure {TransferPressure}, recruitment reputation {RecruitmentReputation}");
             AddNews(
@@ -439,6 +455,7 @@ public partial class GameState
             SyncCurrentRecruitmentTargetToShortlist();
             TransferPressure = Math.Clamp(TransferPressure + 2, 0, 100);
             RefreshPressureCategories();
+            ApplyDirectorRecruitmentInfluence(target, false, "Head Coach request");
             RecordTransferHistory($"{target.PlayerName}: Head Coach request submitted; Director stance {target.DirectorStance}; board stance {target.BoardStance}.");
             RecordPerceptionHistory("Recruitment request", $"Head Coach authority created review pressure; transfer pressure {TransferPressure}, board trust {CareerProfile.BoardTrust}");
             AddNews(
@@ -483,6 +500,7 @@ public partial class GameState
         TransferPressure = Math.Clamp(TransferPressure + (approved ? 4 : 7), 0, 100);
         RecruitmentReputation = Math.Clamp(RecruitmentReputation + (approved ? 1 : -1), 0, 100);
         RefreshPressureCategories();
+        ApplyDirectorRecruitmentInfluence(target, approved, "Manager approach");
         RecordTransferHistory($"{target.PlayerName}: {outcomeState}; market score {marketScore}; agent {target.AgentMood}; rival {target.RivalInterest}; board {target.BoardStance}; Director {target.DirectorStance}.");
         RecordPerceptionHistory("Recruitment decision", $"approved {approved}; board trust {CareerProfile.BoardTrust}, Director trust {CareerProfile.DirectorTrust}, transfer pressure {TransferPressure}, recruitment reputation {RecruitmentReputation}; market score {marketScore}");
         AddNews(
@@ -563,6 +581,7 @@ public partial class GameState
         CareerProfile.PlayerTrust = Math.Clamp(CareerProfile.PlayerTrust + renewalResult.TrustDelta, 0, 100);
         RefreshPressureCategories();
         FinancialPressure = Math.Clamp(FinancialPressure + financialDelta, 0, 100);
+        ApplyDirectorContractInfluence(CurrentTransferContractOffer, CurrentRenewalContractOffer);
         RecordContractHistory($"{CurrentTransferContractOffer.PlayerName}: {CurrentTransferContractOffer.Status}; {CurrentTransferContractOffer.OutcomeSummary}");
         RecordContractHistory($"{CurrentRenewalContractOffer.PlayerName}: {CurrentRenewalContractOffer.Status}; {CurrentRenewalContractOffer.OutcomeSummary}");
         AddContractPromiseIfAccepted(CurrentTransferContractOffer);
@@ -721,7 +740,14 @@ public partial class GameState
             DressingRoomPressure = DressingRoomPressure,
             TransferPressure = TransferPressure,
             FinancialPressure = FinancialPressure,
-            PerceptionHistory = _perceptionHistory.ToArray()
+            PerceptionHistory = _perceptionHistory.ToArray(),
+            DirectorCooperation = DirectorCooperation,
+            DirectorConflict = DirectorConflict,
+            DirectorScoutingPriority = DirectorScoutingPriority,
+            DirectorTransferPreference = DirectorTransferPreference,
+            DirectorSalesPressureSummary = DirectorSalesPressureSummary,
+            DirectorBoardReportSummary = DirectorBoardReportSummary,
+            DirectorActionHistory = _directorActionHistory.ToArray()
         };
     }
 
@@ -893,6 +919,18 @@ public partial class GameState
             _perceptionHistory.AddRange(data.PerceptionHistory);
         }
 
+        DirectorCooperation = Math.Clamp(data.DirectorCooperation <= 0 ? BuildInitialDirectorCooperation() : data.DirectorCooperation, 0, 100);
+        DirectorConflict = Math.Clamp(data.DirectorConflict <= 0 ? BuildInitialDirectorConflict() : data.DirectorConflict, 0, 100);
+        DirectorScoutingPriority = string.IsNullOrWhiteSpace(data.DirectorScoutingPriority) ? BuildDirectorScoutingPriority() : data.DirectorScoutingPriority;
+        DirectorTransferPreference = string.IsNullOrWhiteSpace(data.DirectorTransferPreference) ? BuildDirectorTransferPreference() : data.DirectorTransferPreference;
+        DirectorSalesPressureSummary = string.IsNullOrWhiteSpace(data.DirectorSalesPressureSummary) ? BuildDirectorSalesPressureSummary() : data.DirectorSalesPressureSummary;
+        DirectorBoardReportSummary = string.IsNullOrWhiteSpace(data.DirectorBoardReportSummary) ? BuildDirectorBoardReportSummary("Saved state restored") : data.DirectorBoardReportSummary;
+        _directorActionHistory.Clear();
+        if (data.DirectorActionHistory != null)
+        {
+            _directorActionHistory.AddRange(data.DirectorActionHistory);
+        }
+
         EnsureRecruitmentTarget();
         EnsureJobMarketFoundation();
         RefreshPressureCategories();
@@ -942,6 +980,12 @@ public partial class GameState
         DressingRoomPressure = 35;
         TransferPressure = 25;
         FinancialPressure = 25;
+        DirectorCooperation = 55;
+        DirectorConflict = 25;
+        DirectorScoutingPriority = "Director scouting priority pending.";
+        DirectorTransferPreference = "Director transfer preference pending.";
+        DirectorSalesPressureSummary = "Director sales pressure pending.";
+        DirectorBoardReportSummary = "Director board report pending.";
         _foundationNewsEvents.Clear();
         _activeDecisionEvents.Clear();
         _resolvedDecisionEvents.Clear();
@@ -951,6 +995,7 @@ public partial class GameState
         _perceptionHistory.Clear();
         _transferHistory.Clear();
         _contractHistory.Clear();
+        _directorActionHistory.Clear();
     }
 
     public void InitializeStageFoundationsForClub()
@@ -966,6 +1011,7 @@ public partial class GameState
         }
 
         RefreshTacticFoundation(TacticalFormation, TeamStyle);
+        EnsureDirectorConflictState();
         if (CurrentScoutingAssignment == null)
         {
             StartBasicScoutingAssignment("Position need: versatile midfielder");
@@ -2121,6 +2167,92 @@ public partial class GameState
         return MatchPlaybackContractValidator.PassMessage;
     }
 
+    public string ValidatePhase11DirectorConflictContract()
+    {
+        InitializeStageFoundationsForClub();
+        EnsureDirectorConflictState();
+        if (!DirectorInfluenceSummary.Contains("cooperation", StringComparison.OrdinalIgnoreCase) ||
+            !DirectorInfluenceSummary.Contains("conflict", StringComparison.OrdinalIgnoreCase) ||
+            !DirectorInfluenceSummary.Contains("Scouting priority", StringComparison.Ordinal) ||
+            !DirectorInfluenceSummary.Contains("Board report", StringComparison.Ordinal))
+        {
+            return "Director influence summary is missing cooperation, conflict, scouting priority, or board report.";
+        }
+
+        var beforeDirectorTrust = CareerProfile.DirectorTrust;
+        var beforeBoardTrust = CareerProfile.BoardTrust;
+        var beforeHistoryCount = _directorActionHistory.Count;
+        var beforeNewsCount = CurrentClub?.NewsFeed.Length ?? 0;
+        EnsureRecruitmentTarget();
+        if (CurrentRecruitmentTarget == null)
+        {
+            return "Director conflict validation could not create a recruitment target.";
+        }
+
+        ApplyDirectorRecruitmentInfluence(CurrentRecruitmentTarget, false, "Phase 11 validation");
+        if (_directorActionHistory.Count <= beforeHistoryCount)
+        {
+            return "Director recruitment influence did not record action history.";
+        }
+
+        if ((CurrentClub?.NewsFeed.Length ?? 0) <= beforeNewsCount)
+        {
+            return "Director recruitment influence did not update news.";
+        }
+
+        if (CareerProfile.DirectorTrust == beforeDirectorTrust)
+        {
+            return "Director influence did not change Director trust.";
+        }
+
+        if (CareerProfile.BoardTrust != beforeBoardTrust)
+        {
+            return "Director influence changed board trust directly instead of keeping authority separate.";
+        }
+
+        EnsureContractOffers();
+        if (CurrentTransferContractOffer == null || CurrentRenewalContractOffer == null)
+        {
+            return "Director conflict validation could not create contract offers.";
+        }
+
+        var beforeContractHistoryCount = _directorActionHistory.Count;
+        ApplyDirectorContractInfluence(CurrentTransferContractOffer, CurrentRenewalContractOffer);
+        if (_directorActionHistory.Count <= beforeContractHistoryCount ||
+            !DirectorInfluenceSummary.Contains("Contract negotiation", StringComparison.Ordinal))
+        {
+            return "Director contract influence did not record a contract action.";
+        }
+
+        if (DirectorConflict < 0 || DirectorCooperation < 0 ||
+            string.IsNullOrWhiteSpace(DirectorBoardReportSummary))
+        {
+            return "Director cooperation/conflict state is invalid.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
+    public string ValidatePhase11StoredDirectorConflictContract()
+    {
+        EnsureDirectorConflictState();
+        if (_directorActionHistory.Count == 0 ||
+            !DirectorInfluenceSummary.Contains("Director actions", StringComparison.Ordinal) ||
+            !DirectorBoardReportSummary.Contains("Director reports", StringComparison.Ordinal))
+        {
+            return "Saved Director conflict state did not restore.";
+        }
+
+        if (DirectorCooperation <= 0 || DirectorConflict <= 0 ||
+            string.IsNullOrWhiteSpace(DirectorScoutingPriority) ||
+            string.IsNullOrWhiteSpace(DirectorTransferPreference))
+        {
+            return "Saved Director cooperation, conflict, priority, or preference state is invalid.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
     public string ValidatePhase3PromiseLifecycleContract()
     {
         InitializeStageFoundationsForClub();
@@ -2794,6 +2926,223 @@ public partial class GameState
         }
 
         _recruitmentShortlist.Insert(0, CurrentRecruitmentTarget);
+    }
+
+    private void EnsureDirectorConflictState()
+    {
+        if (DirectorCooperation <= 0 || DirectorCooperation == 55 && DirectorConflict == 25)
+        {
+            DirectorCooperation = BuildInitialDirectorCooperation();
+            DirectorConflict = BuildInitialDirectorConflict();
+        }
+
+        if (string.IsNullOrWhiteSpace(DirectorScoutingPriority) || DirectorScoutingPriority.Contains("pending", StringComparison.OrdinalIgnoreCase))
+        {
+            DirectorScoutingPriority = BuildDirectorScoutingPriority();
+        }
+
+        if (string.IsNullOrWhiteSpace(DirectorTransferPreference) || DirectorTransferPreference.Contains("pending", StringComparison.OrdinalIgnoreCase))
+        {
+            DirectorTransferPreference = BuildDirectorTransferPreference();
+        }
+
+        if (string.IsNullOrWhiteSpace(DirectorSalesPressureSummary) || DirectorSalesPressureSummary.Contains("pending", StringComparison.OrdinalIgnoreCase))
+        {
+            DirectorSalesPressureSummary = BuildDirectorSalesPressureSummary();
+        }
+
+        if (string.IsNullOrWhiteSpace(DirectorBoardReportSummary) || DirectorBoardReportSummary.Contains("pending", StringComparison.OrdinalIgnoreCase))
+        {
+            DirectorBoardReportSummary = BuildDirectorBoardReportSummary("Initial Director briefing");
+        }
+    }
+
+    private string BuildDirectorInfluenceSummary()
+    {
+        EnsureDirectorConflictState();
+        var history = _directorActionHistory.Count == 0
+            ? "Director action history starts after scouting, transfer, contract, or pressure conflict."
+            : string.Join("\n", _directorActionHistory);
+        return $"Style {DirectorOfFootballStyleName} | relationship {DirectorRelationshipName} | trust {CareerProfile.DirectorTrust} | cooperation {DirectorCooperation} | conflict {DirectorConflict}\nScouting priority: {DirectorScoutingPriority}\nTransfer preference: {DirectorTransferPreference}\nSales pressure: {DirectorSalesPressureSummary}\nBoard report: {DirectorBoardReportSummary}\nDirector actions\n{history}";
+    }
+
+    private int BuildInitialDirectorCooperation()
+    {
+        var relationship = CurrentClub?.DirectorRelationshipState ?? DirectorRelationshipState.Neutral;
+        var relationshipBase = relationship switch
+        {
+            DirectorRelationshipState.Ally => 72,
+            DirectorRelationshipState.Supportive => 64,
+            DirectorRelationshipState.Tense => 42,
+            DirectorRelationshipState.Hostile => 28,
+            _ => 55
+        };
+        return Math.Clamp((relationshipBase + CareerProfile.DirectorTrust) / 2, 0, 100);
+    }
+
+    private int BuildInitialDirectorConflict()
+    {
+        var relationship = CurrentClub?.DirectorRelationshipState ?? DirectorRelationshipState.Neutral;
+        var relationshipBase = relationship switch
+        {
+            DirectorRelationshipState.Ally => 12,
+            DirectorRelationshipState.Supportive => 22,
+            DirectorRelationshipState.Tense => 52,
+            DirectorRelationshipState.Hostile => 72,
+            _ => 32
+        };
+        return Math.Clamp(relationshipBase + Math.Max(0, 55 - CareerProfile.DirectorTrust) / 2, 0, 100);
+    }
+
+    private string BuildDirectorScoutingPriority()
+    {
+        return CurrentClub?.DirectorOfFootballStyle switch
+        {
+            DirectorOfFootballStyle.TalentTrader => "Prioritizes resale value and market timing.",
+            DirectorOfFootballStyle.StarChaser => "Prioritizes visible reputation and high-status targets.",
+            DirectorOfFootballStyle.AcademyBuilder => "Prioritizes academy pathways and young high-upside players.",
+            DirectorOfFootballStyle.BargainHunter => "Prioritizes undervalued players and low wage risk.",
+            DirectorOfFootballStyle.ControlFreak => "Prioritizes Director-led shortlist control and process compliance.",
+            DirectorOfFootballStyle.ClubLoyalist => "Prioritizes club identity, dressing-room continuity, and fan trust.",
+            DirectorOfFootballStyle.PoliticalSurvivor => "Prioritizes board optics and blame protection.",
+            _ => "Prioritizes data evidence and tactical value."
+        };
+    }
+
+    private string BuildDirectorTransferPreference()
+    {
+        return CurrentClub?.DirectorOfFootballStyle switch
+        {
+            DirectorOfFootballStyle.TalentTrader => "Will push profitable sales and younger replacements.",
+            DirectorOfFootballStyle.StarChaser => "Will push marquee signings over quiet tactical fits.",
+            DirectorOfFootballStyle.AcademyBuilder => "Will resist signings that block academy minutes.",
+            DirectorOfFootballStyle.BargainHunter => "Will block expensive wages without value proof.",
+            DirectorOfFootballStyle.ControlFreak => "Will challenge targets not sourced through his process.",
+            DirectorOfFootballStyle.ClubLoyalist => "Will resist selling respected dressing-room figures.",
+            DirectorOfFootballStyle.PoliticalSurvivor => "Will protect himself through board reports and leaks.",
+            _ => "Will support evidence-led targets with clean fit and value."
+        };
+    }
+
+    private string BuildDirectorSalesPressureSummary()
+    {
+        return CurrentClub?.DirectorOfFootballStyle switch
+        {
+            DirectorOfFootballStyle.TalentTrader => "High sale pressure if a player exceeds market value.",
+            DirectorOfFootballStyle.BargainHunter => "Moderate sale pressure to protect wage structure.",
+            DirectorOfFootballStyle.ClubLoyalist => "Low sale pressure for popular or loyal players.",
+            DirectorOfFootballStyle.PoliticalSurvivor => "Sale pressure follows board optics and media cover.",
+            _ => "Sale pressure depends on fit, age, contract, and board trust."
+        };
+    }
+
+    private string BuildDirectorBoardReportSummary(string trigger)
+    {
+        return $"{trigger}: Director reports cooperation {DirectorCooperation}/100, conflict {DirectorConflict}/100, transfer pressure {TransferPressure}/100, and Director trust {CareerProfile.DirectorTrust}/100 separately from board trust {CareerProfile.BoardTrust}/100.";
+    }
+
+    private void ApplyDirectorRecruitmentInfluence(RecruitmentTarget target, bool approved, string trigger)
+    {
+        EnsureDirectorConflictState();
+        var action = ResolveDirectorRecruitmentAction(target, approved);
+        var supportive = action.Contains("supports", StringComparison.OrdinalIgnoreCase) ||
+            action.Contains("proposes", StringComparison.OrdinalIgnoreCase);
+        DirectorCooperation = Math.Clamp(DirectorCooperation + (supportive ? 3 : -4), 0, 100);
+        DirectorConflict = Math.Clamp(DirectorConflict + (supportive ? -2 : 7), 0, 100);
+        CareerProfile.DirectorTrust = Math.Clamp(CareerProfile.DirectorTrust + (supportive ? 1 : -2), 0, 100);
+        TransferPressure = Math.Clamp(TransferPressure + (supportive ? -1 : 3), 0, 100);
+        if (action.Contains("leaks", StringComparison.OrdinalIgnoreCase))
+        {
+            CareerProfile.MediaPressure = Math.Clamp(CareerProfile.MediaPressure + 3, 0, 100);
+        }
+
+        DirectorBoardReportSummary = BuildDirectorBoardReportSummary(trigger);
+        RecordDirectorAction($"{trigger}: {action} Target {target.PlayerName}; board stance remains separate: {target.BoardStance}");
+        AddNews(
+            "Director recruitment influence",
+            NewsCategory.Transfer,
+            "Internal",
+            $"{DirectorOfFootballStyleName}: {action}",
+            4,
+            sourceType: "Director of Football",
+            relatedEntity: target.PlayerName,
+            effectSummary: $"Director cooperation {DirectorCooperation}; conflict {DirectorConflict}; Director trust {CareerProfile.DirectorTrust}.",
+            cooldownKey: "director-recruitment");
+        TryRaiseDirectorDecisionEvent(trigger);
+    }
+
+    private void ApplyDirectorContractInfluence(ContractOffer transferOffer, ContractOffer renewalOffer)
+    {
+        EnsureDirectorConflictState();
+        var action = ResolveDirectorContractAction(transferOffer, renewalOffer);
+        var supportive = action.Contains("supports", StringComparison.OrdinalIgnoreCase);
+        DirectorCooperation = Math.Clamp(DirectorCooperation + (supportive ? 2 : -3), 0, 100);
+        DirectorConflict = Math.Clamp(DirectorConflict + (supportive ? -1 : 5), 0, 100);
+        CareerProfile.DirectorTrust = Math.Clamp(CareerProfile.DirectorTrust + (supportive ? 1 : -1), 0, 100);
+        TransferPressure = Math.Clamp(TransferPressure + (supportive ? -1 : 2), 0, 100);
+        DirectorBoardReportSummary = BuildDirectorBoardReportSummary("Contract negotiation");
+        RecordDirectorAction($"Contract negotiation: {action} Transfer offer {transferOffer.Status}; renewal offer {renewalOffer.Status}.");
+        AddNews(
+            "Director contract report",
+            NewsCategory.Contract,
+            "Internal",
+            $"{DirectorOfFootballStyleName}: {action}",
+            3,
+            sourceType: "Director of Football",
+            relatedEntity: $"{transferOffer.PlayerName}; {renewalOffer.PlayerName}",
+            effectSummary: $"Director conflict {DirectorConflict}; transfer pressure {TransferPressure}.",
+            cooldownKey: "director-contract");
+        TryRaiseDirectorDecisionEvent("Contract negotiation");
+    }
+
+    private string ResolveDirectorRecruitmentAction(RecruitmentTarget target, bool approved)
+    {
+        return CurrentClub?.DirectorOfFootballStyle switch
+        {
+            DirectorOfFootballStyle.TalentTrader when target.RivalInterest.Contains("likely", StringComparison.OrdinalIgnoreCase) => "pushes sale-market logic and warns the board about rival pressure.",
+            DirectorOfFootballStyle.StarChaser when !target.TacticalFitSummary.Contains("Strong", StringComparison.Ordinal) => "proposes a higher-profile alternative before accepting a quiet tactical fit.",
+            DirectorOfFootballStyle.AcademyBuilder when target.InterestSummary.Contains("development", StringComparison.OrdinalIgnoreCase) => "supports the target because the pathway fits academy logic.",
+            DirectorOfFootballStyle.BargainHunter when target.EstimatedWageRange.Contains("$7", StringComparison.Ordinal) || target.EstimatedWageRange.Contains("$8", StringComparison.Ordinal) => "blocks the target until wage value is proven.",
+            DirectorOfFootballStyle.ControlFreak => "blocks the target unless the approach runs through his shortlist process.",
+            DirectorOfFootballStyle.ClubLoyalist when approved => "supports the move but warns against damaging dressing-room balance.",
+            DirectorOfFootballStyle.PoliticalSurvivor when !approved => "leaks disagreement and frames the failed signing as a process issue.",
+            _ => approved ? "supports the approach with evidence-led caveats." : "questions the approach and asks for stronger scouting evidence."
+        };
+    }
+
+    private string ResolveDirectorContractAction(ContractOffer transferOffer, ContractOffer renewalOffer)
+    {
+        return CurrentClub?.DirectorOfFootballStyle switch
+        {
+            DirectorOfFootballStyle.BargainHunter when transferOffer.ProposedWage > GetHighestSquadWage() => "blocks wage escalation and asks the board for a tighter structure.",
+            DirectorOfFootballStyle.ControlFreak => "challenges contract authority and wants all agent contact routed through his office.",
+            DirectorOfFootballStyle.PoliticalSurvivor when renewalOffer.Status.Contains("countered", StringComparison.OrdinalIgnoreCase) => "frames the agent counter as proof that contract expectations need board backing.",
+            DirectorOfFootballStyle.ClubLoyalist when renewalOffer.IsRenewal => "supports renewal stability and dressing-room continuity.",
+            DirectorOfFootballStyle.StarChaser when transferOffer.Status == "Accepted" => "supports the signing because it signals ambition.",
+            _ => "supports contract talks if wage, role, and scouting evidence remain explainable."
+        };
+    }
+
+    private void TryRaiseDirectorDecisionEvent(string trigger)
+    {
+        if (DirectorConflict < 55 || _activeDecisionEvents.Count > 0)
+        {
+            return;
+        }
+
+        if (TryCreateDecisionEvent(DecisionEventType.DirectorConflict, trigger, out var decisionEvent))
+        {
+            _activeDecisionEvents.Add(decisionEvent);
+        }
+    }
+
+    private void RecordDirectorAction(string detail)
+    {
+        _directorActionHistory.Insert(0, $"{CurrentDateLabel}: {detail}");
+        if (_directorActionHistory.Count > 12)
+        {
+            _directorActionHistory.RemoveAt(_directorActionHistory.Count - 1);
+        }
     }
 
     private int BuildRecruitmentMarketScore(RecruitmentTarget target)
