@@ -26,7 +26,7 @@
   - Stage 1 through Stage 8 headings are present in `docs/Plan.md`.
 
 ## Last commit hash
-- Pending Stage 0 documentation reconciliation commit.
+- 7f2eace
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`.
