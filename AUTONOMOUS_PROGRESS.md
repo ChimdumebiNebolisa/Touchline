@@ -1,16 +1,18 @@
 # Autonomous Progress
 
 ## Current active Plan step
-- Stabilization and truth-audit pass after Stage 2-8 foundation implementation.
+- Master implementation roadmap documentation.
 
 ## Last completed verified task
-- Stabilization audit fixes verified successfully.
+- Stabilization audit completed and pushed at `c036d92`.
 
 ## Current subtask in progress
-- Commit `stabilize: audit master design implementation foundation` and push to `main`.
+- Add and publish `docs/MASTER_IMPLEMENTATION_ROADMAP.md`.
 
 ## Next queued subtasks
-- None for this stabilization pass.
+- Verify roadmap documentation with `git diff --check`.
+- Commit `docs: add master implementation roadmap`.
+- Begin Phase 1: Information visibility deepening in the next coding run.
 
 ## Known blockers
 - No active blockers.
@@ -25,8 +27,10 @@
 ## Last commit hash
 - Stage 1 completed at `b659280`.
 - Stage 2-8 completed at `f7da7d7`.
+- Stabilization completed at `c036d92`.
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`.
 - Re-read `docs/touchline_master_design_decisions.md`.
-- If resumed before final response, inspect `git status`, rerun the failed or pending stabilization verification, then commit `stabilize: audit master design implementation foundation` and push to `main` if checks pass.
+- Re-read `docs/MASTER_IMPLEMENTATION_ROADMAP.md`.
+- If resumed before final response, inspect `git status`, run `git diff --check`, then commit `docs: add master implementation roadmap` and push to `main` if checks pass.
