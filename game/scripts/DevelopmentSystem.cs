@@ -71,16 +71,13 @@ public static class DevelopmentSystem
                 formDelta += 1;
             }
 
-            updated[index] = new GameState.SquadPlayer
-            {
-                Name = player.Name,
-                Position = player.Position,
-                Age = player.Age,
-                Form = Math.Clamp(player.Form + formDelta, 45, 95),
-                Morale = Math.Clamp(player.Morale + moraleDelta, 35, 95),
-                Fitness = Math.Clamp(player.Fitness + fitnessDelta, 40, 99),
-                IsStarting = player.IsStarting
-            };
+            var nextFitness = Math.Clamp(player.Fitness + fitnessDelta, 40, 99);
+            updated[index] = player.With(
+                form: Math.Clamp(player.Form + formDelta, 45, 95),
+                morale: Math.Clamp(player.Morale + moraleDelta, 35, 95),
+                fitness: nextFitness,
+                fatigue: Math.Clamp(player.Fatigue + (player.IsStarting ? 9 : -4), 0, 100),
+                injuryRisk: Math.Clamp(player.InjuryRisk + (player.IsStarting && nextFitness < 70 ? 3 : -1), 0, 100));
         }
 
         return updated;
@@ -101,16 +98,13 @@ public static class DevelopmentSystem
                 var fitnessDelta = CalculateFitnessDelta(nextAge, rng);
                 var moraleDelta = formDelta > 0 ? 2 : formDelta < 0 ? -2 : 0;
 
-                return new GameState.SquadPlayer
-                {
-                    Name = player.Name,
-                    Position = player.Position,
-                    Age = nextAge,
-                    Form = Math.Clamp(player.Form + formDelta, 55, 90),
-                    Morale = Math.Clamp(player.Morale + moraleDelta, 50, 90),
-                    Fitness = Math.Clamp(player.Fitness + fitnessDelta, 72, 95),
-                    IsStarting = player.IsStarting
-                };
+                return player.With(
+                    age: nextAge,
+                    form: Math.Clamp(player.Form + formDelta, 55, 90),
+                    morale: Math.Clamp(player.Morale + moraleDelta, 50, 90),
+                    fitness: Math.Clamp(player.Fitness + fitnessDelta, 72, 95),
+                    fatigue: Math.Clamp(player.Fatigue - 8, 0, 100),
+                    injuryRisk: Math.Clamp(player.InjuryRisk + (nextAge >= 30 ? 2 : -1), 0, 100));
             });
     }
 

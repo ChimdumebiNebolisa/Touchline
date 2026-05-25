@@ -46,6 +46,9 @@ public partial class ClubDashboard : Control
     private Label _objectivesLabel = default!;
     private Label _staffLabel = default!;
     private Label _newsFeedLabel = default!;
+    private Label _trainingScoutingLabel = default!;
+    private Label _recruitmentLabel = default!;
+    private Label _careerMarketLabel = default!;
     private Label _priorityLabel = default!;
     private Label _statusLabel = default!;
     private Label _saveHintLabel = default!;
@@ -65,6 +68,8 @@ public partial class ClubDashboard : Control
     private Button _standingsButton = default!;
     private Button _matchdayButton = default!;
     private Button _saveButton = default!;
+    private Button _recruitmentButton = default!;
+    private Button _jobMarketButton = default!;
     private Button _backButton = default!;
 
     public override void _Ready()
@@ -139,6 +144,11 @@ public partial class ClubDashboard : Control
         _objectivesLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/ObjectivesLabel");
         _staffLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/StaffLabel");
         _newsFeedLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/NewsFeedLabel");
+        _trainingScoutingLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/TrainingScoutingLabel");
+        _recruitmentLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/RecruitmentLabel");
+        _careerMarketLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/CareerMarketLabel");
+        _recruitmentButton = GetNode<Button>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/RecruitmentButton");
+        _jobMarketButton = GetNode<Button>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/JobMarketButton");
         _priorityLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/PriorityLabel");
         _statusLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/StatusLabel");
     }
@@ -158,6 +168,11 @@ public partial class ClubDashboard : Control
         EnsureLabel(insightContent, ref insightInsertIndex, "ObjectivesLabel");
         EnsureLabel(insightContent, ref insightInsertIndex, "StaffLabel");
         EnsureLabel(insightContent, ref insightInsertIndex, "NewsFeedLabel");
+        EnsureLabel(insightContent, ref insightInsertIndex, "TrainingScoutingLabel");
+        EnsureLabel(insightContent, ref insightInsertIndex, "RecruitmentLabel");
+        EnsureButton(insightContent, ref insightInsertIndex, "RecruitmentButton", "Progress Recruitment Foundation");
+        EnsureLabel(insightContent, ref insightInsertIndex, "CareerMarketLabel");
+        EnsureButton(insightContent, ref insightInsertIndex, "JobMarketButton", "Generate Job Market Event");
     }
 
     private static void EnsureLabel(VBoxContainer container, ref int insertIndex, string labelName)
@@ -175,6 +190,24 @@ public partial class ClubDashboard : Control
         };
         container.AddChild(label);
         container.MoveChild(label, insertIndex++);
+    }
+
+    private static void EnsureButton(VBoxContainer container, ref int insertIndex, string buttonName, string text)
+    {
+        var button = container.GetNodeOrNull<Button>(buttonName);
+        if (button != null)
+        {
+            return;
+        }
+
+        button = new Button
+        {
+            Name = buttonName,
+            Text = text,
+            SizeFlagsHorizontal = SizeFlags.ExpandFill
+        };
+        container.AddChild(button);
+        container.MoveChild(button, insertIndex++);
     }
 
     private void ApplyShellStyles()
@@ -238,6 +271,13 @@ public partial class ClubDashboard : Control
         TouchlineTheme.ApplyMutedStyle(_objectivesLabel, 14);
         TouchlineTheme.ApplyMutedStyle(_staffLabel, 14);
         TouchlineTheme.ApplyMutedStyle(_newsFeedLabel, 14);
+        TouchlineTheme.ApplyMutedStyle(_trainingScoutingLabel, 14);
+        TouchlineTheme.ApplyMutedStyle(_recruitmentLabel, 14);
+        TouchlineTheme.ApplyMutedStyle(_careerMarketLabel, 14);
+        TouchlineTheme.ApplyButtonVariant(_recruitmentButton, TouchlineButtonVariant.Secondary);
+        TouchlineTheme.ApplyButtonVariant(_jobMarketButton, TouchlineButtonVariant.Secondary);
+        _recruitmentButton.Pressed += OnRecruitmentPressed;
+        _jobMarketButton.Pressed += OnJobMarketPressed;
     }
 
     private void RenderState()
@@ -288,7 +328,7 @@ public partial class ClubDashboard : Control
         _boardValueLabel.Text = $"{state.BoardMorale}";
         _boardMetaLabel.Text = $"Board morale | Job pressure {state.JobPressure} | {state.BudgetSummary}";
         _shapeValueLabel.Text = state.TacticalFormation;
-        _shapeMetaLabel.Text = $"Press {state.PressIntensity} | Tempo {state.Tempo} | Risk {state.Risk}";
+        _shapeMetaLabel.Text = $"{state.TeamStyleName} | Press {state.PressIntensity} | Tempo {state.Tempo} | Risk {state.Risk}";
 
         _fixturePreviewLabel.Text = $"{careerPhase}\n{state.NextFixtureSummary}";
         _focusContextLabel.Text = $"{state.CompetitionName} | {state.BuildLeaguePositionSummary()}";
@@ -310,11 +350,14 @@ public partial class ClubDashboard : Control
         _pressureReasonsLabel.Text = PerceptionSystem.BuildPressureReasonSummary(state);
 
         _squadStatusLabel.Text = $"{state.BuildLineupReadinessSummary()}\n{state.SquadStatusSummary}";
-        _tacticsSummaryLabel.Text = state.BuildTacticalPlanSummary();
+        _tacticsSummaryLabel.Text = $"{state.BuildTacticalPlanSummary()}\n{state.TacticsFoundationSummary}";
         _roleAuthorityLabel.Text = $"Role authority | {state.RoleAuthoritySummary}";
         _objectivesLabel.Text = $"Main objectives\n{state.MainObjectivesSummary}";
         _staffLabel.Text = $"Starting staff\n{state.StaffSummary}";
         _newsFeedLabel.Text = $"News feed\n{state.NewsFeedSummary}";
+        _trainingScoutingLabel.Text = $"Training and scouting\n{state.TrainingScoutingSummary}";
+        _recruitmentLabel.Text = $"Recruitment and contracts\n{state.RecruitmentFoundationSummary}\nPromises\n{state.PromiseSummary}";
+        _careerMarketLabel.Text = $"Career and job market\n{state.CareerMarketSummary}\nCareer history\n{state.CareerHistorySummary}";
         _priorityLabel.Text = BuildPrioritySummary(state);
         _statusLabel.Text = hasMatchReport
             ? $"{state.LastMatchReport!.FixtureLabel}: {state.LastMatchReport.Scoreline} | Cause: {state.LastMatchReport.CauseSummary}"
@@ -363,10 +406,15 @@ public partial class ClubDashboard : Control
         _objectivesLabel.Text = "Objectives unavailable.";
         _staffLabel.Text = "Staff foundation unavailable.";
         _newsFeedLabel.Text = "News feed unavailable.";
+        _trainingScoutingLabel.Text = "Training and scouting unavailable.";
+        _recruitmentLabel.Text = "Recruitment unavailable.";
+        _careerMarketLabel.Text = "Career market unavailable.";
         _priorityLabel.Text = status;
         _statusLabel.Text = status;
         _saveHintLabel.Text = "Save unavailable.";
         _saveButton.Disabled = true;
+        _recruitmentButton.Disabled = true;
+        _jobMarketButton.Disabled = true;
         _matchdayButton.Disabled = true;
     }
 
@@ -538,5 +586,28 @@ public partial class ClubDashboard : Control
         _statusLabel.Text = statusMessage;
         _saveHintLabel.Text = statusMessage;
         SetStateChip("CAREER SAVED", true);
+    }
+
+    private void OnRecruitmentPressed()
+    {
+        if (GameState.Instance == null)
+        {
+            return;
+        }
+
+        _statusLabel.Text = GameState.Instance.AttemptBasicRecruitmentAction();
+        RenderState();
+    }
+
+    private void OnJobMarketPressed()
+    {
+        if (GameState.Instance == null)
+        {
+            return;
+        }
+
+        GameState.Instance.GenerateJobMarketEvent();
+        _statusLabel.Text = "Job market event generated from current reputation, license, role, and pressure.";
+        RenderState();
     }
 }

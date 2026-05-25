@@ -8,13 +8,88 @@ public partial class GameState : Node
 
     public sealed class SquadPlayer
     {
+        public string PlayerId { get; init; } = string.Empty;
         public required string Name { get; init; }
         public required string Position { get; init; }
         public required int Age { get; init; }
+        public string Nationality { get; init; } = "Novaran";
+        public int TrueAbility { get; init; } = 65;
+        public int TechnicalAttribute { get; init; } = 65;
+        public int TacticalAttribute { get; init; } = 65;
+        public int PhysicalAttribute { get; init; } = 65;
+        public int MentalAttribute { get; init; } = 65;
+        public string KnownAttributesSummary { get; init; } = "Known: Form and fitness only.";
+        public string EstimatedAttributesSummary { get; init; } = "Estimated: Tactical ?-?, Mental ?-?";
+        public string UnknownAttributesSummary { get; init; } = "Unknown: Potential ?, personality depth ?";
+        public string PlayingStyle { get; init; } = "Balanced player";
+        public string Tendencies { get; init; } = "Keeps role discipline.";
+        public string Traits { get; init; } = "role discipline";
+        public string Personality { get; init; } = "Professional";
+        public string TacticalFit { get; init; } = "Partial fit: role comfort needs observation.";
+        public string DevelopmentCurve { get; init; } = "Growth curve: stable.";
         public required int Form { get; init; }
         public required int Morale { get; init; }
         public required int Fitness { get; init; }
+        public int Fatigue { get; init; } = 10;
+        public int InjuryRisk { get; init; } = 12;
+        public int Wage { get; init; } = 45000;
+        public int ContractExpiryYear { get; init; } = 2028;
+        public string ContractRole { get; init; } = "Squad Player";
+        public string Relationship { get; init; } = "Professional";
+        public string PromiseSummary { get; init; } = "No active promise.";
+        public string TransferInterest { get; init; } = "No active interest.";
+        public int TacticalFitScore { get; init; } = 65;
         public required bool IsStarting { get; init; }
+
+        public SquadPlayer With(
+            int? age = null,
+            int? form = null,
+            int? morale = null,
+            int? fitness = null,
+            int? fatigue = null,
+            int? injuryRisk = null,
+            int? tacticalFitScore = null,
+            bool? isStarting = null,
+            string? relationship = null,
+            string? promiseSummary = null,
+            string? transferInterest = null)
+        {
+            return new SquadPlayer
+            {
+                PlayerId = PlayerId,
+                Name = Name,
+                Position = Position,
+                Age = age ?? Age,
+                Nationality = Nationality,
+                TrueAbility = TrueAbility,
+                TechnicalAttribute = TechnicalAttribute,
+                TacticalAttribute = TacticalAttribute,
+                PhysicalAttribute = PhysicalAttribute,
+                MentalAttribute = MentalAttribute,
+                KnownAttributesSummary = KnownAttributesSummary,
+                EstimatedAttributesSummary = EstimatedAttributesSummary,
+                UnknownAttributesSummary = UnknownAttributesSummary,
+                PlayingStyle = PlayingStyle,
+                Tendencies = Tendencies,
+                Traits = Traits,
+                Personality = Personality,
+                TacticalFit = TacticalFit,
+                DevelopmentCurve = DevelopmentCurve,
+                Form = form ?? Form,
+                Morale = morale ?? Morale,
+                Fitness = fitness ?? Fitness,
+                Fatigue = fatigue ?? Fatigue,
+                InjuryRisk = injuryRisk ?? InjuryRisk,
+                Wage = Wage,
+                ContractExpiryYear = ContractExpiryYear,
+                ContractRole = ContractRole,
+                Relationship = relationship ?? Relationship,
+                PromiseSummary = promiseSummary ?? PromiseSummary,
+                TransferInterest = transferInterest ?? TransferInterest,
+                TacticalFitScore = tacticalFitScore ?? TacticalFitScore,
+                IsStarting = isStarting ?? IsStarting
+            };
+        }
     }
 
     public sealed class MatchReport
@@ -197,6 +272,7 @@ public partial class GameState : Node
         CompetitionTable = Array.Empty<CompetitionRow>();
         CompetitionFixtures = Array.Empty<CompetitionFixture>();
         CurrentMatchResult = null;
+        ResetStageFoundations();
         SquadStatusSummary = BuildSquadStatusSummary();
     }
 
@@ -224,16 +300,20 @@ public partial class GameState : Node
         CurrentOpponentName = selection.CurrentOpponentName;
         NextFixtureSummary = selection.NextFixtureSummary;
         SyncCurrentClubMoraleFromRuntime();
+        InitializeStageFoundationsForClub();
         SquadStatusSummary = BuildSquadStatusSummary();
     }
 
     public void UpdateTactics(string formation, int pressIntensity, int tempo, int width, int risk)
     {
+        var previousFormation = TacticalFormation;
+        var previousStyle = TeamStyle;
         TacticalFormation = formation;
         PressIntensity = pressIntensity;
         Tempo = tempo;
         Width = width;
         Risk = risk;
+        RefreshTacticFoundation(previousFormation, previousStyle);
     }
 
     public void AdvanceDate()
@@ -261,6 +341,7 @@ public partial class GameState : Node
 
         LastMatchReport = null;
         CurrentMatchResult = null;
+        ApplyWeeklyFoundationProgress();
     }
 
     public MatchPlaybackResult PrepareCurrentMatchResult(bool forceNew = false)
@@ -377,7 +458,7 @@ public partial class GameState : Node
 
     public string BuildTacticalPlanSummary()
     {
-        return $"Tactical setup: {TacticalFormation} | pressing {PressIntensity} | tempo {Tempo} | width {Width} | mentality {Risk}";
+        return $"Tactical setup: {TacticalFormation} | style {TeamStyleName} | familiarity {TacticalFamiliarityName} | pressing {PressIntensity} | tempo {Tempo} | passing directness {PassingDirectness} | defensive line {DefensiveLine} | width {Width} | attacking risk {Risk} | tackling {Tackling}";
     }
 
     public string BuildOpponentContextSummary()
@@ -1017,6 +1098,7 @@ public partial class GameState : Node
 
         SquadStatusSummary = BuildSquadStatusSummary();
         UpdateFormSummary(goalDifference);
+        ApplyStageFoundationPostMatch(result, consequence);
 
         RecordCompetitionResults(result.FinalHomeScore, result.FinalAwayScore);
         RefreshFixtureContext();
@@ -1082,12 +1164,37 @@ public partial class GameState : Node
             data.SquadPlayers ?? Array.Empty<SaveSlotPlayerData>(),
             player => new SquadPlayer
             {
+                PlayerId = player.PlayerId,
                 Name = player.Name,
                 Position = player.Position,
                 Age = player.Age,
+                Nationality = string.IsNullOrWhiteSpace(player.Nationality) ? "Novaran" : player.Nationality,
+                TrueAbility = player.TrueAbility <= 0 ? 65 : player.TrueAbility,
+                TechnicalAttribute = player.TechnicalAttribute <= 0 ? 65 : player.TechnicalAttribute,
+                TacticalAttribute = player.TacticalAttribute <= 0 ? 65 : player.TacticalAttribute,
+                PhysicalAttribute = player.PhysicalAttribute <= 0 ? 65 : player.PhysicalAttribute,
+                MentalAttribute = player.MentalAttribute <= 0 ? 65 : player.MentalAttribute,
+                KnownAttributesSummary = string.IsNullOrWhiteSpace(player.KnownAttributesSummary) ? "Known: Form and fitness only." : player.KnownAttributesSummary,
+                EstimatedAttributesSummary = string.IsNullOrWhiteSpace(player.EstimatedAttributesSummary) ? "Estimated: Tactical ?-?, Mental ?-?" : player.EstimatedAttributesSummary,
+                UnknownAttributesSummary = string.IsNullOrWhiteSpace(player.UnknownAttributesSummary) ? "Unknown: Potential ?, personality depth ?" : player.UnknownAttributesSummary,
+                PlayingStyle = string.IsNullOrWhiteSpace(player.PlayingStyle) ? "Balanced player" : player.PlayingStyle,
+                Tendencies = string.IsNullOrWhiteSpace(player.Tendencies) ? "Keeps role discipline." : player.Tendencies,
+                Traits = string.IsNullOrWhiteSpace(player.Traits) ? "role discipline" : player.Traits,
+                Personality = string.IsNullOrWhiteSpace(player.Personality) ? "Professional" : player.Personality,
+                TacticalFit = string.IsNullOrWhiteSpace(player.TacticalFit) ? "Partial fit: role comfort needs observation." : player.TacticalFit,
+                DevelopmentCurve = string.IsNullOrWhiteSpace(player.DevelopmentCurve) ? "Growth curve: stable." : player.DevelopmentCurve,
                 Form = player.Form,
                 Morale = player.Morale,
                 Fitness = player.Fitness,
+                Fatigue = player.Fatigue,
+                InjuryRisk = player.InjuryRisk <= 0 ? 12 : player.InjuryRisk,
+                Wage = player.Wage <= 0 ? 45000 : player.Wage,
+                ContractExpiryYear = player.ContractExpiryYear <= 0 ? 2028 : player.ContractExpiryYear,
+                ContractRole = string.IsNullOrWhiteSpace(player.ContractRole) ? "Squad Player" : player.ContractRole,
+                Relationship = string.IsNullOrWhiteSpace(player.Relationship) ? "Professional" : player.Relationship,
+                PromiseSummary = string.IsNullOrWhiteSpace(player.PromiseSummary) ? "No active promise." : player.PromiseSummary,
+                TransferInterest = string.IsNullOrWhiteSpace(player.TransferInterest) ? "No active interest." : player.TransferInterest,
+                TacticalFitScore = player.TacticalFitScore <= 0 ? 65 : player.TacticalFitScore,
                 IsStarting = player.IsStarting
             });
 
@@ -1158,6 +1265,7 @@ public partial class GameState : Node
 
         CareerProfile.CurrentClubName = SelectedClubName;
         SyncCurrentClubMoraleFromRuntime();
+        RestoreStageFoundationState(data.StageFoundations);
         RefreshFixtureContext();
     }
 
@@ -1194,14 +1302,19 @@ public partial class GameState : Node
                 var player = SquadPlayers[index];
                 selectedSquad[index] = new ClubSquadPlayer
                 {
-                    PlayerId = ClubSquadFactory.BuildPlayerId(clubName, player.Name, index),
+                    PlayerId = string.IsNullOrWhiteSpace(player.PlayerId) ? ClubSquadFactory.BuildPlayerId(clubName, player.Name, index) : player.PlayerId,
                     ClubName = clubName,
                     Name = player.Name,
                     Position = player.Position,
                     Age = player.Age,
+                    TrueAbility = player.TrueAbility,
+                    TacticalFitScore = player.TacticalFitScore,
+                    PlayingStyle = player.PlayingStyle,
+                    TacticalFit = player.TacticalFit,
                     Form = player.Form,
                     Morale = player.Morale,
                     Fitness = player.Fitness,
+                    Fatigue = player.Fatigue,
                     IsStarting = player.IsStarting
                 };
             }
@@ -1494,16 +1607,7 @@ public partial class GameState : Node
     private void SetPlayerStartingStatus(int index, bool isStarting)
     {
         var player = SquadPlayers[index];
-        SquadPlayers[index] = new SquadPlayer
-        {
-            Name = player.Name,
-            Position = player.Position,
-            Age = player.Age,
-            Form = player.Form,
-            Morale = player.Morale,
-            Fitness = player.Fitness,
-            IsStarting = isStarting
-        };
+        SquadPlayers[index] = player.With(isStarting: isStarting);
     }
 
     private int FindReplacementBenchIndex(string position)

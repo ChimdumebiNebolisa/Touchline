@@ -245,18 +245,13 @@ public partial class TouchlineWorldGenerator : Node
 
     private static GameState.SquadPlayer[] BuildSquadPlayers(WorldSeedClubData clubData)
     {
-        return Array.ConvertAll(
-            clubData.Players,
-            player => new GameState.SquadPlayer
-            {
-                Name = player.Name,
-                Position = player.Position,
-                Age = player.Age,
-                Form = player.Form,
-                Morale = player.Morale,
-                Fitness = player.Fitness,
-                IsStarting = player.IsStarting
-            });
+        var players = new GameState.SquadPlayer[clubData.Players.Length];
+        for (var index = 0; index < clubData.Players.Length; index++)
+        {
+            players[index] = PlayerIdentityFoundation.BuildSquadPlayer(clubData.Players[index], clubData.Name, GameState.Instance?.WorldSeed ?? 0, index);
+        }
+
+        return players;
     }
 
     private static GameState.ClubPreview BuildFallbackPreview(string clubName)

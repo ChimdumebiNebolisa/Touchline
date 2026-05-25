@@ -157,6 +157,9 @@ public sealed class MatchPlaybackResult
     public required string HomeClubName { get; init; }
     public required string AwayClubName { get; init; }
     public required string TacticalSummary { get; init; }
+    public string TacticalExplanation { get; init; } = string.Empty;
+    public string PlayerRatingsSummary { get; init; } = string.Empty;
+    public string PostMatchNotes { get; init; } = string.Empty;
     public required int FinalHomeScore { get; init; }
     public required int FinalAwayScore { get; init; }
     public required MatchTimeline Timeline { get; init; }

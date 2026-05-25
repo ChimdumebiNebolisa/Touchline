@@ -143,13 +143,13 @@ public partial class PlayerProfile : Control
         _ageValueLabel.Text = player.Age.ToString();
         _ageMetaLabel.Text = DescribeAgeBand(player.Age);
         _formValueLabel.Text = player.Form.ToString();
-        _formMetaLabel.Text = DescribeMetric(player.Form, "form");
+        _formMetaLabel.Text = $"{DescribeMetric(player.Form, "form")} Tactical fit {player.TacticalFitScore}.";
         _fitnessValueLabel.Text = player.Fitness.ToString();
-        _fitnessMetaLabel.Text = DescribeFitness(player.Fitness);
+        _fitnessMetaLabel.Text = $"{DescribeFitness(player.Fitness)} Fatigue {player.Fatigue}, injury risk {player.InjuryRisk}.";
 
-        _identityLabel.Text = $"Player dossier | {player.Name} | {GameState.Instance.SelectedClubName} | {player.Position} | Age {player.Age}";
-        _roleLabel.Text = $"Squad status | {lineupStatus} | Matchday contribution follows this selection state.";
-        _conditionLabel.Text = $"Match sharpness | Form {player.Form} | Morale {player.Morale} | Fitness {player.Fitness}";
+        _identityLabel.Text = $"Player dossier | {player.Name} | {player.Position} | Age {player.Age}\n{GameState.Instance.BuildPlayerDossier(player)}";
+        _roleLabel.Text = $"Squad status | {lineupStatus} | {player.PlayingStyle} | Traits: {player.Traits} | Personality: {player.Personality}";
+        _conditionLabel.Text = $"Match sharpness | Form {player.Form} | Morale {player.Morale} | Fitness {player.Fitness} | Fatigue {player.Fatigue} | Injury risk {player.InjuryRisk}";
         _pathwayLabel.Text = BuildTrajectorySummary(player, GameState.Instance);
         _readinessLabel.Text = BuildReadinessSummary(player);
     }
@@ -220,7 +220,7 @@ public partial class PlayerProfile : Control
     private static string BuildStatusSummary(GameState.SquadPlayer player)
     {
         var role = player.IsStarting ? "Starting XI" : "Bench/reserve";
-        return $"{player.Position} | {role} | Age {player.Age} | Form {player.Form} | Morale {player.Morale} | Fitness {player.Fitness}";
+        return $"{player.Position} | {role} | Age {player.Age} | Form {player.Form} | Morale {player.Morale} | Fitness {player.Fitness} | {player.PlayingStyle} | Known/estimated/unknown information active";
     }
 
     private static string DescribeMetric(int value, string metric)

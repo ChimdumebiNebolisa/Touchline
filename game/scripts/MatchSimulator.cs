@@ -15,8 +15,12 @@ public static class MatchSimulator
         public required string Role { get; init; }
         public required bool IsHome { get; init; }
         public required int ShapeIndex { get; init; }
+        public required int Ability { get; init; }
+        public required int Morale { get; init; }
         public required int Form { get; init; }
         public required int Fitness { get; init; }
+        public required int Fatigue { get; init; }
+        public required int TacticalFitScore { get; init; }
     }
 
     public static MatchPlaybackResult Simulate(GameState state)
@@ -31,16 +35,19 @@ public static class MatchSimulator
         players.AddRange(homeLineup);
         players.AddRange(awayLineup);
 
-        var homeAttackQuality = AverageRoleForm(homeLineup, "CM", "AM", "RW", "LW", "ST");
-        var homeDefensiveQuality = AverageRoleForm(homeLineup, "GK", "RB", "CB", "LB");
-        var awayAttackQuality = AverageRoleForm(awayLineup, "CM", "AM", "RW", "LW", "ST");
-        var awayDefensiveQuality = AverageRoleForm(awayLineup, "GK", "RB", "CB", "LB");
+        var homeAttackQuality = AverageRoleQuality(homeLineup, state.TacticalFamiliarityScore, "CM", "AM", "RW", "LW", "ST");
+        var homeDefensiveQuality = AverageRoleQuality(homeLineup, state.TacticalFamiliarityScore, "GK", "RB", "CB", "LB");
+        var awayAttackQuality = AverageRoleQuality(awayLineup, 58, "CM", "AM", "RW", "LW", "ST");
+        var awayDefensiveQuality = AverageRoleQuality(awayLineup, 58, "GK", "RB", "CB", "LB");
+        var staffPreparation = Math.Clamp((state.CareerProfile.StaffTrust + state.CareerProfile.DirectorTrust) / 12, 0, 14);
+        var moraleEffect = Math.Clamp((state.SquadMorale - 55) / 5, -8, 8);
+        var familiarityEffect = Math.Clamp((state.TacticalFamiliarityScore - 55) / 4, -8, 10);
         var plannedHomeGoals = Math.Clamp(
-            (homeAttackQuality - awayDefensiveQuality + state.PressIntensity / 3 + state.Tempo / 2 + state.Risk / 2 - 72) / 24 + rng.Next(0, 2),
+            (homeAttackQuality - awayDefensiveQuality + state.PressIntensity / 3 + state.Tempo / 2 + state.Risk / 2 + staffPreparation + moraleEffect + familiarityEffect - 78) / 24 + rng.Next(0, 2),
             0,
             4);
         var plannedAwayGoals = Math.Clamp(
-            (awayAttackQuality - homeDefensiveQuality + state.Risk / 2 + (100 - state.PressIntensity) / 4 - 46) / 28 + rng.Next(0, 2),
+            (awayAttackQuality - homeDefensiveQuality + state.Risk / 2 + (100 - state.PressIntensity) / 4 - moraleEffect - familiarityEffect - 45) / 28 + rng.Next(0, 2),
             0,
             3);
         if (plannedHomeGoals == 0 && plannedAwayGoals == 0)
@@ -82,7 +89,10 @@ public static class MatchSimulator
             HomeClubName = homeClubName,
             AwayClubName = awayClubName,
             TacticalSummary =
-                $"Shape {state.TacticalFormation} | Pressing {state.PressIntensity} | Tempo {state.Tempo} | Width {state.Width} | Mentality {state.Risk}",
+                $"Shape {state.TacticalFormation} | Style {state.TeamStyleName} | Familiarity {state.TacticalFamiliarityName} | Pressing {state.PressIntensity} | Tempo {state.Tempo} | Width {state.Width} | Mentality {state.Risk}",
+            TacticalExplanation = $"The match engine weighted player ability, form, morale, fitness, tactical fit, staff preparation, {state.TeamStyleName.ToLowerInvariant()} style, and familiarity {state.TacticalFamiliarityName}.",
+            PlayerRatingsSummary = BuildPlayerRatingsSummary(homeLineup, awayLineup, homeClubName, awayClubName),
+            PostMatchNotes = $"Preparation {staffPreparation}/14 | Morale effect {moraleEffect:+0;-0;0} | Familiarity effect {familiarityEffect:+0;-0;0} | Fit notes: {state.TacticalFitNotes}",
             FinalHomeScore = finalFrame.HomeScore,
             FinalAwayScore = finalFrame.AwayScore,
             Timeline = new MatchTimeline
@@ -162,8 +172,12 @@ public static class MatchSimulator
                 Role = selectedPlayers[index].Position,
                 IsHome = true,
                 ShapeIndex = index,
+                Ability = selectedPlayers[index].TrueAbility,
+                Morale = selectedPlayers[index].Morale,
                 Form = selectedPlayers[index].Form,
-                Fitness = selectedPlayers[index].Fitness
+                Fitness = selectedPlayers[index].Fitness,
+                Fatigue = selectedPlayers[index].Fatigue,
+                TacticalFitScore = selectedPlayers[index].TacticalFitScore
             };
         }
 
@@ -224,8 +238,12 @@ public static class MatchSimulator
                 Role = player.Position,
                 IsHome = false,
                 ShapeIndex = index,
+                Ability = player.TrueAbility,
+                Morale = player.Morale,
                 Form = player.Form,
-                Fitness = player.Fitness
+                Fitness = player.Fitness,
+                Fatigue = player.Fatigue,
+                TacticalFitScore = player.TacticalFitScore
             };
         }
 
@@ -814,7 +832,7 @@ public static class MatchSimulator
         return slots;
     }
 
-    private static int AverageRoleForm(IReadOnlyList<RuntimePlayer> players, params string[] roles)
+    private static int AverageRoleQuality(IReadOnlyList<RuntimePlayer> players, int tacticalFamiliarity, params string[] roles)
     {
         var total = 0;
         var count = 0;
@@ -825,11 +843,51 @@ public static class MatchSimulator
                 continue;
             }
 
-            total += player.Form;
+            total += CalculatePlayerMatchQuality(player, tacticalFamiliarity);
             count++;
         }
 
         return count == 0 ? 68 : total / count;
+    }
+
+    private static int CalculatePlayerMatchQuality(RuntimePlayer player, int tacticalFamiliarity)
+    {
+        var quality = player.Ability * 5 +
+            player.Form * 3 +
+            player.Morale +
+            player.Fitness +
+            player.TacticalFitScore * 2 +
+            tacticalFamiliarity * 2 -
+            player.Fatigue * 2;
+        return Math.Clamp(quality / 14, 35, 96);
+    }
+
+    private static string BuildPlayerRatingsSummary(
+        IReadOnlyList<RuntimePlayer> homeLineup,
+        IReadOnlyList<RuntimePlayer> awayLineup,
+        string homeClubName,
+        string awayClubName)
+    {
+        var homeBest = PickBestMatchQuality(homeLineup, 58);
+        var awayBest = PickBestMatchQuality(awayLineup, 58);
+        return $"{homeClubName}: {homeBest.Name} {CalculatePlayerMatchQuality(homeBest, 58) / 10.0:0.0}; {awayClubName}: {awayBest.Name} {CalculatePlayerMatchQuality(awayBest, 58) / 10.0:0.0}. Ratings reflect ability, role fit, form, morale, fitness, and fatigue.";
+    }
+
+    private static RuntimePlayer PickBestMatchQuality(IReadOnlyList<RuntimePlayer> lineup, int tacticalFamiliarity)
+    {
+        var best = lineup[0];
+        var bestQuality = CalculatePlayerMatchQuality(best, tacticalFamiliarity);
+        foreach (var player in lineup)
+        {
+            var quality = CalculatePlayerMatchQuality(player, tacticalFamiliarity);
+            if (quality > bestQuality)
+            {
+                best = player;
+                bestQuality = quality;
+            }
+        }
+
+        return best;
     }
 
     private static RuntimePlayer PickByRole(

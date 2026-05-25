@@ -76,6 +76,7 @@ public partial class TacticsScreen : Control
     private Button _backButton = default!;
 
     private OptionButton _formationOption = default!;
+    private OptionButton _styleOption = default!;
     private SpinBox _pressSpin = default!;
     private SpinBox _tempoSpin = default!;
     private SpinBox _widthSpin = default!;
@@ -146,6 +147,7 @@ public partial class TacticsScreen : Control
         _controlsCard = GetNode<PanelContainer>("RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard");
         _controlHintLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/ControlsHintLabel");
         _formationOption = GetNode<OptionButton>("RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/FormationOption");
+        EnsureTeamStyleOption();
         _pressSpin = GetNode<SpinBox>("RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/PressSpin");
         _tempoSpin = GetNode<SpinBox>("RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/TempoSpin");
         _widthSpin = GetNode<SpinBox>("RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/WidthSpin");
@@ -237,6 +239,53 @@ public partial class TacticsScreen : Control
         TouchlineTheme.ApplyEyebrowStyle(_rightChannelLabel);
     }
 
+    private void EnsureTeamStyleOption()
+    {
+        var parent = _formationOption.GetParent();
+        var existing = parent.GetNodeOrNull<OptionButton>("TeamStyleOption");
+        if (existing != null)
+        {
+            _styleOption = existing;
+            return;
+        }
+
+        var label = new Label
+        {
+            Name = "TeamStyleLabel",
+            Text = "Team Style"
+        };
+        label.AddThemeFontSizeOverride("font_size", 14);
+        label.AddThemeColorOverride("font_color", TouchlineTheme.TextMuted);
+
+        _styleOption = new OptionButton
+        {
+            Name = "TeamStyleOption",
+            SizeFlagsHorizontal = SizeFlags.ExpandFill
+        };
+        foreach (var style in new[]
+        {
+            "Balanced",
+            "Possession",
+            "Direct Play",
+            "Counterattack",
+            "High Press",
+            "Low Block",
+            "Wide Attack",
+            "Central Overload",
+            "Defensive Solidity"
+        })
+        {
+            _styleOption.AddItem(style);
+        }
+
+        _styleOption.ItemSelected += OnStyleSelected;
+        var insertIndex = _formationOption.GetIndex() + 1;
+        parent.AddChild(label);
+        parent.MoveChild(label, insertIndex);
+        parent.AddChild(_styleOption);
+        parent.MoveChild(_styleOption, insertIndex + 1);
+    }
+
     private void RenderState()
     {
         if (GameState.Instance == null || string.IsNullOrWhiteSpace(GameState.Instance.SelectedClubName))
@@ -258,6 +307,7 @@ public partial class TacticsScreen : Control
 
         var formationIndex = FindFormationIndex(state.TacticalFormation);
         _formationOption.Select(formationIndex);
+        _styleOption.Select(FindStyleIndex(state.TeamStyleName));
         _pressSpin.Value = state.PressIntensity;
         _tempoSpin.Value = state.Tempo;
         _widthSpin.Value = state.Width;
@@ -320,17 +370,18 @@ public partial class TacticsScreen : Control
     private void RefreshBoard()
     {
         var formation = _formationOption.GetItemText(_formationOption.Selected);
+        var style = _styleOption.GetItemText(_styleOption.Selected);
         var press = (int)_pressSpin.Value;
         var tempo = (int)_tempoSpin.Value;
         var width = (int)_widthSpin.Value;
         var risk = (int)_riskSpin.Value;
 
-        _tacticalChipLabel.Text = BuildTacticalChipLabel(formation, press, tempo);
+        _tacticalChipLabel.Text = BuildTacticalChipLabel(formation, style, press, tempo);
         SetReadinessChip(BuildReadinessLabel(press, tempo, risk), true);
-        _headerStatusLabel.Text = "Shape, intensity, and width update live before you save the match plan.";
+        _headerStatusLabel.Text = "Shape, team style, instructions, familiarity, fit, and risk update live before you save the match plan.";
 
         _formationValueLabel.Text = formation;
-        _formationMetaLabel.Text = BuildFormationMeta(formation);
+        _formationMetaLabel.Text = $"{BuildFormationMeta(formation)} | {style}";
         _pressValueLabel.Text = DescribePress(press);
         _pressMetaLabel.Text = BuildPressMeta(press);
         _tempoValueLabel.Text = DescribeTempo(tempo);
@@ -344,10 +395,10 @@ public partial class TacticsScreen : Control
         _pitchSummaryLabel.Text = BuildPitchSummary(formation);
         ApplyFormationRows(formation, width);
         _shapeSummaryLabel.Text = BuildShapeSummary(formation);
-        _previewSummaryLabel.Text = BuildPreviewSummary(formation, press, tempo, width, risk);
+        _previewSummaryLabel.Text = BuildPreviewSummary(formation, style, press, tempo, width, risk);
         _statusLabel.Text = "Preview mode: these values explain the next match plan before they are saved.";
         _controlHintLabel.Text = "Preview values are unsaved until Save Tactical Plan applies them.";
-        _controlSummaryLabel.Text = BuildControlSummary(formation, press, tempo, width, risk);
+        _controlSummaryLabel.Text = BuildControlSummary(formation, style, press, tempo, width, risk);
         _pressPreviewLabel.Text = $"Pressing Intensity: {DescribePress(press)}. {BuildPressPreview(press)}";
         _tempoPreviewLabel.Text = $"Tempo: {DescribeTempo(tempo)}. {BuildTempoPreview(tempo)}";
         _widthPreviewLabel.Text = $"Pitch use: {DescribeWidth(width)}. {BuildWidthPreview(width)}";
@@ -686,15 +737,16 @@ public partial class TacticsScreen : Control
         }
 
         var formation = _formationOption.GetItemText(_formationOption.Selected);
+        var style = _styleOption.GetItemText(_styleOption.Selected);
         var press = (int)_pressSpin.Value;
         var tempo = (int)_tempoSpin.Value;
         var width = (int)_widthSpin.Value;
         var risk = (int)_riskSpin.Value;
 
-        GameState.Instance.UpdateTactics(formation, press, tempo, width, risk);
+        GameState.Instance.UpdateTactics(formation, style, press, tempo, width, risk);
         _savedPlanLabel.Text = BuildSavedPlanSummary(GameState.Instance);
         RefreshBoard();
-        _statusLabel.Text = $"Saved tactical setup applied to the shared match engine: {formation} | Pressing {press} | Tempo {tempo} | Width {width} | Mentality {risk}";
+        _statusLabel.Text = $"Saved tactical setup applied to the shared match engine: {formation} | {style} | Pressing {press} | Tempo {tempo} | Width {width} | Mentality {risk}";
         _saveHintLabel.Text = "Saved plan is now the matchday tactical setup.";
         SetReadinessChip("PLAN SAVED", true);
     }
@@ -709,6 +761,7 @@ public partial class TacticsScreen : Control
 
         var formationIndex = FindFormationIndex(GameState.Instance.TacticalFormation);
         _formationOption.Select(formationIndex);
+        _styleOption.Select(FindStyleIndex(GameState.Instance.TeamStyleName));
         _pressSpin.Value = GameState.Instance.PressIntensity;
         _tempoSpin.Value = GameState.Instance.Tempo;
         _widthSpin.Value = GameState.Instance.Width;
@@ -760,9 +813,16 @@ public partial class TacticsScreen : Control
         _statusLabel.Text = "Formation changed on the board. Save to lock the new shape.";
     }
 
+    private void OnStyleSelected(long _index)
+    {
+        RefreshBoard();
+        _statusLabel.Text = "Team style changed on the board. Save to lock the new tactical layer.";
+    }
+
     private void SetControlsDisabled(bool disabled)
     {
         _formationOption.Disabled = disabled;
+        _styleOption.Disabled = disabled;
         _pressSpin.Editable = !disabled;
         _tempoSpin.Editable = !disabled;
         _widthSpin.Editable = !disabled;
@@ -788,9 +848,22 @@ public partial class TacticsScreen : Control
         return 0;
     }
 
+    private int FindStyleIndex(string style)
+    {
+        for (var index = 0; index < _styleOption.ItemCount; index++)
+        {
+            if (_styleOption.GetItemText(index) == style)
+            {
+                return index;
+            }
+        }
+
+        return 0;
+    }
+
     private static string BuildSavedPlanSummary(GameState state)
     {
-        return $"Saved tactical setup: {state.BuildTacticalPlanSummary()} | Shared match engine input: Formation {state.TacticalFormation} | Pressing {state.PressIntensity} | Tempo {state.Tempo} | Width {state.Width} | Mentality {state.Risk}";
+        return $"Saved tactical setup: {state.BuildTacticalPlanSummary()} | Shared match engine input: Formation {state.TacticalFormation} | Style {state.TeamStyleName} | Familiarity {state.TacticalFamiliarityName} | Pressing {state.PressIntensity} | Tempo {state.Tempo} | Width {state.Width} | Mentality {state.Risk}\n{state.TacticsFoundationSummary}";
     }
 
     private static string BuildClubMonogram(string clubName)
@@ -809,8 +882,13 @@ public partial class TacticsScreen : Control
         return $"{char.ToUpperInvariant(words[0][0])}{char.ToUpperInvariant(words[^1][0])}";
     }
 
-    private static string BuildTacticalChipLabel(string formation, int press, int tempo)
+    private static string BuildTacticalChipLabel(string formation, string style, int press, int tempo)
     {
+        if (style == "High Press" || style == "Counterattack")
+        {
+            return $"{formation} {style.ToUpperInvariant()}";
+        }
+
         if (press >= 70 && tempo >= 65)
         {
             return $"{formation} FRONT-FOOT";
@@ -913,14 +991,14 @@ public partial class TacticsScreen : Control
         };
     }
 
-    private static string BuildPreviewSummary(string formation, int press, int tempo, int width, int risk)
+    private static string BuildPreviewSummary(string formation, string style, int press, int tempo, int width, int risk)
     {
-        return $"Shared match engine preview: {formation} with pressing {press} ({DescribePress(press).ToLowerInvariant()}), tempo {tempo} ({DescribeTempo(tempo).ToLowerInvariant()}), width {width} ({DescribeWidth(width).ToLowerInvariant()}), and mentality {risk} ({DescribeRisk(risk).ToLowerInvariant()}).";
+        return $"Shared match engine preview: {formation}, {style}, pressing {press} ({DescribePress(press).ToLowerInvariant()}), tempo {tempo} ({DescribeTempo(tempo).ToLowerInvariant()}), width {width} ({DescribeWidth(width).ToLowerInvariant()}), and mentality {risk} ({DescribeRisk(risk).ToLowerInvariant()}).";
     }
 
-    private static string BuildControlSummary(string formation, int press, int tempo, int width, int risk)
+    private static string BuildControlSummary(string formation, string style, int press, int tempo, int width, int risk)
     {
-        return $"Preview values | Formation {formation} | Pressing {press} ({DescribePress(press)}) | Tempo {tempo} ({DescribeTempo(tempo)}) | Width {width} ({DescribeWidth(width)}) | Mentality {risk} ({DescribeRisk(risk)})";
+        return $"Preview values | Formation {formation} | Style {style} | Pressing {press} ({DescribePress(press)}) | Tempo {tempo} ({DescribeTempo(tempo)}) | Width {width} ({DescribeWidth(width)}) | Mentality {risk} ({DescribeRisk(risk)})";
     }
 
     private static string DescribePress(int value)

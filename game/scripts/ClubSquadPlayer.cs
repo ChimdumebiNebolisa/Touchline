@@ -9,9 +9,14 @@ public sealed class ClubSquadPlayer
     public required string Name { get; init; }
     public required string Position { get; init; }
     public required int Age { get; init; }
+    public int TrueAbility { get; init; } = 65;
+    public int TacticalFitScore { get; init; } = 65;
+    public string PlayingStyle { get; init; } = "Balanced player";
+    public string TacticalFit { get; init; } = "Partial fit.";
     public required int Form { get; init; }
     public required int Morale { get; init; }
     public required int Fitness { get; init; }
+    public int Fatigue { get; init; } = 10;
     public required bool IsStarting { get; init; }
 }
 
@@ -40,18 +45,7 @@ public static class ClubSquadFactory
         for (var index = 0; index < clubData.Players.Length; index++)
         {
             var player = clubData.Players[index];
-            squad[index] = new ClubSquadPlayer
-            {
-                PlayerId = BuildPlayerId(clubData.Name, player.Name, index),
-                ClubName = clubData.Name,
-                Name = player.Name,
-                Position = player.Position,
-                Age = player.Age,
-                Form = player.Form,
-                Morale = player.Morale,
-                Fitness = player.Fitness,
-                IsStarting = player.IsStarting
-            };
+            squad[index] = PlayerIdentityFoundation.BuildClubSquadPlayer(player, clubData.Name, worldSeed, index);
         }
 
         return EnsurePlayableSquad(clubData.Name, worldSeed, squad);
@@ -79,9 +73,23 @@ public static class ClubSquadFactory
                 Name = name,
                 Position = position,
                 Age = 19 + ((seed + index * 7) % 13),
+                TrueAbility = 62 + ((seed + index * 6) % 20),
+                TacticalFitScore = 58 + ((seed + index * 5) % 24),
+                PlayingStyle = position switch
+                {
+                    "GK" => "Line goalkeeper",
+                    "CB" => "Stopper",
+                    "RB" or "LB" => "Balanced fullback",
+                    "CM" => "Connector",
+                    "AM" => "Between-lines creator",
+                    "RW" or "LW" => "Direct wide runner",
+                    _ => "Pressing forward"
+                },
+                TacticalFit = "Estimated fit from fallback squad generation.",
                 Form = 62 + ((seed + index * 5) % 18),
                 Morale = 62 + ((seed + index * 3) % 18),
                 Fitness = 80 + ((seed + index * 4) % 13),
+                Fatigue = 8 + ((seed + index) % 18),
                 IsStarting = index < 11
             };
         }

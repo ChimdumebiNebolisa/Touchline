@@ -189,6 +189,11 @@ public static class PostMatchConsequenceService
     private static string BuildTacticalExplanation(MatchPlaybackResult result, GameState state, MatchCauseAnalysis analysis)
     {
         var explanations = new List<string>();
+        if (!string.IsNullOrWhiteSpace(result.TacticalExplanation))
+        {
+            explanations.Add(result.TacticalExplanation);
+        }
+
         if (state.Risk >= 70)
         {
             explanations.Add(analysis.HomeShots >= analysis.AwayShots
@@ -219,6 +224,11 @@ public static class PostMatchConsequenceService
     private static string BuildKeyPlayerMoments(MatchPlaybackResult result)
     {
         var moments = new List<string>();
+        if (!string.IsNullOrWhiteSpace(result.PlayerRatingsSummary))
+        {
+            moments.Add(result.PlayerRatingsSummary);
+        }
+
         foreach (var action in result.Timeline.Actions)
         {
             if (action.Kind == MatchActionKind.Goal && !string.IsNullOrWhiteSpace(action.Participants.ScorerPlayerId))
@@ -234,7 +244,7 @@ public static class PostMatchConsequenceService
                 moments.Add($"Turnover: {ResolvePlayerName(result, action.Participants.InterceptorPlayerId)} intercepted at {FormatMinute(action.StartSecond)}.");
             }
 
-            if (moments.Count == 3)
+            if (moments.Count == 4)
             {
                 break;
             }

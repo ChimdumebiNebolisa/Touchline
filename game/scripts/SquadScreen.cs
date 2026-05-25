@@ -497,7 +497,7 @@ public partial class SquadScreen : Control
         var metaLabel = new Label
         {
             Name = "MetaLabel",
-            Text = $"{player.Position} | Age {player.Age} | {BuildPlayerStatusLine(player)}",
+            Text = $"{player.Position} | Age {player.Age} | {player.PlayingStyle} | {BuildPlayerStatusLine(player)}",
             SizeFlagsHorizontal = SizeFlags.ExpandFill
         };
         metaLabel.AddThemeFontSizeOverride("font_size", 14);
@@ -519,7 +519,7 @@ public partial class SquadScreen : Control
 
         var conditionLabel = new Label
         {
-            Text = $"Form {player.Form} | Morale {player.Morale} | Fitness {player.Fitness}",
+            Text = $"Form {player.Form} | Morale {player.Morale} | Fitness {player.Fitness} | Known {player.TechnicalAttribute}/{player.PhysicalAttribute} | Unknown ?",
             HorizontalAlignment = HorizontalAlignment.Right
         };
         conditionLabel.AddThemeFontSizeOverride("font_size", 13);
@@ -573,7 +573,7 @@ public partial class SquadScreen : Control
         _selectedPlayerName = player.Name;
 
         _playerNameLabel.Text = player.Name;
-        _detailMetaLabel.Text = $"{player.Position} | Age {player.Age} | {BuildPlayerStatusLine(player)}";
+        _detailMetaLabel.Text = $"{player.Position} | Age {player.Age} | {PlayerIdentityFoundation.BuildProfileSummary(player)}";
         _roleChipLabel.Text = player.IsStarting ? "STARTING XI" : "BENCH/RESERVE";
         _statusChipLabel.Text = BuildReadinessLabel(player).ToUpperInvariant();
         TouchlineTheme.ApplyPanelVariant(_roleChip, player.IsStarting ? TouchlineSurfaceVariant.Positive : TouchlineSurfaceVariant.Accent, 999);
@@ -583,7 +583,7 @@ public partial class SquadScreen : Control
         _moraleStatLabel.Text = $"Morale | {player.Morale} | {DescribePulse(player.Morale)}";
         _fitnessStatLabel.Text = $"Fitness | {player.Fitness} | {DescribeReadiness(player.Fitness)}";
         _readinessSummaryLabel.Text = BuildReadinessSummary(player);
-        _profileHintLabel.Text = "Open the player profile for identity, lineup status, and the longer form-morale-fitness arc.";
+        _profileHintLabel.Text = $"Open the player profile for identity, lineup status, and the longer form-morale-fitness arc.\n{PlayerIdentityFoundation.BuildInformationSummary(player)}\n{PlayerIdentityFoundation.BuildContractSummary(player)}";
         _lineupStatusLabel.Text = player.IsStarting
             ? $"{player.Name} currently holds a Starting XI role. Use the primary action only if you want to rotate the XI."
             : $"{player.Name} is in the bench/reserve group. Promote only if the readiness level fits the next fixture.";
@@ -697,7 +697,7 @@ public partial class SquadScreen : Control
 
     private static string BuildPlayerStatusLine(GameState.SquadPlayer player)
     {
-        return player.IsStarting ? "Starting XI role" : "Bench/reserve depth";
+        return player.IsStarting ? $"Starting XI role | {player.ContractRole}" : $"Bench/reserve depth | {player.ContractRole}";
     }
 
     private static string BuildReadinessLabel(GameState.SquadPlayer player)
@@ -740,7 +740,7 @@ public partial class SquadScreen : Control
 
     private static string BuildReadinessSummary(GameState.SquadPlayer player)
     {
-        return $"{player.Name} reads as {BuildReadinessLabel(player).ToLowerInvariant()} for the next fixture: form {player.Form}, morale {player.Morale}, fitness {player.Fitness}, squad status {BuildPlayerStatusLine(player).ToLowerInvariant()}.";
+        return $"{player.Name} reads as {BuildReadinessLabel(player).ToLowerInvariant()} for the next fixture: form {player.Form}, morale {player.Morale}, fitness {player.Fitness}, fatigue {player.Fatigue}, injury risk {player.InjuryRisk}, tactical fit {player.TacticalFitScore}, squad status {BuildPlayerStatusLine(player).ToLowerInvariant()}. {player.TacticalFit}";
     }
 
     private static string BuildHeaderStatus(GameState state)

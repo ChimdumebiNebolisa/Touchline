@@ -14,6 +14,7 @@ public sealed class SaveSlotData
     public string? SelectedClubName { get; set; }
     public SaveSlotCareerProfileData? CareerProfile { get; set; }
     public SaveSlotClubFoundationData? CurrentClub { get; set; }
+    public SaveSlotStageFoundationData? StageFoundations { get; set; }
     public string NextFixtureSummary { get; set; } = "Fixture context unavailable.";
     public string SquadStatusSummary { get; set; } = "Squad status unavailable.";
     public SaveSlotPlayerData[]? SquadPlayers { get; set; }
@@ -92,12 +93,37 @@ public sealed class SaveSlotObjectiveData
 
 public sealed class SaveSlotPlayerData
 {
+    public string PlayerId { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     public string Position { get; set; } = string.Empty;
     public int Age { get; set; }
+    public string Nationality { get; set; } = "Novaran";
+    public int TrueAbility { get; set; }
+    public int TechnicalAttribute { get; set; }
+    public int TacticalAttribute { get; set; }
+    public int PhysicalAttribute { get; set; }
+    public int MentalAttribute { get; set; }
+    public string KnownAttributesSummary { get; set; } = string.Empty;
+    public string EstimatedAttributesSummary { get; set; } = string.Empty;
+    public string UnknownAttributesSummary { get; set; } = string.Empty;
+    public string PlayingStyle { get; set; } = string.Empty;
+    public string Tendencies { get; set; } = string.Empty;
+    public string Traits { get; set; } = string.Empty;
+    public string Personality { get; set; } = string.Empty;
+    public string TacticalFit { get; set; } = string.Empty;
+    public string DevelopmentCurve { get; set; } = string.Empty;
     public int Form { get; set; }
     public int Morale { get; set; }
     public int Fitness { get; set; }
+    public int Fatigue { get; set; }
+    public int InjuryRisk { get; set; }
+    public int Wage { get; set; }
+    public int ContractExpiryYear { get; set; }
+    public string ContractRole { get; set; } = string.Empty;
+    public string Relationship { get; set; } = string.Empty;
+    public string PromiseSummary { get; set; } = string.Empty;
+    public string TransferInterest { get; set; } = string.Empty;
+    public int TacticalFitScore { get; set; }
     public bool IsStarting { get; set; }
 }
 
@@ -150,7 +176,7 @@ public partial class SaveSystem : Node
         WriteIndented = true,
         PropertyNameCaseInsensitive = true
     };
-    public const int CurrentSaveVersion = 2;
+    public const int CurrentSaveVersion = 3;
 
     public static SaveSystem? Instance { get; private set; }
     public string LastStatusMessage { get; private set; } = "Save system idle.";
@@ -324,11 +350,11 @@ public partial class SaveSystem : Node
         normalizedPayload = payload;
         migratedLegacySave = false;
 
-        if (payload.SaveVersion >= CurrentSaveVersion &&
+        if (payload.SaveVersion >= 2 &&
             (payload.CompetitionTable == null || payload.CompetitionFixtures == null))
         {
             normalizedPayload = new SaveSlotData();
-            statusMessage = "Save file is incomplete: current saves must include competition table and fixture state.";
+            statusMessage = "Save file is incomplete: versioned saves must include competition table and fixture state.";
             return false;
         }
 
@@ -428,18 +454,44 @@ public partial class SaveSystem : Node
             SelectedClubName = state.SelectedClubName,
             CareerProfile = BuildCareerProfileData(state.CareerProfile),
             CurrentClub = BuildClubFoundationData(state.CurrentClub),
+            StageFoundations = state.BuildStageFoundationSaveData(),
             NextFixtureSummary = state.NextFixtureSummary,
             SquadStatusSummary = state.SquadStatusSummary,
             SquadPlayers = Array.ConvertAll(
                 state.SquadPlayers,
                 player => new SaveSlotPlayerData
                 {
+                    PlayerId = player.PlayerId,
                     Name = player.Name,
                     Position = player.Position,
                     Age = player.Age,
+                    Nationality = player.Nationality,
+                    TrueAbility = player.TrueAbility,
+                    TechnicalAttribute = player.TechnicalAttribute,
+                    TacticalAttribute = player.TacticalAttribute,
+                    PhysicalAttribute = player.PhysicalAttribute,
+                    MentalAttribute = player.MentalAttribute,
+                    KnownAttributesSummary = player.KnownAttributesSummary,
+                    EstimatedAttributesSummary = player.EstimatedAttributesSummary,
+                    UnknownAttributesSummary = player.UnknownAttributesSummary,
+                    PlayingStyle = player.PlayingStyle,
+                    Tendencies = player.Tendencies,
+                    Traits = player.Traits,
+                    Personality = player.Personality,
+                    TacticalFit = player.TacticalFit,
+                    DevelopmentCurve = player.DevelopmentCurve,
                     Form = player.Form,
                     Morale = player.Morale,
                     Fitness = player.Fitness,
+                    Fatigue = player.Fatigue,
+                    InjuryRisk = player.InjuryRisk,
+                    Wage = player.Wage,
+                    ContractExpiryYear = player.ContractExpiryYear,
+                    ContractRole = player.ContractRole,
+                    Relationship = player.Relationship,
+                    PromiseSummary = player.PromiseSummary,
+                    TransferInterest = player.TransferInterest,
+                    TacticalFitScore = player.TacticalFitScore,
                     IsStarting = player.IsStarting
                 }),
             TacticalFormation = state.TacticalFormation,
@@ -519,6 +571,7 @@ public partial class SaveSystem : Node
             SelectedClubName = source.SelectedClubName,
             CareerProfile = CloneCareerProfileData(source.CareerProfile),
             CurrentClub = CloneClubFoundationData(source.CurrentClub),
+            StageFoundations = CloneStageFoundationData(source.StageFoundations),
             NextFixtureSummary = source.NextFixtureSummary,
             SquadStatusSummary = source.SquadStatusSummary,
             SquadPlayers = source.SquadPlayers == null
@@ -527,12 +580,37 @@ public partial class SaveSystem : Node
                     source.SquadPlayers,
                     player => new SaveSlotPlayerData
                     {
+                        PlayerId = player.PlayerId,
                         Name = player.Name,
                         Position = player.Position,
                         Age = player.Age,
+                        Nationality = player.Nationality,
+                        TrueAbility = player.TrueAbility,
+                        TechnicalAttribute = player.TechnicalAttribute,
+                        TacticalAttribute = player.TacticalAttribute,
+                        PhysicalAttribute = player.PhysicalAttribute,
+                        MentalAttribute = player.MentalAttribute,
+                        KnownAttributesSummary = player.KnownAttributesSummary,
+                        EstimatedAttributesSummary = player.EstimatedAttributesSummary,
+                        UnknownAttributesSummary = player.UnknownAttributesSummary,
+                        PlayingStyle = player.PlayingStyle,
+                        Tendencies = player.Tendencies,
+                        Traits = player.Traits,
+                        Personality = player.Personality,
+                        TacticalFit = player.TacticalFit,
+                        DevelopmentCurve = player.DevelopmentCurve,
                         Form = player.Form,
                         Morale = player.Morale,
                         Fitness = player.Fitness,
+                        Fatigue = player.Fatigue,
+                        InjuryRisk = player.InjuryRisk,
+                        Wage = player.Wage,
+                        ContractExpiryYear = player.ContractExpiryYear,
+                        ContractRole = player.ContractRole,
+                        Relationship = player.Relationship,
+                        PromiseSummary = player.PromiseSummary,
+                        TransferInterest = player.TransferInterest,
+                        TacticalFitScore = player.TacticalFitScore,
                         IsStarting = player.IsStarting
                     }),
             TacticalFormation = source.TacticalFormation,
@@ -734,6 +812,97 @@ public partial class SaveSystem : Node
             SquadMorale = source.SquadMorale,
             JobPressure = source.JobPressure,
             NewsFeed = source.NewsFeed == null ? null : (string[])source.NewsFeed.Clone()
+        };
+    }
+
+    private static SaveSlotStageFoundationData? CloneStageFoundationData(SaveSlotStageFoundationData? source)
+    {
+        if (source == null)
+        {
+            return null;
+        }
+
+        return new SaveSlotStageFoundationData
+        {
+            TeamStyleName = source.TeamStyleName,
+            PassingDirectness = source.PassingDirectness,
+            DefensiveLine = source.DefensiveLine,
+            Tackling = source.Tackling,
+            TacticalFamiliarityScore = source.TacticalFamiliarityScore,
+            TeamInstructionsSummary = source.TeamInstructionsSummary,
+            PlayerRolesSummary = source.PlayerRolesSummary,
+            PlayerInstructionsSummary = source.PlayerInstructionsSummary,
+            TacticalFitNotes = source.TacticalFitNotes,
+            TacticalRiskNotes = source.TacticalRiskNotes,
+            TrainingFocusName = source.TrainingFocusName,
+            TrainingStatusSummary = source.TrainingStatusSummary,
+            ScoutingAssignment = source.ScoutingAssignment == null
+                ? null
+                : new SaveSlotScoutingAssignmentData
+                {
+                    Target = source.ScoutingAssignment.Target,
+                    DaysRemaining = source.ScoutingAssignment.DaysRemaining,
+                    ReportQuality = source.ScoutingAssignment.ReportQuality,
+                    DiscoverySummary = source.ScoutingAssignment.DiscoverySummary,
+                    ReportReady = source.ScoutingAssignment.ReportReady
+                },
+            NewsEvents = source.NewsEvents == null
+                ? null
+                : Array.ConvertAll(
+                    source.NewsEvents,
+                    newsEvent => new SaveSlotNewsEventData
+                    {
+                        Title = newsEvent.Title,
+                        CategoryName = newsEvent.CategoryName,
+                        Reliability = newsEvent.Reliability,
+                        Text = newsEvent.Text,
+                        Importance = newsEvent.Importance
+                    }),
+            RecruitmentTarget = source.RecruitmentTarget == null
+                ? null
+                : new SaveSlotRecruitmentTargetData
+                {
+                    PlayerName = source.RecruitmentTarget.PlayerName,
+                    Position = source.RecruitmentTarget.Position,
+                    InterestSummary = source.RecruitmentTarget.InterestSummary,
+                    TacticalFitSummary = source.RecruitmentTarget.TacticalFitSummary,
+                    EstimatedFeeRange = source.RecruitmentTarget.EstimatedFeeRange,
+                    EstimatedWageRange = source.RecruitmentTarget.EstimatedWageRange,
+                    DirectorResponse = source.RecruitmentTarget.DirectorResponse,
+                    BoardResponse = source.RecruitmentTarget.BoardResponse,
+                    Status = source.RecruitmentTarget.Status
+                },
+            PromiseRecords = source.PromiseRecords == null
+                ? null
+                : Array.ConvertAll(
+                    source.PromiseRecords,
+                    promise => new SaveSlotPromiseRecordData
+                    {
+                        PromiseType = promise.PromiseType,
+                        Recipient = promise.Recipient,
+                        ExpectedAction = promise.ExpectedAction,
+                        DeadlineSummary = promise.DeadlineSummary,
+                        StatusName = promise.StatusName,
+                        ConsequenceRisk = promise.ConsequenceRisk
+                    }),
+            JobSecurityName = source.JobSecurityName,
+            JobOffer = source.JobOffer == null
+                ? null
+                : new SaveSlotJobOfferEventData
+                {
+                    OfferTypeName = source.JobOffer.OfferTypeName,
+                    ClubName = source.JobOffer.ClubName,
+                    RoleName = source.JobOffer.RoleName,
+                    InterestSummary = source.JobOffer.InterestSummary,
+                    Reason = source.JobOffer.Reason
+                },
+            CareerHistory = source.CareerHistory == null ? null : (string[])source.CareerHistory.Clone(),
+            LicenseOpportunitySummary = source.LicenseOpportunitySummary,
+            ObjectiveReviewSummary = source.ObjectiveReviewSummary,
+            FanTrust = source.FanTrust,
+            WorldReputation = source.WorldReputation,
+            DressingRoomPressure = source.DressingRoomPressure,
+            TransferPressure = source.TransferPressure
         };
     }
 
