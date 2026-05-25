@@ -126,11 +126,11 @@ public partial class PostMatchScene : Control
         _pressureValueLabel.Text = BuildPressureHeadline(report.PressureSummary);
         _pressureMetaLabel.Text = report.PressureSummary;
 
-        _deltasLabel.Text = $"{report.ConsequenceSummary}\nStats | {report.StatsSummary}";
+        _deltasLabel.Text = $"{report.ConsequenceSummary}\nStats | {report.StatsSummary}\n{report.MoraleSection}";
         _tableImpactLabel.Text = report.TableImpactSummary;
-        _tacticalLabel.Text = $"{report.TacticalSummary}\nTactical read | {report.TacticalExplanation}\nCause | {report.CauseSummary}";
-        _pressureLabel.Text = report.PressureSummary;
-        _eventsLabel.Text = $"{string.Join("\n", report.KeyEvents)}\n\nKey moments\n{report.KeyPlayerMoments}";
+        _tacticalLabel.Text = $"{report.TacticalSummary}\n{report.TacticalSection}\n{report.PlayerFitSection}\n{report.FatigueSection}\nTactical read | {report.TacticalExplanation}\nCause | {report.CauseSummary}";
+        _pressureLabel.Text = $"{report.PressureSummary}\n{report.BoardReactionSection}\n{report.FanReactionSection}";
+        _eventsLabel.Text = $"{report.MediaStorySection}\n{string.Join("\n", report.KeyEvents)}\n\nKey moments\n{report.KeyPlayerMoments}\n\n{report.StaffAnalysisSection}\n{report.DevelopmentNotesSection}";
         _nextStepLabel.Text = "Advance to Manager Hub and carry this result into the next planning cycle.";
     }
 

@@ -1,38 +1,35 @@
 # Autonomous Progress
 
 ## Current active Plan step
-- Phase 6: Post-match report depth.
+- Phase 7: Morale, trust, reputation, and pressure depth.
 
 ## Last completed verified task
-- Phase 5: Match engine depth implemented and verified locally.
+- Phase 6: Post-match report depth implemented and verified locally.
 
 ## Current subtask in progress
-- Prepare Phase 5 commit and push, then begin Phase 6.
+- Prepare Phase 6 commit and push, then begin Phase 7.
 
 ## Next queued subtasks
-- Commit and push `phase-5: deepen shared match engine`.
-- Begin Phase 6 post-match report depth inspection.
-- Keep post-match explanations tied to stored match facts and the shared match object.
+- Commit and push `phase-6: deepen post-match reports`.
+- Begin Phase 7 morale/trust/reputation/pressure inspection.
+- Keep morale, trust, reputation, and pressure separated and explainable.
 
 ## Known blockers
 - No active blockers.
 - `docs/audit/` remains untracked and intentionally excluded from phase commits.
 
 ## Last verification run
-- Phase 5 local verification:
+- Phase 6 local verification:
   - `dotnet build game/Touchline.sln` passed with 0 warnings and 0 errors.
-  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/phase5_match_engine_depth_check.gd` passed.
-  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/stage5_match_alignment_check.gd` passed.
-  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step34_match_playback_check.gd` passed.
-  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step39_action_participants_check.gd` passed.
-  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step40_match_stats_check.gd` passed.
-  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step41_post_match_report_check.gd` passed.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/phase6_post_match_report_depth_check.gd` passed.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step23_post_match_check.gd` passed.
   - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step38_post_match_causes_check.gd` passed.
-  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step49_matchday_preparation_check.gd` passed.
-  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step22_shared_engine_check.gd` passed with a 360000 ms timeout because live playback takes over two minutes headless.
-  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step65_live_match_readability_check.gd` passed.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step41_post_match_report_check.gd` passed.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/stage6_consequences_pressure_check.gd` passed.
   - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step27_save_compat_check.gd` passed.
   - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step50_end_to_end_user_flow_check.gd` passed.
+  - `git diff --check` passed.
+  - `git diff --cached --check` passed.
 
 ## Last commit hash
 - Stage 1 completed at `b659280`.
@@ -43,11 +40,12 @@
 - Phase 2 completed at `2e618ca`.
 - Phase 3 completed at `02b9ddc`.
 - Phase 4 completed at `08b27cb`.
-- Phase 5 commit pending.
+- Phase 5 completed at `a50f438`.
+- Phase 6 commit pending.
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`.
 - Re-read `docs/touchline_master_design_decisions.md`.
 - Re-read `docs/MASTER_IMPLEMENTATION_ROADMAP.md`.
-- Resume at Phase 6 after the Phase 5 commit/push completes.
+- Resume at Phase 7 after the Phase 6 commit/push completes.
 - Keep `docs/audit/` untouched unless a future task explicitly uses it.

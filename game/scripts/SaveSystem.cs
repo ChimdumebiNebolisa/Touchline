@@ -145,6 +145,15 @@ public sealed class SaveSlotMatchReportData
     public string StatsSummary { get; set; } = string.Empty;
     public string KeyPlayerMoments { get; set; } = string.Empty;
     public string TacticalExplanation { get; set; } = string.Empty;
+    public string TacticalSection { get; set; } = string.Empty;
+    public string PlayerFitSection { get; set; } = string.Empty;
+    public string FatigueSection { get; set; } = string.Empty;
+    public string MoraleSection { get; set; } = string.Empty;
+    public string BoardReactionSection { get; set; } = string.Empty;
+    public string FanReactionSection { get; set; } = string.Empty;
+    public string MediaStorySection { get; set; } = string.Empty;
+    public string StaffAnalysisSection { get; set; } = string.Empty;
+    public string DevelopmentNotesSection { get; set; } = string.Empty;
     public string[]? KeyEvents { get; set; }
     public int MoraleDelta { get; set; }
     public int FanDelta { get; set; }
@@ -181,7 +190,7 @@ public partial class SaveSystem : Node
         WriteIndented = true,
         PropertyNameCaseInsensitive = true
     };
-    public const int CurrentSaveVersion = 7;
+    public const int CurrentSaveVersion = 8;
 
     public static SaveSystem? Instance { get; private set; }
     public string LastStatusMessage { get; private set; } = "Save system idle.";
@@ -534,6 +543,15 @@ public partial class SaveSystem : Node
                     StatsSummary = state.LastMatchReport.StatsSummary,
                     KeyPlayerMoments = state.LastMatchReport.KeyPlayerMoments,
                     TacticalExplanation = state.LastMatchReport.TacticalExplanation,
+                    TacticalSection = state.LastMatchReport.TacticalSection,
+                    PlayerFitSection = state.LastMatchReport.PlayerFitSection,
+                    FatigueSection = state.LastMatchReport.FatigueSection,
+                    MoraleSection = state.LastMatchReport.MoraleSection,
+                    BoardReactionSection = state.LastMatchReport.BoardReactionSection,
+                    FanReactionSection = state.LastMatchReport.FanReactionSection,
+                    MediaStorySection = state.LastMatchReport.MediaStorySection,
+                    StaffAnalysisSection = state.LastMatchReport.StaffAnalysisSection,
+                    DevelopmentNotesSection = state.LastMatchReport.DevelopmentNotesSection,
                     KeyEvents = state.LastMatchReport.KeyEvents,
                     MoraleDelta = state.LastMatchReport.MoraleDelta,
                     FanDelta = state.LastMatchReport.FanDelta,
@@ -658,6 +676,15 @@ public partial class SaveSystem : Node
                     StatsSummary = source.LastMatchReport.StatsSummary,
                     KeyPlayerMoments = source.LastMatchReport.KeyPlayerMoments,
                     TacticalExplanation = source.LastMatchReport.TacticalExplanation,
+                    TacticalSection = source.LastMatchReport.TacticalSection,
+                    PlayerFitSection = source.LastMatchReport.PlayerFitSection,
+                    FatigueSection = source.LastMatchReport.FatigueSection,
+                    MoraleSection = source.LastMatchReport.MoraleSection,
+                    BoardReactionSection = source.LastMatchReport.BoardReactionSection,
+                    FanReactionSection = source.LastMatchReport.FanReactionSection,
+                    MediaStorySection = source.LastMatchReport.MediaStorySection,
+                    StaffAnalysisSection = source.LastMatchReport.StaffAnalysisSection,
+                    DevelopmentNotesSection = source.LastMatchReport.DevelopmentNotesSection,
                     KeyEvents = source.LastMatchReport.KeyEvents == null ? null : (string[])source.LastMatchReport.KeyEvents.Clone(),
                     MoraleDelta = source.LastMatchReport.MoraleDelta,
                     FanDelta = source.LastMatchReport.FanDelta,

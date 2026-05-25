@@ -117,6 +117,15 @@ public partial class GameState : Node
         public required string StatsSummary { get; init; }
         public required string KeyPlayerMoments { get; init; }
         public required string TacticalExplanation { get; init; }
+        public required string TacticalSection { get; init; }
+        public required string PlayerFitSection { get; init; }
+        public required string FatigueSection { get; init; }
+        public required string MoraleSection { get; init; }
+        public required string BoardReactionSection { get; init; }
+        public required string FanReactionSection { get; init; }
+        public required string MediaStorySection { get; init; }
+        public required string StaffAnalysisSection { get; init; }
+        public required string DevelopmentNotesSection { get; init; }
         public required string[] KeyEvents { get; init; }
         public required int MoraleDelta { get; init; }
         public required int FanDelta { get; init; }
@@ -1130,6 +1139,15 @@ public partial class GameState : Node
             StatsSummary = consequence.StatsSummary,
             KeyPlayerMoments = consequence.KeyPlayerMoments,
             TacticalExplanation = consequence.TacticalExplanation,
+            TacticalSection = consequence.TacticalSection,
+            PlayerFitSection = consequence.PlayerFitSection,
+            FatigueSection = consequence.FatigueSection,
+            MoraleSection = consequence.MoraleSection,
+            BoardReactionSection = consequence.BoardReactionSection,
+            FanReactionSection = consequence.FanReactionSection,
+            MediaStorySection = consequence.MediaStorySection,
+            StaffAnalysisSection = consequence.StaffAnalysisSection,
+            DevelopmentNotesSection = consequence.DevelopmentNotesSection,
             KeyEvents = consequence.KeyEvents,
             MoraleDelta = consequence.MoraleDelta,
             FanDelta = consequence.FanDelta,
@@ -1244,6 +1262,33 @@ public partial class GameState : Node
                 TacticalExplanation = string.IsNullOrWhiteSpace(data.LastMatchReport.TacticalExplanation)
                     ? "Tactical explanation unavailable for this saved report."
                     : data.LastMatchReport.TacticalExplanation,
+                TacticalSection = string.IsNullOrWhiteSpace(data.LastMatchReport.TacticalSection)
+                    ? "Tactical section unavailable for this saved report."
+                    : data.LastMatchReport.TacticalSection,
+                PlayerFitSection = string.IsNullOrWhiteSpace(data.LastMatchReport.PlayerFitSection)
+                    ? "Player fit section unavailable for this saved report."
+                    : data.LastMatchReport.PlayerFitSection,
+                FatigueSection = string.IsNullOrWhiteSpace(data.LastMatchReport.FatigueSection)
+                    ? "Fatigue section unavailable for this saved report."
+                    : data.LastMatchReport.FatigueSection,
+                MoraleSection = string.IsNullOrWhiteSpace(data.LastMatchReport.MoraleSection)
+                    ? "Morale section unavailable for this saved report."
+                    : data.LastMatchReport.MoraleSection,
+                BoardReactionSection = string.IsNullOrWhiteSpace(data.LastMatchReport.BoardReactionSection)
+                    ? "Board reaction unavailable for this saved report."
+                    : data.LastMatchReport.BoardReactionSection,
+                FanReactionSection = string.IsNullOrWhiteSpace(data.LastMatchReport.FanReactionSection)
+                    ? "Fan reaction unavailable for this saved report."
+                    : data.LastMatchReport.FanReactionSection,
+                MediaStorySection = string.IsNullOrWhiteSpace(data.LastMatchReport.MediaStorySection)
+                    ? "Media story unavailable for this saved report."
+                    : data.LastMatchReport.MediaStorySection,
+                StaffAnalysisSection = string.IsNullOrWhiteSpace(data.LastMatchReport.StaffAnalysisSection)
+                    ? "Staff analysis unavailable for this saved report."
+                    : data.LastMatchReport.StaffAnalysisSection,
+                DevelopmentNotesSection = string.IsNullOrWhiteSpace(data.LastMatchReport.DevelopmentNotesSection)
+                    ? "Development notes unavailable for this saved report."
+                    : data.LastMatchReport.DevelopmentNotesSection,
                 KeyEvents = data.LastMatchReport.KeyEvents ?? Array.Empty<string>(),
                 MoraleDelta = data.LastMatchReport.MoraleDelta,
                 FanDelta = data.LastMatchReport.FanDelta,

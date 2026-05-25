@@ -13,6 +13,15 @@ public sealed class PostMatchConsequenceResult
     public required string KeyPlayerMoments { get; init; }
     public required string TacticalExplanation { get; init; }
     public required string PressureSummary { get; init; }
+    public required string TacticalSection { get; init; }
+    public required string PlayerFitSection { get; init; }
+    public required string FatigueSection { get; init; }
+    public required string MoraleSection { get; init; }
+    public required string BoardReactionSection { get; init; }
+    public required string FanReactionSection { get; init; }
+    public required string MediaStorySection { get; init; }
+    public required string StaffAnalysisSection { get; init; }
+    public required string DevelopmentNotesSection { get; init; }
     public required string[] KeyEvents { get; init; }
 }
 
@@ -82,13 +91,14 @@ public static class PostMatchConsequenceService
         var keyPlayerMoments = BuildKeyPlayerMoments(result);
         var pressureSummary =
             $"Club pressure now sits at morale {Math.Clamp(state.TeamMorale + moraleDelta, 0, 100)}, fan trust {Math.Clamp(state.FanSentiment + fanDelta, 0, 100)}, and board confidence {Math.Clamp(state.BoardConfidence + boardDelta, 0, 100)}. Cause: {causeSummary}";
+        var resultLabel = BuildResultLabel(goalDifference, result.AwayClubName, analysis);
 
         return new PostMatchConsequenceResult
         {
             MoraleDelta = moraleDelta,
             FanDelta = fanDelta,
             BoardDelta = boardDelta,
-            ResultLabel = BuildResultLabel(goalDifference, result.AwayClubName, analysis),
+            ResultLabel = resultLabel,
             ConsequenceSummary =
                 $"Morale {FormatSignedDelta(moraleDelta)} | Fans {FormatSignedDelta(fanDelta)} | Board {FormatSignedDelta(boardDelta)} | Cause: {causeSummary}",
             CauseSummary = causeSummary,
@@ -96,6 +106,15 @@ public static class PostMatchConsequenceService
             KeyPlayerMoments = keyPlayerMoments,
             TacticalExplanation = tacticalExplanation,
             PressureSummary = pressureSummary,
+            TacticalSection = BuildTacticalSection(result, state, analysis),
+            PlayerFitSection = BuildPlayerFitSection(result, state),
+            FatigueSection = BuildFatigueSection(result),
+            MoraleSection = BuildMoraleSection(state, moraleDelta, fanDelta, boardDelta),
+            BoardReactionSection = BuildBoardReactionSection(state, boardDelta, causeSummary),
+            FanReactionSection = BuildFanReactionSection(state, fanDelta, result),
+            MediaStorySection = BuildMediaStorySection(result, resultLabel),
+            StaffAnalysisSection = BuildStaffAnalysisSection(result, state),
+            DevelopmentNotesSection = BuildDevelopmentNotesSection(result, state),
             KeyEvents = BuildKeyEvents(result, causeSummary)
         };
     }
@@ -295,6 +314,156 @@ public static class PostMatchConsequenceService
         }
 
         return string.Join("\n", moments);
+    }
+
+    private static string BuildTacticalSection(MatchPlaybackResult result, GameState state, MatchCauseAnalysis analysis)
+    {
+        var causeText = result.TacticalCauses.Length == 0
+            ? "No separate tactical cause record was isolated from the timeline."
+            : string.Join("; ", Array.ConvertAll(
+                result.TacticalCauses,
+                cause => $"{cause.Category}: {cause.Summary} ({cause.HomeImpact:+0;-0;0})"));
+        var turnoverRead = analysis.HomeInterceptions >= analysis.AwayInterceptions
+            ? "turnover pressure held up"
+            : "turnover pressure did not outpace the opponent";
+        return $"Tactical section: {state.TacticalFormation} {state.TeamStyleName} with {state.TacticalFamiliarityName.ToLowerInvariant()} familiarity; {turnoverRead}. Causes: {causeText}";
+    }
+
+    private static string BuildPlayerFitSection(MatchPlaybackResult result, GameState state)
+    {
+        var best = FindExtremeRating(result, true);
+        var weakest = FindExtremeRating(result, false);
+        var bestText = best == null ? "No individual rating leader was recorded." : $"{best.Name} {best.Rating:0.0}: {best.Note}";
+        var weakText = weakest == null || best == weakest ? "No separate weak-fit rating stood out." : $"{weakest.Name} {weakest.Rating:0.0}: {weakest.Note}";
+        return $"Player fit section: {state.TacticalRoleFitSummary} Familiarity: {state.PlayerFamiliaritySummary}. Top note: {bestText}. Watch note: {weakText}";
+    }
+
+    private static string BuildFatigueSection(MatchPlaybackResult result)
+    {
+        var conditionEvents = result.Stats.HomeFatigueWarnings + result.Stats.AwayFatigueWarnings +
+            result.Stats.HomeInjuryConcerns + result.Stats.AwayInjuryConcerns;
+        var conditionRead = conditionEvents == 0
+            ? "No late fatigue or injury-warning events were recorded."
+            : $"{result.Stats.HomeFatigueWarnings}-{result.Stats.AwayFatigueWarnings} fatigue warnings and {result.Stats.HomeInjuryConcerns}-{result.Stats.AwayInjuryConcerns} injury concerns came from the timeline.";
+        return $"Fatigue section: {conditionRead} {result.DisciplineSummary}";
+    }
+
+    private static string BuildMoraleSection(GameState state, int moraleDelta, int fanDelta, int boardDelta)
+    {
+        return $"Morale section: squad {state.TeamMorale}->{Math.Clamp(state.TeamMorale + moraleDelta, 0, 100)} ({FormatSignedDelta(moraleDelta)}), fans {state.FanSentiment}->{Math.Clamp(state.FanSentiment + fanDelta, 0, 100)} ({FormatSignedDelta(fanDelta)}), board {state.BoardConfidence}->{Math.Clamp(state.BoardConfidence + boardDelta, 0, 100)} ({FormatSignedDelta(boardDelta)}).";
+    }
+
+    private static string BuildBoardReactionSection(GameState state, int boardDelta, string causeSummary)
+    {
+        var lens = state.CurrentClub?.BoardPhilosophy switch
+        {
+            BoardPhilosophy.WinNowBoard => "result-first standards",
+            BoardPhilosophy.FinanciallyStrictBoard => "risk control and wage discipline",
+            BoardPhilosophy.YouthDevelopmentBoard => "development path and patience",
+            BoardPhilosophy.DataDrivenBoard => "evidence from chances, fit, and value",
+            BoardPhilosophy.TriggerHappyBoard => "short patience under pressure",
+            _ => "longer-term context"
+        };
+        return $"Board reaction: {state.BoardPhilosophyName} applies {lens}; board movement {FormatSignedDelta(boardDelta)} because {causeSummary}.";
+    }
+
+    private static string BuildFanReactionSection(GameState state, int fanDelta, MatchPlaybackResult result)
+    {
+        var lens = state.CurrentClub?.FanCulture switch
+        {
+            FanCulture.AttackingFootball => "chance creation and ambition",
+            FanCulture.DefensiveGrit => "defensive interventions and resilience",
+            FanCulture.AcademyLoyalists => "young-player pathway and identity",
+            FanCulture.AntiSellingFans => "commitment to the squad",
+            FanCulture.DerbyObsessed => "emotion and rivalry stakes",
+            FanCulture.ResultsFirst => "the result before the process",
+            _ => "club identity and effort"
+        };
+        return $"Fan reaction: {state.FanCultureName} judges {lens}; fans moved {FormatSignedDelta(fanDelta)} after a {result.FinalHomeScore}-{result.FinalAwayScore} result.";
+    }
+
+    private static string BuildMediaStorySection(MatchPlaybackResult result, string resultLabel)
+    {
+        var headline = result.FinalHomeScore >= result.FinalAwayScore
+            ? $"{result.HomeClubName} take a result with {result.Stats.HomeBigChances} big chances"
+            : $"{result.AwayClubName} expose {result.HomeClubName} despite {result.Stats.HomeShots} home shots";
+        return $"Media story: {headline}. Narrative: {resultLabel} Discipline/fatigue angle: {result.DisciplineSummary}";
+    }
+
+    private static string BuildStaffAnalysisSection(MatchPlaybackResult result, GameState state)
+    {
+        var coachQuality = GetStaffQuality(state, StaffRole.FirstTeamCoach);
+        var analystQuality = GetStaffQuality(state, StaffRole.DataAnalyst);
+        var detailLevel = (coachQuality + analystQuality) / 2 >= 68 ? "high-confidence" : "limited-confidence";
+        var cause = result.TacticalCauses.Length > 0 ? result.TacticalCauses[0].Summary : result.TacticalSummary;
+        return $"Staff analysis: {detailLevel} review from coach {coachQuality}/100 and analyst {analystQuality}/100. Lead staff point: {cause}";
+    }
+
+    private static string BuildDevelopmentNotesSection(MatchPlaybackResult result, GameState state)
+    {
+        var youngPlayer = FindYoungDevelopmentPlayer(state);
+        var youngText = youngPlayer == null
+            ? "No young player development note was isolated."
+            : $"{youngPlayer.Name}: {youngPlayer.DevelopmentCurve}";
+        return $"Development notes: tactical familiarity review starts from {state.TacticalFamiliarityName}; form and condition changes were applied from the shared timeline. Youth/development note: {youngText}. Rating basis: {result.PlayerRatingsSummary}";
+    }
+
+    private static PlayerMatchRating? FindExtremeRating(MatchPlaybackResult result, bool highest)
+    {
+        PlayerMatchRating? selected = null;
+        foreach (var rating in result.PlayerRatings)
+        {
+            if (rating.Team != result.HomeClubName)
+            {
+                continue;
+            }
+
+            if (selected == null ||
+                (highest && rating.Rating > selected.Rating) ||
+                (!highest && rating.Rating < selected.Rating))
+            {
+                selected = rating;
+            }
+        }
+
+        return selected;
+    }
+
+    private static GameState.SquadPlayer? FindYoungDevelopmentPlayer(GameState state)
+    {
+        GameState.SquadPlayer? selected = null;
+        foreach (var player in state.SquadPlayers)
+        {
+            if (player.Age > 23)
+            {
+                continue;
+            }
+
+            if (selected == null || player.Age < selected.Age || player.TrueAbility > selected.TrueAbility)
+            {
+                selected = player;
+            }
+        }
+
+        return selected;
+    }
+
+    private static int GetStaffQuality(GameState state, StaffRole role)
+    {
+        if (state.CurrentClub == null)
+        {
+            return 55;
+        }
+
+        foreach (var staff in state.CurrentClub.Staff)
+        {
+            if (staff.Role == role)
+            {
+                return staff.Quality;
+            }
+        }
+
+        return 55;
     }
 
     private static string BuildResultLabel(int goalDifference, string opponentName, MatchCauseAnalysis analysis)

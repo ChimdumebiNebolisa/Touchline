@@ -1203,6 +1203,108 @@ public partial class GameState
         return MatchPlaybackContractValidator.PassMessage;
     }
 
+    public string ValidatePhase6PostMatchReportDepthContract()
+    {
+        InitializeStageFoundationsForClub();
+        var result = PrepareCurrentMatchResult(true);
+        ApplyMatchResult(result);
+        if (LastMatchReport == null)
+        {
+            return "Phase 6 post-match depth did not create a report.";
+        }
+
+        var requiredSections = new[]
+        {
+            LastMatchReport.TacticalSection,
+            LastMatchReport.PlayerFitSection,
+            LastMatchReport.FatigueSection,
+            LastMatchReport.MoraleSection,
+            LastMatchReport.BoardReactionSection,
+            LastMatchReport.FanReactionSection,
+            LastMatchReport.MediaStorySection,
+            LastMatchReport.StaffAnalysisSection,
+            LastMatchReport.DevelopmentNotesSection
+        };
+
+        foreach (var section in requiredSections)
+        {
+            if (string.IsNullOrWhiteSpace(section))
+            {
+                return "Phase 6 post-match report is missing a required section.";
+            }
+        }
+
+        if (!LastMatchReport.TacticalSection.Contains(TacticalFormation, StringComparison.Ordinal) ||
+            !LastMatchReport.TacticalSection.Contains("Causes:", StringComparison.Ordinal))
+        {
+            return "Tactical report section is not tied to formation and tactical causes.";
+        }
+
+        if (!LastMatchReport.PlayerFitSection.Contains("Top note:", StringComparison.Ordinal) ||
+            !LastMatchReport.PlayerFitSection.Contains("Watch note:", StringComparison.Ordinal))
+        {
+            return "Player fit report section is missing top and watch notes.";
+        }
+
+        var fatigueScore = $"{result.Stats.HomeFatigueWarnings}-{result.Stats.AwayFatigueWarnings}";
+        if (!LastMatchReport.FatigueSection.Contains(fatigueScore, StringComparison.Ordinal) ||
+            !LastMatchReport.FatigueSection.Contains("injury concerns", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Fatigue report section is not tied to stored fatigue and injury facts.";
+        }
+
+        var moraleDelta = LastMatchReport.MoraleDelta >= 0
+            ? $"+{LastMatchReport.MoraleDelta}"
+            : LastMatchReport.MoraleDelta.ToString();
+        if (!LastMatchReport.MoraleSection.Contains(moraleDelta, StringComparison.Ordinal) ||
+            !LastMatchReport.MoraleSection.Contains("fans", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Morale report section is not tied to stored deltas.";
+        }
+
+        if (!LastMatchReport.BoardReactionSection.Contains(BoardPhilosophyName, StringComparison.Ordinal) ||
+            !LastMatchReport.FanReactionSection.Contains(FanCultureName, StringComparison.Ordinal))
+        {
+            return "Board or fan reaction sections do not use club philosophy and fan culture.";
+        }
+
+        if (!LastMatchReport.MediaStorySection.Contains(result.HomeClubName, StringComparison.Ordinal) ||
+            !LastMatchReport.StaffAnalysisSection.Contains("coach", StringComparison.OrdinalIgnoreCase) ||
+            !LastMatchReport.DevelopmentNotesSection.Contains("tactical familiarity", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Media, staff, or development sections are not grounded in match and career state.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
+    public string ValidatePhase6StoredPostMatchReportContract()
+    {
+        if (LastMatchReport == null)
+        {
+            return "Saved phase 6 report did not restore.";
+        }
+
+        if (!LastMatchReport.TacticalSection.Contains("Tactical section", StringComparison.Ordinal) ||
+            !LastMatchReport.PlayerFitSection.Contains("Player fit section", StringComparison.Ordinal) ||
+            !LastMatchReport.FatigueSection.Contains("Fatigue section", StringComparison.Ordinal) ||
+            !LastMatchReport.MoraleSection.Contains("Morale section", StringComparison.Ordinal))
+        {
+            return "Saved phase 6 report restored without core analysis sections.";
+        }
+
+        if (!LastMatchReport.BoardReactionSection.Contains("Board reaction", StringComparison.Ordinal) ||
+            !LastMatchReport.FanReactionSection.Contains("Fan reaction", StringComparison.Ordinal) ||
+            !LastMatchReport.MediaStorySection.Contains("Media story", StringComparison.Ordinal) ||
+            !LastMatchReport.StaffAnalysisSection.Contains("Staff analysis", StringComparison.Ordinal) ||
+            !LastMatchReport.DevelopmentNotesSection.Contains("Development notes", StringComparison.Ordinal))
+        {
+            return "Saved phase 6 report restored without reaction, media, staff, or development sections.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
     private static bool HasActionKind(MatchPlaybackResult result, MatchActionKind kind)
     {
         foreach (var action in result.Timeline.Actions)
