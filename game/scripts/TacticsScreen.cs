@@ -1002,12 +1002,62 @@ public partial class TacticsScreen : Control
 
     private static string BuildPreviewSummary(string formation, string style, int press, int tempo, int width, int risk)
     {
-        return $"Shared match engine preview: {formation}, {style}, pressing {press} ({DescribePress(press).ToLowerInvariant()}), tempo {tempo} ({DescribeTempo(tempo).ToLowerInvariant()}), width {width} ({DescribeWidth(width).ToLowerInvariant()}), and mentality {risk} ({DescribeRisk(risk).ToLowerInvariant()}).";
+        return $"Shared match engine preview: {formation}, {style}, pressing {press} ({DescribePress(press).ToLowerInvariant()}), tempo {tempo} ({DescribeTempo(tempo).ToLowerInvariant()}), width {width} ({DescribeWidth(width).ToLowerInvariant()}), mentality {risk} ({DescribeRisk(risk).ToLowerInvariant()}), set pieces {BuildPreviewSetPiece(style, risk)}, and opponent prep {BuildPreviewOpponentPrep(style, press, width, risk)}. Role fit and player familiarity refresh when the plan is saved.";
     }
 
     private static string BuildControlSummary(string formation, string style, int press, int tempo, int width, int risk)
     {
         return $"Preview values | Formation {formation} | Style {style} | Pressing {press} ({DescribePress(press)}) | Tempo {tempo} ({DescribeTempo(tempo)}) | Width {width} ({DescribeWidth(width)}) | Mentality {risk} ({DescribeRisk(risk)})";
+    }
+
+    private static string BuildPreviewSetPiece(string style, int risk)
+    {
+        if (style == "Possession")
+        {
+            return "short routines";
+        }
+
+        if (style == "Direct Play" || style == "Wide Attack")
+        {
+            return risk >= 60 ? "near-post attack" : "far-post attack";
+        }
+
+        if (style == "Low Block" || style == "Defensive Solidity")
+        {
+            return "defensive security";
+        }
+
+        return "balanced routines";
+    }
+
+    private static string BuildPreviewOpponentPrep(string style, int press, int width, int risk)
+    {
+        if (risk >= 72)
+        {
+            return "rest defense";
+        }
+
+        if (press >= 72)
+        {
+            return "press triggers";
+        }
+
+        if (width >= 68 || style == "Wide Attack")
+        {
+            return "wide containment";
+        }
+
+        if (style == "Central Overload")
+        {
+            return "central containment";
+        }
+
+        if (style == "Direct Play")
+        {
+            return "direct-defense brief";
+        }
+
+        return "balanced brief";
     }
 
     private static string DescribePress(int value)

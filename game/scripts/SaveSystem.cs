@@ -181,7 +181,7 @@ public partial class SaveSystem : Node
         WriteIndented = true,
         PropertyNameCaseInsensitive = true
     };
-    public const int CurrentSaveVersion = 6;
+    public const int CurrentSaveVersion = 7;
 
     public static SaveSystem? Instance { get; private set; }
     public string LastStatusMessage { get; private set; } = "Save system idle.";
@@ -847,6 +847,13 @@ public partial class SaveSystem : Node
             TeamInstructionsSummary = source.TeamInstructionsSummary,
             PlayerRolesSummary = source.PlayerRolesSummary,
             PlayerInstructionsSummary = source.PlayerInstructionsSummary,
+            TacticalRoleFitScore = source.TacticalRoleFitScore,
+            TacticalRoleFitSummary = source.TacticalRoleFitSummary,
+            PlayerFamiliaritySummary = source.PlayerFamiliaritySummary,
+            SetPieceApproachName = source.SetPieceApproachName,
+            SetPieceSummary = source.SetPieceSummary,
+            OpponentPreparationFocusName = source.OpponentPreparationFocusName,
+            OpponentPreparationSummary = source.OpponentPreparationSummary,
             TacticalFitNotes = source.TacticalFitNotes,
             TacticalRiskNotes = source.TacticalRiskNotes,
             TrainingFocusName = source.TrainingFocusName,

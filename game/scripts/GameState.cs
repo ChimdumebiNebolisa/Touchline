@@ -470,7 +470,7 @@ public partial class GameState : Node
 
     public string BuildTacticalPlanSummary()
     {
-        return $"Tactical setup: {TacticalFormation} | style {TeamStyleName} | familiarity {TacticalFamiliarityName} | pressing {PressIntensity} | tempo {Tempo} | passing directness {PassingDirectness} | defensive line {DefensiveLine} | width {Width} | attacking risk {Risk} | tackling {Tackling}";
+        return $"Tactical setup: {TacticalFormation} | style {TeamStyleName} | familiarity {TacticalFamiliarityName} | role fit {TacticalRoleFitScore}/100 | set pieces {SetPieceApproachName} | opponent prep {OpponentPreparationFocusName} | pressing {PressIntensity} | tempo {Tempo} | passing directness {PassingDirectness} | defensive line {DefensiveLine} | width {Width} | attacking risk {Risk} | tackling {Tackling}";
     }
 
     public string BuildOpponentContextSummary()

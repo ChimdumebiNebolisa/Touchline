@@ -53,6 +53,27 @@ public enum ScoutingReportDepth
     FullReport
 }
 
+public enum TacticalSetPieceApproach
+{
+    BalancedSetPieces,
+    AttackNearPost,
+    AttackFarPost,
+    ShortRoutines,
+    CrowdKeeper,
+    DefensiveSecurity
+}
+
+public enum OpponentPreparationFocus
+{
+    BalancedBrief,
+    PressTriggers,
+    RestDefense,
+    WideContainment,
+    CentralContainment,
+    DirectDefense,
+    LowBlockPatience
+}
+
 public enum NewsCategory
 {
     Club,
@@ -269,6 +290,60 @@ public static class StageFoundationText
             "Quick look" => ScoutingReportDepth.QuickLook,
             "Full report" => ScoutingReportDepth.FullReport,
             _ => ScoutingReportDepth.StandardReport
+        };
+    }
+
+    public static string GetDisplayName(TacticalSetPieceApproach value)
+    {
+        return value switch
+        {
+            TacticalSetPieceApproach.AttackNearPost => "Attack near post",
+            TacticalSetPieceApproach.AttackFarPost => "Attack far post",
+            TacticalSetPieceApproach.ShortRoutines => "Short routines",
+            TacticalSetPieceApproach.CrowdKeeper => "Crowd keeper",
+            TacticalSetPieceApproach.DefensiveSecurity => "Defensive security",
+            _ => "Balanced set pieces"
+        };
+    }
+
+    public static TacticalSetPieceApproach ParseSetPieceApproach(string value)
+    {
+        return value switch
+        {
+            "Attack near post" => TacticalSetPieceApproach.AttackNearPost,
+            "Attack far post" => TacticalSetPieceApproach.AttackFarPost,
+            "Short routines" => TacticalSetPieceApproach.ShortRoutines,
+            "Crowd keeper" => TacticalSetPieceApproach.CrowdKeeper,
+            "Defensive security" => TacticalSetPieceApproach.DefensiveSecurity,
+            _ => TacticalSetPieceApproach.BalancedSetPieces
+        };
+    }
+
+    public static string GetDisplayName(OpponentPreparationFocus value)
+    {
+        return value switch
+        {
+            OpponentPreparationFocus.PressTriggers => "Press triggers",
+            OpponentPreparationFocus.RestDefense => "Rest defense",
+            OpponentPreparationFocus.WideContainment => "Wide containment",
+            OpponentPreparationFocus.CentralContainment => "Central containment",
+            OpponentPreparationFocus.DirectDefense => "Direct defense",
+            OpponentPreparationFocus.LowBlockPatience => "Low-block patience",
+            _ => "Balanced brief"
+        };
+    }
+
+    public static OpponentPreparationFocus ParseOpponentPreparationFocus(string value)
+    {
+        return value switch
+        {
+            "Press triggers" => OpponentPreparationFocus.PressTriggers,
+            "Rest defense" => OpponentPreparationFocus.RestDefense,
+            "Wide containment" => OpponentPreparationFocus.WideContainment,
+            "Central containment" => OpponentPreparationFocus.CentralContainment,
+            "Direct defense" => OpponentPreparationFocus.DirectDefense,
+            "Low-block patience" => OpponentPreparationFocus.LowBlockPatience,
+            _ => OpponentPreparationFocus.BalancedBrief
         };
     }
 
@@ -696,6 +771,11 @@ public static class PlayerIdentityFoundation
 
 public static class TacticsFoundation
 {
+    private static readonly string[] DefaultFormationRoles =
+    {
+        "GK", "RB", "CB", "CB", "LB", "CM", "CM", "AM", "LW", "ST", "RW"
+    };
+
     public static string BuildTeamInstructions(TacticalTeamStyle style, int tempo, int passingDirectness, int press, int line, int width, int risk, int tackling)
     {
         return $"{StageFoundationText.GetDisplayName(style)} | Tempo {tempo} | Passing directness {passingDirectness} | Press {press} | Defensive line {line} | Width {width} | Attacking risk {risk} | Tackling {tackling}";
@@ -773,6 +853,156 @@ public static class TacticsFoundation
         return $"Risk notes: {riskText}.";
     }
 
+    public static int CalculateRoleFitScore(GameState.SquadPlayer[] squadPlayers, string formation, TacticalTeamStyle style)
+    {
+        var starters = BuildStarterList(squadPlayers);
+        if (starters.Count == 0)
+        {
+            return 60;
+        }
+
+        var fitTotal = 0;
+        var styleMatches = 0;
+        foreach (var player in starters)
+        {
+            fitTotal += player.TacticalFitScore;
+            if (StyleMatchesPlayer(player, style))
+            {
+                styleMatches++;
+            }
+        }
+
+        var averageFit = fitTotal / starters.Count;
+        var shapeFit = CalculateShapeBalance(starters, formation);
+        var styleBonus = Math.Clamp((styleMatches * 4) - 8, -8, 12);
+        return Math.Clamp((averageFit * 2 + shapeFit) / 3 + styleBonus, 25, 98);
+    }
+
+    public static string BuildRoleFitDepthSummary(GameState.SquadPlayer[] squadPlayers, string formation, TacticalTeamStyle style, int score)
+    {
+        var starters = BuildStarterList(squadPlayers);
+        if (starters.Count == 0)
+        {
+            return $"Role fit: {score}/100. No XI is available for role-fit analysis.";
+        }
+
+        var strongest = starters[0];
+        var concern = starters[0];
+        foreach (var player in starters)
+        {
+            if (player.TacticalFitScore > strongest.TacticalFitScore)
+            {
+                strongest = player;
+            }
+
+            if (player.TacticalFitScore < concern.TacticalFitScore)
+            {
+                concern = player;
+            }
+        }
+
+        var level = score >= 76
+            ? "strong"
+            : score >= 60
+                ? "workable"
+                : "fragile";
+        return $"Role fit: {score}/100 ({level}) in {formation}. Best fit: {strongest.Name} as {ResolveRole(strongest.Position, style)}. Watch: {concern.Name} needs clearer role support.";
+    }
+
+    public static string BuildPlayerFamiliaritySummary(GameState.SquadPlayer[] squadPlayers, TacticalFamiliarity familiarity)
+    {
+        var starters = BuildStarterList(squadPlayers);
+        if (starters.Count == 0)
+        {
+            return $"Player familiarity: no XI loaded; team familiarity {StageFoundationText.GetDisplayName(familiarity)}.";
+        }
+
+        var total = 0;
+        var lowCount = 0;
+        foreach (var player in starters)
+        {
+            total += player.PlayerFamiliarity;
+            if (player.PlayerFamiliarity < 45)
+            {
+                lowCount++;
+            }
+        }
+
+        var average = total / starters.Count;
+        var note = lowCount > 0
+            ? $"{lowCount} starter(s) still have role/familiarity uncertainty"
+            : "the XI understands the current plan well enough for matchday";
+        return $"Player familiarity: XI average {average}/100; {note}; team familiarity {StageFoundationText.GetDisplayName(familiarity)}.";
+    }
+
+    public static TacticalSetPieceApproach ResolveSetPieceApproach(TacticalTeamStyle style, TrainingFocus focus, int risk)
+    {
+        if (focus == TrainingFocus.SetPieces)
+        {
+            return risk >= 62 ? TacticalSetPieceApproach.AttackNearPost : TacticalSetPieceApproach.ShortRoutines;
+        }
+
+        return style switch
+        {
+            TacticalTeamStyle.DirectPlay => TacticalSetPieceApproach.AttackFarPost,
+            TacticalTeamStyle.WideAttack => TacticalSetPieceApproach.AttackNearPost,
+            TacticalTeamStyle.Possession => TacticalSetPieceApproach.ShortRoutines,
+            TacticalTeamStyle.HighPress when risk >= 65 => TacticalSetPieceApproach.CrowdKeeper,
+            TacticalTeamStyle.LowBlock or TacticalTeamStyle.DefensiveSolidity => TacticalSetPieceApproach.DefensiveSecurity,
+            _ => TacticalSetPieceApproach.BalancedSetPieces
+        };
+    }
+
+    public static string BuildSetPieceSummary(TacticalSetPieceApproach approach, TrainingFocus focus)
+    {
+        var focusText = focus == TrainingFocus.SetPieces
+            ? "set-piece training is active this week"
+            : "set-piece work follows the wider team style";
+        return $"Set pieces: {StageFoundationText.GetDisplayName(approach)}; {focusText}.";
+    }
+
+    public static OpponentPreparationFocus ResolveOpponentPreparationFocus(TacticalTeamStyle style, int press, int width, int risk)
+    {
+        if (risk >= 72)
+        {
+            return OpponentPreparationFocus.RestDefense;
+        }
+
+        if (press >= 72)
+        {
+            return OpponentPreparationFocus.PressTriggers;
+        }
+
+        if (width >= 68 || style == TacticalTeamStyle.WideAttack)
+        {
+            return OpponentPreparationFocus.WideContainment;
+        }
+
+        return style switch
+        {
+            TacticalTeamStyle.CentralOverload => OpponentPreparationFocus.CentralContainment,
+            TacticalTeamStyle.DirectPlay => OpponentPreparationFocus.DirectDefense,
+            TacticalTeamStyle.LowBlock or TacticalTeamStyle.DefensiveSolidity => OpponentPreparationFocus.LowBlockPatience,
+            _ => OpponentPreparationFocus.BalancedBrief
+        };
+    }
+
+    public static string BuildOpponentPreparationSummary(OpponentPreparationFocus focus, string opponentName)
+    {
+        var opponent = string.IsNullOrWhiteSpace(opponentName) ? "the next opponent" : opponentName;
+        var explanation = focus switch
+        {
+            OpponentPreparationFocus.PressTriggers => "staff highlight backward passes and loose first touches as press cues",
+            OpponentPreparationFocus.RestDefense => "staff stress cover behind attacks before chasing extra runners",
+            OpponentPreparationFocus.WideContainment => "staff prepare fullback support and far-post cover",
+            OpponentPreparationFocus.CentralContainment => "staff protect the central lane and second balls",
+            OpponentPreparationFocus.DirectDefense => "staff prepare for early balls and aerial duels",
+            OpponentPreparationFocus.LowBlockPatience => "staff ask for patience against a compressed game",
+            _ => "staff keep the brief balanced while scouting detail remains limited"
+        };
+        return $"Opponent prep: {StageFoundationText.GetDisplayName(focus)} vs {opponent}; {explanation}.";
+    }
+
     public static TacticalFamiliarity FamiliarityFromScore(int score)
     {
         return score switch
@@ -784,6 +1014,132 @@ public static class TacticsFoundation
             >= 40 => TacticalFamiliarity.Unfamiliar,
             >= 28 => TacticalFamiliarity.Poor,
             _ => TacticalFamiliarity.VeryPoor
+        };
+    }
+
+    private static List<GameState.SquadPlayer> BuildStarterList(GameState.SquadPlayer[] squadPlayers)
+    {
+        var starters = new List<GameState.SquadPlayer>();
+        foreach (var player in squadPlayers)
+        {
+            if (!player.IsStarting)
+            {
+                continue;
+            }
+
+            starters.Add(player);
+            if (starters.Count == 11)
+            {
+                break;
+            }
+        }
+
+        return starters;
+    }
+
+    private static int CalculateShapeBalance(List<GameState.SquadPlayer> starters, string formation)
+    {
+        var defenders = 0;
+        var midfielders = 0;
+        var forwards = 0;
+        var widePlayers = 0;
+        foreach (var player in starters)
+        {
+            var family = PositionFamily(player.Position);
+            if (family == "DEF")
+            {
+                defenders++;
+            }
+            else if (family == "MID")
+            {
+                midfielders++;
+            }
+            else if (family == "FWD")
+            {
+                forwards++;
+            }
+
+            if (player.Position is "RB" or "LB" or "RW" or "LW")
+            {
+                widePlayers++;
+            }
+        }
+
+        var expected = BuildFormationRoles(formation);
+        var expectedDefenders = CountFamily(expected, "DEF");
+        var expectedMidfielders = CountFamily(expected, "MID");
+        var expectedForwards = CountFamily(expected, "FWD");
+        var expectedWide = CountWide(expected);
+        var penalty =
+            Math.Abs(defenders - expectedDefenders) * 5 +
+            Math.Abs(midfielders - expectedMidfielders) * 4 +
+            Math.Abs(forwards - expectedForwards) * 4 +
+            Math.Abs(widePlayers - expectedWide) * 3;
+        return Math.Clamp(82 - penalty, 35, 92);
+    }
+
+    private static string[] BuildFormationRoles(string formation)
+    {
+        return formation switch
+        {
+            "4-2-3-1" => new[] { "GK", "RB", "CB", "CB", "LB", "CM", "CM", "LW", "AM", "RW", "ST" },
+            "3-5-2" => new[] { "GK", "CB", "CB", "CB", "LWB", "CM", "CM", "AM", "RWB", "ST", "ST" },
+            _ => DefaultFormationRoles
+        };
+    }
+
+    private static int CountFamily(string[] roles, string family)
+    {
+        var count = 0;
+        foreach (var role in roles)
+        {
+            if (PositionFamily(role) == family)
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    private static int CountWide(string[] roles)
+    {
+        var count = 0;
+        foreach (var role in roles)
+        {
+            if (role is "RB" or "LB" or "RWB" or "LWB" or "RW" or "LW")
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    private static string PositionFamily(string position)
+    {
+        return position switch
+        {
+            "GK" => "GK",
+            "RB" or "LB" or "CB" or "RWB" or "LWB" => "DEF",
+            "CM" or "AM" => "MID",
+            _ => "FWD"
+        };
+    }
+
+    private static bool StyleMatchesPlayer(GameState.SquadPlayer player, TacticalTeamStyle style)
+    {
+        var styleText = $"{player.PlayingStyle} {player.Traits} {player.Tendencies}".ToLowerInvariant();
+        return style switch
+        {
+            TacticalTeamStyle.HighPress => styleText.Contains("press", StringComparison.Ordinal) || styleText.Contains("training intensity", StringComparison.Ordinal),
+            TacticalTeamStyle.Possession => styleText.Contains("tempo", StringComparison.Ordinal) || styleText.Contains("ball-playing", StringComparison.Ordinal) || styleText.Contains("sweeper", StringComparison.Ordinal),
+            TacticalTeamStyle.DirectPlay => styleText.Contains("direct", StringComparison.Ordinal) || styleText.Contains("box", StringComparison.Ordinal) || styleText.Contains("aerial", StringComparison.Ordinal),
+            TacticalTeamStyle.Counterattack => styleText.Contains("channel", StringComparison.Ordinal) || styleText.Contains("runner", StringComparison.Ordinal) || styleText.Contains("forward", StringComparison.Ordinal),
+            TacticalTeamStyle.WideAttack => styleText.Contains("overlap", StringComparison.Ordinal) || styleText.Contains("wide", StringComparison.Ordinal) || styleText.Contains("1v1", StringComparison.Ordinal),
+            TacticalTeamStyle.CentralOverload => styleText.Contains("creator", StringComparison.Ordinal) || styleText.Contains("tempo", StringComparison.Ordinal) || styleText.Contains("between", StringComparison.Ordinal),
+            TacticalTeamStyle.LowBlock or TacticalTeamStyle.DefensiveSolidity => styleText.Contains("discipline", StringComparison.Ordinal) || styleText.Contains("stopper", StringComparison.Ordinal) || styleText.Contains("handling", StringComparison.Ordinal),
+            _ => true
         };
     }
 

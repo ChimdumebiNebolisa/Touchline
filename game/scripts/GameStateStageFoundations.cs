@@ -11,6 +11,13 @@ public sealed class SaveSlotStageFoundationData
     public string TeamInstructionsSummary { get; set; } = string.Empty;
     public string PlayerRolesSummary { get; set; } = string.Empty;
     public string PlayerInstructionsSummary { get; set; } = string.Empty;
+    public int TacticalRoleFitScore { get; set; } = 60;
+    public string TacticalRoleFitSummary { get; set; } = string.Empty;
+    public string PlayerFamiliaritySummary { get; set; } = string.Empty;
+    public string SetPieceApproachName { get; set; } = "Balanced set pieces";
+    public string SetPieceSummary { get; set; } = string.Empty;
+    public string OpponentPreparationFocusName { get; set; } = "Balanced brief";
+    public string OpponentPreparationSummary { get; set; } = string.Empty;
     public string TacticalFitNotes { get; set; } = string.Empty;
     public string TacticalRiskNotes { get; set; } = string.Empty;
     public string TrainingFocusName { get; set; } = "Team cohesion";
@@ -101,6 +108,13 @@ public partial class GameState
     public string TeamInstructionsSummary { get; private set; } = "Balanced tactical foundation.";
     public string PlayerRolesSummary { get; private set; } = "Player roles pending until a squad is selected.";
     public string PlayerInstructionsSummary { get; private set; } = "Player instructions pending until tactics are selected.";
+    public int TacticalRoleFitScore { get; private set; } = 60;
+    public string TacticalRoleFitSummary { get; private set; } = "Role fit pending.";
+    public string PlayerFamiliaritySummary { get; private set; } = "Player familiarity pending.";
+    public TacticalSetPieceApproach SetPieceApproach { get; private set; } = TacticalSetPieceApproach.BalancedSetPieces;
+    public string SetPieceSummary { get; private set; } = "Set-piece approach pending.";
+    public OpponentPreparationFocus CurrentOpponentPreparationFocus { get; private set; } = OpponentPreparationFocus.BalancedBrief;
+    public string OpponentPreparationSummary { get; private set; } = "Opponent preparation pending.";
     public string TacticalFitNotes { get; private set; } = "Fit notes pending.";
     public string TacticalRiskNotes { get; private set; } = "Risk notes pending.";
     public TrainingFocus CurrentTrainingFocus { get; private set; } = TrainingFocus.TeamCohesion;
@@ -120,6 +134,8 @@ public partial class GameState
 
     public string TeamStyleName => StageFoundationText.GetDisplayName(TeamStyle);
     public string TacticalFamiliarityName => StageFoundationText.GetDisplayName(TacticsFoundation.FamiliarityFromScore(TacticalFamiliarityScore));
+    public string SetPieceApproachName => StageFoundationText.GetDisplayName(SetPieceApproach);
+    public string OpponentPreparationFocusName => StageFoundationText.GetDisplayName(CurrentOpponentPreparationFocus);
     public string TrainingFocusName => StageFoundationText.GetDisplayName(CurrentTrainingFocus);
     public string TrainingIntensityName => StageFoundationText.GetDisplayName(CurrentTrainingIntensity);
     public string ScoutingReportDepthName => StageFoundationText.GetDisplayName(CurrentScoutingReportDepth);
@@ -131,7 +147,7 @@ public partial class GameState
         : $"{CurrentRecruitmentTarget.PlayerName} ({CurrentRecruitmentTarget.Position}) | {CurrentRecruitmentTarget.InformationSummary} | {CurrentRecruitmentTarget.InterestSummary} | {CurrentRecruitmentTarget.TacticalFitSummary} | Fee {CurrentRecruitmentTarget.EstimatedFeeRange} | Wage {CurrentRecruitmentTarget.EstimatedWageRange} | {CurrentRecruitmentTarget.Status}";
     public string TrainingScoutingSummary => $"{TrainingFocusName} ({TrainingIntensityName}): {TrainingStatusSummary}\nScouting depth: {ScoutingReportDepthName}\nScouting: {BuildScoutingSummary()}";
     public string CareerMarketSummary => $"Job security: {JobSecurityName} | Reputation {WorldReputation} | Fan trust {FanTrust} | Dressing-room pressure {DressingRoomPressure} | Transfer pressure {TransferPressure}\nLicense: {LicenseOpportunitySummary}\nJob market: {BuildJobOfferSummary()}";
-    public string TacticsFoundationSummary => $"{TeamStyleName} | {TeamInstructionsSummary}\n{PlayerRolesSummary}\n{PlayerInstructionsSummary}\n{TacticalFitNotes}\n{TacticalRiskNotes}";
+    public string TacticsFoundationSummary => $"{TeamStyleName} | {TeamInstructionsSummary}\n{SetPieceSummary}\n{OpponentPreparationSummary}\n{PlayerRolesSummary}\n{PlayerInstructionsSummary}\n{TacticalRoleFitSummary}\n{PlayerFamiliaritySummary}\n{TacticalFitNotes}\n{TacticalRiskNotes}";
 
     public void UpdateTactics(string formation, string teamStyle, int pressIntensity, int tempo, int width, int risk)
     {
@@ -388,6 +404,13 @@ public partial class GameState
             TeamInstructionsSummary = TeamInstructionsSummary,
             PlayerRolesSummary = PlayerRolesSummary,
             PlayerInstructionsSummary = PlayerInstructionsSummary,
+            TacticalRoleFitScore = TacticalRoleFitScore,
+            TacticalRoleFitSummary = TacticalRoleFitSummary,
+            PlayerFamiliaritySummary = PlayerFamiliaritySummary,
+            SetPieceApproachName = SetPieceApproachName,
+            SetPieceSummary = SetPieceSummary,
+            OpponentPreparationFocusName = OpponentPreparationFocusName,
+            OpponentPreparationSummary = OpponentPreparationSummary,
             TacticalFitNotes = TacticalFitNotes,
             TacticalRiskNotes = TacticalRiskNotes,
             TrainingFocusName = TrainingFocusName,
@@ -482,6 +505,13 @@ public partial class GameState
         TeamInstructionsSummary = string.IsNullOrWhiteSpace(data.TeamInstructionsSummary) ? "Tactic state restored with default instructions." : data.TeamInstructionsSummary;
         PlayerRolesSummary = string.IsNullOrWhiteSpace(data.PlayerRolesSummary) ? "Player roles restored from saved tactic state." : data.PlayerRolesSummary;
         PlayerInstructionsSummary = string.IsNullOrWhiteSpace(data.PlayerInstructionsSummary) ? "Player instructions restored from saved tactic state." : data.PlayerInstructionsSummary;
+        TacticalRoleFitScore = Math.Clamp(data.TacticalRoleFitScore <= 0 ? 60 : data.TacticalRoleFitScore, 0, 100);
+        TacticalRoleFitSummary = string.IsNullOrWhiteSpace(data.TacticalRoleFitSummary) ? "Role fit restored from saved tactic state." : data.TacticalRoleFitSummary;
+        PlayerFamiliaritySummary = string.IsNullOrWhiteSpace(data.PlayerFamiliaritySummary) ? "Player familiarity restored from saved tactic state." : data.PlayerFamiliaritySummary;
+        SetPieceApproach = StageFoundationText.ParseSetPieceApproach(data.SetPieceApproachName);
+        SetPieceSummary = string.IsNullOrWhiteSpace(data.SetPieceSummary) ? TacticsFoundation.BuildSetPieceSummary(SetPieceApproach, CurrentTrainingFocus) : data.SetPieceSummary;
+        CurrentOpponentPreparationFocus = StageFoundationText.ParseOpponentPreparationFocus(data.OpponentPreparationFocusName);
+        OpponentPreparationSummary = string.IsNullOrWhiteSpace(data.OpponentPreparationSummary) ? TacticsFoundation.BuildOpponentPreparationSummary(CurrentOpponentPreparationFocus, CurrentOpponentName) : data.OpponentPreparationSummary;
         TacticalFitNotes = string.IsNullOrWhiteSpace(data.TacticalFitNotes) ? "Fit notes restored from saved tactic state." : data.TacticalFitNotes;
         TacticalRiskNotes = string.IsNullOrWhiteSpace(data.TacticalRiskNotes) ? "Risk notes restored from saved tactic state." : data.TacticalRiskNotes;
         CurrentTrainingFocus = StageFoundationText.ParseTrainingFocus(data.TrainingFocusName);
@@ -592,6 +622,13 @@ public partial class GameState
         TeamInstructionsSummary = "Balanced tactical foundation.";
         PlayerRolesSummary = "Player roles pending until a squad is selected.";
         PlayerInstructionsSummary = "Player instructions pending until tactics are selected.";
+        TacticalRoleFitScore = 60;
+        TacticalRoleFitSummary = "Role fit pending.";
+        PlayerFamiliaritySummary = "Player familiarity pending.";
+        SetPieceApproach = TacticalSetPieceApproach.BalancedSetPieces;
+        SetPieceSummary = "Set-piece approach pending.";
+        CurrentOpponentPreparationFocus = OpponentPreparationFocus.BalancedBrief;
+        OpponentPreparationSummary = "Opponent preparation pending.";
         TacticalFitNotes = "Fit notes pending.";
         TacticalRiskNotes = "Risk notes pending.";
         CurrentTrainingFocus = TrainingFocus.TeamCohesion;
@@ -866,6 +903,65 @@ public partial class GameState
             !result.TacticalSummary.Contains(TacticalFamiliarityName, StringComparison.Ordinal))
         {
             return "Match simulator did not receive tactic style or familiarity input.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
+    public string ValidatePhase4TacticalDepthContract()
+    {
+        InitializeStageFoundationsForClub();
+        UpdateTactics("3-5-2", "High Press", 82, 74, 66, 72);
+        if (TacticalRoleFitScore <= 0 ||
+            string.IsNullOrWhiteSpace(TacticalRoleFitSummary) ||
+            string.IsNullOrWhiteSpace(PlayerFamiliaritySummary) ||
+            string.IsNullOrWhiteSpace(SetPieceSummary) ||
+            string.IsNullOrWhiteSpace(OpponentPreparationSummary))
+        {
+            return "Tactical depth did not compute role fit, familiarity, set pieces, or opponent preparation.";
+        }
+
+        if (!TacticsFoundationSummary.Contains("Role fit", StringComparison.Ordinal) ||
+            !TacticsFoundationSummary.Contains("Set pieces", StringComparison.Ordinal) ||
+            !TacticsFoundationSummary.Contains("Opponent prep", StringComparison.Ordinal))
+        {
+            return "Tactics summary does not expose Phase 4 tactical depth fields.";
+        }
+
+        var result = PrepareCurrentMatchResult(true);
+        if (!result.TacticalSummary.Contains("Role fit", StringComparison.Ordinal) ||
+            !result.TacticalSummary.Contains("Set pieces", StringComparison.Ordinal) ||
+            !result.TacticalSummary.Contains("Opponent prep", StringComparison.Ordinal) ||
+            !result.TacticalExplanation.Contains("role fit", StringComparison.OrdinalIgnoreCase) ||
+            !result.PostMatchNotes.Contains("Role-fit effect", StringComparison.Ordinal))
+        {
+            return "Shared match simulator did not receive Phase 4 tactical depth inputs.";
+        }
+
+        if (SaveSystem.Instance == null)
+        {
+            return "Save system unavailable for tactical depth validation.";
+        }
+
+        var expectedRoleFit = TacticalRoleFitScore;
+        var expectedSetPiece = SetPieceApproachName;
+        var expectedOpponentPrep = OpponentPreparationFocusName;
+        if (!SaveSystem.Instance.SaveGame(out var saveStatus))
+        {
+            return saveStatus;
+        }
+
+        UpdateTactics("4-3-3", "Low Block", 35, 42, 44, 32);
+        if (!SaveSystem.Instance.LoadGame(out var loadStatus))
+        {
+            return loadStatus;
+        }
+
+        if (TacticalRoleFitScore != expectedRoleFit ||
+            SetPieceApproachName != expectedSetPiece ||
+            OpponentPreparationFocusName != expectedOpponentPrep)
+        {
+            return "Save/load did not preserve tactical role fit, set-piece approach, or opponent preparation.";
         }
 
         return MatchPlaybackContractValidator.PassMessage;
@@ -1334,6 +1430,13 @@ public partial class GameState
             Tackling);
         PlayerRolesSummary = TacticsFoundation.BuildPlayerRolesSummary(SquadPlayers, TacticalFormation, TeamStyle);
         PlayerInstructionsSummary = TacticsFoundation.BuildPlayerInstructionsSummary(TeamStyle);
+        TacticalRoleFitScore = TacticsFoundation.CalculateRoleFitScore(SquadPlayers, TacticalFormation, TeamStyle);
+        TacticalRoleFitSummary = TacticsFoundation.BuildRoleFitDepthSummary(SquadPlayers, TacticalFormation, TeamStyle, TacticalRoleFitScore);
+        PlayerFamiliaritySummary = TacticsFoundation.BuildPlayerFamiliaritySummary(SquadPlayers, familiarity);
+        SetPieceApproach = TacticsFoundation.ResolveSetPieceApproach(TeamStyle, CurrentTrainingFocus, Risk);
+        SetPieceSummary = TacticsFoundation.BuildSetPieceSummary(SetPieceApproach, CurrentTrainingFocus);
+        CurrentOpponentPreparationFocus = TacticsFoundation.ResolveOpponentPreparationFocus(TeamStyle, PressIntensity, Width, Risk);
+        OpponentPreparationSummary = TacticsFoundation.BuildOpponentPreparationSummary(CurrentOpponentPreparationFocus, CurrentOpponentName);
         TacticalFitNotes = TacticsFoundation.BuildFitNotes(SquadPlayers, TeamStyle, familiarity);
         TacticalRiskNotes = TacticsFoundation.BuildRiskNotes(TeamStyle, PressIntensity, Tempo, Risk, familiarity);
     }

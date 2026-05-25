@@ -178,6 +178,20 @@ public static class PostMatchConsequenceService
             causes.Add("pressing intensity shaped the match");
         }
 
+        if (state.TacticalRoleFitScore >= 74)
+        {
+            causes.Add("role fit supported the plan");
+        }
+        else if (state.TacticalRoleFitScore <= 52)
+        {
+            causes.Add("role-fit concerns limited execution");
+        }
+
+        if (state.CurrentOpponentPreparationFocus != OpponentPreparationFocus.BalancedBrief)
+        {
+            causes.Add($"{state.OpponentPreparationFocusName.ToLowerInvariant()} opponent prep shaped staff instructions");
+        }
+
         return string.Join("; ", causes);
     }
 

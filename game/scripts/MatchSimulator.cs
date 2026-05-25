@@ -42,12 +42,15 @@ public static class MatchSimulator
         var staffPreparation = Math.Clamp((state.CareerProfile.StaffTrust + state.CareerProfile.DirectorTrust) / 12, 0, 14);
         var moraleEffect = Math.Clamp((state.SquadMorale - 55) / 5, -8, 8);
         var familiarityEffect = Math.Clamp((state.TacticalFamiliarityScore - 55) / 4, -8, 10);
+        var roleFitEffect = Math.Clamp((state.TacticalRoleFitScore - 60) / 5, -7, 8);
+        var setPieceEffect = ResolveSetPieceEffect(state);
+        var opponentPrepEffect = ResolveOpponentPreparationEffect(state);
         var plannedHomeGoals = Math.Clamp(
-            (homeAttackQuality - awayDefensiveQuality + state.PressIntensity / 3 + state.Tempo / 2 + state.Risk / 2 + staffPreparation + moraleEffect + familiarityEffect - 78) / 24 + rng.Next(0, 2),
+            (homeAttackQuality - awayDefensiveQuality + state.PressIntensity / 3 + state.Tempo / 2 + state.Risk / 2 + staffPreparation + moraleEffect + familiarityEffect + roleFitEffect + setPieceEffect + opponentPrepEffect - 78) / 24 + rng.Next(0, 2),
             0,
             4);
         var plannedAwayGoals = Math.Clamp(
-            (awayAttackQuality - homeDefensiveQuality + state.Risk / 2 + (100 - state.PressIntensity) / 4 - moraleEffect - familiarityEffect - 45) / 28 + rng.Next(0, 2),
+            (awayAttackQuality - homeDefensiveQuality + state.Risk / 2 + (100 - state.PressIntensity) / 4 - moraleEffect - familiarityEffect - roleFitEffect / 2 - opponentPrepEffect - (state.SetPieceApproach == TacticalSetPieceApproach.DefensiveSecurity ? 1 : 0) - 45) / 28 + rng.Next(0, 2),
             0,
             3);
         if (plannedHomeGoals == 0 && plannedAwayGoals == 0)
@@ -89,10 +92,10 @@ public static class MatchSimulator
             HomeClubName = homeClubName,
             AwayClubName = awayClubName,
             TacticalSummary =
-                $"Shape {state.TacticalFormation} | Style {state.TeamStyleName} | Familiarity {state.TacticalFamiliarityName} | Pressing {state.PressIntensity} | Tempo {state.Tempo} | Width {state.Width} | Mentality {state.Risk}",
-            TacticalExplanation = $"The match engine weighted player ability, form, morale, fitness, tactical fit, staff preparation, {state.TeamStyleName.ToLowerInvariant()} style, and familiarity {state.TacticalFamiliarityName}.",
+                $"Shape {state.TacticalFormation} | Style {state.TeamStyleName} | Familiarity {state.TacticalFamiliarityName} | Role fit {state.TacticalRoleFitScore}/100 | Set pieces {state.SetPieceApproachName} | Opponent prep {state.OpponentPreparationFocusName} | Pressing {state.PressIntensity} | Tempo {state.Tempo} | Width {state.Width} | Mentality {state.Risk}",
+            TacticalExplanation = $"The match engine weighted player ability, form, morale, fitness, staff preparation, {state.TeamStyleName.ToLowerInvariant()} style, familiarity {state.TacticalFamiliarityName}, role fit {state.TacticalRoleFitScore}/100, set-piece approach {state.SetPieceApproachName.ToLowerInvariant()}, and opponent preparation {state.OpponentPreparationFocusName.ToLowerInvariant()}. {state.TacticalRoleFitSummary} {state.OpponentPreparationSummary}",
             PlayerRatingsSummary = BuildPlayerRatingsSummary(homeLineup, awayLineup, homeClubName, awayClubName),
-            PostMatchNotes = $"Preparation {staffPreparation}/14 | Morale effect {moraleEffect:+0;-0;0} | Familiarity effect {familiarityEffect:+0;-0;0} | Fit notes: {state.TacticalFitNotes}",
+            PostMatchNotes = $"Preparation {staffPreparation}/14 | Morale effect {moraleEffect:+0;-0;0} | Familiarity effect {familiarityEffect:+0;-0;0} | Role-fit effect {roleFitEffect:+0;-0;0} | Set-piece effect {setPieceEffect:+0;-0;0} | Opponent-prep effect {opponentPrepEffect:+0;-0;0} | Fit notes: {state.TacticalFitNotes}",
             FinalHomeScore = finalFrame.HomeScore,
             FinalAwayScore = finalFrame.AwayScore,
             Timeline = new MatchTimeline
@@ -108,6 +111,32 @@ public static class MatchSimulator
             ActionLabels = Array.ConvertAll(actions, action => action.Label),
             Stats = stats,
             FinalResultSummary = $"{homeClubName} {finalFrame.HomeScore} - {finalFrame.AwayScore} {awayClubName}"
+        };
+    }
+
+    private static int ResolveSetPieceEffect(GameState state)
+    {
+        return state.SetPieceApproach switch
+        {
+            TacticalSetPieceApproach.AttackNearPost or TacticalSetPieceApproach.AttackFarPost => 1,
+            TacticalSetPieceApproach.CrowdKeeper when state.Risk >= 60 => 1,
+            TacticalSetPieceApproach.ShortRoutines when state.TeamStyle == TacticalTeamStyle.Possession => 1,
+            TacticalSetPieceApproach.DefensiveSecurity => -1,
+            _ => 0
+        };
+    }
+
+    private static int ResolveOpponentPreparationEffect(GameState state)
+    {
+        return state.CurrentOpponentPreparationFocus switch
+        {
+            OpponentPreparationFocus.PressTriggers when state.PressIntensity >= 65 => 1,
+            OpponentPreparationFocus.RestDefense => 2,
+            OpponentPreparationFocus.WideContainment when state.Width >= 60 => 1,
+            OpponentPreparationFocus.CentralContainment when state.TeamStyle == TacticalTeamStyle.CentralOverload => 1,
+            OpponentPreparationFocus.DirectDefense when state.TeamStyle == TacticalTeamStyle.DirectPlay => 1,
+            OpponentPreparationFocus.LowBlockPatience when state.Risk <= 50 => 1,
+            _ => 0
         };
     }
 
