@@ -190,7 +190,7 @@ public partial class SaveSystem : Node
         WriteIndented = true,
         PropertyNameCaseInsensitive = true
     };
-    public const int CurrentSaveVersion = 8;
+    public const int CurrentSaveVersion = 9;
 
     public static SaveSystem? Instance { get; private set; }
     public string LastStatusMessage { get; private set; } = "Save system idle.";
@@ -957,9 +957,19 @@ public partial class SaveSystem : Node
             LicenseOpportunitySummary = source.LicenseOpportunitySummary,
             ObjectiveReviewSummary = source.ObjectiveReviewSummary,
             FanTrust = source.FanTrust,
+            MediaTrust = source.MediaTrust,
             WorldReputation = source.WorldReputation,
+            ClubReputation = source.ClubReputation,
+            MediaReputation = source.MediaReputation,
+            TacticalReputation = source.TacticalReputation,
+            YouthReputation = source.YouthReputation,
+            RecruitmentReputation = source.RecruitmentReputation,
+            BoardPressure = source.BoardPressure,
+            FanPressure = source.FanPressure,
             DressingRoomPressure = source.DressingRoomPressure,
-            TransferPressure = source.TransferPressure
+            TransferPressure = source.TransferPressure,
+            FinancialPressure = source.FinancialPressure,
+            PerceptionHistory = source.PerceptionHistory == null ? null : (string[])source.PerceptionHistory.Clone()
         };
     }
 

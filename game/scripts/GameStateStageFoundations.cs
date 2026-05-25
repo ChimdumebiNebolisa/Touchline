@@ -34,9 +34,19 @@ public sealed class SaveSlotStageFoundationData
     public string LicenseOpportunitySummary { get; set; } = string.Empty;
     public string ObjectiveReviewSummary { get; set; } = string.Empty;
     public int FanTrust { get; set; } = 55;
+    public int MediaTrust { get; set; } = 52;
     public int WorldReputation { get; set; } = 45;
+    public int ClubReputation { get; set; } = 45;
+    public int MediaReputation { get; set; } = 45;
+    public int TacticalReputation { get; set; } = 45;
+    public int YouthReputation { get; set; } = 45;
+    public int RecruitmentReputation { get; set; } = 45;
+    public int BoardPressure { get; set; } = 35;
+    public int FanPressure { get; set; } = 35;
     public int DressingRoomPressure { get; set; } = 35;
     public int TransferPressure { get; set; } = 25;
+    public int FinancialPressure { get; set; } = 25;
+    public string[]? PerceptionHistory { get; set; }
 }
 public sealed class SaveSlotScoutingAssignmentData
 {
@@ -99,6 +109,7 @@ public partial class GameState
     private readonly List<NewsEvent> _foundationNewsEvents = new();
     private readonly List<PromiseRecord> _promiseRecords = new();
     private readonly List<string> _careerHistory = new();
+    private readonly List<string> _perceptionHistory = new();
 
     public TacticalTeamStyle TeamStyle { get; private set; } = TacticalTeamStyle.Balanced;
     public int PassingDirectness { get; private set; } = 52;
@@ -128,9 +139,18 @@ public partial class GameState
     public string LicenseOpportunitySummary { get; private set; } = "License progression will be reviewed after sustained progress.";
     public string ObjectiveReviewSummary { get; private set; } = "Objective review pending first run of matches.";
     public int FanTrust { get; private set; } = 55;
+    public int MediaTrust { get; private set; } = 52;
     public int WorldReputation { get; private set; } = 45;
+    public int ClubReputation { get; private set; } = 45;
+    public int MediaReputation { get; private set; } = 45;
+    public int TacticalReputation { get; private set; } = 45;
+    public int YouthReputation { get; private set; } = 45;
+    public int RecruitmentReputation { get; private set; } = 45;
+    public int BoardPressure { get; private set; } = 35;
+    public int FanPressure { get; private set; } = 35;
     public int DressingRoomPressure { get; private set; } = 35;
     public int TransferPressure { get; private set; } = 25;
+    public int FinancialPressure { get; private set; } = 25;
 
     public string TeamStyleName => StageFoundationText.GetDisplayName(TeamStyle);
     public string TacticalFamiliarityName => StageFoundationText.GetDisplayName(TacticsFoundation.FamiliarityFromScore(TacticalFamiliarityScore));
@@ -142,11 +162,15 @@ public partial class GameState
     public string JobSecurityName => StageFoundationText.GetDisplayName(JobSecurity);
     public string CareerHistorySummary => _careerHistory.Count == 0 ? "Career history starts when a club is selected." : string.Join("\n", _careerHistory);
     public string PromiseSummary => _promiseRecords.Count == 0 ? "No active promises." : BuildPromiseSummary();
+    public string TrustSummary => $"Trust | board {CareerProfile.BoardTrust}, fans {FanTrust}, players {CareerProfile.PlayerTrust}, staff {CareerProfile.StaffTrust}, Director {CareerProfile.DirectorTrust}, media {MediaTrust}";
+    public string ReputationSummary => $"Reputation | world {WorldReputation}, club {ClubReputation}, tactical {TacticalReputation}, youth {YouthReputation}, recruitment {RecruitmentReputation}, media {MediaReputation}";
+    public string PressureCategorySummary => $"Pressure | job {JobPressure}, board {BoardPressure}, fans {FanPressure}, media {CareerProfile.MediaPressure}, dressing room {DressingRoomPressure}, transfer {TransferPressure}, financial {FinancialPressure}";
+    public string PerceptionHistorySummary => _perceptionHistory.Count == 0 ? "Perception history starts after matches, promises, or recruitment decisions." : string.Join("\n", _perceptionHistory);
     public string RecruitmentFoundationSummary => CurrentRecruitmentTarget == null
         ? "Recruitment foundation pending scouting target."
         : $"{CurrentRecruitmentTarget.PlayerName} ({CurrentRecruitmentTarget.Position}) | {CurrentRecruitmentTarget.InformationSummary} | {CurrentRecruitmentTarget.InterestSummary} | {CurrentRecruitmentTarget.TacticalFitSummary} | Fee {CurrentRecruitmentTarget.EstimatedFeeRange} | Wage {CurrentRecruitmentTarget.EstimatedWageRange} | {CurrentRecruitmentTarget.Status}";
     public string TrainingScoutingSummary => $"{TrainingFocusName} ({TrainingIntensityName}): {TrainingStatusSummary}\nScouting depth: {ScoutingReportDepthName}\nScouting: {BuildScoutingSummary()}";
-    public string CareerMarketSummary => $"Job security: {JobSecurityName} | Reputation {WorldReputation} | Fan trust {FanTrust} | Dressing-room pressure {DressingRoomPressure} | Transfer pressure {TransferPressure}\nLicense: {LicenseOpportunitySummary}\nJob market: {BuildJobOfferSummary()}";
+    public string CareerMarketSummary => $"Job security: {JobSecurityName}\n{TrustSummary}\n{ReputationSummary}\n{PressureCategorySummary}\nLicense: {LicenseOpportunitySummary}\nJob market: {BuildJobOfferSummary()}";
     public string TacticsFoundationSummary => $"{TeamStyleName} | {TeamInstructionsSummary}\n{SetPieceSummary}\n{OpponentPreparationSummary}\n{PlayerRolesSummary}\n{PlayerInstructionsSummary}\n{TacticalRoleFitSummary}\n{PlayerFamiliaritySummary}\n{TacticalFitNotes}\n{TacticalRiskNotes}";
 
     public void UpdateTactics(string formation, string teamStyle, int pressIntensity, int tempo, int width, int risk)
@@ -298,6 +322,9 @@ public partial class GameState
         if (role == ManagerRole.AssistantManager)
         {
             CurrentRecruitmentTarget = CloneRecruitmentTarget(target, "Recommended by Assistant Manager; final authority sits with senior staff.");
+            TransferPressure = Math.Clamp(TransferPressure + 1, 0, 100);
+            RefreshPressureCategories();
+            RecordPerceptionHistory("Recruitment recommendation", $"role authority limited action; transfer pressure {TransferPressure}, recruitment reputation {RecruitmentReputation}");
             AddNews(
                 "Recruitment recommendation filed",
                 NewsCategory.Transfer,
@@ -310,6 +337,9 @@ public partial class GameState
         if (role == ManagerRole.HeadCoach)
         {
             CurrentRecruitmentTarget = CloneRecruitmentTarget(target, "Requested by Head Coach; Director of Football and board review required.");
+            TransferPressure = Math.Clamp(TransferPressure + 2, 0, 100);
+            RefreshPressureCategories();
+            RecordPerceptionHistory("Recruitment request", $"Head Coach authority created review pressure; transfer pressure {TransferPressure}, board trust {CareerProfile.BoardTrust}");
             AddNews(
                 "Head Coach submits recruitment request",
                 NewsCategory.Transfer,
@@ -319,8 +349,11 @@ public partial class GameState
             return CurrentRecruitmentTarget.Status;
         }
 
-        var approved = target.TacticalFitSummary.Contains("Strong", StringComparison.Ordinal) ||
-            CurrentClub?.DirectorRelationshipState is DirectorRelationshipState.Ally or DirectorRelationshipState.Supportive;
+        var trustSupport = CareerProfile.BoardTrust >= 62 || CareerProfile.DirectorTrust >= 62;
+        var lowTrustBlock = CareerProfile.BoardTrust < 42 && !target.TacticalFitSummary.Contains("Strong", StringComparison.Ordinal);
+        var approved = !lowTrustBlock && (target.TacticalFitSummary.Contains("Strong", StringComparison.Ordinal) ||
+            trustSupport ||
+            CurrentClub?.DirectorRelationshipState is DirectorRelationshipState.Ally or DirectorRelationshipState.Supportive);
         var status = approved
             ? "Board approval granted for a basic approach; promise logged around squad role."
             : "Board rejects the basic approach: fit, wage, and Director confidence do not align.";
@@ -344,6 +377,9 @@ public partial class GameState
         }
 
         TransferPressure = Math.Clamp(TransferPressure + (approved ? 4 : 7), 0, 100);
+        RecruitmentReputation = Math.Clamp(RecruitmentReputation + (approved ? 1 : -1), 0, 100);
+        RefreshPressureCategories();
+        RecordPerceptionHistory("Recruitment decision", $"approved {approved}; board trust {CareerProfile.BoardTrust}, Director trust {CareerProfile.DirectorTrust}, transfer pressure {TransferPressure}, recruitment reputation {RecruitmentReputation}");
         AddNews(
             approved ? "Transfer approach approved" : "Transfer approach blocked",
             NewsCategory.Transfer,
@@ -483,9 +519,19 @@ public partial class GameState
             LicenseOpportunitySummary = LicenseOpportunitySummary,
             ObjectiveReviewSummary = ObjectiveReviewSummary,
             FanTrust = FanTrust,
+            MediaTrust = MediaTrust,
             WorldReputation = WorldReputation,
+            ClubReputation = ClubReputation,
+            MediaReputation = MediaReputation,
+            TacticalReputation = TacticalReputation,
+            YouthReputation = YouthReputation,
+            RecruitmentReputation = RecruitmentReputation,
+            BoardPressure = BoardPressure,
+            FanPressure = FanPressure,
             DressingRoomPressure = DressingRoomPressure,
-            TransferPressure = TransferPressure
+            TransferPressure = TransferPressure,
+            FinancialPressure = FinancialPressure,
+            PerceptionHistory = _perceptionHistory.ToArray()
         };
     }
 
@@ -605,11 +651,27 @@ public partial class GameState
         LicenseOpportunitySummary = string.IsNullOrWhiteSpace(data.LicenseOpportunitySummary) ? "License progression will be reviewed after sustained progress." : data.LicenseOpportunitySummary;
         ObjectiveReviewSummary = string.IsNullOrWhiteSpace(data.ObjectiveReviewSummary) ? "Objective review restored." : data.ObjectiveReviewSummary;
         FanTrust = Math.Clamp(data.FanTrust <= 0 ? 55 : data.FanTrust, 0, 100);
+        MediaTrust = Math.Clamp(data.MediaTrust <= 0 ? 52 : data.MediaTrust, 0, 100);
         WorldReputation = Math.Clamp(data.WorldReputation <= 0 ? CareerProfile.Reputation : data.WorldReputation, 0, 100);
-        DressingRoomPressure = Math.Clamp(data.DressingRoomPressure, 0, 100);
-        TransferPressure = Math.Clamp(data.TransferPressure, 0, 100);
+        ClubReputation = Math.Clamp(data.ClubReputation <= 0 ? WorldReputation : data.ClubReputation, 0, 100);
+        MediaReputation = Math.Clamp(data.MediaReputation <= 0 ? WorldReputation : data.MediaReputation, 0, 100);
+        TacticalReputation = Math.Clamp(data.TacticalReputation <= 0 ? 45 : data.TacticalReputation, 0, 100);
+        YouthReputation = Math.Clamp(data.YouthReputation <= 0 ? 45 : data.YouthReputation, 0, 100);
+        RecruitmentReputation = Math.Clamp(data.RecruitmentReputation <= 0 ? 45 : data.RecruitmentReputation, 0, 100);
+        BoardPressure = Math.Clamp(data.BoardPressure <= 0 ? 35 : data.BoardPressure, 0, 100);
+        FanPressure = Math.Clamp(data.FanPressure <= 0 ? 35 : data.FanPressure, 0, 100);
+        DressingRoomPressure = Math.Clamp(data.DressingRoomPressure <= 0 ? 35 : data.DressingRoomPressure, 0, 100);
+        TransferPressure = Math.Clamp(data.TransferPressure <= 0 ? 25 : data.TransferPressure, 0, 100);
+        FinancialPressure = Math.Clamp(data.FinancialPressure <= 0 ? 25 : data.FinancialPressure, 0, 100);
+        _perceptionHistory.Clear();
+        if (data.PerceptionHistory != null)
+        {
+            _perceptionHistory.AddRange(data.PerceptionHistory);
+        }
+
         EnsureRecruitmentTarget();
         EnsureJobMarketFoundation();
+        RefreshPressureCategories();
     }
 
     public void ResetStageFoundations()
@@ -642,12 +704,22 @@ public partial class GameState
         LicenseOpportunitySummary = "License progression will be reviewed after sustained progress.";
         ObjectiveReviewSummary = "Objective review pending first run of matches.";
         FanTrust = 55;
+        MediaTrust = 52;
         WorldReputation = CareerProfile.Reputation;
+        ClubReputation = CareerProfile.Reputation;
+        MediaReputation = CareerProfile.Reputation;
+        TacticalReputation = 45;
+        YouthReputation = 45;
+        RecruitmentReputation = 45;
+        BoardPressure = 35;
+        FanPressure = 35;
         DressingRoomPressure = 35;
         TransferPressure = 25;
+        FinancialPressure = 25;
         _foundationNewsEvents.Clear();
         _promiseRecords.Clear();
         _careerHistory.Clear();
+        _perceptionHistory.Clear();
     }
 
     public void InitializeStageFoundationsForClub()
@@ -682,16 +754,29 @@ public partial class GameState
     public void ApplyStageFoundationPostMatch(MatchPlaybackResult result, PostMatchConsequenceResult consequence)
     {
         var goalDifference = result.FinalHomeScore - result.FinalAwayScore;
-        CareerProfile.BoardTrust = Math.Clamp(CareerProfile.BoardTrust + Math.Sign(consequence.BoardDelta), 0, 100);
-        CareerProfile.PlayerTrust = Math.Clamp(CareerProfile.PlayerTrust + Math.Sign(consequence.MoraleDelta), 0, 100);
-        CareerProfile.DirectorTrust = Math.Clamp(CareerProfile.DirectorTrust + (goalDifference >= 0 ? 1 : -1), 0, 100);
-        FanTrust = Math.Clamp(FanTrust + Math.Sign(consequence.FanDelta), 0, 100);
+        var boardTrustDelta = ResolveSlowTrustDelta(consequence.BoardDelta);
+        var playerTrustDelta = ResolveSlowTrustDelta(consequence.MoraleDelta);
+        var fanTrustDelta = ResolveSlowTrustDelta(consequence.FanDelta);
+        CareerProfile.BoardTrust = Math.Clamp(CareerProfile.BoardTrust + boardTrustDelta, 0, 100);
+        CareerProfile.PlayerTrust = Math.Clamp(CareerProfile.PlayerTrust + playerTrustDelta, 0, 100);
+        CareerProfile.StaffTrust = Math.Clamp(CareerProfile.StaffTrust + ResolveSlowTrustDelta(consequence.MoraleDelta + (TacticalRoleFitScore >= 65 ? 1 : -1)), 0, 100);
+        CareerProfile.DirectorTrust = Math.Clamp(CareerProfile.DirectorTrust + ResolveSlowTrustDelta(goalDifference >= 0 ? 2 : -2), 0, 100);
+        FanTrust = Math.Clamp(FanTrust + fanTrustDelta, 0, 100);
+        MediaTrust = Math.Clamp(MediaTrust + ResolveSlowTrustDelta(goalDifference >= 0 ? 1 : -2), 0, 100);
         WorldReputation = Math.Clamp(WorldReputation + (goalDifference > 0 ? 2 : goalDifference == 0 ? 0 : -1), 0, 100);
+        ClubReputation = Math.Clamp(ClubReputation + Math.Sign(consequence.BoardDelta + consequence.FanDelta), 0, 100);
+        MediaReputation = Math.Clamp(MediaReputation + (goalDifference > 0 ? 1 : goalDifference < 0 ? -1 : 0), 0, 100);
+        TacticalReputation = Math.Clamp(TacticalReputation + ResolveTacticalReputationDelta(result, goalDifference), 0, 100);
+        YouthReputation = Math.Clamp(YouthReputation + ResolveYouthReputationDelta(result), 0, 100);
+        RecruitmentReputation = Math.Clamp(RecruitmentReputation + ResolveRecruitmentReputationDelta(goalDifference), 0, 100);
         CareerProfile.Reputation = WorldReputation;
         CareerProfile.MediaPressure = Math.Clamp(CareerProfile.MediaPressure + (goalDifference < 0 ? 3 : -1), 0, 100);
         TacticalFamiliarityScore = Math.Clamp(TacticalFamiliarityScore + (goalDifference >= 0 ? 2 : -1), 0, 100);
-        DressingRoomPressure = Math.Clamp(100 - SquadMorale + Math.Max(0, JobPressure - 55) / 2, 0, 100);
         TransferPressure = Math.Clamp(TransferPressure + (goalDifference < 0 ? 3 : -1), 0, 100);
+        RefreshPressureCategories();
+        RecordPerceptionHistory(
+            "Post-match",
+            $"morale squad {TeamMorale} ({consequence.MoraleDelta:+0;-0;0}); trust board {boardTrustDelta:+0;-0;0}, players {playerTrustDelta:+0;-0;0}, fans {fanTrustDelta:+0;-0;0}; reputation world {WorldReputation}, tactical {TacticalReputation}; pressure job {JobPressure}, board {BoardPressure}, fans {FanPressure}, dressing room {DressingRoomPressure}");
         EvaluateCareerFoundationState();
         RefreshTacticFoundation(TacticalFormation, TeamStyle);
         ObjectiveReviewSummary = BuildObjectiveReviewSummary(goalDifference);
@@ -700,7 +785,7 @@ public partial class GameState
             "Post-match consequences logged",
             NewsCategory.Pressure,
             "Confirmed",
-            $"{result.FinalResultSummary}: board, fan, squad, trust, reputation, and job security states were updated.",
+            $"{result.FinalResultSummary}: morale moved quickly, trust moved slowly, and reputation/pressure categories were updated separately.",
             5);
         ReviewPromiseLifecycle("Post-match review", 0);
     }
@@ -1305,6 +1390,111 @@ public partial class GameState
         return MatchPlaybackContractValidator.PassMessage;
     }
 
+    public string ValidatePhase7PerceptionDepthContract()
+    {
+        InitializeStageFoundationsForClub();
+        var startingSquadMorale = TeamMorale;
+        var startingFanMorale = FanSentiment;
+        var startingBoardMorale = BoardConfidence;
+        var startingBoardTrust = CareerProfile.BoardTrust;
+        var startingPlayerTrust = CareerProfile.PlayerTrust;
+        var startingWorldReputation = WorldReputation;
+        var startingTacticalReputation = TacticalReputation;
+
+        var result = PrepareCurrentMatchResult(true);
+        ApplyMatchResult(result);
+        if (LastMatchReport == null)
+        {
+            return "Phase 7 perception check did not create a post-match report.";
+        }
+
+        var moraleMove = Math.Abs(TeamMorale - startingSquadMorale) +
+            Math.Abs(FanSentiment - startingFanMorale) +
+            Math.Abs(BoardConfidence - startingBoardMorale);
+        var boardTrustMove = Math.Abs(CareerProfile.BoardTrust - startingBoardTrust);
+        var playerTrustMove = Math.Abs(CareerProfile.PlayerTrust - startingPlayerTrust);
+        if (moraleMove == 0 ||
+            boardTrustMove >= moraleMove ||
+            playerTrustMove >= moraleMove ||
+            boardTrustMove > 2 ||
+            playerTrustMove > 2)
+        {
+            return $"Trust did not move slower than morale after the match. Morale move {moraleMove}, board trust move {boardTrustMove}, player trust move {playerTrustMove}.";
+        }
+
+        if (WorldReputation == startingWorldReputation && TacticalReputation == startingTacticalReputation)
+        {
+            return "Reputation categories did not update separately from morale.";
+        }
+
+        if (BoardPressure <= 0 || FanPressure <= 0 || DressingRoomPressure <= 0 || FinancialPressure <= 0)
+        {
+            return "Pressure categories were not recalculated.";
+        }
+
+        if (!TrustSummary.Contains("media", StringComparison.OrdinalIgnoreCase) ||
+            !ReputationSummary.Contains("tactical", StringComparison.OrdinalIgnoreCase) ||
+            !PressureCategorySummary.Contains("financial", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Perception summaries do not expose trust, reputation, and pressure categories.";
+        }
+
+        if (_perceptionHistory.Count == 0 ||
+            !PerceptionHistorySummary.Contains("Post-match", StringComparison.Ordinal))
+        {
+            return "Perception history did not record the post-match change.";
+        }
+
+        var transferPressureBefore = TransferPressure;
+        var recruitmentReputationBefore = RecruitmentReputation;
+        var recruitmentResult = AttemptBasicRecruitmentAction();
+        if (string.IsNullOrWhiteSpace(recruitmentResult) ||
+            TransferPressure <= transferPressureBefore ||
+            RecruitmentReputation == recruitmentReputationBefore ||
+            !_perceptionHistory[0].Contains("Recruitment", StringComparison.Ordinal))
+        {
+            return "Recruitment action did not affect pressure, recruitment reputation, and perception history.";
+        }
+
+        EvaluateCareerFoundationState();
+        if (string.IsNullOrWhiteSpace(JobSecurityName) ||
+            !CareerMarketSummary.Contains("Trust |", StringComparison.Ordinal) ||
+            !CareerMarketSummary.Contains("Pressure |", StringComparison.Ordinal))
+        {
+            return "Job security or career market UI does not use perception categories.";
+        }
+
+        if (!NewsFeedSummary.Contains("Post-match consequences", StringComparison.OrdinalIgnoreCase) &&
+            !NewsFeedSummary.Contains("Transfer", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Perception changes did not surface in news.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
+    public string ValidatePhase7StoredPerceptionContract()
+    {
+        if (_perceptionHistory.Count == 0)
+        {
+            return "Saved perception history did not restore.";
+        }
+
+        if (!TrustSummary.Contains("board", StringComparison.OrdinalIgnoreCase) ||
+            !ReputationSummary.Contains("recruitment", StringComparison.OrdinalIgnoreCase) ||
+            !PressureCategorySummary.Contains("dressing room", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Saved perception summaries did not restore all category groups.";
+        }
+
+        if (BoardPressure <= 0 || FanPressure <= 0 || FinancialPressure <= 0)
+        {
+            return "Saved pressure categories did not restore.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
     private static bool HasActionKind(MatchPlaybackResult result, MatchActionKind kind)
     {
         foreach (var action in result.Timeline.Actions)
@@ -1737,14 +1927,18 @@ public partial class GameState
 
     private void EvaluateCareerFoundationState()
     {
+        RefreshPressureCategories();
         JobSecurity = EvaluateJobSecurity();
         LicenseOpportunitySummary = BuildLicenseOpportunitySummary();
-        DressingRoomPressure = Math.Clamp(100 - SquadMorale + Math.Max(0, JobPressure - 55) / 2, 0, 100);
     }
 
     private JobSecurityState EvaluateJobSecurity()
     {
-        var pressure = JobPressure + Math.Max(0, 55 - BoardMorale) / 2 + Math.Max(0, 55 - FanMorale) / 3 + GetRolePressureWeight();
+        var pressure = JobPressure +
+            BoardPressure / 5 +
+            FanPressure / 6 +
+            DressingRoomPressure / 6 +
+            GetRolePressureWeight();
         return pressure switch
         {
             >= 95 => JobSecurityState.Sacked,
@@ -1765,6 +1959,87 @@ public partial class GameState
             ManagerRole.HeadCoach => 3,
             _ => 8
         };
+    }
+
+    private void RefreshPressureCategories()
+    {
+        BoardPressure = Math.Clamp(100 - BoardMorale + Math.Max(0, 55 - CareerProfile.BoardTrust) / 2 + GetRolePressureWeight(), 0, 100);
+        FanPressure = Math.Clamp(100 - FanMorale + Math.Max(0, CareerProfile.MediaPressure - 45) / 2, 0, 100);
+        DressingRoomPressure = Math.Clamp(100 - SquadMorale + Math.Max(0, JobPressure - 55) / 2 + Math.Max(0, 55 - CareerProfile.PlayerTrust) / 3, 0, 100);
+        var strictBoardPressure = CurrentClub?.BoardPhilosophy == BoardPhilosophy.FinanciallyStrictBoard ? 15 : 0;
+        FinancialPressure = Math.Clamp(25 + strictBoardPressure + Math.Max(0, TransferPressure - 55) / 3 + Math.Max(0, 55 - BoardMorale) / 4, 0, 100);
+    }
+
+    private static int ResolveSlowTrustDelta(int fastDelta)
+    {
+        return fastDelta switch
+        {
+            >= 6 => 2,
+            >= 2 => 1,
+            <= -6 => -2,
+            <= -2 => -1,
+            _ => 0
+        };
+    }
+
+    private int ResolveTacticalReputationDelta(MatchPlaybackResult result, int goalDifference)
+    {
+        var delta = goalDifference > 0 ? 1 : goalDifference < 0 ? -1 : 0;
+        if (TacticalRoleFitScore >= 72 && result.Stats.HomeBigChances >= result.Stats.AwayBigChances)
+        {
+            delta += 1;
+        }
+        else if (TacticalRoleFitScore <= 52 && result.Stats.HomeBigChances <= result.Stats.AwayBigChances)
+        {
+            delta -= 1;
+        }
+
+        return Math.Clamp(delta, -2, 2);
+    }
+
+    private int ResolveYouthReputationDelta(MatchPlaybackResult result)
+    {
+        foreach (var rating in result.PlayerRatings)
+        {
+            if (rating.Team != result.HomeClubName)
+            {
+                continue;
+            }
+
+            foreach (var player in SquadPlayers)
+            {
+                if (player.PlayerId == rating.PlayerId && player.Age <= 23 && rating.Rating >= 6.8)
+                {
+                    return 1;
+                }
+            }
+        }
+
+        return 0;
+    }
+
+    private int ResolveRecruitmentReputationDelta(int goalDifference)
+    {
+        if (goalDifference >= 0 && TransferPressure < 45)
+        {
+            return 1;
+        }
+
+        if (goalDifference < 0 && TransferPressure >= 65)
+        {
+            return -1;
+        }
+
+        return 0;
+    }
+
+    private void RecordPerceptionHistory(string trigger, string detail)
+    {
+        _perceptionHistory.Insert(0, $"{CurrentDateLabel}: {trigger} - {detail}");
+        if (_perceptionHistory.Count > 10)
+        {
+            _perceptionHistory.RemoveAt(_perceptionHistory.Count - 1);
+        }
     }
 
     private void AddNews(string title, NewsCategory category, string reliability, string text, int importance)
@@ -1926,9 +2201,14 @@ public partial class GameState
         if (promise.IsPublic)
         {
             CareerProfile.MediaPressure = Math.Clamp(CareerProfile.MediaPressure + Math.Max(0, pressureDelta / 2), 0, 100);
+            MediaTrust = Math.Clamp(MediaTrust + ResolveSlowTrustDelta(-pressureDelta), 0, 100);
         }
 
         SyncCurrentClubMoraleFromRuntime();
+        RefreshPressureCategories();
+        RecordPerceptionHistory(
+            "Promise review",
+            $"{promise.PromiseType} to {promise.Recipient} became {StageFoundationText.GetDisplayName(promise.Status)}; player trust {playerTrustDelta:+0;-0;0}, squad morale {squadDelta:+0;-0;0}, transfer pressure {TransferPressure}");
         AddNews(
             "Promise review",
             promise.IsPublic ? NewsCategory.Pressure : NewsCategory.Contract,
@@ -2054,11 +2334,11 @@ public partial class GameState
 
         return CurrentClub.DirectorOfFootballStyle switch
         {
-            DirectorOfFootballStyle.AcademyBuilder when candidate.Age <= 23 => "Director supports the age profile and pathway value.",
-            DirectorOfFootballStyle.BargainHunter => "Director wants fee discipline before any move.",
-            DirectorOfFootballStyle.StarChaser when candidate.TrueAbility >= 75 => "Director likes the visible ambition signal.",
-            DirectorOfFootballStyle.ControlFreak => "Director insists recruitment must run through his shortlist process.",
-            _ => "Director requests fit evidence before committing."
+            DirectorOfFootballStyle.AcademyBuilder when candidate.Age <= 23 => $"Director supports the age profile and pathway value; Director trust {CareerProfile.DirectorTrust}/100 strengthens cooperation.",
+            DirectorOfFootballStyle.BargainHunter => $"Director wants fee discipline before any move; Director trust {CareerProfile.DirectorTrust}/100 affects patience.",
+            DirectorOfFootballStyle.StarChaser when candidate.TrueAbility >= 75 => $"Director likes the visible ambition signal; Director trust {CareerProfile.DirectorTrust}/100 supports the case.",
+            DirectorOfFootballStyle.ControlFreak => $"Director insists recruitment must run through his shortlist process; Director trust {CareerProfile.DirectorTrust}/100 shapes conflict risk.",
+            _ => $"Director requests fit evidence before committing; Director trust {CareerProfile.DirectorTrust}/100 sets the cooperation level."
         };
     }
 
@@ -2071,11 +2351,11 @@ public partial class GameState
 
         return CurrentClub.BoardPhilosophy switch
         {
-            BoardPhilosophy.FinanciallyStrictBoard => "Board demands wage control and resale logic.",
-            BoardPhilosophy.YouthDevelopmentBoard when candidate.Age <= 23 => "Board is open if the pathway remains credible.",
-            BoardPhilosophy.WinNowBoard when candidate.TrueAbility >= 74 => "Board accepts a first-team case if results justify it.",
-            BoardPhilosophy.DataDrivenBoard => "Board wants tactical fit and value evidence, not fee alone.",
-            _ => "Board will review cost, role, tactical fit, and Director view together."
+            BoardPhilosophy.FinanciallyStrictBoard => $"Board demands wage control and resale logic; board trust {CareerProfile.BoardTrust}/100 affects approval tolerance.",
+            BoardPhilosophy.YouthDevelopmentBoard when candidate.Age <= 23 => $"Board is open if the pathway remains credible; board trust {CareerProfile.BoardTrust}/100 affects patience.",
+            BoardPhilosophy.WinNowBoard when candidate.TrueAbility >= 74 => $"Board accepts a first-team case if results justify it; board trust {CareerProfile.BoardTrust}/100 affects room for risk.",
+            BoardPhilosophy.DataDrivenBoard => $"Board wants tactical fit and value evidence, not fee alone; board trust {CareerProfile.BoardTrust}/100 shapes the burden of proof.",
+            _ => $"Board will review cost, role, tactical fit, Director view, and board trust {CareerProfile.BoardTrust}/100 together."
         };
     }
 

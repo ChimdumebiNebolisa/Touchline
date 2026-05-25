@@ -7,7 +7,7 @@ public static class PerceptionSystem
         var boardReason = BuildBoardReason(state);
         var fanReason = BuildFanReason(state);
         var dressingRoomReason = BuildDressingRoomReason(state);
-        return $"Board: {boardReason} Fans: {fanReason} Dressing room: {dressingRoomReason}";
+        return $"Board: {boardReason} Fans: {fanReason} Dressing room: {dressingRoomReason}\n{state.TrustSummary}\n{state.ReputationSummary}\n{state.PressureCategorySummary}\nRecent perception: {state.PerceptionHistorySummary}";
     }
 
     private static string BuildBoardReason(GameState state)

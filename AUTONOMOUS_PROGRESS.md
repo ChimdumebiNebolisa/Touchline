@@ -1,31 +1,33 @@
 # Autonomous Progress
 
 ## Current active Plan step
-- Phase 7: Morale, trust, reputation, and pressure depth.
+- Phase 8: News, media, and decision events.
 
 ## Last completed verified task
-- Phase 6: Post-match report depth implemented and verified locally.
+- Phase 7: Morale, trust, reputation, and pressure depth implemented and verified locally.
 
 ## Current subtask in progress
-- Prepare Phase 6 commit and push, then begin Phase 7.
+- Prepare Phase 7 commit and push, then begin Phase 8.
 
 ## Next queued subtasks
-- Commit and push `phase-6: deepen post-match reports`.
-- Begin Phase 7 morale/trust/reputation/pressure inspection.
-- Keep morale, trust, reputation, and pressure separated and explainable.
+- Commit and push `phase-7: deepen perception systems`.
+- Begin Phase 8 news/media/decision-event inspection.
+- Keep structured events deterministic, save-backed, and consequence-bearing.
 
 ## Known blockers
 - No active blockers.
 - `docs/audit/` remains untracked and intentionally excluded from phase commits.
 
 ## Last verification run
-- Phase 6 local verification:
+- Phase 7 local verification:
   - `dotnet build game/Touchline.sln` passed with 0 warnings and 0 errors.
-  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/phase6_post_match_report_depth_check.gd` passed.
-  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step23_post_match_check.gd` passed.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/phase7_perception_depth_check.gd` passed.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/stage6_consequences_pressure_check.gd` passed.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step29_pressure_context_check.gd` passed.
   - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step38_post_match_causes_check.gd` passed.
   - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step41_post_match_report_check.gd` passed.
-  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/stage6_consequences_pressure_check.gd` passed.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step48_dashboard_context_check.gd` passed.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step49_matchday_preparation_check.gd` passed.
   - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step27_save_compat_check.gd` passed.
   - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step50_end_to_end_user_flow_check.gd` passed.
   - `git diff --check` passed.
@@ -41,11 +43,12 @@
 - Phase 3 completed at `02b9ddc`.
 - Phase 4 completed at `08b27cb`.
 - Phase 5 completed at `a50f438`.
-- Phase 6 commit pending.
+- Phase 6 completed at `03522d0`.
+- Phase 7 commit pending.
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`.
 - Re-read `docs/touchline_master_design_decisions.md`.
 - Re-read `docs/MASTER_IMPLEMENTATION_ROADMAP.md`.
-- Resume at Phase 7 after the Phase 6 commit/push completes.
+- Resume at Phase 8 after the Phase 7 commit/push completes.
 - Keep `docs/audit/` untouched unless a future task explicitly uses it.

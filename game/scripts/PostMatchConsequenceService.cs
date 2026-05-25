@@ -90,7 +90,7 @@ public static class PostMatchConsequenceService
         var tacticalExplanation = BuildTacticalExplanation(result, state, analysis);
         var keyPlayerMoments = BuildKeyPlayerMoments(result);
         var pressureSummary =
-            $"Club pressure now sits at morale {Math.Clamp(state.TeamMorale + moraleDelta, 0, 100)}, fan trust {Math.Clamp(state.FanSentiment + fanDelta, 0, 100)}, and board confidence {Math.Clamp(state.BoardConfidence + boardDelta, 0, 100)}. Cause: {causeSummary}";
+            $"Club pressure now sits at morale {Math.Clamp(state.TeamMorale + moraleDelta, 0, 100)}, fan trust {Math.Clamp(state.FanSentiment + fanDelta, 0, 100)}, and board confidence {Math.Clamp(state.BoardConfidence + boardDelta, 0, 100)}. Categories before update: {state.PressureCategorySummary}. Cause: {causeSummary}";
         var resultLabel = BuildResultLabel(goalDifference, result.AwayClubName, analysis);
 
         return new PostMatchConsequenceResult

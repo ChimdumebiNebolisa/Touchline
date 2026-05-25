@@ -179,7 +179,7 @@ public partial class MatchdayScene : Control
         _benchLabel.Text = $"Team News | Bench {benchCount} | Average XI fitness {averageFitness} | Missing slots {System.Math.Max(0, 11 - startingCount)}";
         _pressureReasonsLabel.Text = $"Club Mood | {PerceptionSystem.BuildPressureReasonSummary(state)}";
 
-        _pressureLabel.Text = $"Club Mood | Morale {state.TeamMorale} | Fans {state.FanSentiment} | Board {state.BoardConfidence}";
+        _pressureLabel.Text = $"Club Mood | Morale {state.TeamMorale} | Fans {state.FanSentiment} | Board {state.BoardConfidence}\n{state.PressureCategorySummary}";
         _tacticsLabel.Text = $"Match Plan | {state.BuildTacticalPlanSummary()}";
         _opponentFocusLabel.Text = $"Opponent Brief | {state.BuildOpponentContextSummary()}";
         _readinessLabel.Text = startingCount >= 11

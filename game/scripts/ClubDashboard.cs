@@ -373,9 +373,9 @@ public partial class ClubDashboard : Control
             ? "Table position unavailable."
             : $"{currentRow.Points} pts | GD {FormatSigned(currentRow.GoalDifference)} | {currentRow.Played} played";
         _moraleValueLabel.Text = $"{state.SquadMorale}";
-        _moraleMetaLabel.Text = $"Squad morale {DescribePulse(state.SquadMorale)} | Fan morale {state.FanMorale}";
+        _moraleMetaLabel.Text = $"Squad morale {DescribePulse(state.SquadMorale)} | Fan morale {state.FanMorale} | Player trust {state.CareerProfile.PlayerTrust}";
         _boardValueLabel.Text = $"{state.BoardMorale}";
-        _boardMetaLabel.Text = $"Board morale | Job pressure {state.JobPressure} | {state.BudgetSummary}";
+        _boardMetaLabel.Text = $"Board morale | Board trust {state.CareerProfile.BoardTrust} | Job pressure {state.JobPressure} | {state.BudgetSummary}";
         _shapeValueLabel.Text = state.TacticalFormation;
         _shapeMetaLabel.Text = $"{state.TeamStyleName} | Press {state.PressIntensity} | Tempo {state.Tempo} | Risk {state.Risk}";
 
@@ -394,8 +394,7 @@ public partial class ClubDashboard : Control
             ? $"{state.LastMatchReport!.TableImpactSummary} | {state.LastMatchReport.StatsSummary}"
             : BuildTableLine(position, tableSize, currentRow);
 
-        _pressureValueLabel.Text =
-            $"Job pressure {state.JobPressure} | Board morale {state.BoardMorale} | Fan morale {state.FanMorale} | Squad morale {state.SquadMorale}";
+        _pressureValueLabel.Text = state.PressureCategorySummary;
         _pressureReasonsLabel.Text = PerceptionSystem.BuildPressureReasonSummary(state);
 
         _squadStatusLabel.Text = $"{state.BuildLineupReadinessSummary()}\n{state.SquadStatusSummary}";
