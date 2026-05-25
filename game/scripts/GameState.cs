@@ -1403,6 +1403,17 @@ public partial class GameState : Node
         }
 
         var targetPlayer = SquadPlayers[targetIndex];
+        if (CareerProfile.Role == ManagerRole.AssistantManager)
+        {
+            AddNews(
+                "Lineup recommendation filed",
+                NewsCategory.Club,
+                "Internal",
+                $"{ManagerName} recommended a lineup change involving {targetPlayer.Name}, but Assistant Manager authority cannot finalize the XI.",
+                2);
+            return $"Assistant Manager recommendation logged for {targetPlayer.Name}; final lineup authority sits with senior staff.";
+        }
+
         var startingCount = CountStartingPlayers();
 
         if (targetPlayer.IsStarting)

@@ -85,13 +85,13 @@ Each implementation slice must:
 - verify the new behavior with the strongest relevant checks
 - avoid UI-only claims for systems that do not affect state yet
 
-## 9. Next Implementation Slice Boundary
+## 9. Current Implementation Baseline
 
-The next implementation slice is Stage 1: Career foundation.
+The current playable baseline is the Stage 1 through Stage 8 foundation pass.
 
-Stage 1 should establish a valid new-career state with role, starting license, manager background, selected club, club archetype, board philosophy, fan culture, Director of Football style, staff, starting squad, objectives, budget/wage summary, and dashboard visibility.
+The app should now provide a coherent local career loop with role, starting license, manager background, selected club, club archetype, board philosophy, fan culture, Director of Football style, staff, squad identity, tactics, weekly calendar/training/scouting foundations, shared match simulation/live playback, post-match consequences, recruitment/contracts foundation, job security, job-market events, and save/load coverage.
 
-Stage 1 should not attempt full transfer negotiation, complete job market simulation, deep youth development, full finance, multi-year media systems, or a complete four-tier pyramid. It should create the authoritative state shape and the first playable dashboard loop needed for later stages.
+This baseline is not the full master design. It should not claim full transfer negotiation, complete job-market simulation, deep youth development, full finance, deep scouting regions, multi-year media systems, or a complete four-tier pyramid. Those remain future deeper systems unless later plan stages explicitly add them.
 
 ## 10. Acceptance Criteria For The Reconciled Direction
 

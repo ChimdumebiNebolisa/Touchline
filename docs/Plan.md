@@ -4,12 +4,19 @@
 
 ### Active
 
-- Stage 2: Player and squad identity
+- Stabilization and truth-audit pass after Stage 2-8 foundation implementation
 
 ### Done
 
 - Stage 0: Documentation reconciliation
 - Stage 1: Career foundation
+- Stage 2: Player and squad identity foundation
+- Stage 3: Tactics foundation
+- Stage 4: Calendar, training, scouting foundation
+- Stage 5: Match engine alignment
+- Stage 6: Consequences and pressure foundation
+- Stage 7: Transfers/contracts foundation
+- Stage 8: Career/job market foundation
 
 ### Blocked
 

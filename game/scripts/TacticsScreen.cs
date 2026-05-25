@@ -299,7 +299,7 @@ public partial class TacticsScreen : Control
 
         _clubBadgeLabel.Text = BuildClubMonogram(clubName);
         _clubNameLabel.Text = clubName;
-        _managerLabel.Text = $"Manager {state.ManagerName}";
+        _managerLabel.Text = $"{state.CurrentRoleName} {state.ManagerName}";
         _seasonLabel.Text = $"Season {state.SeasonLabel}";
         _competitionChipLabel.Text = state.CompetitionName.ToUpperInvariant();
         _clubContextLabel.Text = $"{clubName} tactical board";
@@ -314,7 +314,9 @@ public partial class TacticsScreen : Control
         _riskSpin.Value = state.Risk;
 
         _savedPlanLabel.Text = BuildSavedPlanSummary(state);
-        _saveHintLabel.Text = "Unsaved preview: adjust the board, then save to apply it to the shared match engine.";
+        _saveHintLabel.Text = state.CareerProfile.Role == ManagerRole.AssistantManager
+            ? "Unsaved preview: submit tactical recommendations without changing the saved match plan."
+            : "Unsaved preview: adjust the board, then save to apply it to the shared match engine.";
         RefreshBoard();
     }
 
@@ -743,10 +745,17 @@ public partial class TacticsScreen : Control
         var width = (int)_widthSpin.Value;
         var risk = (int)_riskSpin.Value;
 
-        GameState.Instance.UpdateTactics(formation, style, press, tempo, width, risk);
+        var status = GameState.Instance.TryApplyTacticsFromUser(formation, style, press, tempo, width, risk);
         _savedPlanLabel.Text = BuildSavedPlanSummary(GameState.Instance);
         RefreshBoard();
-        _statusLabel.Text = $"Saved tactical setup applied to the shared match engine: {formation} | {style} | Pressing {press} | Tempo {tempo} | Width {width} | Mentality {risk}";
+        _statusLabel.Text = status;
+        if (GameState.Instance.CareerProfile.Role == ManagerRole.AssistantManager)
+        {
+            _saveHintLabel.Text = status;
+            SetReadinessChip("SUGGESTED", true);
+            return;
+        }
+
         _saveHintLabel.Text = "Saved plan is now the matchday tactical setup.";
         SetReadinessChip("PLAN SAVED", true);
     }

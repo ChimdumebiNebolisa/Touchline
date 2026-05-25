@@ -134,6 +134,23 @@ public partial class GameState
         RefreshTacticFoundation(previousFormation, previousStyle);
     }
 
+    public string TryApplyTacticsFromUser(string formation, string teamStyle, int pressIntensity, int tempo, int width, int risk)
+    {
+        if (CareerProfile.Role == ManagerRole.AssistantManager)
+        {
+            AddNews(
+                "Tactical recommendation filed",
+                NewsCategory.Club,
+                "Internal",
+                $"{ManagerName} recommended {formation} {teamStyle}, but Assistant Manager authority cannot finalize the match plan.",
+                2);
+            return "Assistant Manager tactical recommendation logged; final tactical authority sits with senior staff. Saved match plan unchanged.";
+        }
+
+        UpdateTactics(formation, teamStyle, pressIntensity, tempo, width, risk);
+        return $"Saved tactical setup applied to the shared match engine: {formation} | {teamStyle} | Pressing {pressIntensity} | Tempo {tempo} | Width {width} | Mentality {risk}";
+    }
+
     public void SetTrainingFocusByName(string trainingFocusName)
     {
         CurrentTrainingFocus = StageFoundationText.ParseTrainingFocus(trainingFocusName);
@@ -824,6 +841,82 @@ public partial class GameState
         }
 
         return MatchPlaybackContractValidator.PassMessage;
+    }
+
+    public string ValidateRoleAuthorityStabilizationContract()
+    {
+        InitializeStageFoundationsForClub();
+        if (CareerProfile.Role == ManagerRole.AssistantManager)
+        {
+            if (SquadPlayers.Length == 0)
+            {
+                return "No squad players available for Assistant Manager authority validation.";
+            }
+
+            var playerName = SquadPlayers[0].Name;
+            var wasStarting = SquadPlayers[0].IsStarting;
+            var originalFormation = TacticalFormation;
+            var originalStyle = TeamStyleName;
+            var lineupStatus = TogglePlayerLineupStatus(playerName);
+            if (!lineupStatus.Contains("Assistant Manager recommendation", StringComparison.Ordinal))
+            {
+                return $"Assistant lineup action was not treated as a recommendation: {lineupStatus}";
+            }
+
+            if (SquadPlayers[0].IsStarting != wasStarting)
+            {
+                return "Assistant lineup recommendation changed the final XI.";
+            }
+
+            var tacticStatus = TryApplyTacticsFromUser("3-5-2", "High Press", 82, 76, 58, 68);
+            if (!tacticStatus.Contains("Assistant Manager tactical recommendation", StringComparison.Ordinal))
+            {
+                return $"Assistant tactics action was not treated as a recommendation: {tacticStatus}";
+            }
+
+            if (TacticalFormation != originalFormation || TeamStyleName != originalStyle)
+            {
+                return "Assistant tactical recommendation changed the saved match plan.";
+            }
+
+            if (!NewsFeedSummary.Contains("recommendation", StringComparison.OrdinalIgnoreCase))
+            {
+                return "Assistant recommendations did not leave a visible news trail.";
+            }
+
+            return MatchPlaybackContractValidator.PassMessage;
+        }
+
+        if (CareerProfile.Role == ManagerRole.HeadCoach)
+        {
+            var tacticStatus = TryApplyTacticsFromUser("3-5-2", "High Press", 82, 76, 58, 68);
+            if (!tacticStatus.Contains("Saved tactical setup", StringComparison.Ordinal) ||
+                TacticalFormation != "3-5-2" ||
+                TeamStyleName != "High Press")
+            {
+                return $"Head Coach tactic control did not update saved tactic state: {tacticStatus}";
+            }
+
+            return MatchPlaybackContractValidator.PassMessage;
+        }
+
+        var benchIndex = Array.FindIndex(SquadPlayers, player => !player.IsStarting);
+        if (benchIndex < 0)
+        {
+            return "No bench player found for Manager lineup-control validation.";
+        }
+
+        var targetName = SquadPlayers[benchIndex].Name;
+        var managerStatus = TogglePlayerLineupStatus(targetName);
+        if (!managerStatus.Contains("enters the XI", StringComparison.Ordinal) &&
+            !managerStatus.Contains("promoted into the XI", StringComparison.Ordinal))
+        {
+            return $"Manager lineup action did not apply a direct XI change: {managerStatus}";
+        }
+
+        return SquadPlayers[benchIndex].IsStarting
+            ? MatchPlaybackContractValidator.PassMessage
+            : "Manager lineup control did not update the XI.";
     }
 
     private void RefreshTacticFoundation(string previousFormation, TacticalTeamStyle previousStyle)

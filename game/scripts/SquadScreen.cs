@@ -243,7 +243,7 @@ public partial class SquadScreen : Control
 
         _clubBadgeLabel.Text = BuildClubMonogram(clubName);
         _clubNameLabel.Text = clubName;
-        _managerLabel.Text = $"Manager {state.ManagerName}";
+        _managerLabel.Text = $"{state.CurrentRoleName} {state.ManagerName}";
         _seasonLabel.Text = $"Season {state.SeasonLabel}";
         _competitionChipLabel.Text = state.CompetitionName.ToUpperInvariant();
         _clubContextLabel.Text = $"{clubName} Team Sheet";
@@ -261,8 +261,12 @@ public partial class SquadScreen : Control
         _nextMatchValueLabel.Text = state.CurrentOpponentName;
         _nextMatchMetaLabel.Text = state.NextFixtureSummary;
         _squadStatusLabel.Text = BuildSquadWorkspaceSummary(state, starters, bench);
-        _actionHintLabel.Text = "Selection call: settle the XI from the available squad. This screen is lineup and readiness only.";
-        _railHintLabel.Text = "Review the team sheet, adjust the XI, then move into Tactics or Matchday.";
+        _actionHintLabel.Text = state.CareerProfile.Role == ManagerRole.AssistantManager
+            ? "Selection call: review the XI and submit recommendations; final lineup authority sits above this role."
+            : "Selection call: settle the XI from the available squad. This screen is lineup and readiness only.";
+        _railHintLabel.Text = state.CareerProfile.Role == ManagerRole.AssistantManager
+            ? "Review the team sheet, recommend changes, then move into Tactics or Matchday."
+            : "Review the team sheet, adjust the XI, then move into Tactics or Matchday.";
 
         _matchdayButton.Disabled = false;
         PopulatePlayerRows((int)_positionFilter.GetSelectedId(), _selectedPlayerName);
@@ -584,11 +588,22 @@ public partial class SquadScreen : Control
         _fitnessStatLabel.Text = $"Fitness | {player.Fitness} | {DescribeReadiness(player.Fitness)}";
         _readinessSummaryLabel.Text = BuildReadinessSummary(player);
         _profileHintLabel.Text = $"Open the player profile for identity, lineup status, and the longer form-morale-fitness arc.\n{PlayerIdentityFoundation.BuildInformationSummary(player)}\n{PlayerIdentityFoundation.BuildContractSummary(player)}";
-        _lineupStatusLabel.Text = player.IsStarting
-            ? $"{player.Name} currently holds a Starting XI role. Use the primary action only if you want to rotate the XI."
-            : $"{player.Name} is in the bench/reserve group. Promote only if the readiness level fits the next fixture.";
+        if (GameState.Instance.CareerProfile.Role == ManagerRole.AssistantManager)
+        {
+            _lineupStatusLabel.Text = player.IsStarting
+                ? $"{player.Name} currently holds a Starting XI role. Assistant Manager authority can recommend rotation only."
+                : $"{player.Name} is in the bench/reserve group. Assistant Manager authority can recommend promotion only.";
+            _lineupActionButton.Text = player.IsStarting ? $"Recommend rotating {player.Name}" : $"Recommend promoting {player.Name}";
+        }
+        else
+        {
+            _lineupStatusLabel.Text = player.IsStarting
+                ? $"{player.Name} currently holds a Starting XI role. Use the primary action only if you want to rotate the XI."
+                : $"{player.Name} is in the bench/reserve group. Promote only if the readiness level fits the next fixture.";
+            _lineupActionButton.Text = player.IsStarting ? $"Move {player.Name} to Bench" : $"Promote {player.Name} to XI";
+        }
+
         _lineupActionButton.Disabled = false;
-        _lineupActionButton.Text = player.IsStarting ? $"Move {player.Name} to Bench" : $"Promote {player.Name} to XI";
         _openProfileButton.Disabled = false;
         _openProfileButton.Text = $"Open {player.Name} Profile";
         SetReadinessChip(BuildSquadReadinessChip(player), true);
@@ -603,9 +618,10 @@ public partial class SquadScreen : Control
 
         var selectedIndex = _visiblePlayerIndexes[_currentVisibleSelectionIndex];
         var selectedPlayerName = GameState.Instance.SquadPlayers[selectedIndex].Name;
-        _lineupStatusLabel.Text = GameState.Instance.TogglePlayerLineupStatus(selectedPlayerName);
+        var status = GameState.Instance.TogglePlayerLineupStatus(selectedPlayerName);
         RenderState();
         PopulatePlayerRows((int)_positionFilter.GetSelectedId(), selectedPlayerName);
+        _lineupStatusLabel.Text = status;
     }
 
     private void OnOpenProfilePressed()

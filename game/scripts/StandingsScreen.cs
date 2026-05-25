@@ -207,7 +207,7 @@ public partial class StandingsScreen : Control
 
         _clubBadgeLabel.Text = BuildClubMonogram(clubName);
         _clubNameLabel.Text = clubName;
-        _managerLabel.Text = $"Manager {state.ManagerName}";
+        _managerLabel.Text = $"{state.CurrentRoleName} {state.ManagerName}";
         _seasonLabel.Text = $"Season {state.SeasonLabel}";
         _competitionChipLabel.Text = state.CompetitionName.ToUpperInvariant();
         _competitionLabel.Text = $"{state.CompetitionName} League Table";

@@ -92,25 +92,25 @@ The table marks architectural intent, not current implementation claims.
 
 | Module | Responsibility | Current status |
 |---|---|---|
-| Career profile | Manager name, role, background, license, reputation, history, job offers, sackings, promises, trophies | Partial: manager name/seed only |
-| Roles and licenses | Assistant Manager, Head Coach, Manager authority; license ladder and access/information effects | Planned |
-| Clubs | Club identity, archetype, board philosophy, fan culture, Director of Football, staff, objectives, budgets, squad, academy, rivals, history | Partial: seeded club names, summaries, squad, morale/fan/board values |
+| Career profile | Manager name, role, background, license, reputation, history, job offers, sackings, promises, trophies | Foundation implemented: role, background, license, reputation, career history, job offer, and promise foundations |
+| Roles and licenses | Assistant Manager, Head Coach, Manager authority; license ladder and access/information effects | Foundation implemented: role authority text and key action restrictions, license effects and progression summary |
+| Clubs | Club identity, archetype, board philosophy, fan culture, Director of Football, staff, objectives, budgets, squad, academy, rivals, history | Foundation implemented: identity, archetype, board, fans, Director, staff, objectives, budgets, squad, morale, pressure, and news |
 | Leagues and calendar | Fictional league pyramid, fixtures, standings, season calendar, windows, cups, rollover | Partial: small seeded competition, fixtures, standings, weekly advance, rollover |
-| Players | Identity, ability, known/estimated/unknown attributes, style, traits, personality, fit, development, contract, morale, form, fitness, relationships | Partial: name, position, age, form, morale, fitness, lineup |
-| Staff | Staff roles, ratings, loyalty, ambition, reports, training/scouting/media effects | Planned |
-| Tactics | Formation, team style, instructions, player roles, player instructions, tactical familiarity, fit/risk notes | Partial: formation and numeric tactical inputs |
-| Match simulation | Shared stat-and-event-driven engine using ability, tactics, familiarity, morale, form, fitness, staff prep, opponent style | Partial: shared result/timeline engine exists with limited inputs |
+| Players | Identity, ability, known/estimated/unknown attributes, style, traits, personality, fit, development, contract, morale, form, fitness, relationships | Foundation implemented: identity, partial information, style, traits, personality, fit, development, contracts, morale, form, fitness, fatigue, injury risk, relationship, and transfer-interest text |
+| Staff | Staff roles, ratings, loyalty, ambition, reports, training/scouting/media effects | Foundation implemented: staff roster and quality values affect preparation/scouting foundations |
+| Tactics | Formation, team style, instructions, player roles, player instructions, tactical familiarity, fit/risk notes | Foundation implemented: formation, styles, instructions, roles, familiarity, fit/risk notes, and match inputs |
+| Match simulation | Shared stat-and-event-driven engine using ability, tactics, familiarity, morale, form, fitness, staff prep, opponent style | Foundation implemented: shared result/timeline engine uses player, tactic, familiarity, morale, fitness, staff, and opponent context |
 | Live playback | Visual renderer for the same simulated match timeline used by Instant Sim | Partial/current: live scene consumes shared playback result |
-| Transfers/contracts | Scouting-based recruitment, interest, fees, wages, agents, promises, board approval, loans, renewals, integration | Planned |
-| Scouting | Assignments, regions, report timing, confidence, partial discovery, scout accuracy, analyst support | Planned |
-| Training | Weekly focus, tactical familiarity, development, fatigue, morale, injury risk | Planned |
+| Transfers/contracts | Scouting-based recruitment, interest, fees, wages, agents, promises, board approval, loans, renewals, integration | Foundation implemented: one recruitment/contract interaction with interest, fee/wage ranges, board, Director, role restrictions, promises, and news |
+| Scouting | Assignments, regions, report timing, confidence, partial discovery, scout accuracy, analyst support | Foundation implemented: assignment timing, report quality, partial discovery text, scout/data analyst quality |
+| Training | Weekly focus, tactical familiarity, development, fatigue, morale, injury risk | Foundation implemented: weekly focus affects tactical familiarity, fitness, fatigue, morale, and injury risk |
 | Youth academy | Academy quality, youth intake, generated prospects, promotion, loans, hidden potential, reactions | Planned |
 | Finance | Transfer budget, wage budget, debt, revenue, prize money, ticket income, commercial growth, financial rules | Planned |
-| News/media/world events | News categories, reliability labels, templates, media pressure, decision events, downstream effects | Planned |
-| Morale/trust/reputation/pressure | Separate state systems for mood, belief, world view, and consequence risk | Partial: team morale, fan sentiment, board confidence, simple pressure text |
-| Objectives/job security | Objectives by priority/type, board reviews, job security states, sackings | Planned |
-| Career job market | Club manager states, offers, applications, interim routes, license-gated hiring, aftermath | Planned |
-| Save/load | Complete persistent career state, versioning, migration, validation, history | Partial/current: v1 state saved and validated |
+| News/media/world events | News categories, reliability labels, templates, media pressure, decision events, downstream effects | Foundation implemented for news events; media/decision events remain planned |
+| Morale/trust/reputation/pressure | Separate state systems for mood, belief, world view, and consequence risk | Foundation implemented: morale, trust, reputation, and pressure are separate and update after matches/events |
+| Objectives/job security | Objectives by priority/type, board reviews, job security states, sackings | Foundation implemented: objectives and job security states; sacking aftermath remains planned |
+| Career job market | Club manager states, offers, applications, interim routes, license-gated hiring, aftermath | Foundation implemented: career history, license opportunity, and generated job-market events; applications/interviews remain planned |
+| Save/load | Complete persistent career state, versioning, migration, validation, history | Foundation implemented: v3 save/load covers Stage 1-8 foundations with legacy migration and malformed-save rejection |
 
 ## 6. Core Data Objects
 
