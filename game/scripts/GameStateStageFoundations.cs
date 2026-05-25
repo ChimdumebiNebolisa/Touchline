@@ -40,6 +40,15 @@ public sealed class SaveSlotStageFoundationData
     public string[]? CareerHistory { get; set; }
     public string LicenseOpportunitySummary { get; set; } = string.Empty;
     public string ObjectiveReviewSummary { get; set; } = string.Empty;
+    public string ObjectiveWarningSummary { get; set; } = string.Empty;
+    public string UltimatumSummary { get; set; } = string.Empty;
+    public string SackingSummary { get; set; } = string.Empty;
+    public bool ObjectiveWarningIssued { get; set; }
+    public bool UltimatumActive { get; set; }
+    public bool IsSacked { get; set; }
+    public int ObjectiveReviewCount { get; set; }
+    public string[]? ObjectiveReviewHistory { get; set; }
+    public string[]? SackingHistory { get; set; }
     public int FanTrust { get; set; } = 55;
     public int MediaTrust { get; set; } = 52;
     public int WorldReputation { get; set; } = 45;
@@ -289,6 +298,8 @@ public partial class GameState
     private readonly List<RecruitmentTarget> _recruitmentShortlist = new();
     private readonly List<PromiseRecord> _promiseRecords = new();
     private readonly List<string> _careerHistory = new();
+    private readonly List<string> _objectiveReviewHistory = new();
+    private readonly List<string> _sackingHistory = new();
     private readonly List<string> _perceptionHistory = new();
     private readonly List<string> _transferHistory = new();
     private readonly List<string> _contractHistory = new();
@@ -340,6 +351,15 @@ public partial class GameState
     public JobOfferEvent? CurrentJobOffer { get; private set; }
     public string LicenseOpportunitySummary { get; private set; } = "License progression will be reviewed after sustained progress.";
     public string ObjectiveReviewSummary { get; private set; } = "Objective review pending first run of matches.";
+    public string ObjectiveWarningSummary { get; private set; } = "No board warning active.";
+    public string UltimatumSummary { get; private set; } = "No ultimatum active.";
+    public string SackingSummary { get; private set; } = "No sacking decision recorded.";
+    public bool ObjectiveWarningIssued { get; private set; }
+    public bool UltimatumActive { get; private set; }
+    public bool IsSacked { get; private set; }
+    public int ObjectiveReviewCount { get; private set; }
+    public string ObjectiveReviewHistorySummary => _objectiveReviewHistory.Count == 0 ? "Objective history starts after the first board review." : string.Join("\n", _objectiveReviewHistory);
+    public string SackingHistorySummary => _sackingHistory.Count == 0 ? "Sacking history starts after warnings, ultimatums, or dismissal events." : string.Join("\n", _sackingHistory);
     public int FanTrust { get; private set; } = 55;
     public int MediaTrust { get; private set; } = 52;
     public int WorldReputation { get; private set; } = 45;
@@ -449,7 +469,7 @@ public partial class GameState
         ? "Recruitment foundation pending scouting target."
         : $"{CurrentRecruitmentTarget.PlayerName} ({CurrentRecruitmentTarget.Position}) | {CurrentRecruitmentTarget.InformationSummary} | {CurrentRecruitmentTarget.InterestSummary} | {CurrentRecruitmentTarget.TacticalFitSummary} | Fee {CurrentRecruitmentTarget.EstimatedFeeRange} | Wage {CurrentRecruitmentTarget.EstimatedWageRange} | Status {CurrentRecruitmentTarget.TargetStatus} | Valuation {CurrentRecruitmentTarget.ClubValuation} | Agent {CurrentRecruitmentTarget.AgentMood} | Rival {CurrentRecruitmentTarget.RivalInterest} | Board {CurrentRecruitmentTarget.BoardStance} | Director {CurrentRecruitmentTarget.DirectorStance} | Outcome {CurrentRecruitmentTarget.OutcomeState} | {CurrentRecruitmentTarget.Status}\nDirector of Football\n{DirectorInfluenceSummary}\nShortlist\n{RecruitmentShortlistSummary}\nContracts\n{ContractFoundationSummary}\nTransfer history\n{TransferHistorySummary}";
     public string TrainingScoutingSummary => $"{TrainingFocusName} ({TrainingIntensityName}): {TrainingStatusSummary}\nScouting depth: {ScoutingReportDepthName}\nScouting: {BuildScoutingSummary()}\nDevelopment\n{PlayerDevelopmentSummary}\nDevelopment history\n{PlayerDevelopmentHistorySummary}\nRegistration\n{RegistrationStatusSummary}\n{RegistrationIssuesSummary}\nStaff effects\n{StaffImpactSummary}";
-    public string CareerMarketSummary => $"Job security: {JobSecurityName}\n{TrustSummary}\n{ReputationSummary}\n{PressureCategorySummary}\nLeague system\n{LeaguePyramidSummary}\n{PromotionRelegationSummary}\n{ShadowLeagueSummary}\nLeague history\n{LeagueHistorySummary}\nCup competitions\n{CupStatusSummary}\n{CupDrawSummary}\n{CupObjectiveSummary}\nCup history\n{CupHistorySummary}\nRivalries\n{RivalryStatusSummary}\n{RivalryPressureSummary}\nRivalry history\n{RivalryHistorySummary}\nFinance\n{FinanceSummary}\nFinance history\n{FinanceHistorySummary}\nLicense: {LicenseOpportunitySummary}\nJob market: {BuildJobOfferSummary()}";
+    public string CareerMarketSummary => $"Job security: {JobSecurityName}\nObjective reviews\n{ObjectiveReviewSummary}\n{ObjectiveWarningSummary}\n{UltimatumSummary}\n{SackingSummary}\nObjective history\n{ObjectiveReviewHistorySummary}\nSacking history\n{SackingHistorySummary}\n{TrustSummary}\n{ReputationSummary}\n{PressureCategorySummary}\nLeague system\n{LeaguePyramidSummary}\n{PromotionRelegationSummary}\n{ShadowLeagueSummary}\nLeague history\n{LeagueHistorySummary}\nCup competitions\n{CupStatusSummary}\n{CupDrawSummary}\n{CupObjectiveSummary}\nCup history\n{CupHistorySummary}\nRivalries\n{RivalryStatusSummary}\n{RivalryPressureSummary}\nRivalry history\n{RivalryHistorySummary}\nFinance\n{FinanceSummary}\nFinance history\n{FinanceHistorySummary}\nLicense: {LicenseOpportunitySummary}\nJob market: {BuildJobOfferSummary()}";
     public string TacticsFoundationSummary => $"{TeamStyleName} | {TeamInstructionsSummary}\n{SetPieceSummary}\n{OpponentPreparationSummary}\n{PlayerRolesSummary}\n{PlayerInstructionsSummary}\n{TacticalRoleFitSummary}\n{PlayerFamiliaritySummary}\n{TacticalFitNotes}\n{TacticalRiskNotes}";
 
     public void UpdateTactics(string formation, string teamStyle, int pressIntensity, int tempo, int width, int risk)
@@ -569,6 +589,7 @@ public partial class GameState
         ApplyScoutingProgress(7);
         ReviewPromiseLifecycle("Weekly review", 7);
         EvaluateCareerFoundationState();
+        ReviewObjectivesAndJobSecurity("Weekly board review", 0);
         GenerateContextDecisionEvent("Weekly review");
         AddNews(
             "Weekly football report",
@@ -1006,6 +1027,15 @@ public partial class GameState
             CareerHistory = _careerHistory.ToArray(),
             LicenseOpportunitySummary = LicenseOpportunitySummary,
             ObjectiveReviewSummary = ObjectiveReviewSummary,
+            ObjectiveWarningSummary = ObjectiveWarningSummary,
+            UltimatumSummary = UltimatumSummary,
+            SackingSummary = SackingSummary,
+            ObjectiveWarningIssued = ObjectiveWarningIssued,
+            UltimatumActive = UltimatumActive,
+            IsSacked = IsSacked,
+            ObjectiveReviewCount = ObjectiveReviewCount,
+            ObjectiveReviewHistory = _objectiveReviewHistory.ToArray(),
+            SackingHistory = _sackingHistory.ToArray(),
             FanTrust = FanTrust,
             MediaTrust = MediaTrust,
             WorldReputation = WorldReputation,
@@ -1245,6 +1275,25 @@ public partial class GameState
 
         LicenseOpportunitySummary = string.IsNullOrWhiteSpace(data.LicenseOpportunitySummary) ? "License progression will be reviewed after sustained progress." : data.LicenseOpportunitySummary;
         ObjectiveReviewSummary = string.IsNullOrWhiteSpace(data.ObjectiveReviewSummary) ? "Objective review restored." : data.ObjectiveReviewSummary;
+        ObjectiveWarningSummary = string.IsNullOrWhiteSpace(data.ObjectiveWarningSummary) ? "No board warning active." : data.ObjectiveWarningSummary;
+        UltimatumSummary = string.IsNullOrWhiteSpace(data.UltimatumSummary) ? "No ultimatum active." : data.UltimatumSummary;
+        SackingSummary = string.IsNullOrWhiteSpace(data.SackingSummary) ? "No sacking decision recorded." : data.SackingSummary;
+        ObjectiveWarningIssued = data.ObjectiveWarningIssued;
+        UltimatumActive = data.UltimatumActive;
+        IsSacked = data.IsSacked || JobSecurity == JobSecurityState.Sacked;
+        ObjectiveReviewCount = Math.Max(0, data.ObjectiveReviewCount);
+        _objectiveReviewHistory.Clear();
+        if (data.ObjectiveReviewHistory != null)
+        {
+            _objectiveReviewHistory.AddRange(data.ObjectiveReviewHistory);
+        }
+
+        _sackingHistory.Clear();
+        if (data.SackingHistory != null)
+        {
+            _sackingHistory.AddRange(data.SackingHistory);
+        }
+
         FanTrust = Math.Clamp(data.FanTrust <= 0 ? 55 : data.FanTrust, 0, 100);
         MediaTrust = Math.Clamp(data.MediaTrust <= 0 ? 52 : data.MediaTrust, 0, 100);
         WorldReputation = Math.Clamp(data.WorldReputation <= 0 ? CareerProfile.Reputation : data.WorldReputation, 0, 100);
@@ -1438,6 +1487,13 @@ public partial class GameState
         CurrentJobOffer = null;
         LicenseOpportunitySummary = "License progression will be reviewed after sustained progress.";
         ObjectiveReviewSummary = "Objective review pending first run of matches.";
+        ObjectiveWarningSummary = "No board warning active.";
+        UltimatumSummary = "No ultimatum active.";
+        SackingSummary = "No sacking decision recorded.";
+        ObjectiveWarningIssued = false;
+        UltimatumActive = false;
+        IsSacked = false;
+        ObjectiveReviewCount = 0;
         FanTrust = 55;
         MediaTrust = 52;
         WorldReputation = CareerProfile.Reputation;
@@ -1519,6 +1575,8 @@ public partial class GameState
         _recruitmentShortlist.Clear();
         _promiseRecords.Clear();
         _careerHistory.Clear();
+        _objectiveReviewHistory.Clear();
+        _sackingHistory.Clear();
         _perceptionHistory.Clear();
         _transferHistory.Clear();
         _contractHistory.Clear();
@@ -1602,7 +1660,7 @@ public partial class GameState
             $"morale squad {TeamMorale} ({consequence.MoraleDelta:+0;-0;0}); trust board {boardTrustDelta:+0;-0;0}, players {playerTrustDelta:+0;-0;0}, fans {fanTrustDelta:+0;-0;0}; reputation world {WorldReputation}, tactical {TacticalReputation}; pressure job {JobPressure}, board {BoardPressure}, fans {FanPressure}, dressing room {DressingRoomPressure}");
         EvaluateCareerFoundationState();
         RefreshTacticFoundation(TacticalFormation, TeamStyle);
-        ObjectiveReviewSummary = BuildObjectiveReviewSummary(goalDifference);
+        ReviewObjectivesAndJobSecurity("Post-match review", goalDifference);
         LicenseOpportunitySummary = BuildLicenseOpportunitySummary();
         ApplyRivalryPostMatch(result);
         AddNews(
@@ -3550,6 +3608,91 @@ public partial class GameState
         return MatchPlaybackContractValidator.PassMessage;
     }
 
+    public string ValidatePhase20ObjectivesSackingContract()
+    {
+        InitializeStageFoundationsForClub();
+        EnsureFinanceState();
+        EnsureLeaguePyramidState();
+        EnsureCupCompetitionState();
+        EnsureSquadRegistrationState();
+        ReviewObjectivesAndJobSecurity("Validation stable review", 1);
+        if (ObjectiveReviewCount == 0 ||
+            !_objectiveReviewHistory.Exists(entry => entry.Contains("Objective review", StringComparison.OrdinalIgnoreCase)) ||
+            !CareerMarketSummary.Contains("Objective reviews", StringComparison.Ordinal) ||
+            !CareerMarketSummary.Contains("Objective history", StringComparison.Ordinal))
+        {
+            return "Objective review did not record visible board-review state.";
+        }
+
+        if (CurrentClub != null)
+        {
+            CurrentClub.JobPressure = 70;
+            CurrentClub.BoardMorale = 30;
+            CurrentClub.FanMorale = 35;
+            CurrentClub.SquadMorale = 44;
+        }
+
+        TeamMorale = 44;
+        CareerProfile.BoardTrust = 32;
+        CareerProfile.PlayerTrust = 34;
+        CareerProfile.MediaPressure = 65;
+        TransferPressure = 55;
+        ReviewObjectivesAndJobSecurity("Validation warning review", -1);
+        if (!ObjectiveWarningIssued ||
+            JobSecurity < JobSecurityState.UnderPressure ||
+            string.IsNullOrWhiteSpace(ObjectiveWarningSummary) ||
+            !ObjectiveWarningSummary.Contains("warning", StringComparison.OrdinalIgnoreCase) ||
+            _sackingHistory.Count == 0)
+        {
+            return $"Objective warning did not activate under pressure. Security {JobSecurityName}; warning '{ObjectiveWarningSummary}'.";
+        }
+
+        UltimatumActive = true;
+        if (CurrentClub != null)
+        {
+            CurrentClub.JobPressure = 96;
+            CurrentClub.BoardMorale = 8;
+            CurrentClub.FanMorale = 10;
+            CurrentClub.SquadMorale = 12;
+        }
+
+        TeamMorale = 12;
+        CareerProfile.BoardTrust = 12;
+        CareerProfile.PlayerTrust = 14;
+        CareerProfile.MediaPressure = 92;
+        TransferPressure = 92;
+        FinancialPressure = 85;
+        ReviewObjectivesAndJobSecurity("Validation ultimatum review", -3);
+        if (!IsSacked ||
+            JobSecurity != JobSecurityState.Sacked ||
+            string.IsNullOrWhiteSpace(SackingSummary) ||
+            !SackingSummary.Contains("Sacked", StringComparison.OrdinalIgnoreCase) ||
+            !_careerHistory.Exists(entry => entry.Contains("sacked", StringComparison.OrdinalIgnoreCase)) ||
+            !NewsFeedSummary.Contains("sacked", StringComparison.OrdinalIgnoreCase))
+        {
+            return $"Sacking aftermath did not apply after ultimatum. Security {JobSecurityName}; summary '{SackingSummary}'.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
+    public string ValidatePhase20StoredObjectivesSackingContract()
+    {
+        if (!IsSacked ||
+            JobSecurity != JobSecurityState.Sacked ||
+            ObjectiveReviewCount <= 0 ||
+            _objectiveReviewHistory.Count == 0 ||
+            _sackingHistory.Count == 0 ||
+            !CareerMarketSummary.Contains("Objective reviews", StringComparison.Ordinal) ||
+            !CareerMarketSummary.Contains("Sacking history", StringComparison.Ordinal) ||
+            !SackingHistorySummary.Contains("dismissal", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Saved objective review and sacking state did not restore.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
     public string ValidatePhase3PromiseLifecycleContract()
     {
         InitializeStageFoundationsForClub();
@@ -4092,6 +4235,11 @@ public partial class GameState
 
     private JobSecurityState EvaluateJobSecurity()
     {
+        if (IsSacked)
+        {
+            return JobSecurityState.Sacked;
+        }
+
         var pressure = JobPressure +
             BoardPressure / 5 +
             FanPressure / 6 +
@@ -4099,7 +4247,7 @@ public partial class GameState
             GetRolePressureWeight();
         return pressure switch
         {
-            >= 95 => JobSecurityState.Sacked,
+            >= 95 => UltimatumActive ? JobSecurityState.NearSacking : JobSecurityState.Ultimatum,
             >= 84 => JobSecurityState.NearSacking,
             >= 74 => JobSecurityState.Ultimatum,
             >= 64 => JobSecurityState.UnderPressure,
@@ -4107,6 +4255,146 @@ public partial class GameState
             >= 36 => JobSecurityState.Stable,
             _ => JobSecurityState.Secure
         };
+    }
+
+    private void ReviewObjectivesAndJobSecurity(string trigger, int goalDifference)
+    {
+        RefreshPressureCategories();
+        ObjectiveReviewCount++;
+        var reviewScore = BuildObjectiveReviewScore(goalDifference);
+        ObjectiveReviewSummary = BuildObjectiveReviewSummary(goalDifference, reviewScore);
+        RecordObjectiveReviewHistory($"{trigger}: score {reviewScore}; {ObjectiveReviewSummary}");
+
+        if (IsSacked)
+        {
+            JobSecurity = JobSecurityState.Sacked;
+            return;
+        }
+
+        if (reviewScore >= 96 && UltimatumActive)
+        {
+            ApplySackingAftermath(trigger, reviewScore);
+            return;
+        }
+
+        if (reviewScore >= 84)
+        {
+            ObjectiveWarningIssued = true;
+            UltimatumActive = true;
+            JobSecurity = JobSecurityState.Ultimatum;
+            ObjectiveWarningSummary = $"Board warning active: objective score {reviewScore}/100 is beyond tolerance.";
+            UltimatumSummary = $"Ultimatum active: next review must show results, dressing-room control, and board/fan pressure improvement.";
+            SackingSummary = "No dismissal yet; the board has escalated to an ultimatum before taking action.";
+            RecordSackingHistory($"{trigger}: ultimatum issued at objective score {reviewScore}.");
+            AddNews(
+                "Board issues ultimatum",
+                NewsCategory.Pressure,
+                "Confirmed",
+                $"{SelectedClubName} board escalated job security after objective review pressure reached {reviewScore}/100.",
+                8,
+                "Board source",
+                SelectedClubName ?? "club",
+                "Job security moved to ultimatum.",
+                $"objective-ultimatum-{ObjectiveReviewCount}");
+            return;
+        }
+
+        if (reviewScore >= 68)
+        {
+            ObjectiveWarningIssued = true;
+            JobSecurity = JobSecurityState.UnderPressure;
+            ObjectiveWarningSummary = $"Board warning active: objective score {reviewScore}/100 requires an improved run.";
+            UltimatumSummary = UltimatumActive
+                ? "Ultimatum remains active until a board review confirms recovery."
+                : "No ultimatum active; the board has stopped at a warning.";
+            SackingSummary = "No dismissal decision recorded.";
+            RecordSackingHistory($"{trigger}: board warning issued at objective score {reviewScore}.");
+            AddNews(
+                "Board warning recorded",
+                NewsCategory.Pressure,
+                "Confirmed",
+                $"{SelectedClubName} board warned that objectives need a stronger trend before the next review.",
+                6,
+                "Board source",
+                SelectedClubName ?? "club",
+                "Job pressure increased but no sacking action was taken.",
+                $"objective-warning-{ObjectiveReviewCount}");
+            return;
+        }
+
+        JobSecurity = EvaluateJobSecurity();
+        ObjectiveWarningSummary = ObjectiveWarningIssued
+            ? "Previous warning easing: current review is back inside board tolerance."
+            : "No board warning active.";
+        UltimatumSummary = UltimatumActive
+            ? "Ultimatum cooling: sustained improvement is required before the board clears it."
+            : "No ultimatum active.";
+        SackingSummary = "No sacking decision recorded.";
+    }
+
+    private int BuildObjectiveReviewScore(int goalDifference)
+    {
+        var score = (
+            JobPressure * 2 +
+            BoardPressure +
+            FanPressure +
+            DressingRoomPressure +
+            FinancialPressure +
+            TransferPressure / 2) / 6 +
+            GetRolePressureWeight();
+
+        score += goalDifference < 0 ? 10 : goalDifference == 0 ? 3 : -8;
+        score += CurrentClub?.BoardPhilosophy switch
+        {
+            BoardPhilosophy.TriggerHappyBoard => 8,
+            BoardPhilosophy.WinNowBoard => 5,
+            BoardPhilosophy.FinanciallyStrictBoard when FinancialPressure >= 55 => 6,
+            BoardPhilosophy.YouthDevelopmentBoard when YouthReputation >= 58 => -4,
+            BoardPhilosophy.PatientLongTermBoard => -6,
+            _ => 0
+        };
+        score += CurrentClub?.FanCulture == FanCulture.ResultsFirst && FanPressure >= 60 ? 4 : 0;
+        score += CurrentClub?.FanCulture == FanCulture.DerbyObsessed && RivalryLosses > RivalryWins ? 5 : 0;
+        score += RegistrationValid ? 0 : 8;
+        score += WageStructurePressure >= 70 ? 4 : 0;
+
+        return Math.Clamp(score, 0, 100);
+    }
+
+    private void ApplySackingAftermath(string trigger, int reviewScore)
+    {
+        IsSacked = true;
+        ObjectiveWarningIssued = true;
+        UltimatumActive = false;
+        JobSecurity = JobSecurityState.Sacked;
+        SackingSummary = $"Sacked after {trigger}: objective score {reviewScore}/100 exceeded the ultimatum threshold. Career is awaiting job-market handling.";
+        UltimatumSummary = "Ultimatum closed by dismissal.";
+        ObjectiveWarningSummary = "Board warning resolved by sacking decision.";
+        WorldReputation = Math.Clamp(WorldReputation - 5, 0, 100);
+        MediaReputation = Math.Clamp(MediaReputation - 4, 0, 100);
+        ClubReputation = Math.Clamp(ClubReputation - 3, 0, 100);
+        CareerProfile.Reputation = WorldReputation;
+        CareerProfile.BoardTrust = Math.Clamp(CareerProfile.BoardTrust - 8, 0, 100);
+        CareerProfile.MediaPressure = Math.Clamp(CareerProfile.MediaPressure + 10, 0, 100);
+        var detail = $"{CurrentDateLabel}: sacked by {SelectedClubName}; reason: failed objective review after ultimatum, score {reviewScore}/100.";
+        _careerHistory.Insert(0, detail);
+        if (_careerHistory.Count > 18)
+        {
+            _careerHistory.RemoveAt(_careerHistory.Count - 1);
+        }
+
+        RecordSackingHistory($"{trigger}: dismissal confirmed at objective score {reviewScore}; reputation now {WorldReputation}.");
+        RecordPerceptionHistory("Sacking aftermath", $"world reputation {WorldReputation}, media reputation {MediaReputation}, board trust {CareerProfile.BoardTrust}");
+        AddNews(
+            "Manager sacked after board review",
+            NewsCategory.Career,
+            "Confirmed",
+            $"{SelectedClubName} dismissed {CareerProfile.ManagerName} after warnings and an ultimatum failed to produce enough improvement.",
+            10,
+            "Board source",
+            SelectedClubName ?? "club",
+            "Job security moved to Sacked; reputation and career history updated.",
+            $"sacking-{ObjectiveReviewCount}");
     }
 
     private int GetRolePressureWeight()
@@ -4197,6 +4485,24 @@ public partial class GameState
         if (_perceptionHistory.Count > 10)
         {
             _perceptionHistory.RemoveAt(_perceptionHistory.Count - 1);
+        }
+    }
+
+    private void RecordObjectiveReviewHistory(string detail)
+    {
+        _objectiveReviewHistory.Insert(0, $"{CurrentDateLabel}: {detail}");
+        if (_objectiveReviewHistory.Count > 14)
+        {
+            _objectiveReviewHistory.RemoveAt(_objectiveReviewHistory.Count - 1);
+        }
+    }
+
+    private void RecordSackingHistory(string detail)
+    {
+        _sackingHistory.Insert(0, $"{CurrentDateLabel}: {detail}");
+        if (_sackingHistory.Count > 10)
+        {
+            _sackingHistory.RemoveAt(_sackingHistory.Count - 1);
         }
     }
 
@@ -7150,14 +7456,14 @@ public partial class GameState
         return string.Join("\n", lines);
     }
 
-    private string BuildObjectiveReviewSummary(int goalDifference)
+    private string BuildObjectiveReviewSummary(int goalDifference, int reviewScore)
     {
         var resultLine = goalDifference > 0
             ? "result supports the current objective path"
             : goalDifference == 0
                 ? "draw keeps objectives under review"
                 : "loss increases objective scrutiny";
-        return $"Objective review: {resultLine}; board philosophy {BoardPhilosophyName}, fan culture {FanCultureName}, and role authority {CurrentRoleName} all affect pressure.";
+        return $"Objective review {ObjectiveReviewCount}: {resultLine}; score {reviewScore}/100; league {CurrentDivisionName}, cup {CupStatusSummary}, finance {ProfitExpectationSummary}, registration {(RegistrationValid ? "valid" : "invalid")}, board philosophy {BoardPhilosophyName}, fan culture {FanCultureName}, and role authority {CurrentRoleName}.";
     }
 
     private string BuildLicenseOpportunitySummary()
