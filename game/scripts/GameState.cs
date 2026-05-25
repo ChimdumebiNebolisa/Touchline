@@ -39,6 +39,11 @@ public partial class GameState : Node
         public string PromiseSummary { get; init; } = "No active promise.";
         public string TransferInterest { get; init; } = "No active interest.";
         public int TacticalFitScore { get; init; } = 65;
+        public int PlayerFamiliarity { get; init; } = 55;
+        public int ScoutingConfidence { get; init; } = 45;
+        public string KnownAttributeGroups { get; init; } = "form,fitness";
+        public string EstimatedAttributeGroups { get; init; } = "technical,tactical,physical,mental";
+        public string UnknownAttributeGroups { get; init; } = "potential,personality depth,agent loyalty,pressure response";
         public required bool IsStarting { get; init; }
 
         public SquadPlayer With(
@@ -52,7 +57,9 @@ public partial class GameState : Node
             bool? isStarting = null,
             string? relationship = null,
             string? promiseSummary = null,
-            string? transferInterest = null)
+            string? transferInterest = null,
+            int? playerFamiliarity = null,
+            int? scoutingConfidence = null)
         {
             return new SquadPlayer
             {
@@ -87,6 +94,11 @@ public partial class GameState : Node
                 PromiseSummary = promiseSummary ?? PromiseSummary,
                 TransferInterest = transferInterest ?? TransferInterest,
                 TacticalFitScore = tacticalFitScore ?? TacticalFitScore,
+                PlayerFamiliarity = playerFamiliarity ?? PlayerFamiliarity,
+                ScoutingConfidence = scoutingConfidence ?? ScoutingConfidence,
+                KnownAttributeGroups = KnownAttributeGroups,
+                EstimatedAttributeGroups = EstimatedAttributeGroups,
+                UnknownAttributeGroups = UnknownAttributeGroups,
                 IsStarting = isStarting ?? IsStarting
             };
         }
@@ -1195,6 +1207,17 @@ public partial class GameState : Node
                 PromiseSummary = string.IsNullOrWhiteSpace(player.PromiseSummary) ? "No active promise." : player.PromiseSummary,
                 TransferInterest = string.IsNullOrWhiteSpace(player.TransferInterest) ? "No active interest." : player.TransferInterest,
                 TacticalFitScore = player.TacticalFitScore <= 0 ? 65 : player.TacticalFitScore,
+                PlayerFamiliarity = Math.Clamp(player.PlayerFamiliarity <= 0 ? (player.IsStarting ? 68 : 48) : player.PlayerFamiliarity, 0, 100),
+                ScoutingConfidence = Math.Clamp(player.ScoutingConfidence <= 0 ? (player.IsStarting ? 60 : 45) : player.ScoutingConfidence, 0, 100),
+                KnownAttributeGroups = string.IsNullOrWhiteSpace(player.KnownAttributeGroups)
+                    ? (player.IsStarting ? "form,fitness,technical,physical,current role" : "form,fitness,current role")
+                    : player.KnownAttributeGroups,
+                EstimatedAttributeGroups = string.IsNullOrWhiteSpace(player.EstimatedAttributeGroups)
+                    ? "technical,tactical,physical,mental,potential"
+                    : player.EstimatedAttributeGroups,
+                UnknownAttributeGroups = string.IsNullOrWhiteSpace(player.UnknownAttributeGroups)
+                    ? "pressure response,agent loyalty,future behavior,exact potential"
+                    : player.UnknownAttributeGroups,
                 IsStarting = player.IsStarting
             });
 

@@ -105,6 +105,7 @@ public sealed class RecruitmentTarget
 {
     public required string PlayerName { get; init; }
     public required string Position { get; init; }
+    public required string InformationSummary { get; init; }
     public required string InterestSummary { get; init; }
     public required string TacticalFitSummary { get; init; }
     public required string EstimatedFeeRange { get; init; }
@@ -395,6 +396,13 @@ public static class PlayerIdentityFoundation
             PromiseSummary = player.IsStarting ? "Implicit playing-time expectation." : "No active promise.",
             TransferInterest = BuildTransferInterest(trueAbility, player.Age),
             TacticalFitScore = Math.Clamp((tactical + mental + (player.IsStarting ? 6 : 0)) / 2, 35, 95),
+            PlayerFamiliarity = Math.Clamp(player.IsStarting ? 68 + seed % 12 : 46 + seed % 16, 0, 100),
+            ScoutingConfidence = Math.Clamp(player.IsStarting ? 58 + seed % 12 : 42 + seed % 14, 0, 100),
+            KnownAttributeGroups = player.IsStarting
+                ? "form,fitness,technical,physical,current role"
+                : "form,fitness,current role",
+            EstimatedAttributeGroups = "technical,tactical,physical,mental,potential",
+            UnknownAttributeGroups = "pressure response,agent loyalty,future behavior,exact potential",
             IsStarting = player.IsStarting
         };
     }

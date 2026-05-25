@@ -51,6 +51,7 @@ public sealed class SaveSlotRecruitmentTargetData
 {
     public string PlayerName { get; set; } = string.Empty;
     public string Position { get; set; } = string.Empty;
+    public string InformationSummary { get; set; } = string.Empty;
     public string InterestSummary { get; set; } = string.Empty;
     public string TacticalFitSummary { get; set; } = string.Empty;
     public string EstimatedFeeRange { get; set; } = string.Empty;
@@ -116,7 +117,7 @@ public partial class GameState
     public string PromiseSummary => _promiseRecords.Count == 0 ? "No active promises." : BuildPromiseSummary();
     public string RecruitmentFoundationSummary => CurrentRecruitmentTarget == null
         ? "Recruitment foundation pending scouting target."
-        : $"{CurrentRecruitmentTarget.PlayerName} ({CurrentRecruitmentTarget.Position}) | {CurrentRecruitmentTarget.InterestSummary} | {CurrentRecruitmentTarget.TacticalFitSummary} | Fee {CurrentRecruitmentTarget.EstimatedFeeRange} | Wage {CurrentRecruitmentTarget.EstimatedWageRange} | {CurrentRecruitmentTarget.Status}";
+        : $"{CurrentRecruitmentTarget.PlayerName} ({CurrentRecruitmentTarget.Position}) | {CurrentRecruitmentTarget.InformationSummary} | {CurrentRecruitmentTarget.InterestSummary} | {CurrentRecruitmentTarget.TacticalFitSummary} | Fee {CurrentRecruitmentTarget.EstimatedFeeRange} | Wage {CurrentRecruitmentTarget.EstimatedWageRange} | {CurrentRecruitmentTarget.Status}";
     public string TrainingScoutingSummary => $"{TrainingFocusName}: {TrainingStatusSummary}\nScouting: {BuildScoutingSummary()}";
     public string CareerMarketSummary => $"Job security: {JobSecurityName} | Reputation {WorldReputation} | Fan trust {FanTrust} | Dressing-room pressure {DressingRoomPressure} | Transfer pressure {TransferPressure}\nLicense: {LicenseOpportunitySummary}\nJob market: {BuildJobOfferSummary()}";
     public string TacticsFoundationSummary => $"{TeamStyleName} | {TeamInstructionsSummary}\n{PlayerRolesSummary}\n{PlayerInstructionsSummary}\n{TacticalFitNotes}\n{TacticalRiskNotes}";
@@ -358,6 +359,7 @@ public partial class GameState
                 {
                     PlayerName = CurrentRecruitmentTarget.PlayerName,
                     Position = CurrentRecruitmentTarget.Position,
+                    InformationSummary = CurrentRecruitmentTarget.InformationSummary,
                     InterestSummary = CurrentRecruitmentTarget.InterestSummary,
                     TacticalFitSummary = CurrentRecruitmentTarget.TacticalFitSummary,
                     EstimatedFeeRange = CurrentRecruitmentTarget.EstimatedFeeRange,
@@ -451,6 +453,9 @@ public partial class GameState
             {
                 PlayerName = data.RecruitmentTarget.PlayerName,
                 Position = data.RecruitmentTarget.Position,
+                InformationSummary = string.IsNullOrWhiteSpace(data.RecruitmentTarget.InformationSummary)
+                    ? "Knowledge: saved target visibility unavailable; scout confidence should be rebuilt by a new report."
+                    : data.RecruitmentTarget.InformationSummary,
                 InterestSummary = data.RecruitmentTarget.InterestSummary,
                 TacticalFitSummary = data.RecruitmentTarget.TacticalFitSummary,
                 EstimatedFeeRange = data.RecruitmentTarget.EstimatedFeeRange,
@@ -589,7 +594,34 @@ public partial class GameState
 
     public string BuildPlayerDossier(GameState.SquadPlayer player)
     {
-        return $"{PlayerIdentityFoundation.BuildProfileSummary(player)}\n{PlayerIdentityFoundation.BuildInformationSummary(player)}\n{player.TacticalFit}\n{PlayerIdentityFoundation.BuildContractSummary(player)}\nRelationship: {player.Relationship} | Transfer: {player.TransferInterest}";
+        var report = BuildPlayerInformationReport(player, PlayerKnowledgeContext.OwnSquad);
+        return $"{PlayerIdentityFoundation.BuildProfileSummary(player)}\n{report.FullSummary}\n{PlayerIdentityFoundation.BuildContractSummary(player)}\nRelationship: {player.Relationship} | Transfer: {player.TransferInterest}";
+    }
+
+    public PlayerInformationReport BuildPlayerInformationReport(GameState.SquadPlayer player, PlayerKnowledgeContext context)
+    {
+        var scoutQuality = GetStaffQuality(StaffRole.Scout);
+        var analystQuality = GetStaffQuality(StaffRole.DataAnalyst);
+        var staffQuality = context == PlayerKnowledgeContext.OwnSquad
+            ? (GetStaffQuality(StaffRole.FirstTeamCoach) + GetStaffQuality(StaffRole.AssistantManager)) / 2
+            : GetStaffQuality(StaffRole.HeadOfRecruitment);
+        var reportQuality = context == PlayerKnowledgeContext.ScoutedTarget
+            ? CurrentScoutingAssignment?.ReportQuality ?? player.ScoutingConfidence
+            : player.ScoutingConfidence;
+        return PlayerInformationVisibility.BuildReport(
+            player,
+            context,
+            CareerProfile.Role,
+            CareerProfile.License,
+            scoutQuality,
+            analystQuality,
+            staffQuality,
+            reportQuality);
+    }
+
+    public string BuildPlayerInformationSummary(GameState.SquadPlayer player)
+    {
+        return BuildPlayerInformationReport(player, PlayerKnowledgeContext.OwnSquad).FullSummary;
     }
 
     public string ValidateStage2PlayerIdentityContract()
@@ -601,6 +633,25 @@ public partial class GameState
         }
 
         var player = SquadPlayers[0];
+        var ownedReport = BuildPlayerInformationReport(player, PlayerKnowledgeContext.OwnSquad);
+        var lowVisibilityReport = PlayerInformationVisibility.BuildReport(
+            player.With(playerFamiliarity: 0, scoutingConfidence: 0),
+            PlayerKnowledgeContext.UnknownTarget,
+            ManagerRole.AssistantManager,
+            ManagerLicense.GrassrootsLicense,
+            35,
+            35,
+            35,
+            0);
+        var highVisibilityReport = PlayerInformationVisibility.BuildReport(
+            player.With(playerFamiliarity: 95, scoutingConfidence: 95),
+            PlayerKnowledgeContext.OwnSquad,
+            ManagerRole.Manager,
+            ManagerLicense.ProLicense,
+            90,
+            90,
+            90,
+            95);
         if (string.IsNullOrWhiteSpace(player.KnownAttributesSummary) ||
             string.IsNullOrWhiteSpace(player.EstimatedAttributesSummary) ||
             !player.UnknownAttributesSummary.Contains("?", StringComparison.Ordinal) ||
@@ -608,10 +659,18 @@ public partial class GameState
             string.IsNullOrWhiteSpace(player.Traits) ||
             string.IsNullOrWhiteSpace(player.Personality) ||
             string.IsNullOrWhiteSpace(player.TacticalFit) ||
+            string.IsNullOrWhiteSpace(player.KnownAttributeGroups) ||
+            string.IsNullOrWhiteSpace(player.EstimatedAttributeGroups) ||
+            string.IsNullOrWhiteSpace(player.UnknownAttributeGroups) ||
+            ownedReport.KnowledgeScore <= 0 ||
+            !lowVisibilityReport.UnknownAttributesSummary.Contains("?", StringComparison.Ordinal) ||
+            lowVisibilityReport.KnownAttributesSummary.Contains("Technical", StringComparison.Ordinal) ||
+            highVisibilityReport.KnownAttributesSummary.Contains("?", StringComparison.Ordinal) ||
+            highVisibilityReport.KnowledgeScore <= lowVisibilityReport.KnowledgeScore ||
             player.Wage <= 0 ||
             player.ContractExpiryYear <= 0)
         {
-            return "Player identity foundation is missing known, estimated, unknown, style, trait, personality, fit, or contract data.";
+            return "Player identity foundation is missing systemic known/estimated/unknown visibility, style, trait, personality, fit, or contract data.";
         }
 
         if (SaveSystem.Instance == null)
@@ -633,6 +692,80 @@ public partial class GameState
         if (SquadPlayers.Length == 0 || SquadPlayers[0].PlayingStyle != expectedStyle)
         {
             return "Save/load did not preserve player identity state.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
+    public string ValidatePhase1InformationVisibilityContract()
+    {
+        InitializeStageFoundationsForClub();
+        if (SquadPlayers.Length == 0)
+        {
+            return "No squad players available for information visibility validation.";
+        }
+
+        var player = SquadPlayers[0];
+        var lowReport = PlayerInformationVisibility.BuildReport(
+            player.With(playerFamiliarity: 0, scoutingConfidence: 0),
+            PlayerKnowledgeContext.UnknownTarget,
+            ManagerRole.AssistantManager,
+            ManagerLicense.GrassrootsLicense,
+            35,
+            35,
+            35,
+            0);
+        var ownedReport = BuildPlayerInformationReport(player, PlayerKnowledgeContext.OwnSquad);
+        var highReport = PlayerInformationVisibility.BuildReport(
+            player.With(playerFamiliarity: 95, scoutingConfidence: 95),
+            PlayerKnowledgeContext.OwnSquad,
+            ManagerRole.Manager,
+            ManagerLicense.ProLicense,
+            90,
+            90,
+            90,
+            95);
+
+        if (!lowReport.UnknownAttributesSummary.Contains("?", StringComparison.Ordinal) ||
+            lowReport.KnownAttributesSummary.Contains("Technical", StringComparison.Ordinal) ||
+            !ownedReport.KnownAttributesSummary.Contains("Known:", StringComparison.Ordinal) ||
+            !ownedReport.EstimatedAttributesSummary.Contains("Estimated:", StringComparison.Ordinal) ||
+            ownedReport.KnowledgeScore <= lowReport.KnowledgeScore ||
+            highReport.KnowledgeScore <= lowReport.KnowledgeScore)
+        {
+            return "Information visibility did not produce distinct low, owned, and high-knowledge reports.";
+        }
+
+        EnsureRecruitmentTarget();
+        if (CurrentRecruitmentTarget == null ||
+            !CurrentRecruitmentTarget.InformationSummary.Contains("Knowledge:", StringComparison.Ordinal) ||
+            !CurrentRecruitmentTarget.InformationSummary.Contains("Unknown:", StringComparison.Ordinal))
+        {
+            return "Recruitment target does not use the shared information visibility summary.";
+        }
+
+        if (SaveSystem.Instance == null)
+        {
+            return "Save system unavailable for information visibility validation.";
+        }
+
+        var expectedFamiliarity = player.PlayerFamiliarity;
+        var expectedConfidence = player.ScoutingConfidence;
+        if (!SaveSystem.Instance.SaveGame(out var saveStatus))
+        {
+            return saveStatus;
+        }
+
+        if (!SaveSystem.Instance.LoadGame(out var loadStatus))
+        {
+            return loadStatus;
+        }
+
+        if (SquadPlayers.Length == 0 ||
+            SquadPlayers[0].PlayerFamiliarity != expectedFamiliarity ||
+            SquadPlayers[0].ScoutingConfidence != expectedConfidence)
+        {
+            return "Save/load did not preserve player familiarity and scouting confidence.";
         }
 
         return MatchPlaybackContractValidator.PassMessage;
@@ -1000,14 +1133,15 @@ public partial class GameState
 
         var remaining = Math.Max(0, CurrentScoutingAssignment.DaysRemaining - days);
         var ready = remaining == 0;
+        var projectedQuality = Math.Clamp(CurrentScoutingAssignment.ReportQuality + days / 2, 0, 100);
         var discovery = ready
-            ? $"Report ready: {CurrentScoutingAssignment.Target}; exact current role visible, estimated technical range 66-74, unknown personality depth ?, tactical fit: {TeamStyleName} context reviewed."
-            : $"In progress: {CurrentScoutingAssignment.Target}; partial attribute range and tactical-fit language improving.";
+            ? BuildScoutingDiscoverySummary(projectedQuality, true)
+            : BuildScoutingDiscoverySummary(projectedQuality, false);
         CurrentScoutingAssignment = new ScoutingAssignment
         {
             Target = CurrentScoutingAssignment.Target,
             DaysRemaining = remaining,
-            ReportQuality = Math.Clamp(CurrentScoutingAssignment.ReportQuality + days / 2, 0, 100),
+            ReportQuality = projectedQuality,
             DiscoverySummary = discovery,
             ReportReady = ready
         };
@@ -1040,6 +1174,7 @@ public partial class GameState
         {
             PlayerName = candidate.Name,
             Position = candidate.Position,
+            InformationSummary = BuildRecruitmentInformationSummary(candidate),
             InterestSummary = candidate.Age <= 23 ? "Open to a development pathway if minutes are credible." : "Interest depends on role, wage, and club trajectory.",
             TacticalFitSummary = strongFit ? $"Strong fit for {TeamStyleName}." : $"Partial fit for {TeamStyleName}; scouting recommends caution.",
             EstimatedFeeRange = BuildFeeRange(candidate.TrueAbility, candidate.Age),
@@ -1201,6 +1336,39 @@ public partial class GameState
         return $"${low / 1000}k/w-${high / 1000}k/w";
     }
 
+    private string BuildRecruitmentInformationSummary(ClubSquadPlayer candidate)
+    {
+        var reportQuality = CurrentScoutingAssignment?.ReportQuality ?? 35;
+        var report = PlayerInformationVisibility.BuildReport(
+            candidate,
+            PlayerKnowledgeContext.ScoutedTarget,
+            CareerProfile.Role,
+            CareerProfile.License,
+            GetStaffQuality(StaffRole.Scout),
+            GetStaffQuality(StaffRole.DataAnalyst),
+            GetStaffQuality(StaffRole.HeadOfRecruitment),
+            reportQuality);
+        return $"{report.KnowledgeLabel}; {report.KnownAttributesSummary} {report.EstimatedAttributesSummary} {report.UnknownAttributesSummary}";
+    }
+
+    private string BuildScoutingDiscoverySummary(int reportQuality, bool ready)
+    {
+        var confidence = reportQuality >= 75
+            ? "strong"
+            : reportQuality >= 55
+                ? "working"
+                : "low";
+        var exactLine = reportQuality >= 70
+            ? "exact current role and some exact current attributes are visible"
+            : "exact role context is visible, but attributes remain mostly estimated";
+        var unknownLine = reportQuality >= 70
+            ? "unknowns remain around potential ?, agent loyalty ?, and pressure response ?"
+            : "unknowns remain around tactical detail ?, personality ?, potential ?, and agent loyalty ?";
+        return ready
+            ? $"Report ready: {CurrentScoutingAssignment?.Target}; confidence {confidence}; {exactLine}; {unknownLine}; tactical fit reviewed for {TeamStyleName}."
+            : $"In progress: {CurrentScoutingAssignment?.Target}; confidence {confidence}; wider attribute ranges and tactical-fit language improving; personality still ?.";
+    }
+
     private string BuildDirectorRecruitmentResponse(ClubSquadPlayer candidate)
     {
         if (CurrentClub == null)
@@ -1241,6 +1409,7 @@ public partial class GameState
         {
             PlayerName = target.PlayerName,
             Position = target.Position,
+            InformationSummary = target.InformationSummary,
             InterestSummary = target.InterestSummary,
             TacticalFitSummary = target.TacticalFitSummary,
             EstimatedFeeRange = target.EstimatedFeeRange,

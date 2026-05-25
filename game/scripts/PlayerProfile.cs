@@ -142,13 +142,14 @@ public partial class PlayerProfile : Control
         _positionMetaLabel.Text = player.IsStarting ? "Current starter in the active shape." : "Bench/reserve option outside the XI.";
         _ageValueLabel.Text = player.Age.ToString();
         _ageMetaLabel.Text = DescribeAgeBand(player.Age);
+        var informationReport = GameState.Instance.BuildPlayerInformationReport(player, PlayerKnowledgeContext.OwnSquad);
         _formValueLabel.Text = player.Form.ToString();
-        _formMetaLabel.Text = $"{DescribeMetric(player.Form, "form")} Tactical fit {player.TacticalFitScore}.";
+        _formMetaLabel.Text = $"{DescribeMetric(player.Form, "form")} {informationReport.TacticalFitSummary}";
         _fitnessValueLabel.Text = player.Fitness.ToString();
         _fitnessMetaLabel.Text = $"{DescribeFitness(player.Fitness)} Fatigue {player.Fatigue}, injury risk {player.InjuryRisk}.";
 
         _identityLabel.Text = $"Player dossier | {player.Name} | {player.Position} | Age {player.Age}\n{GameState.Instance.BuildPlayerDossier(player)}";
-        _roleLabel.Text = $"Squad status | {lineupStatus} | {player.PlayingStyle} | Traits: {player.Traits} | Personality: {player.Personality}";
+        _roleLabel.Text = $"Squad status | {lineupStatus} | {player.PlayingStyle} | {informationReport.PersonalitySummary}";
         _conditionLabel.Text = $"Match sharpness | Form {player.Form} | Morale {player.Morale} | Fitness {player.Fitness} | Fatigue {player.Fatigue} | Injury risk {player.InjuryRisk}";
         _pathwayLabel.Text = BuildTrajectorySummary(player, GameState.Instance);
         _readinessLabel.Text = BuildReadinessSummary(player);

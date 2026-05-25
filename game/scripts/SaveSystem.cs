@@ -124,6 +124,11 @@ public sealed class SaveSlotPlayerData
     public string PromiseSummary { get; set; } = string.Empty;
     public string TransferInterest { get; set; } = string.Empty;
     public int TacticalFitScore { get; set; }
+    public int PlayerFamiliarity { get; set; }
+    public int ScoutingConfidence { get; set; }
+    public string KnownAttributeGroups { get; set; } = string.Empty;
+    public string EstimatedAttributeGroups { get; set; } = string.Empty;
+    public string UnknownAttributeGroups { get; set; } = string.Empty;
     public bool IsStarting { get; set; }
 }
 
@@ -176,7 +181,7 @@ public partial class SaveSystem : Node
         WriteIndented = true,
         PropertyNameCaseInsensitive = true
     };
-    public const int CurrentSaveVersion = 3;
+    public const int CurrentSaveVersion = 4;
 
     public static SaveSystem? Instance { get; private set; }
     public string LastStatusMessage { get; private set; } = "Save system idle.";
@@ -492,6 +497,11 @@ public partial class SaveSystem : Node
                     PromiseSummary = player.PromiseSummary,
                     TransferInterest = player.TransferInterest,
                     TacticalFitScore = player.TacticalFitScore,
+                    PlayerFamiliarity = player.PlayerFamiliarity,
+                    ScoutingConfidence = player.ScoutingConfidence,
+                    KnownAttributeGroups = player.KnownAttributeGroups,
+                    EstimatedAttributeGroups = player.EstimatedAttributeGroups,
+                    UnknownAttributeGroups = player.UnknownAttributeGroups,
                     IsStarting = player.IsStarting
                 }),
             TacticalFormation = state.TacticalFormation,
@@ -611,6 +621,11 @@ public partial class SaveSystem : Node
                         PromiseSummary = player.PromiseSummary,
                         TransferInterest = player.TransferInterest,
                         TacticalFitScore = player.TacticalFitScore,
+                        PlayerFamiliarity = player.PlayerFamiliarity,
+                        ScoutingConfidence = player.ScoutingConfidence,
+                        KnownAttributeGroups = player.KnownAttributeGroups,
+                        EstimatedAttributeGroups = player.EstimatedAttributeGroups,
+                        UnknownAttributeGroups = player.UnknownAttributeGroups,
                         IsStarting = player.IsStarting
                     }),
             TacticalFormation = source.TacticalFormation,
@@ -864,6 +879,7 @@ public partial class SaveSystem : Node
                 {
                     PlayerName = source.RecruitmentTarget.PlayerName,
                     Position = source.RecruitmentTarget.Position,
+                    InformationSummary = source.RecruitmentTarget.InformationSummary,
                     InterestSummary = source.RecruitmentTarget.InterestSummary,
                     TacticalFitSummary = source.RecruitmentTarget.TacticalFitSummary,
                     EstimatedFeeRange = source.RecruitmentTarget.EstimatedFeeRange,

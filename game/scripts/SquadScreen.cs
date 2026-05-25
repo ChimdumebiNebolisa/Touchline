@@ -521,9 +521,15 @@ public partial class SquadScreen : Control
         readinessLabel.AddThemeColorOverride("font_color", TouchlineTheme.TextPrimary);
         rightColumn.AddChild(readinessLabel);
 
+        var informationReport = GameState.Instance?.BuildPlayerInformationReport(player, PlayerKnowledgeContext.OwnSquad);
+        var rowKnowledgeLabel = informationReport == null
+            ? "Information unavailable"
+            : informationReport.KnowledgeLabel.Split('|')[0].Trim();
         var conditionLabel = new Label
         {
-            Text = $"Form {player.Form} | Morale {player.Morale} | Fitness {player.Fitness} | Known {player.TechnicalAttribute}/{player.PhysicalAttribute} | Unknown ?",
+            Text = informationReport == null
+                ? $"Form {player.Form} | Morale {player.Morale} | Fitness {player.Fitness} | Information unavailable"
+                : $"Form {player.Form} | Morale {player.Morale} | Fitness {player.Fitness} | {rowKnowledgeLabel}",
             HorizontalAlignment = HorizontalAlignment.Right
         };
         conditionLabel.AddThemeFontSizeOverride("font_size", 13);
@@ -587,7 +593,7 @@ public partial class SquadScreen : Control
         _moraleStatLabel.Text = $"Morale | {player.Morale} | {DescribePulse(player.Morale)}";
         _fitnessStatLabel.Text = $"Fitness | {player.Fitness} | {DescribeReadiness(player.Fitness)}";
         _readinessSummaryLabel.Text = BuildReadinessSummary(player);
-        _profileHintLabel.Text = $"Open the player profile for identity, lineup status, and the longer form-morale-fitness arc.\n{PlayerIdentityFoundation.BuildInformationSummary(player)}\n{PlayerIdentityFoundation.BuildContractSummary(player)}";
+        _profileHintLabel.Text = $"Open the player profile for identity, lineup status, and the longer form-morale-fitness arc.\n{GameState.Instance.BuildPlayerInformationSummary(player)}\n{PlayerIdentityFoundation.BuildContractSummary(player)}";
         if (GameState.Instance.CareerProfile.Role == ManagerRole.AssistantManager)
         {
             _lineupStatusLabel.Text = player.IsStarting
