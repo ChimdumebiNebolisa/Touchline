@@ -197,7 +197,7 @@ public partial class SaveSystem : Node
         WriteIndented = true,
         PropertyNameCaseInsensitive = true
     };
-    public const int CurrentSaveVersion = 17;
+    public const int CurrentSaveVersion = 18;
 
     public static SaveSystem? Instance { get; private set; }
     public string LastStatusMessage { get; private set; } = "Save system idle.";
@@ -1087,7 +1087,15 @@ public partial class SaveSystem : Node
             FinanceSummary = source.FinanceSummary,
             ProfitExpectationSummary = source.ProfitExpectationSummary,
             BoardFinanceActionSummary = source.BoardFinanceActionSummary,
-            FinanceHistory = source.FinanceHistory == null ? null : (string[])source.FinanceHistory.Clone()
+            FinanceHistory = source.FinanceHistory == null ? null : (string[])source.FinanceHistory.Clone(),
+            CurrentDivisionTier = source.CurrentDivisionTier,
+            CurrentDivisionName = source.CurrentDivisionName,
+            CurrentDivisionReputation = source.CurrentDivisionReputation,
+            CurrentDivisionSimulationDepth = source.CurrentDivisionSimulationDepth,
+            LeaguePyramidSummary = source.LeaguePyramidSummary,
+            PromotionRelegationSummary = source.PromotionRelegationSummary,
+            ShadowLeagueSummary = source.ShadowLeagueSummary,
+            LeagueHistory = source.LeagueHistory == null ? null : (string[])source.LeagueHistory.Clone()
         };
     }
 

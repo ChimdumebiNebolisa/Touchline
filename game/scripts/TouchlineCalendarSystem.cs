@@ -55,6 +55,7 @@ public partial class TouchlineCalendarSystem : Node
 
         if (seasonComplete)
         {
+            GameState.Instance.ApplyLeagueSeasonRolloverHooks(competitionTable);
             nextSeasonStartYear++;
             nextDate = new DateTime(nextSeasonStartYear, DefaultSeasonStartDate.Month, DefaultSeasonStartDate.Day);
             nextMatchday = 1;

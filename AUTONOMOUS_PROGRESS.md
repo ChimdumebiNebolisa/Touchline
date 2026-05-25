@@ -1,24 +1,37 @@
 # Autonomous Progress
 
 ## Current active Plan step
-- Phase 16: League structure and promotion/relegation.
+- Phase 17: Cup competitions.
 
 ## Last completed verified task
-- Phase 15: Finance system implemented and verified locally.
+- Phase 16: League structure and promotion/relegation foundation implemented and verified locally.
 
 ## Current subtask in progress
-- Prepare Phase 15 commit and push, then begin Phase 16.
+- Prepare Phase 16 commit and push, then begin Phase 17.
 
 ## Next queued subtasks
-- Commit and push `phase-15: add readable finance system`.
-- Begin Phase 16 league structure and promotion/relegation inspection.
-- Keep league expansion bounded to fictional structure, standings integrity, deep/shadow split, promotion/relegation, season rollover, and hooks to finance/objectives/reputation/history.
+- Commit and push `phase-16: add league pyramid and promotion foundation`.
+- Begin Phase 17 cup competitions inspection.
+- Keep cup expansion bounded to domestic cup draw, round progression, fixture insertion, prize/reputation/objective hooks, and post-match/news context.
 
 ## Known blockers
 - No active blockers.
 - `docs/audit/` remains untracked and intentionally excluded from phase commits.
 
 ## Last verification run
+- Phase 16 local verification:
+  - `dotnet build game/Touchline.sln` passed with 0 warnings and 0 errors.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/phase16_league_structure_check.gd` passed.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step28_season_rollover_check.gd` passed.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step53_competition_surfaces_check.gd` passed.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step47_full_season_regression_check.gd` passed.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step27_save_compat_check.gd` passed.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/phase15_finance_check.gd` passed.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step50_end_to_end_user_flow_check.gd` passed.
+  - `git diff --check` pending.
+  - `git diff --cached --check` pending.
+
+## Previous verification notes
 - Phase 15 local verification:
   - `dotnet build game/Touchline.sln` passed with 0 warnings and 0 errors.
   - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/phase15_finance_check.gd` passed.
@@ -28,8 +41,8 @@
   - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step48_dashboard_context_check.gd` passed.
   - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step27_save_compat_check.gd` passed.
   - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step50_end_to_end_user_flow_check.gd` passed.
-  - `git diff --check` pending.
-  - `git diff --cached --check` pending.
+  - `git diff --check` passed.
+  - `git diff --cached --check` passed.
 
 ## Previous verification notes
 - Phase 14 local verification:
@@ -133,11 +146,12 @@
 - Phase 12 completed at `ab74018`.
 - Phase 13 completed at `3199f75`.
 - Phase 14 completed at `d46f51f`.
-- Phase 15 commit pending.
+- Phase 15 completed at `6fbd971`.
+- Phase 16 commit pending.
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`.
 - Re-read `docs/touchline_master_design_decisions.md`.
 - Re-read `docs/MASTER_IMPLEMENTATION_ROADMAP.md`.
-- Resume at Phase 16 after the Phase 15 commit/push completes.
+- Resume at Phase 17 after the Phase 16 commit/push completes.
 - Keep `docs/audit/` untouched unless a future task explicitly uses it.

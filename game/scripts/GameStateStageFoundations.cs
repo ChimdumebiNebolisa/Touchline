@@ -94,6 +94,14 @@ public sealed class SaveSlotStageFoundationData
     public string ProfitExpectationSummary { get; set; } = string.Empty;
     public string BoardFinanceActionSummary { get; set; } = string.Empty;
     public string[]? FinanceHistory { get; set; }
+    public int CurrentDivisionTier { get; set; }
+    public string CurrentDivisionName { get; set; } = string.Empty;
+    public int CurrentDivisionReputation { get; set; }
+    public string CurrentDivisionSimulationDepth { get; set; } = string.Empty;
+    public string LeaguePyramidSummary { get; set; } = string.Empty;
+    public string PromotionRelegationSummary { get; set; } = string.Empty;
+    public string ShadowLeagueSummary { get; set; } = string.Empty;
+    public string[]? LeagueHistory { get; set; }
 }
 
 public sealed class SaveSlotStaffMarketCandidateData
@@ -265,6 +273,7 @@ public partial class GameState
     private readonly List<string> _youthHistory = new();
     private readonly List<string> _playerDevelopmentHistory = new();
     private readonly List<string> _financeHistory = new();
+    private readonly List<string> _leagueHistory = new();
 
     private readonly record struct ContractResolution(
         ContractOffer Offer,
@@ -349,6 +358,13 @@ public partial class GameState
     public string FinanceSummary { get; private set; } = "Finance foundation pending.";
     public string ProfitExpectationSummary { get; private set; } = "Profit expectation pending.";
     public string BoardFinanceActionSummary { get; private set; } = "Board finance action pending.";
+    public int CurrentDivisionTier { get; private set; } = 1;
+    public string CurrentDivisionName { get; private set; } = "Novara Premier Division";
+    public int CurrentDivisionReputation { get; private set; } = 72;
+    public string CurrentDivisionSimulationDepth { get; private set; } = "Deep simulation";
+    public string LeaguePyramidSummary { get; private set; } = "League pyramid pending.";
+    public string PromotionRelegationSummary { get; private set; } = "Promotion/relegation review pending.";
+    public string ShadowLeagueSummary { get; private set; } = "Shadow league summary pending.";
 
     public string TeamStyleName => StageFoundationText.GetDisplayName(TeamStyle);
     public string TacticalFamiliarityName => StageFoundationText.GetDisplayName(TacticsFoundation.FamiliarityFromScore(TacticalFamiliarityScore));
@@ -373,11 +389,12 @@ public partial class GameState
     public string YouthAcademySummary => BuildYouthAcademySummary();
     public string PlayerDevelopmentHistorySummary => _playerDevelopmentHistory.Count == 0 ? "Player development history starts after weekly training, match minutes, loan review, or season aging." : string.Join("\n", _playerDevelopmentHistory);
     public string FinanceHistorySummary => _financeHistory.Count == 0 ? "Finance history starts after weekly revenue, transfer, contract, staff, board cut, or board injection events." : string.Join("\n", _financeHistory);
+    public string LeagueHistorySummary => _leagueHistory.Count == 0 ? "League history starts after promotion, relegation, prize, shadow simulation, or season rollover events." : string.Join("\n", _leagueHistory);
     public string RecruitmentFoundationSummary => CurrentRecruitmentTarget == null
         ? "Recruitment foundation pending scouting target."
         : $"{CurrentRecruitmentTarget.PlayerName} ({CurrentRecruitmentTarget.Position}) | {CurrentRecruitmentTarget.InformationSummary} | {CurrentRecruitmentTarget.InterestSummary} | {CurrentRecruitmentTarget.TacticalFitSummary} | Fee {CurrentRecruitmentTarget.EstimatedFeeRange} | Wage {CurrentRecruitmentTarget.EstimatedWageRange} | Status {CurrentRecruitmentTarget.TargetStatus} | Valuation {CurrentRecruitmentTarget.ClubValuation} | Agent {CurrentRecruitmentTarget.AgentMood} | Rival {CurrentRecruitmentTarget.RivalInterest} | Board {CurrentRecruitmentTarget.BoardStance} | Director {CurrentRecruitmentTarget.DirectorStance} | Outcome {CurrentRecruitmentTarget.OutcomeState} | {CurrentRecruitmentTarget.Status}\nDirector of Football\n{DirectorInfluenceSummary}\nShortlist\n{RecruitmentShortlistSummary}\nContracts\n{ContractFoundationSummary}\nTransfer history\n{TransferHistorySummary}";
     public string TrainingScoutingSummary => $"{TrainingFocusName} ({TrainingIntensityName}): {TrainingStatusSummary}\nScouting depth: {ScoutingReportDepthName}\nScouting: {BuildScoutingSummary()}\nDevelopment\n{PlayerDevelopmentSummary}\nDevelopment history\n{PlayerDevelopmentHistorySummary}\nStaff effects\n{StaffImpactSummary}";
-    public string CareerMarketSummary => $"Job security: {JobSecurityName}\n{TrustSummary}\n{ReputationSummary}\n{PressureCategorySummary}\nFinance\n{FinanceSummary}\nFinance history\n{FinanceHistorySummary}\nLicense: {LicenseOpportunitySummary}\nJob market: {BuildJobOfferSummary()}";
+    public string CareerMarketSummary => $"Job security: {JobSecurityName}\n{TrustSummary}\n{ReputationSummary}\n{PressureCategorySummary}\nLeague system\n{LeaguePyramidSummary}\n{PromotionRelegationSummary}\n{ShadowLeagueSummary}\nLeague history\n{LeagueHistorySummary}\nFinance\n{FinanceSummary}\nFinance history\n{FinanceHistorySummary}\nLicense: {LicenseOpportunitySummary}\nJob market: {BuildJobOfferSummary()}";
     public string TacticsFoundationSummary => $"{TeamStyleName} | {TeamInstructionsSummary}\n{SetPieceSummary}\n{OpponentPreparationSummary}\n{PlayerRolesSummary}\n{PlayerInstructionsSummary}\n{TacticalRoleFitSummary}\n{PlayerFamiliaritySummary}\n{TacticalFitNotes}\n{TacticalRiskNotes}";
 
     public void UpdateTactics(string formation, string teamStyle, int pressIntensity, int tempo, int width, int risk)
@@ -984,7 +1001,15 @@ public partial class GameState
             FinanceSummary = FinanceSummary,
             ProfitExpectationSummary = ProfitExpectationSummary,
             BoardFinanceActionSummary = BoardFinanceActionSummary,
-            FinanceHistory = _financeHistory.ToArray()
+            FinanceHistory = _financeHistory.ToArray(),
+            CurrentDivisionTier = CurrentDivisionTier,
+            CurrentDivisionName = CurrentDivisionName,
+            CurrentDivisionReputation = CurrentDivisionReputation,
+            CurrentDivisionSimulationDepth = CurrentDivisionSimulationDepth,
+            LeaguePyramidSummary = LeaguePyramidSummary,
+            PromotionRelegationSummary = PromotionRelegationSummary,
+            ShadowLeagueSummary = ShadowLeagueSummary,
+            LeagueHistory = _leagueHistory.ToArray()
         };
     }
 
@@ -1231,6 +1256,20 @@ public partial class GameState
             _financeHistory.AddRange(data.FinanceHistory);
         }
 
+        CurrentDivisionTier = data.CurrentDivisionTier <= 0 ? ResolveStartingDivisionTier() : data.CurrentDivisionTier;
+        CurrentDivisionName = string.IsNullOrWhiteSpace(data.CurrentDivisionName) ? ResolveDivisionName(CurrentDivisionTier) : data.CurrentDivisionName;
+        CurrentDivisionReputation = Math.Clamp(data.CurrentDivisionReputation <= 0 ? ResolveDivisionReputation(CurrentDivisionTier) : data.CurrentDivisionReputation, 0, 100);
+        CurrentDivisionSimulationDepth = string.IsNullOrWhiteSpace(data.CurrentDivisionSimulationDepth) ? ResolveSimulationDepth(CurrentDivisionTier) : data.CurrentDivisionSimulationDepth;
+        LeaguePyramidSummary = string.IsNullOrWhiteSpace(data.LeaguePyramidSummary) ? "League pyramid restored; current division pending refresh." : data.LeaguePyramidSummary;
+        PromotionRelegationSummary = string.IsNullOrWhiteSpace(data.PromotionRelegationSummary) ? "Promotion/relegation restored with no latest review." : data.PromotionRelegationSummary;
+        ShadowLeagueSummary = string.IsNullOrWhiteSpace(data.ShadowLeagueSummary) ? "Shadow league summary restored with no latest review." : data.ShadowLeagueSummary;
+        _leagueHistory.Clear();
+        if (data.LeagueHistory != null)
+        {
+            _leagueHistory.AddRange(data.LeagueHistory);
+        }
+
+        EnsureLeaguePyramidState();
         EnsureFinanceState();
         EnsureRecruitmentTarget();
         EnsureJobMarketFoundation();
@@ -1315,6 +1354,13 @@ public partial class GameState
         FinanceSummary = "Finance foundation pending.";
         ProfitExpectationSummary = "Profit expectation pending.";
         BoardFinanceActionSummary = "Board finance action pending.";
+        CurrentDivisionTier = 1;
+        CurrentDivisionName = "Novara Premier Division";
+        CurrentDivisionReputation = 72;
+        CurrentDivisionSimulationDepth = "Deep simulation";
+        LeaguePyramidSummary = "League pyramid pending.";
+        PromotionRelegationSummary = "Promotion/relegation review pending.";
+        ShadowLeagueSummary = "Shadow league summary pending.";
         _foundationNewsEvents.Clear();
         _activeDecisionEvents.Clear();
         _resolvedDecisionEvents.Clear();
@@ -1330,6 +1376,7 @@ public partial class GameState
         _youthHistory.Clear();
         _playerDevelopmentHistory.Clear();
         _financeHistory.Clear();
+        _leagueHistory.Clear();
     }
 
     public void InitializeStageFoundationsForClub()
@@ -1350,6 +1397,7 @@ public partial class GameState
         EnsureYouthAcademyState();
         EnsurePlayerDevelopmentState();
         EnsureFinanceState();
+        EnsureLeaguePyramidState();
         if (CurrentScoutingAssignment == null)
         {
             StartBasicScoutingAssignment("Position need: versatile midfielder");
@@ -3008,6 +3056,102 @@ public partial class GameState
             !CareerMarketSummary.Contains("Finance history", StringComparison.Ordinal))
         {
             return "Saved finance state did not restore.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
+    public string ValidatePhase16LeagueStructureContract()
+    {
+        InitializeStageFoundationsForClub();
+        EnsureLeaguePyramidState();
+        if (!LeaguePyramidSummary.Contains("Tier 1", StringComparison.Ordinal) ||
+            !LeaguePyramidSummary.Contains("Tier 4", StringComparison.Ordinal) ||
+            !LeaguePyramidSummary.Contains("deep", StringComparison.OrdinalIgnoreCase) ||
+            !LeaguePyramidSummary.Contains("shadow", StringComparison.OrdinalIgnoreCase) ||
+            !PromotionRelegationSummary.Contains("Promotion/relegation", StringComparison.OrdinalIgnoreCase))
+        {
+            return "League pyramid summary does not expose tier, deep simulation, shadow simulation, and promotion/relegation rules.";
+        }
+
+        var selectedClub = SelectedClubName ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(selectedClub))
+        {
+            return "No selected club available for league structure validation.";
+        }
+
+        CurrentDivisionTier = 2;
+        CurrentDivisionName = ResolveDivisionName(CurrentDivisionTier);
+        CurrentDivisionReputation = ResolveDivisionReputation(CurrentDivisionTier);
+        CurrentDivisionSimulationDepth = ResolveSimulationDepth(CurrentDivisionTier);
+        CompetitionName = CurrentDivisionName;
+        var beforePrizeMoney = FinancePrizeMoney;
+        var promotionSummary = ApplyLeagueSeasonRolloverHooks(new[]
+        {
+            new CompetitionRow { ClubName = selectedClub, Played = 6, Won = 5, Drawn = 1, Lost = 0, GoalsFor = 14, GoalsAgainst = 4, Points = 16 },
+            new CompetitionRow { ClubName = "Eastvale Rovers", Played = 6, Won = 4, Drawn = 0, Lost = 2, GoalsFor = 11, GoalsAgainst = 7, Points = 12 },
+            new CompetitionRow { ClubName = "Riverton Town", Played = 6, Won = 2, Drawn = 1, Lost = 3, GoalsFor = 8, GoalsAgainst = 10, Points = 7 },
+            new CompetitionRow { ClubName = "Southgate Athletic", Played = 6, Won = 1, Drawn = 0, Lost = 5, GoalsFor = 5, GoalsAgainst = 17, Points = 3 }
+        });
+        if (CurrentDivisionTier != 1 ||
+            !promotionSummary.Contains("promoted", StringComparison.OrdinalIgnoreCase) ||
+            FinancePrizeMoney <= beforePrizeMoney ||
+            _leagueHistory.Count == 0)
+        {
+            return "Promotion rollover did not change division, prize money, and league history.";
+        }
+
+        CurrentDivisionTier = 1;
+        CurrentDivisionName = ResolveDivisionName(CurrentDivisionTier);
+        CurrentDivisionReputation = ResolveDivisionReputation(CurrentDivisionTier);
+        CurrentDivisionSimulationDepth = ResolveSimulationDepth(CurrentDivisionTier);
+        CompetitionName = CurrentDivisionName;
+        var beforeFinancialPressure = FinancialPressure;
+        var relegationSummary = ApplyLeagueSeasonRolloverHooks(new[]
+        {
+            new CompetitionRow { ClubName = "Northbridge City", Played = 6, Won = 5, Drawn = 0, Lost = 1, GoalsFor = 15, GoalsAgainst = 6, Points = 15 },
+            new CompetitionRow { ClubName = "Eastvale Rovers", Played = 6, Won = 3, Drawn = 1, Lost = 2, GoalsFor = 10, GoalsAgainst = 8, Points = 10 },
+            new CompetitionRow { ClubName = "Riverton Town", Played = 6, Won = 2, Drawn = 1, Lost = 3, GoalsFor = 7, GoalsAgainst = 10, Points = 7 },
+            new CompetitionRow { ClubName = selectedClub, Played = 6, Won = 0, Drawn = 2, Lost = 4, GoalsFor = 4, GoalsAgainst = 12, Points = 2 }
+        });
+        if (CurrentDivisionTier != 2 ||
+            !relegationSummary.Contains("relegated", StringComparison.OrdinalIgnoreCase) ||
+            JobSecurity < JobSecurityState.UnderPressure ||
+            FinancialPressure <= beforeFinancialPressure ||
+            CompetitionName != CurrentDivisionName)
+        {
+            return $"Relegation rollover did not change division, pressure, job security, and competition context. Tier {CurrentDivisionTier}; summary '{relegationSummary}'; job {JobSecurity}; financial pressure {beforeFinancialPressure}->{FinancialPressure}; competition '{CompetitionName}' vs '{CurrentDivisionName}'.";
+        }
+
+        if (!CareerMarketSummary.Contains("League system", StringComparison.Ordinal) ||
+            !CareerMarketSummary.Contains("League history", StringComparison.Ordinal) ||
+            !ShadowLeagueSummary.Contains("shadow", StringComparison.OrdinalIgnoreCase))
+        {
+            return "League state is not surfaced in the career market summary.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
+    public string ValidatePhase16StoredLeagueStructureContract()
+    {
+        EnsureLeaguePyramidState();
+        if (CurrentDivisionTier <= 0 ||
+            string.IsNullOrWhiteSpace(CurrentDivisionName) ||
+            string.IsNullOrWhiteSpace(CurrentDivisionSimulationDepth) ||
+            string.IsNullOrWhiteSpace(LeaguePyramidSummary) ||
+            string.IsNullOrWhiteSpace(PromotionRelegationSummary) ||
+            string.IsNullOrWhiteSpace(ShadowLeagueSummary) ||
+            _leagueHistory.Count == 0)
+        {
+            return "Saved league structure state did not restore.";
+        }
+
+        if (!CareerMarketSummary.Contains("League system", StringComparison.Ordinal) ||
+            !CareerMarketSummary.Contains("League history", StringComparison.Ordinal) ||
+            !LeagueHistorySummary.Contains("relegated", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Saved league structure summary/history is not surfaced.";
         }
 
         return MatchPlaybackContractValidator.PassMessage;
@@ -5483,6 +5627,174 @@ public partial class GameState
         if (_financeHistory.Count > 16)
         {
             _financeHistory.RemoveAt(_financeHistory.Count - 1);
+        }
+    }
+
+    private void EnsureLeaguePyramidState()
+    {
+        if (CurrentDivisionTier <= 0)
+        {
+            CurrentDivisionTier = ResolveStartingDivisionTier();
+        }
+
+        CurrentDivisionName = string.IsNullOrWhiteSpace(CurrentDivisionName) || CurrentDivisionName.Contains("pending", StringComparison.OrdinalIgnoreCase)
+            ? ResolveDivisionName(CurrentDivisionTier)
+            : CurrentDivisionName;
+        CurrentDivisionReputation = CurrentDivisionReputation <= 0 ? ResolveDivisionReputation(CurrentDivisionTier) : CurrentDivisionReputation;
+        CurrentDivisionSimulationDepth = string.IsNullOrWhiteSpace(CurrentDivisionSimulationDepth) || CurrentDivisionSimulationDepth.Contains("pending", StringComparison.OrdinalIgnoreCase)
+            ? ResolveSimulationDepth(CurrentDivisionTier)
+            : CurrentDivisionSimulationDepth;
+        LeaguePyramidSummary = BuildLeaguePyramidSummary();
+        ShadowLeagueSummary = BuildShadowLeagueSummary();
+        if (PromotionRelegationSummary.Contains("pending", StringComparison.OrdinalIgnoreCase))
+        {
+            PromotionRelegationSummary = BuildPromotionRelegationRuleSummary(CurrentDivisionTier);
+        }
+    }
+
+    public string ApplyLeagueSeasonRolloverHooks(CompetitionRow[] finalTable)
+    {
+        EnsureLeaguePyramidState();
+        if (string.IsNullOrWhiteSpace(SelectedClubName) || finalTable.Length == 0)
+        {
+            PromotionRelegationSummary = "Promotion/relegation review skipped: selected club or final table unavailable.";
+            return PromotionRelegationSummary;
+        }
+
+        var previousTier = CurrentDivisionTier;
+        var position = CompetitionRuntimeService.GetClubTablePosition(finalTable, SelectedClubName);
+        if (position <= 0)
+        {
+            PromotionRelegationSummary = "Promotion/relegation review skipped: selected club not found in final table.";
+            return PromotionRelegationSummary;
+        }
+
+        var tableSize = finalTable.Length;
+        var promoted = CurrentDivisionTier > 1 && position == 1;
+        var relegated = CurrentDivisionTier < 4 && position == tableSize;
+        if (promoted)
+        {
+            CurrentDivisionTier--;
+            ClubReputation = Math.Clamp(ClubReputation + 4, 0, 100);
+            WorldReputation = Math.Clamp(WorldReputation + 2, 0, 100);
+            CareerProfile.BoardTrust = Math.Clamp(CareerProfile.BoardTrust + 3, 0, 100);
+            AddLeaguePrizeMoney(650000 + CurrentDivisionReputation * 9000, "promotion prize");
+        }
+        else if (relegated)
+        {
+            CurrentDivisionTier++;
+            ClubReputation = Math.Clamp(ClubReputation - 5, 0, 100);
+            WorldReputation = Math.Clamp(WorldReputation - 2, 0, 100);
+            CareerProfile.BoardTrust = Math.Clamp(CareerProfile.BoardTrust - 4, 0, 100);
+            JobSecurity = JobSecurity < JobSecurityState.UnderPressure ? JobSecurityState.UnderPressure : JobSecurity;
+            FinancialPressure = Math.Clamp(FinancialPressure + 5, 0, 100);
+            AddLeaguePrizeMoney(180000 + CurrentDivisionReputation * 3000, "relegation parachute foundation");
+        }
+        else
+        {
+            AddLeaguePrizeMoney(Math.Max(75000, (tableSize - position + 1) * 80000), "league placing prize");
+        }
+
+        CurrentDivisionName = ResolveDivisionName(CurrentDivisionTier);
+        CurrentDivisionReputation = ResolveDivisionReputation(CurrentDivisionTier);
+        CurrentDivisionSimulationDepth = ResolveSimulationDepth(CurrentDivisionTier);
+        CompetitionName = CurrentDivisionName;
+        PromotionRelegationSummary = promoted
+            ? $"{SelectedClubName} promoted from tier {previousTier} to tier {CurrentDivisionTier} after finishing {position}/{tableSize}; league reputation, board trust, finance, and career visibility updated."
+            : relegated
+                ? $"{SelectedClubName} relegated from tier {previousTier} to tier {CurrentDivisionTier} after finishing {position}/{tableSize}; pressure, reputation, and finance updated."
+                : $"{SelectedClubName} stayed in tier {CurrentDivisionTier} after finishing {position}/{tableSize}; placing prize and history recorded.";
+        ShadowLeagueSummary = BuildShadowLeagueSummary();
+        LeaguePyramidSummary = BuildLeaguePyramidSummary();
+        RecordLeagueHistory(PromotionRelegationSummary);
+        AddNews(
+            promoted ? "Promotion confirmed" : relegated ? "Relegation confirmed" : "League season reviewed",
+            NewsCategory.Career,
+            "League office",
+            PromotionRelegationSummary,
+            promoted || relegated ? 5 : 3,
+            sourceType: "League office",
+            relatedEntity: SelectedClubName,
+            effectSummary: $"Division {CurrentDivisionName}; reputation {ClubReputation}; financial pressure {FinancialPressure}; prize money {FormatFinanceMoney(FinancePrizeMoney)}.",
+            cooldownKey: "league-rollover");
+        return PromotionRelegationSummary;
+    }
+
+    private int ResolveStartingDivisionTier()
+    {
+        return CurrentClub?.Archetype switch
+        {
+            ClubArchetype.TitleContender or ClubArchetype.AmbitiousNewMoneyClub => 1,
+            ClubArchetype.RelegationFighter or ClubArchetype.FinanciallyRestrictedClub => 2,
+            _ => 1
+        };
+    }
+
+    private static string ResolveDivisionName(int tier)
+    {
+        return Math.Clamp(tier, 1, 4) switch
+        {
+            1 => "Novara Premier Division",
+            2 => "Novara Championship Division",
+            3 => "Novara Regional Professional League",
+            _ => "Novara Semi-Professional League"
+        };
+    }
+
+    private static int ResolveDivisionReputation(int tier)
+    {
+        return Math.Clamp(tier, 1, 4) switch
+        {
+            1 => 76,
+            2 => 61,
+            3 => 46,
+            _ => 32
+        };
+    }
+
+    private static string ResolveSimulationDepth(int tier)
+    {
+        return tier <= 2 ? "Deep simulation" : "Shadow simulation";
+    }
+
+    private string BuildLeaguePyramidSummary()
+    {
+        return $"League pyramid | Tier 1 Novara Premier Division (deep, reputation 76) | Tier 2 Novara Championship Division (deep, reputation 61) | Tier 3 Novara Regional Professional League (shadow, reputation 46) | Tier 4 Novara Semi-Professional League (shadow, reputation 32). Current: tier {CurrentDivisionTier}, {CurrentDivisionName}, {CurrentDivisionSimulationDepth}, reputation {CurrentDivisionReputation}.";
+    }
+
+    private string BuildShadowLeagueSummary()
+    {
+        return CurrentDivisionTier <= 2
+            ? "Top two divisions are deep-sim foundations; lower divisions are shadow simulated for movement, reputation, and job-market context."
+            : $"Current club is in a shadow tier ({CurrentDivisionName}); match loop remains playable while wider lower-league results stay summarized.";
+    }
+
+    private static string BuildPromotionRelegationRuleSummary(int tier)
+    {
+        return Math.Clamp(tier, 1, 4) switch
+        {
+            1 => "Promotion/relegation rules: Tier 1 bottom club relegated in this compact foundation; no promotion above tier 1.",
+            2 => "Promotion/relegation rules: Tier 2 top club promoted and bottom club relegated in this compact foundation.",
+            3 => "Promotion/relegation rules: Tier 3 top club promoted and bottom club relegated in this compact foundation.",
+            _ => "Promotion/relegation rules: Tier 4 top club promoted; no relegation below tier 4 in this foundation."
+        };
+    }
+
+    private void AddLeaguePrizeMoney(int amount, string reason)
+    {
+        EnsureFinanceState();
+        FinancePrizeMoney += amount;
+        FinanceRevenue += amount;
+        RefreshFinanceProjection();
+        RecordFinanceHistory($"League finance: {reason} added {FormatFinanceMoney(amount)}; projected balance {FormatFinanceMoney(FinanceProjectedBalance)}.");
+    }
+
+    private void RecordLeagueHistory(string detail)
+    {
+        _leagueHistory.Insert(0, $"{CurrentDateLabel}: {detail}");
+        if (_leagueHistory.Count > 16)
+        {
+            _leagueHistory.RemoveAt(_leagueHistory.Count - 1);
         }
     }
 
