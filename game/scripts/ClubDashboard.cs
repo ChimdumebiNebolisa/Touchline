@@ -850,8 +850,7 @@ public partial class ClubDashboard : Control
             return;
         }
 
-        GameState.Instance.GenerateJobMarketEvent();
-        _statusLabel.Text = "Job market event generated from current reputation, license, role, and pressure.";
+        _statusLabel.Text = GameState.Instance.AdvanceCareerJobMarketAction();
         RenderState();
     }
 

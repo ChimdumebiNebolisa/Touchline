@@ -1,31 +1,32 @@
 # Autonomous Progress
 
 ## Current active Plan step
-- Phase 21: Career job market and interviews.
+- Phase 22: Generated content and narrative variety.
 
 ## Last completed verified task
-- Phase 20: Objectives, job security, and sackings depth implemented and verified locally.
+- Phase 21: Career job market and interviews implemented and verified locally.
 
 ## Current subtask in progress
-- Prepare Phase 20 commit and push, then begin Phase 21.
+- Prepare Phase 21 commit and push, then begin Phase 22.
 
 ## Next queued subtasks
-- Commit and push `phase-20: deepen objectives and sacking consequences`.
-- Begin Phase 21 career job market and interviews inspection.
-- Keep job-market expansion bounded to vacancies, applications/interviews, interim opportunities, license gates, accept/reject flow, and save-backed career movement.
+- Commit and push `phase-21: add career job market movement`.
+- Begin Phase 22 generated content and narrative variety inspection.
+- Keep generated content deterministic, template-based, and tied to existing state facts.
 
 ## Known blockers
 - No active blockers.
 - `docs/audit/` remains untracked and intentionally excluded from phase commits.
 
 ## Last verification run
-- Phase 20 local verification:
+- Phase 21 local verification:
   - `dotnet build game/Touchline.sln` passed with 0 warnings and 0 errors.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/phase21_career_job_market_check.gd` passed.
   - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/phase20_objectives_sacking_check.gd` passed.
-  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step29_pressure_context_check.gd` passed.
-  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/phase19_rivalry_derby_check.gd` passed.
   - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step27_save_compat_check.gd` passed.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/stage8_career_job_market_check.gd` passed.
   - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step50_end_to_end_user_flow_check.gd` passed.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step30_navigation_flow_check.gd` passed.
   - `git diff --check` passed.
   - `git diff --cached --check` pending.
 
@@ -189,11 +190,12 @@
 - Phase 17 completed at `b88b706`.
 - Phase 18 completed at `0cd00da`.
 - Phase 19 completed at `95ae110`.
-- Phase 20 commit pending.
+- Phase 20 completed at `69bccf2`.
+- Phase 21 commit pending.
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`.
 - Re-read `docs/touchline_master_design_decisions.md`.
 - Re-read `docs/MASTER_IMPLEMENTATION_ROADMAP.md`.
-- Resume at Phase 21 after the Phase 20 commit/push completes.
+- Resume at Phase 22 after the Phase 21 commit/push completes.
 - Keep `docs/audit/` untouched unless a future task explicitly uses it.

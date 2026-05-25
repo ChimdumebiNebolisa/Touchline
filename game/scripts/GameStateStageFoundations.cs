@@ -49,6 +49,16 @@ public sealed class SaveSlotStageFoundationData
     public int ObjectiveReviewCount { get; set; }
     public string[]? ObjectiveReviewHistory { get; set; }
     public string[]? SackingHistory { get; set; }
+    public string JobMarketStateSummary { get; set; } = string.Empty;
+    public string JobApplicationSummary { get; set; } = string.Empty;
+    public string JobInterviewSummary { get; set; } = string.Empty;
+    public string JobMovementSummary { get; set; } = string.Empty;
+    public string LicenseCourseStatusSummary { get; set; } = string.Empty;
+    public bool JobApplicationActive { get; set; }
+    public bool JobInterviewOffered { get; set; }
+    public bool JobOfferMade { get; set; }
+    public bool JobOfferAccepted { get; set; }
+    public string[]? JobMarketHistory { get; set; }
     public int FanTrust { get; set; } = 55;
     public int MediaTrust { get; set; } = 52;
     public int WorldReputation { get; set; } = 45;
@@ -300,6 +310,7 @@ public partial class GameState
     private readonly List<string> _careerHistory = new();
     private readonly List<string> _objectiveReviewHistory = new();
     private readonly List<string> _sackingHistory = new();
+    private readonly List<string> _jobMarketHistory = new();
     private readonly List<string> _perceptionHistory = new();
     private readonly List<string> _transferHistory = new();
     private readonly List<string> _contractHistory = new();
@@ -360,6 +371,16 @@ public partial class GameState
     public int ObjectiveReviewCount { get; private set; }
     public string ObjectiveReviewHistorySummary => _objectiveReviewHistory.Count == 0 ? "Objective history starts after the first board review." : string.Join("\n", _objectiveReviewHistory);
     public string SackingHistorySummary => _sackingHistory.Count == 0 ? "Sacking history starts after warnings, ultimatums, or dismissal events." : string.Join("\n", _sackingHistory);
+    public string JobMarketStateSummary { get; private set; } = "Job market monitoring has not started.";
+    public string JobApplicationSummary { get; private set; } = "No active application.";
+    public string JobInterviewSummary { get; private set; } = "No interview scheduled.";
+    public string JobMovementSummary { get; private set; } = "No career move recorded.";
+    public string LicenseCourseStatusSummary { get; private set; } = "License course timing pending career review.";
+    public bool JobApplicationActive { get; private set; }
+    public bool JobInterviewOffered { get; private set; }
+    public bool JobOfferMade { get; private set; }
+    public bool JobOfferAccepted { get; private set; }
+    public string JobMarketHistorySummary => _jobMarketHistory.Count == 0 ? "Job market history starts after an application, interview, offer, or career move." : string.Join("\n", _jobMarketHistory);
     public int FanTrust { get; private set; } = 55;
     public int MediaTrust { get; private set; } = 52;
     public int WorldReputation { get; private set; } = 45;
@@ -469,7 +490,7 @@ public partial class GameState
         ? "Recruitment foundation pending scouting target."
         : $"{CurrentRecruitmentTarget.PlayerName} ({CurrentRecruitmentTarget.Position}) | {CurrentRecruitmentTarget.InformationSummary} | {CurrentRecruitmentTarget.InterestSummary} | {CurrentRecruitmentTarget.TacticalFitSummary} | Fee {CurrentRecruitmentTarget.EstimatedFeeRange} | Wage {CurrentRecruitmentTarget.EstimatedWageRange} | Status {CurrentRecruitmentTarget.TargetStatus} | Valuation {CurrentRecruitmentTarget.ClubValuation} | Agent {CurrentRecruitmentTarget.AgentMood} | Rival {CurrentRecruitmentTarget.RivalInterest} | Board {CurrentRecruitmentTarget.BoardStance} | Director {CurrentRecruitmentTarget.DirectorStance} | Outcome {CurrentRecruitmentTarget.OutcomeState} | {CurrentRecruitmentTarget.Status}\nDirector of Football\n{DirectorInfluenceSummary}\nShortlist\n{RecruitmentShortlistSummary}\nContracts\n{ContractFoundationSummary}\nTransfer history\n{TransferHistorySummary}";
     public string TrainingScoutingSummary => $"{TrainingFocusName} ({TrainingIntensityName}): {TrainingStatusSummary}\nScouting depth: {ScoutingReportDepthName}\nScouting: {BuildScoutingSummary()}\nDevelopment\n{PlayerDevelopmentSummary}\nDevelopment history\n{PlayerDevelopmentHistorySummary}\nRegistration\n{RegistrationStatusSummary}\n{RegistrationIssuesSummary}\nStaff effects\n{StaffImpactSummary}";
-    public string CareerMarketSummary => $"Job security: {JobSecurityName}\nObjective reviews\n{ObjectiveReviewSummary}\n{ObjectiveWarningSummary}\n{UltimatumSummary}\n{SackingSummary}\nObjective history\n{ObjectiveReviewHistorySummary}\nSacking history\n{SackingHistorySummary}\n{TrustSummary}\n{ReputationSummary}\n{PressureCategorySummary}\nLeague system\n{LeaguePyramidSummary}\n{PromotionRelegationSummary}\n{ShadowLeagueSummary}\nLeague history\n{LeagueHistorySummary}\nCup competitions\n{CupStatusSummary}\n{CupDrawSummary}\n{CupObjectiveSummary}\nCup history\n{CupHistorySummary}\nRivalries\n{RivalryStatusSummary}\n{RivalryPressureSummary}\nRivalry history\n{RivalryHistorySummary}\nFinance\n{FinanceSummary}\nFinance history\n{FinanceHistorySummary}\nLicense: {LicenseOpportunitySummary}\nJob market: {BuildJobOfferSummary()}";
+    public string CareerMarketSummary => $"Job security: {JobSecurityName}\nObjective reviews\n{ObjectiveReviewSummary}\n{ObjectiveWarningSummary}\n{UltimatumSummary}\n{SackingSummary}\nObjective history\n{ObjectiveReviewHistorySummary}\nSacking history\n{SackingHistorySummary}\n{TrustSummary}\n{ReputationSummary}\n{PressureCategorySummary}\nLeague system\n{LeaguePyramidSummary}\n{PromotionRelegationSummary}\n{ShadowLeagueSummary}\nLeague history\n{LeagueHistorySummary}\nCup competitions\n{CupStatusSummary}\n{CupDrawSummary}\n{CupObjectiveSummary}\nCup history\n{CupHistorySummary}\nRivalries\n{RivalryStatusSummary}\n{RivalryPressureSummary}\nRivalry history\n{RivalryHistorySummary}\nFinance\n{FinanceSummary}\nFinance history\n{FinanceHistorySummary}\nLicense: {LicenseOpportunitySummary}\n{LicenseCourseStatusSummary}\nJob market\n{JobMarketStateSummary}\n{JobApplicationSummary}\n{JobInterviewSummary}\n{JobMovementSummary}\n{BuildJobOfferSummary()}\nJob market history\n{JobMarketHistorySummary}";
     public string TacticsFoundationSummary => $"{TeamStyleName} | {TeamInstructionsSummary}\n{SetPieceSummary}\n{OpponentPreparationSummary}\n{PlayerRolesSummary}\n{PlayerInstructionsSummary}\n{TacticalRoleFitSummary}\n{PlayerFamiliaritySummary}\n{TacticalFitNotes}\n{TacticalRiskNotes}";
 
     public void UpdateTactics(string formation, string teamStyle, int pressIntensity, int tempo, int width, int risk)
@@ -930,12 +951,220 @@ public partial class GameState
                 ? "Market interest is cautious because pressure is high at the current club."
                 : "Market interest follows stable early-career visibility."
         };
+        JobApplicationActive = false;
+        JobInterviewOffered = false;
+        JobOfferMade = offerType is JobOfferType.EmergencyApproach or JobOfferType.InterimManagerOffer;
+        JobOfferAccepted = false;
+        JobMarketStateSummary = BuildJobMarketStateSummary(otherClub, offerType);
+        JobApplicationSummary = JobOfferMade
+            ? $"Direct approach: {otherClub} are prepared to move without a long application because the situation is urgent."
+            : $"Application available: {otherClub} are monitoring candidates and will judge reputation, license, role history, and crisis fit.";
+        JobInterviewSummary = JobOfferMade
+            ? "Interview compressed into an emergency board call."
+            : "No interview scheduled until an application is submitted.";
+        JobMovementSummary = "No career move recorded from this opportunity.";
+        LicenseCourseStatusSummary = BuildLicenseCourseStatusSummary();
+        RecordJobMarketHistory($"Opportunity generated: {StageFoundationText.GetDisplayName(offerType)} at {otherClub}; {JobMarketStateSummary}");
         AddNews(
             "Job market movement",
             NewsCategory.Career,
             "Agent briefing",
             $"{otherClub} register {StageFoundationText.GetDisplayName(offerType).ToLowerInvariant()} interest in {ManagerName}.",
             4);
+    }
+
+    public string AdvanceCareerJobMarketAction()
+    {
+        if (CurrentJobOffer == null ||
+            JobOfferAccepted ||
+            JobApplicationSummary.StartsWith("Rejected", StringComparison.OrdinalIgnoreCase) ||
+            JobApplicationSummary.StartsWith("Club chose another", StringComparison.OrdinalIgnoreCase))
+        {
+            GenerateJobMarketEvent();
+            return "Job market event generated from current reputation, license, role, and pressure.";
+        }
+
+        if (!JobApplicationActive && !JobOfferMade)
+        {
+            return ApplyForCurrentJob();
+        }
+
+        if (JobInterviewOffered && !JobOfferMade)
+        {
+            return ResolveCurrentJobInterview();
+        }
+
+        if (JobOfferMade && !JobOfferAccepted)
+        {
+            return AcceptCurrentJobOffer();
+        }
+
+        GenerateJobMarketEvent();
+        return "Previous job-market path completed; a fresh opportunity was generated.";
+    }
+
+    public string ApplyForCurrentJob()
+    {
+        if (CurrentJobOffer == null)
+        {
+            GenerateJobMarketEvent();
+            return "No live opening existed, so a job-market event was generated first.";
+        }
+
+        var score = BuildJobMarketFitScore(CurrentJobOffer);
+        if (!MeetsLicenseExpectation(CurrentJobOffer, score))
+        {
+            JobApplicationActive = false;
+            JobInterviewOffered = false;
+            JobOfferMade = false;
+            JobApplicationSummary = $"Rejected immediately: {CurrentJobOffer.ClubName} want a stronger license/reputation blend for the {CurrentJobOffer.RoleName} room.";
+            JobInterviewSummary = "No interview offered.";
+            RecordJobMarketHistory($"Application rejected by {CurrentJobOffer.ClubName}; fit score {score}, license {LicenseName}.");
+            AddNews(
+                "Job application rejected",
+                NewsCategory.Career,
+                "Agent briefing",
+                $"{CurrentJobOffer.ClubName} passed on {ManagerName}; the board cited license and reputation risk.",
+                4,
+                "Agent source",
+                CurrentJobOffer.ClubName,
+                "Career history records a rejected application.",
+                $"job-rejected-{CurrentJobOffer.ClubName}");
+            return JobApplicationSummary;
+        }
+
+        JobApplicationActive = true;
+        JobInterviewOffered = score >= 58;
+        JobOfferMade = CurrentJobOffer.OfferType == JobOfferType.EmergencyApproach && score >= 68;
+        JobApplicationSummary = JobOfferMade
+            ? $"Board considering: {CurrentJobOffer.ClubName} escalated the application into an offer discussion."
+            : JobInterviewOffered
+                ? $"Interview offered: {CurrentJobOffer.ClubName} see enough fit to continue."
+                : $"Shortlisted: {CurrentJobOffer.ClubName} are monitoring but need stronger evidence.";
+        JobInterviewSummary = JobOfferMade
+            ? "Emergency interview resolved quickly; offer can now be accepted or rejected."
+            : JobInterviewOffered
+                ? $"Interview invitation: explain tactical identity, pressure handling, and license pathway. Fit score {score}/100."
+                : $"No interview yet; fit score {score}/100 leaves the club monitoring candidates.";
+        RecordJobMarketHistory($"Application submitted to {CurrentJobOffer.ClubName}; score {score}; {JobApplicationSummary}");
+        AddNews(
+            JobInterviewOffered ? "Interview invitation received" : "Job application shortlisted",
+            NewsCategory.Career,
+            "Agent briefing",
+            $"{CurrentJobOffer.ClubName} responded to {ManagerName}'s application: {JobApplicationSummary}",
+            JobInterviewOffered ? 6 : 4,
+            "Agent source",
+            CurrentJobOffer.ClubName,
+            "Job-market state advanced from application.",
+            $"job-application-{CurrentJobOffer.ClubName}");
+        return JobApplicationSummary;
+    }
+
+    public string ResolveCurrentJobInterview()
+    {
+        if (CurrentJobOffer == null)
+        {
+            return "No current job interview is available.";
+        }
+
+        if (!JobInterviewOffered)
+        {
+            return "No interview has been offered for the current opportunity.";
+        }
+
+        var score = BuildJobMarketFitScore(CurrentJobOffer) + (IsSacked ? -4 : 4) + (TacticalReputation >= 58 ? 3 : 0);
+        if (score >= 66)
+        {
+            JobOfferMade = true;
+            JobInterviewSummary = $"Interview passed: {CurrentJobOffer.ClubName} believe the role, license, and reputation risk are manageable. Score {Math.Clamp(score, 0, 100)}/100.";
+            JobApplicationSummary = $"Offer made: {CurrentJobOffer.ClubName} are ready to appoint {ManagerName} as {CurrentJobOffer.RoleName}.";
+            RecordJobMarketHistory($"Interview passed at {CurrentJobOffer.ClubName}; offer made with score {Math.Clamp(score, 0, 100)}.");
+            AddNews(
+                "Job offer made",
+                NewsCategory.Career,
+                "Agent briefing",
+                $"{CurrentJobOffer.ClubName} made a {CurrentJobOffer.RoleName} offer after interview.",
+                7,
+                "Agent source",
+                CurrentJobOffer.ClubName,
+                "Offer can be accepted or rejected.",
+                $"job-offer-{CurrentJobOffer.ClubName}");
+            return JobApplicationSummary;
+        }
+
+        JobApplicationActive = false;
+        JobInterviewOffered = false;
+        JobOfferMade = false;
+        JobApplicationSummary = $"Club chose another candidate: {CurrentJobOffer.ClubName} felt the interview did not offset reputation or license concerns.";
+        JobInterviewSummary = $"Interview failed: score {Math.Clamp(score, 0, 100)}/100.";
+        RecordJobMarketHistory($"Interview failed at {CurrentJobOffer.ClubName}; score {Math.Clamp(score, 0, 100)}.");
+        AddNews(
+            "Interview ends without offer",
+            NewsCategory.Career,
+            "Agent briefing",
+            $"{CurrentJobOffer.ClubName} chose another candidate after interviewing {ManagerName}.",
+            5,
+            "Agent source",
+            CurrentJobOffer.ClubName,
+            "No career move completed.",
+            $"job-interview-failed-{CurrentJobOffer.ClubName}");
+        return JobApplicationSummary;
+    }
+
+    public string AcceptCurrentJobOffer()
+    {
+        if (CurrentJobOffer == null)
+        {
+            return "No job offer is available to accept.";
+        }
+
+        if (!JobOfferMade)
+        {
+            return "The current job-market path has not produced an offer yet.";
+        }
+
+        var offer = CurrentJobOffer;
+        var previousClub = SelectedClubName ?? "unattached";
+        var newRole = CareerFoundation.ParseRole(offer.RoleName);
+        if (TouchlineWorldGenerator.Instance == null || !TouchlineWorldGenerator.Instance.SelectClub(offer.ClubName))
+        {
+            return TouchlineWorldGenerator.Instance?.LastStatusMessage ?? "World generator unavailable for job move.";
+        }
+
+        CareerProfile.Role = newRole;
+        CareerProfile.CurrentClubName = offer.ClubName;
+        IsSacked = false;
+        UltimatumActive = false;
+        JobOfferAccepted = true;
+        JobApplicationActive = false;
+        JobInterviewOffered = false;
+        JobOfferMade = false;
+        CurrentJobOffer = null;
+        JobSecurity = JobSecurityState.Stable;
+        JobMarketStateSummary = $"Newly hired: {offer.ClubName} appointed {ManagerName} as {offer.RoleName}.";
+        JobApplicationSummary = "Accepted offer: application path closed.";
+        JobInterviewSummary = "Interview path closed by appointment.";
+        JobMovementSummary = $"{CurrentDateLabel}: moved from {previousClub} to {offer.ClubName} as {offer.RoleName}.";
+        LicenseOpportunitySummary = BuildLicenseOpportunitySummary();
+        LicenseCourseStatusSummary = BuildLicenseCourseStatusSummary();
+        RecordJobMarketHistory($"Career move completed: {previousClub} -> {offer.ClubName} as {offer.RoleName}.");
+        _careerHistory.Insert(0, JobMovementSummary);
+        if (_careerHistory.Count > 18)
+        {
+            _careerHistory.RemoveAt(_careerHistory.Count - 1);
+        }
+
+        AddNews(
+            "Career move completed",
+            NewsCategory.Career,
+            "Confirmed",
+            $"{ManagerName} accepted the {offer.RoleName} job at {offer.ClubName}.",
+            8,
+            "Club announcement",
+            offer.ClubName,
+            "Current club, role, objectives, staff, squad, and job-market state updated.",
+            $"job-move-{offer.ClubName}");
+        return JobMovementSummary;
     }
 
     public SaveSlotStageFoundationData BuildStageFoundationSaveData()
@@ -1036,6 +1265,16 @@ public partial class GameState
             ObjectiveReviewCount = ObjectiveReviewCount,
             ObjectiveReviewHistory = _objectiveReviewHistory.ToArray(),
             SackingHistory = _sackingHistory.ToArray(),
+            JobMarketStateSummary = JobMarketStateSummary,
+            JobApplicationSummary = JobApplicationSummary,
+            JobInterviewSummary = JobInterviewSummary,
+            JobMovementSummary = JobMovementSummary,
+            LicenseCourseStatusSummary = LicenseCourseStatusSummary,
+            JobApplicationActive = JobApplicationActive,
+            JobInterviewOffered = JobInterviewOffered,
+            JobOfferMade = JobOfferMade,
+            JobOfferAccepted = JobOfferAccepted,
+            JobMarketHistory = _jobMarketHistory.ToArray(),
             FanTrust = FanTrust,
             MediaTrust = MediaTrust,
             WorldReputation = WorldReputation,
@@ -1294,6 +1533,21 @@ public partial class GameState
             _sackingHistory.AddRange(data.SackingHistory);
         }
 
+        JobMarketStateSummary = string.IsNullOrWhiteSpace(data.JobMarketStateSummary) ? "Job market monitoring restored." : data.JobMarketStateSummary;
+        JobApplicationSummary = string.IsNullOrWhiteSpace(data.JobApplicationSummary) ? "No active application." : data.JobApplicationSummary;
+        JobInterviewSummary = string.IsNullOrWhiteSpace(data.JobInterviewSummary) ? "No interview scheduled." : data.JobInterviewSummary;
+        JobMovementSummary = string.IsNullOrWhiteSpace(data.JobMovementSummary) ? "No career move recorded." : data.JobMovementSummary;
+        LicenseCourseStatusSummary = string.IsNullOrWhiteSpace(data.LicenseCourseStatusSummary) ? "License course timing pending career review." : data.LicenseCourseStatusSummary;
+        JobApplicationActive = data.JobApplicationActive;
+        JobInterviewOffered = data.JobInterviewOffered;
+        JobOfferMade = data.JobOfferMade;
+        JobOfferAccepted = data.JobOfferAccepted;
+        _jobMarketHistory.Clear();
+        if (data.JobMarketHistory != null)
+        {
+            _jobMarketHistory.AddRange(data.JobMarketHistory);
+        }
+
         FanTrust = Math.Clamp(data.FanTrust <= 0 ? 55 : data.FanTrust, 0, 100);
         MediaTrust = Math.Clamp(data.MediaTrust <= 0 ? 52 : data.MediaTrust, 0, 100);
         WorldReputation = Math.Clamp(data.WorldReputation <= 0 ? CareerProfile.Reputation : data.WorldReputation, 0, 100);
@@ -1494,6 +1748,15 @@ public partial class GameState
         UltimatumActive = false;
         IsSacked = false;
         ObjectiveReviewCount = 0;
+        JobMarketStateSummary = "Job market monitoring has not started.";
+        JobApplicationSummary = "No active application.";
+        JobInterviewSummary = "No interview scheduled.";
+        JobMovementSummary = "No career move recorded.";
+        LicenseCourseStatusSummary = "License course timing pending career review.";
+        JobApplicationActive = false;
+        JobInterviewOffered = false;
+        JobOfferMade = false;
+        JobOfferAccepted = false;
         FanTrust = 55;
         MediaTrust = 52;
         WorldReputation = CareerProfile.Reputation;
@@ -1577,6 +1840,7 @@ public partial class GameState
         _careerHistory.Clear();
         _objectiveReviewHistory.Clear();
         _sackingHistory.Clear();
+        _jobMarketHistory.Clear();
         _perceptionHistory.Clear();
         _transferHistory.Clear();
         _contractHistory.Clear();
@@ -3693,6 +3957,72 @@ public partial class GameState
         return MatchPlaybackContractValidator.PassMessage;
     }
 
+    public string ValidatePhase21CareerJobMarketContract()
+    {
+        InitializeStageFoundationsForClub();
+        var startingClub = SelectedClubName;
+        GenerateJobMarketEvent();
+        if (CurrentJobOffer == null ||
+            string.IsNullOrWhiteSpace(JobMarketStateSummary) ||
+            !CareerMarketSummary.Contains("Job market", StringComparison.Ordinal) ||
+            !CareerMarketSummary.Contains("Job market history", StringComparison.Ordinal))
+        {
+            return "Job-market opening did not generate visible state.";
+        }
+
+        var targetClub = CurrentJobOffer.ClubName;
+        var firstStep = AdvanceCareerJobMarketAction();
+        if (!JobApplicationActive && !JobOfferMade)
+        {
+            return $"Job application did not progress: {firstStep}";
+        }
+
+        if (JobInterviewOffered && !JobOfferMade)
+        {
+            var interviewStep = AdvanceCareerJobMarketAction();
+            if (!JobOfferMade)
+            {
+                return $"Interview did not produce an offer in the high-fit validation path: {interviewStep}";
+            }
+        }
+
+        var moveStep = AdvanceCareerJobMarketAction();
+        if (SelectedClubName == startingClub ||
+            SelectedClubName != targetClub ||
+            CurrentJobOffer != null ||
+            !JobOfferAccepted ||
+            string.IsNullOrWhiteSpace(JobMovementSummary) ||
+            !JobMovementSummary.Contains(targetClub, StringComparison.OrdinalIgnoreCase) ||
+            !_careerHistory.Exists(entry => entry.Contains(targetClub, StringComparison.OrdinalIgnoreCase)) ||
+            !_jobMarketHistory.Exists(entry => entry.Contains("Career move completed", StringComparison.OrdinalIgnoreCase)))
+        {
+            return $"Accepting job offer did not move the career. Step '{moveStep}', selected '{SelectedClubName}', target '{targetClub}'.";
+        }
+
+        if (string.IsNullOrWhiteSpace(LicenseCourseStatusSummary) ||
+            !LicenseCourseStatusSummary.Contains("License course", StringComparison.Ordinal))
+        {
+            return "License course status was not represented after the career move.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
+    public string ValidatePhase21StoredCareerJobMarketContract()
+    {
+        if (!JobOfferAccepted ||
+            _jobMarketHistory.Count == 0 ||
+            string.IsNullOrWhiteSpace(JobMovementSummary) ||
+            !CareerMarketSummary.Contains("Job market history", StringComparison.Ordinal) ||
+            !CareerHistorySummary.Contains("moved from", StringComparison.OrdinalIgnoreCase) ||
+            !LicenseCourseStatusSummary.Contains("License course", StringComparison.Ordinal))
+        {
+            return "Saved career job-market movement did not restore.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
     public string ValidatePhase3PromiseLifecycleContract()
     {
         InitializeStageFoundationsForClub();
@@ -4503,6 +4833,15 @@ public partial class GameState
         if (_sackingHistory.Count > 10)
         {
             _sackingHistory.RemoveAt(_sackingHistory.Count - 1);
+        }
+    }
+
+    private void RecordJobMarketHistory(string detail)
+    {
+        _jobMarketHistory.Insert(0, $"{CurrentDateLabel}: {detail}");
+        if (_jobMarketHistory.Count > 14)
+        {
+            _jobMarketHistory.RemoveAt(_jobMarketHistory.Count - 1);
         }
     }
 
@@ -7442,6 +7781,102 @@ public partial class GameState
         }
 
         return $"{StageFoundationText.GetDisplayName(CurrentJobOffer.OfferType)} from {CurrentJobOffer.ClubName} as {CurrentJobOffer.RoleName}. {CurrentJobOffer.InterestSummary} {CurrentJobOffer.Reason}";
+    }
+
+    private string BuildJobMarketStateSummary(string clubName, JobOfferType offerType)
+    {
+        var managerState = offerType switch
+        {
+            JobOfferType.InterimManagerOffer => "Interim opportunity",
+            JobOfferType.EmergencyApproach => "Actively hiring after crisis",
+            JobOfferType.EndOfSeasonApproach => "Monitoring candidates",
+            JobOfferType.InterviewInvitation => "Monitoring candidates",
+            _ => "Likely vacancy"
+        };
+        var licenseRisk = MeetsLicenseExpectation(
+            new JobOfferEvent
+            {
+                OfferType = offerType,
+                ClubName = clubName,
+                RoleName = offerType == JobOfferType.HeadCoachOffer ? "Head Coach" : offerType == JobOfferType.AssistantManagerOffer ? "Assistant Manager" : "Manager",
+                InterestSummary = string.Empty,
+                Reason = string.Empty
+            },
+            BuildJobMarketFitScoreFor(clubName, offerType))
+            ? "license acceptable"
+            : "license/reputation risk";
+        return $"{clubName}: {managerState}; {licenseRisk}; reputation {WorldReputation}, job security {JobSecurityName}, role history {CurrentRoleName}.";
+    }
+
+    private int BuildJobMarketFitScore(JobOfferEvent offer)
+    {
+        return BuildJobMarketFitScoreFor(offer.ClubName, offer.OfferType);
+    }
+
+    private int BuildJobMarketFitScoreFor(string clubName, JobOfferType offerType)
+    {
+        var score = WorldReputation +
+            TacticalReputation / 5 +
+            YouthReputation / 8 +
+            RecruitmentReputation / 8 +
+            MediaReputation / 10 +
+            (int)CareerProfile.License * 6;
+        score += offerType switch
+        {
+            JobOfferType.AssistantManagerOffer => CareerProfile.Role == ManagerRole.AssistantManager ? 8 : 2,
+            JobOfferType.HeadCoachOffer => CareerProfile.Role == ManagerRole.HeadCoach ? 7 : 3,
+            JobOfferType.InterimManagerOffer => CareerProfile.Role == ManagerRole.AssistantManager ? 10 : 5,
+            JobOfferType.EmergencyApproach => IsSacked ? 4 : JobPressure >= 65 ? 6 : 2,
+            JobOfferType.EndOfSeasonApproach => 4,
+            JobOfferType.InterviewInvitation => 2,
+            _ => CareerProfile.Role == ManagerRole.Manager ? 6 : 2
+        };
+        score += IsSacked ? -8 : 0;
+        score += JobSecurity is JobSecurityState.Secure or JobSecurityState.Stable ? 4 : 0;
+        score += ResolveDifferentClub(SelectedClubName) == clubName ? 2 : 0;
+        return Math.Clamp(score, 0, 100);
+    }
+
+    private bool MeetsLicenseExpectation(JobOfferEvent offer, int score)
+    {
+        var expectedLicense = offer.OfferType switch
+        {
+            JobOfferType.AssistantManagerOffer => ManagerLicense.GrassrootsLicense,
+            JobOfferType.InterimManagerOffer => ManagerLicense.NationalCLicense,
+            JobOfferType.HeadCoachOffer => ManagerLicense.NationalBLicense,
+            JobOfferType.ManagerOffer => CurrentDivisionTier <= 1 ? ManagerLicense.NationalBLicense : ManagerLicense.NationalCLicense,
+            JobOfferType.EmergencyApproach => ManagerLicense.NationalCLicense,
+            _ => CurrentDivisionTier <= 1 ? ManagerLicense.NationalBLicense : ManagerLicense.NationalCLicense
+        };
+        if (CareerProfile.License >= expectedLicense)
+        {
+            return true;
+        }
+
+        var desperateBoardCanGamble = offer.OfferType is JobOfferType.InterimManagerOffer or JobOfferType.EmergencyApproach;
+        return desperateBoardCanGamble && score >= 62;
+    }
+
+    private string BuildLicenseCourseStatusSummary()
+    {
+        if (CareerProfile.License == ManagerLicense.ProLicense)
+        {
+            return "License course: Pro License complete; no course needed.";
+        }
+
+        var window = CurrentDate.Month switch
+        {
+            >= 6 and <= 8 => "preseason course window",
+            1 => "midseason course window",
+            >= 5 => "offseason course window",
+            _ => "next scheduled course window"
+        };
+        var backing = CareerProfile.BoardTrust >= 58 && JobPressure < 60
+            ? "board sponsorship plausible"
+            : CareerProfile.Role == ManagerRole.AssistantManager && FanTrust >= 58
+                ? "club recommendation plausible through Assistant Manager pathway"
+                : "self-funded or future-performance route more likely";
+        return $"License course: {window}; {backing}; current license {LicenseName}.";
     }
 
     private string BuildPromiseSummary()

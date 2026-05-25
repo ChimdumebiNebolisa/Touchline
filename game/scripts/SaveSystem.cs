@@ -200,7 +200,7 @@ public partial class SaveSystem : Node
         WriteIndented = true,
         PropertyNameCaseInsensitive = true
     };
-    public const int CurrentSaveVersion = 22;
+    public const int CurrentSaveVersion = 23;
 
     public static SaveSystem? Instance { get; private set; }
     public string LastStatusMessage { get; private set; } = "Save system idle.";
@@ -1052,6 +1052,16 @@ public partial class SaveSystem : Node
             ObjectiveReviewCount = source.ObjectiveReviewCount,
             ObjectiveReviewHistory = source.ObjectiveReviewHistory == null ? null : (string[])source.ObjectiveReviewHistory.Clone(),
             SackingHistory = source.SackingHistory == null ? null : (string[])source.SackingHistory.Clone(),
+            JobMarketStateSummary = source.JobMarketStateSummary,
+            JobApplicationSummary = source.JobApplicationSummary,
+            JobInterviewSummary = source.JobInterviewSummary,
+            JobMovementSummary = source.JobMovementSummary,
+            LicenseCourseStatusSummary = source.LicenseCourseStatusSummary,
+            JobApplicationActive = source.JobApplicationActive,
+            JobInterviewOffered = source.JobInterviewOffered,
+            JobOfferMade = source.JobOfferMade,
+            JobOfferAccepted = source.JobOfferAccepted,
+            JobMarketHistory = source.JobMarketHistory == null ? null : (string[])source.JobMarketHistory.Clone(),
             FanTrust = source.FanTrust,
             MediaTrust = source.MediaTrust,
             WorldReputation = source.WorldReputation,
