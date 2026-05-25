@@ -117,6 +117,16 @@ public sealed class SaveSlotStageFoundationData
     public bool RegistrationSubmitted { get; set; }
     public string[]? RegisteredPlayerIds { get; set; }
     public string[]? RegistrationHistory { get; set; }
+    public string PrimaryRivalName { get; set; } = string.Empty;
+    public string RivalryType { get; set; } = string.Empty;
+    public int RivalryImportance { get; set; }
+    public string RivalryStatusSummary { get; set; } = string.Empty;
+    public string RivalryPressureSummary { get; set; } = string.Empty;
+    public int RivalryWins { get; set; }
+    public int RivalryDraws { get; set; }
+    public int RivalryLosses { get; set; }
+    public string DerbyHypeKey { get; set; } = string.Empty;
+    public string[]? RivalryHistory { get; set; }
 }
 
 public sealed class SaveSlotStaffMarketCandidateData
@@ -292,6 +302,7 @@ public partial class GameState
     private readonly List<string> _cupHistory = new();
     private readonly List<string> _registeredPlayerIds = new();
     private readonly List<string> _registrationHistory = new();
+    private readonly List<string> _rivalryHistory = new();
 
     private readonly record struct ContractResolution(
         ContractOffer Offer,
@@ -397,6 +408,17 @@ public partial class GameState
     public bool RegistrationSubmitted { get; private set; }
     public string RegistrationHistorySummary => _registrationHistory.Count == 0 ? "Registration history starts after submission, youth promotion, transfer, loan, wage, or matchday validation." : string.Join("\n", _registrationHistory);
     public bool CanPlayCurrentFixture => RegistrationValid && CountStartingPlayers() >= 11;
+    public string PrimaryRivalName { get; private set; } = string.Empty;
+    public string RivalryType { get; private set; } = "Local rivalry";
+    public int RivalryImportance { get; private set; } = 60;
+    public string RivalryStatusSummary { get; private set; } = "Rivalry foundation pending.";
+    public string RivalryPressureSummary { get; private set; } = "Rivalry pressure pending.";
+    public int RivalryWins { get; private set; }
+    public int RivalryDraws { get; private set; }
+    public int RivalryLosses { get; private set; }
+    public string DerbyHypeKey { get; private set; } = string.Empty;
+    public string RivalryHistorySummary => _rivalryHistory.Count == 0 ? "Rivalry history starts after derby buildup or derby results." : string.Join("\n", _rivalryHistory);
+    public bool CurrentFixtureIsDerby => IsDerbyFixture(GetCurrentClubFixture());
 
     public string TeamStyleName => StageFoundationText.GetDisplayName(TeamStyle);
     public string TacticalFamiliarityName => StageFoundationText.GetDisplayName(TacticsFoundation.FamiliarityFromScore(TacticalFamiliarityScore));
@@ -427,7 +449,7 @@ public partial class GameState
         ? "Recruitment foundation pending scouting target."
         : $"{CurrentRecruitmentTarget.PlayerName} ({CurrentRecruitmentTarget.Position}) | {CurrentRecruitmentTarget.InformationSummary} | {CurrentRecruitmentTarget.InterestSummary} | {CurrentRecruitmentTarget.TacticalFitSummary} | Fee {CurrentRecruitmentTarget.EstimatedFeeRange} | Wage {CurrentRecruitmentTarget.EstimatedWageRange} | Status {CurrentRecruitmentTarget.TargetStatus} | Valuation {CurrentRecruitmentTarget.ClubValuation} | Agent {CurrentRecruitmentTarget.AgentMood} | Rival {CurrentRecruitmentTarget.RivalInterest} | Board {CurrentRecruitmentTarget.BoardStance} | Director {CurrentRecruitmentTarget.DirectorStance} | Outcome {CurrentRecruitmentTarget.OutcomeState} | {CurrentRecruitmentTarget.Status}\nDirector of Football\n{DirectorInfluenceSummary}\nShortlist\n{RecruitmentShortlistSummary}\nContracts\n{ContractFoundationSummary}\nTransfer history\n{TransferHistorySummary}";
     public string TrainingScoutingSummary => $"{TrainingFocusName} ({TrainingIntensityName}): {TrainingStatusSummary}\nScouting depth: {ScoutingReportDepthName}\nScouting: {BuildScoutingSummary()}\nDevelopment\n{PlayerDevelopmentSummary}\nDevelopment history\n{PlayerDevelopmentHistorySummary}\nRegistration\n{RegistrationStatusSummary}\n{RegistrationIssuesSummary}\nStaff effects\n{StaffImpactSummary}";
-    public string CareerMarketSummary => $"Job security: {JobSecurityName}\n{TrustSummary}\n{ReputationSummary}\n{PressureCategorySummary}\nLeague system\n{LeaguePyramidSummary}\n{PromotionRelegationSummary}\n{ShadowLeagueSummary}\nLeague history\n{LeagueHistorySummary}\nCup competitions\n{CupStatusSummary}\n{CupDrawSummary}\n{CupObjectiveSummary}\nCup history\n{CupHistorySummary}\nFinance\n{FinanceSummary}\nFinance history\n{FinanceHistorySummary}\nLicense: {LicenseOpportunitySummary}\nJob market: {BuildJobOfferSummary()}";
+    public string CareerMarketSummary => $"Job security: {JobSecurityName}\n{TrustSummary}\n{ReputationSummary}\n{PressureCategorySummary}\nLeague system\n{LeaguePyramidSummary}\n{PromotionRelegationSummary}\n{ShadowLeagueSummary}\nLeague history\n{LeagueHistorySummary}\nCup competitions\n{CupStatusSummary}\n{CupDrawSummary}\n{CupObjectiveSummary}\nCup history\n{CupHistorySummary}\nRivalries\n{RivalryStatusSummary}\n{RivalryPressureSummary}\nRivalry history\n{RivalryHistorySummary}\nFinance\n{FinanceSummary}\nFinance history\n{FinanceHistorySummary}\nLicense: {LicenseOpportunitySummary}\nJob market: {BuildJobOfferSummary()}";
     public string TacticsFoundationSummary => $"{TeamStyleName} | {TeamInstructionsSummary}\n{SetPieceSummary}\n{OpponentPreparationSummary}\n{PlayerRolesSummary}\n{PlayerInstructionsSummary}\n{TacticalRoleFitSummary}\n{PlayerFamiliaritySummary}\n{TacticalFitNotes}\n{TacticalRiskNotes}";
 
     public void UpdateTactics(string formation, string teamStyle, int pressIntensity, int tempo, int width, int risk)
@@ -543,6 +565,7 @@ public partial class GameState
         ApplyPlayerDevelopmentProgress();
         ApplyWeeklyFinanceProgress();
         EnsureSquadRegistrationState();
+        EnsureRivalryState();
         ApplyScoutingProgress(7);
         ReviewPromiseLifecycle("Weekly review", 7);
         EvaluateCareerFoundationState();
@@ -1059,7 +1082,17 @@ public partial class GameState
             RegistrationValid = RegistrationValid,
             RegistrationSubmitted = RegistrationSubmitted,
             RegisteredPlayerIds = _registeredPlayerIds.ToArray(),
-            RegistrationHistory = _registrationHistory.ToArray()
+            RegistrationHistory = _registrationHistory.ToArray(),
+            PrimaryRivalName = PrimaryRivalName,
+            RivalryType = RivalryType,
+            RivalryImportance = RivalryImportance,
+            RivalryStatusSummary = RivalryStatusSummary,
+            RivalryPressureSummary = RivalryPressureSummary,
+            RivalryWins = RivalryWins,
+            RivalryDraws = RivalryDraws,
+            RivalryLosses = RivalryLosses,
+            DerbyHypeKey = DerbyHypeKey,
+            RivalryHistory = _rivalryHistory.ToArray()
         };
     }
 
@@ -1349,10 +1382,26 @@ public partial class GameState
             _registrationHistory.AddRange(data.RegistrationHistory);
         }
 
+        PrimaryRivalName = data.PrimaryRivalName ?? string.Empty;
+        RivalryType = string.IsNullOrWhiteSpace(data.RivalryType) ? "Local rivalry" : data.RivalryType;
+        RivalryImportance = data.RivalryImportance <= 0 ? 60 : data.RivalryImportance;
+        RivalryStatusSummary = string.IsNullOrWhiteSpace(data.RivalryStatusSummary) ? "Rivalry restored; pending validation." : data.RivalryStatusSummary;
+        RivalryPressureSummary = string.IsNullOrWhiteSpace(data.RivalryPressureSummary) ? "Rivalry pressure restored; pending validation." : data.RivalryPressureSummary;
+        RivalryWins = Math.Max(0, data.RivalryWins);
+        RivalryDraws = Math.Max(0, data.RivalryDraws);
+        RivalryLosses = Math.Max(0, data.RivalryLosses);
+        DerbyHypeKey = data.DerbyHypeKey ?? string.Empty;
+        _rivalryHistory.Clear();
+        if (data.RivalryHistory != null)
+        {
+            _rivalryHistory.AddRange(data.RivalryHistory);
+        }
+
         EnsureLeaguePyramidState();
         EnsureCupCompetitionState();
         EnsureFinanceState();
         EnsureSquadRegistrationState();
+        EnsureRivalryState();
         EnsureRecruitmentTarget();
         EnsureJobMarketFoundation();
         RefreshPressureCategories();
@@ -1455,6 +1504,15 @@ public partial class GameState
         RegistrationIssuesSummary = "Registration issues pending.";
         RegistrationValid = true;
         RegistrationSubmitted = false;
+        PrimaryRivalName = string.Empty;
+        RivalryType = "Local rivalry";
+        RivalryImportance = 60;
+        RivalryStatusSummary = "Rivalry foundation pending.";
+        RivalryPressureSummary = "Rivalry pressure pending.";
+        RivalryWins = 0;
+        RivalryDraws = 0;
+        RivalryLosses = 0;
+        DerbyHypeKey = string.Empty;
         _foundationNewsEvents.Clear();
         _activeDecisionEvents.Clear();
         _resolvedDecisionEvents.Clear();
@@ -1474,6 +1532,7 @@ public partial class GameState
         _cupHistory.Clear();
         _registeredPlayerIds.Clear();
         _registrationHistory.Clear();
+        _rivalryHistory.Clear();
     }
 
     public void InitializeStageFoundationsForClub()
@@ -1497,6 +1556,7 @@ public partial class GameState
         EnsureLeaguePyramidState();
         EnsureCupCompetitionState();
         EnsureSquadRegistrationState();
+        EnsureRivalryState();
         if (CurrentScoutingAssignment == null)
         {
             StartBasicScoutingAssignment("Position need: versatile midfielder");
@@ -1544,6 +1604,7 @@ public partial class GameState
         RefreshTacticFoundation(TacticalFormation, TeamStyle);
         ObjectiveReviewSummary = BuildObjectiveReviewSummary(goalDifference);
         LicenseOpportunitySummary = BuildLicenseOpportunitySummary();
+        ApplyRivalryPostMatch(result);
         AddNews(
             "Post-match consequences logged",
             NewsCategory.Pressure,
@@ -3429,6 +3490,61 @@ public partial class GameState
             !RegistrationHistorySummary.Contains("Registration submitted", StringComparison.OrdinalIgnoreCase))
         {
             return "Saved squad registration state did not restore.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
+    public string ValidatePhase19RivalryDerbyContract()
+    {
+        InitializeStageFoundationsForClub();
+        EnsureRivalryState();
+        if (string.IsNullOrWhiteSpace(PrimaryRivalName) ||
+            !RivalryStatusSummary.Contains("Primary rivalry", StringComparison.OrdinalIgnoreCase) ||
+            !CurrentFixtureIsDerby ||
+            !RivalryPressureSummary.Contains("Derby fixture active", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Rivalry setup did not identify the active derby fixture.";
+        }
+
+        if (_rivalryHistory.Count == 0 ||
+            !NewsFeedSummary.Contains("Derby", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Derby buildup did not create history and news.";
+        }
+
+        var beforeRecordTotal = RivalryWins + RivalryDraws + RivalryLosses;
+        var beforeFanPressure = FanPressure;
+        ResolveCurrentMatchInstantly();
+        if (RivalryWins + RivalryDraws + RivalryLosses <= beforeRecordTotal ||
+            !_rivalryHistory.Exists(entry => entry.Contains("Derby", StringComparison.OrdinalIgnoreCase)) ||
+            !CareerMarketSummary.Contains("Rivalries", StringComparison.Ordinal) ||
+            !CareerMarketSummary.Contains("Rivalry history", StringComparison.Ordinal))
+        {
+            return "Derby result did not update rivalry record, history, and career summary.";
+        }
+
+        var reportHasRival = LastMatchReport != null &&
+            LastMatchReport.FixtureLabel.Contains(PrimaryRivalName, StringComparison.OrdinalIgnoreCase);
+        if (FanPressure == beforeFanPressure && !reportHasRival)
+        {
+            return "Derby result did not affect pressure or match report context.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
+    public string ValidatePhase19StoredRivalryDerbyContract()
+    {
+        EnsureRivalryState();
+        if (string.IsNullOrWhiteSpace(PrimaryRivalName) ||
+            RivalryImportance <= 0 ||
+            RivalryWins + RivalryDraws + RivalryLosses <= 0 ||
+            _rivalryHistory.Count == 0 ||
+            !CareerMarketSummary.Contains("Rivalries", StringComparison.Ordinal) ||
+            !RivalryHistorySummary.Contains("Derby", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Saved rivalry/derby state did not restore.";
         }
 
         return MatchPlaybackContractValidator.PassMessage;
@@ -6085,6 +6201,154 @@ public partial class GameState
         RegistrationIssuesSummary = RegistrationValid
             ? $"Registration issues: no blockers.{warning}"
             : $"Registration issues: {string.Join("; ", issues)}.{warning}";
+    }
+
+    private void EnsureRivalryState()
+    {
+        if (string.IsNullOrWhiteSpace(PrimaryRivalName) || PrimaryRivalName == SelectedClubName)
+        {
+            PrimaryRivalName = ResolvePrimaryRivalName();
+        }
+
+        RivalryType = CurrentClub?.FanCulture == FanCulture.DerbyObsessed
+            ? "Historic derby"
+            : CurrentClub?.Archetype == ClubArchetype.FallenGiant
+                ? "Major derby"
+                : "Local rivalry";
+        RivalryImportance = RivalryType switch
+        {
+            "Historic derby" => 90,
+            "Major derby" => 78,
+            _ => 62
+        };
+        RivalryStatusSummary = $"Primary rivalry: {SelectedClubName} vs {PrimaryRivalName} | {RivalryType} | importance {RivalryImportance} | record W{RivalryWins}-D{RivalryDraws}-L{RivalryLosses}.";
+        RivalryPressureSummary = CurrentFixtureIsDerby
+            ? $"Derby fixture active: fan pressure and media attention are elevated before {PrimaryRivalName}; result swings are stronger than a normal fixture."
+            : $"Rivalry watch: next derby against {PrimaryRivalName} will carry extra fan pressure, media hype, and history.";
+
+        if (CurrentFixtureIsDerby)
+        {
+            GenerateDerbyHypeIfNeeded();
+        }
+    }
+
+    private string ResolvePrimaryRivalName()
+    {
+        if (!string.IsNullOrWhiteSpace(CurrentOpponentName) && CurrentOpponentName != SelectedClubName)
+        {
+            return CurrentOpponentName;
+        }
+
+        foreach (var club in AvailableClubs)
+        {
+            if (club != SelectedClubName)
+            {
+                return club;
+            }
+        }
+
+        return "Local Rival";
+    }
+
+    private bool IsDerbyFixture(CompetitionFixture? fixture)
+    {
+        if (fixture == null || string.IsNullOrWhiteSpace(PrimaryRivalName))
+        {
+            return false;
+        }
+
+        return fixture.HomeClubName == PrimaryRivalName ||
+            fixture.AwayClubName == PrimaryRivalName;
+    }
+
+    private void GenerateDerbyHypeIfNeeded()
+    {
+        var key = $"{SeasonStartYear}-{CurrentMatchday}-{PrimaryRivalName}";
+        if (DerbyHypeKey == key)
+        {
+            return;
+        }
+
+        DerbyHypeKey = key;
+        FanPressure = Math.Clamp(FanPressure + 3, 0, 100);
+        CareerProfile.MediaPressure = Math.Clamp(CareerProfile.MediaPressure + 2, 0, 100);
+        DressingRoomPressure = Math.Clamp(DressingRoomPressure + 1, 0, 100);
+        RefreshPressureCategories();
+        var detail = $"Derby buildup: {SelectedClubName} vs {PrimaryRivalName}; {RivalryType} raised fan, media, and dressing-room pressure.";
+        RecordRivalryHistory(detail);
+        AddNews(
+            "Derby buildup intensifies",
+            NewsCategory.Pressure,
+            "Media watch",
+            detail,
+            4,
+            sourceType: "Local media",
+            relatedEntity: PrimaryRivalName,
+            effectSummary: $"Fan pressure {FanPressure}; media pressure {CareerProfile.MediaPressure}; dressing room pressure {DressingRoomPressure}.",
+            cooldownKey: key);
+    }
+
+    private void ApplyRivalryPostMatch(MatchPlaybackResult result)
+    {
+        EnsureRivalryState();
+        if (string.IsNullOrWhiteSpace(SelectedClubName) ||
+            (result.HomeClubName != PrimaryRivalName && result.AwayClubName != PrimaryRivalName))
+        {
+            return;
+        }
+
+        var selectedAtHome = result.HomeClubName == SelectedClubName;
+        var selectedGoals = selectedAtHome ? result.FinalHomeScore : result.FinalAwayScore;
+        var rivalGoals = selectedAtHome ? result.FinalAwayScore : result.FinalHomeScore;
+        var goalDifference = selectedGoals - rivalGoals;
+        if (goalDifference > 0)
+        {
+            RivalryWins++;
+        }
+        else if (goalDifference == 0)
+        {
+            RivalryDraws++;
+        }
+        else
+        {
+            RivalryLosses++;
+        }
+
+        var fanDelta = goalDifference > 0 ? 6 : goalDifference == 0 ? 1 : -7;
+        var boardDelta = goalDifference > 0 ? 2 : goalDifference == 0 ? 0 : -2;
+        FanSentiment = Math.Clamp(FanSentiment + fanDelta, 0, 100);
+        BoardConfidence = Math.Clamp(BoardConfidence + boardDelta, 0, 100);
+        FanPressure = Math.Clamp(FanPressure + (goalDifference > 0 ? -5 : goalDifference == 0 ? 1 : 6), 0, 100);
+        BoardPressure = Math.Clamp(BoardPressure + (goalDifference < 0 ? 2 : -1), 0, 100);
+        MediaReputation = Math.Clamp(MediaReputation + (goalDifference > 0 ? 2 : goalDifference < 0 ? -2 : 0), 0, 100);
+        SyncCurrentClubMoraleFromRuntime();
+        RefreshPressureCategories();
+        var detail = goalDifference > 0
+            ? $"Derby won: {SelectedClubName} beat {PrimaryRivalName}; fan morale surge, pressure relief, and rivalry record updated."
+            : goalDifference == 0
+                ? $"Derby drawn: {SelectedClubName} and {PrimaryRivalName} split the points; tension remains in the rivalry record."
+                : $"Derby lost: {SelectedClubName} fell to {PrimaryRivalName}; fan pressure and media scrutiny increased.";
+        RecordRivalryHistory(detail);
+        EnsureRivalryState();
+        AddNews(
+            goalDifference > 0 ? "Derby win changes the mood" : goalDifference == 0 ? "Derby tension unresolved" : "Derby defeat raises pressure",
+            NewsCategory.Pressure,
+            "Local media",
+            detail,
+            5,
+            sourceType: "Local media",
+            relatedEntity: PrimaryRivalName,
+            effectSummary: $"Fan morale {FanSentiment}; board {BoardConfidence}; fan pressure {FanPressure}; record W{RivalryWins}-D{RivalryDraws}-L{RivalryLosses}.",
+            cooldownKey: $"derby-result-{SeasonStartYear}-{CurrentMatchday}-{PrimaryRivalName}");
+    }
+
+    private void RecordRivalryHistory(string detail)
+    {
+        _rivalryHistory.Insert(0, $"{CurrentDateLabel}: {detail}");
+        if (_rivalryHistory.Count > 16)
+        {
+            _rivalryHistory.RemoveAt(_rivalryHistory.Count - 1);
+        }
     }
 
     public string SubmitSquadRegistration()

@@ -266,6 +266,11 @@ public partial class MatchdayScene : Control
             return "Match stakes unavailable.";
         }
 
+        if (GameState.Instance.CurrentFixtureIsDerby)
+        {
+            return $"Derby stake | {GameState.Instance.RivalryType} vs {GameState.Instance.PrimaryRivalName} | importance {GameState.Instance.RivalryImportance}";
+        }
+
         for (var index = 0; index < GameState.Instance.CompetitionTable.Length; index++)
         {
             var row = GameState.Instance.CompetitionTable[index];

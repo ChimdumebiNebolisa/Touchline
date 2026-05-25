@@ -1,24 +1,36 @@
 # Autonomous Progress
 
 ## Current active Plan step
-- Phase 19: Rivalries and derbies.
+- Phase 20: Objectives, job security, and sackings depth.
 
 ## Last completed verified task
-- Phase 18: Squad registration rules implemented and verified locally.
+- Phase 19: Rivalries and derbies implemented and verified locally.
 
 ## Current subtask in progress
-- Prepare Phase 18 commit and push, then begin Phase 19.
+- Prepare Phase 19 commit and push, then begin Phase 20.
 
 ## Next queued subtasks
-- Commit and push `phase-18: add squad registration rules`.
-- Begin Phase 19 rivalry and derby inspection.
-- Keep rivalry expansion bounded to rivalry flags, derby fixture context, fan/board/news pressure effects, and persistent rivalry history.
+- Commit and push `phase-19: add rivalry and derby foundation`.
+- Begin Phase 20 objectives, job security, and sackings inspection.
+- Keep job-security expansion bounded to typed reviews, warnings, ultimatums, sacking trigger/aftermath, news, and career history.
 
 ## Known blockers
 - No active blockers.
 - `docs/audit/` remains untracked and intentionally excluded from phase commits.
 
 ## Last verification run
+- Phase 19 local verification:
+  - `dotnet build game/Touchline.sln` passed with 0 warnings and 0 errors.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/phase19_rivalry_derby_check.gd` passed.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step23_post_match_check.gd` passed.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step29_pressure_context_check.gd` passed.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step42_matchday_progression_check.gd` passed.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step27_save_compat_check.gd` passed.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step50_end_to_end_user_flow_check.gd` passed.
+  - `git diff --check` pending.
+  - `git diff --cached --check` pending.
+
+## Previous verification notes
 - Phase 18 local verification:
   - `dotnet build game/Touchline.sln` passed with 0 warnings and 0 errors.
   - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/phase18_squad_registration_check.gd` passed.
@@ -28,8 +40,8 @@
   - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/phase17_cup_competition_check.gd` passed.
   - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step27_save_compat_check.gd` passed.
   - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step50_end_to_end_user_flow_check.gd` passed.
-  - `git diff --check` pending.
-  - `git diff --cached --check` pending.
+  - `git diff --check` passed.
+  - `git diff --cached --check` passed.
 
 ## Previous verification notes
 - Phase 17 local verification:
@@ -176,11 +188,12 @@
 - Phase 15 completed at `6fbd971`.
 - Phase 16 completed at `6ee63b0`.
 - Phase 17 completed at `b88b706`.
-- Phase 18 commit pending.
+- Phase 18 completed at `0cd00da`.
+- Phase 19 commit pending.
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`.
 - Re-read `docs/touchline_master_design_decisions.md`.
 - Re-read `docs/MASTER_IMPLEMENTATION_ROADMAP.md`.
-- Resume at Phase 19 after the Phase 18 commit/push completes.
+- Resume at Phase 20 after the Phase 19 commit/push completes.
 - Keep `docs/audit/` untouched unless a future task explicitly uses it.
