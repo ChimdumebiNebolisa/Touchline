@@ -1598,7 +1598,14 @@ public partial class GameState : Node
             Quality = data.Quality,
             InfluenceSummary = string.IsNullOrWhiteSpace(data.InfluenceSummary)
                 ? "Influence summary unavailable."
-                : data.InfluenceSummary
+                : data.InfluenceSummary,
+            ContractExpiryYear = data.ContractExpiryYear <= 0 ? 2028 : data.ContractExpiryYear,
+            Wage = data.Wage <= 0 ? 9000 : data.Wage,
+            Reputation = Math.Clamp(data.Reputation <= 0 ? data.Quality : data.Reputation, 0, 100),
+            Loyalty = Math.Clamp(data.Loyalty <= 0 ? 55 : data.Loyalty, 0, 100),
+            Ambition = Math.Clamp(data.Ambition <= 0 ? 45 : data.Ambition, 0, 100),
+            PreferredStyle = string.IsNullOrWhiteSpace(data.PreferredStyle) ? "Balanced" : data.PreferredStyle,
+            Relationship = string.IsNullOrWhiteSpace(data.Relationship) ? "Professional" : data.Relationship
         };
     }
 

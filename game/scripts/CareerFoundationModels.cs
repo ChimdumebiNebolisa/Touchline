@@ -163,6 +163,13 @@ public sealed class StaffMember
     public required StaffRole Role { get; init; }
     public required int Quality { get; init; }
     public required string InfluenceSummary { get; init; }
+    public int ContractExpiryYear { get; init; } = 2028;
+    public int Wage { get; init; } = 9000;
+    public int Reputation { get; init; } = 50;
+    public int Loyalty { get; init; } = 55;
+    public int Ambition { get; init; } = 45;
+    public string PreferredStyle { get; init; } = "Balanced";
+    public string Relationship { get; init; } = "Professional";
 }
 
 public sealed class Objective
@@ -347,7 +354,7 @@ public static class CareerFoundation
         var summaries = new List<string>();
         foreach (var staff in club.Staff)
         {
-            summaries.Add($"{staff.Name}, {GetDisplayName(staff.Role)} ({staff.Quality}) - {staff.InfluenceSummary}");
+            summaries.Add($"{staff.Name}, {GetDisplayName(staff.Role)} ({staff.Quality}) - {staff.InfluenceSummary} | Contract {staff.ContractExpiryYear}, wage {FormatMoney(staff.Wage)}, reputation {staff.Reputation}, loyalty {staff.Loyalty}, ambition {staff.Ambition}, style {staff.PreferredStyle}, relationship {staff.Relationship}");
         }
 
         return string.Join("\n", summaries);

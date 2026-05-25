@@ -224,6 +224,24 @@ public sealed class ContractOffer
     public required bool IsAccepted { get; init; }
 }
 
+public sealed class StaffMarketCandidate
+{
+    public required string Name { get; init; }
+    public required StaffRole Role { get; init; }
+    public required int Quality { get; init; }
+    public required int Wage { get; init; }
+    public required int ContractExpiryYear { get; init; }
+    public required int Reputation { get; init; }
+    public required int Loyalty { get; init; }
+    public required int Ambition { get; init; }
+    public required string PreferredStyle { get; init; }
+    public required string Relationship { get; init; }
+    public required string InterestSummary { get; init; }
+    public required string BoardApproval { get; init; }
+    public required string Status { get; init; }
+    public required string OutcomeSummary { get; init; }
+}
+
 public sealed class PromiseRecord
 {
     public required string PromiseType { get; init; }

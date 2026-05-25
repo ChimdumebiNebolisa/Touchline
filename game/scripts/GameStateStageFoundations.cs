@@ -61,6 +61,28 @@ public sealed class SaveSlotStageFoundationData
     public string DirectorSalesPressureSummary { get; set; } = string.Empty;
     public string DirectorBoardReportSummary { get; set; } = string.Empty;
     public string[]? DirectorActionHistory { get; set; }
+    public SaveSlotStaffMarketCandidateData? StaffMarketCandidate { get; set; }
+    public string StaffReportSummary { get; set; } = string.Empty;
+    public string StaffMarketSummary { get; set; } = string.Empty;
+    public string[]? StaffHistory { get; set; }
+}
+
+public sealed class SaveSlotStaffMarketCandidateData
+{
+    public string Name { get; set; } = string.Empty;
+    public string RoleName { get; set; } = "First-Team Coach";
+    public int Quality { get; set; }
+    public int Wage { get; set; }
+    public int ContractExpiryYear { get; set; }
+    public int Reputation { get; set; }
+    public int Loyalty { get; set; }
+    public int Ambition { get; set; }
+    public string PreferredStyle { get; set; } = string.Empty;
+    public string Relationship { get; set; } = string.Empty;
+    public string InterestSummary { get; set; } = string.Empty;
+    public string BoardApproval { get; set; } = string.Empty;
+    public string Status { get; set; } = string.Empty;
+    public string OutcomeSummary { get; set; } = string.Empty;
 }
 public sealed class SaveSlotScoutingAssignmentData
 {
@@ -191,6 +213,7 @@ public partial class GameState
     private readonly List<string> _transferHistory = new();
     private readonly List<string> _contractHistory = new();
     private readonly List<string> _directorActionHistory = new();
+    private readonly List<string> _staffHistory = new();
 
     private readonly record struct ContractResolution(
         ContractOffer Offer,
@@ -247,6 +270,9 @@ public partial class GameState
     public string DirectorTransferPreference { get; private set; } = "Director transfer preference pending.";
     public string DirectorSalesPressureSummary { get; private set; } = "Director sales pressure pending.";
     public string DirectorBoardReportSummary { get; private set; } = "Director board report pending.";
+    public StaffMarketCandidate? CurrentStaffMarketCandidate { get; private set; }
+    public string StaffReportSummary { get; private set; } = "Staff reports pending.";
+    public string StaffMarketSummary { get; private set; } = "Staff market pending.";
 
     public string TeamStyleName => StageFoundationText.GetDisplayName(TeamStyle);
     public string TacticalFamiliarityName => StageFoundationText.GetDisplayName(TacticsFoundation.FamiliarityFromScore(TacticalFamiliarityScore));
@@ -267,10 +293,11 @@ public partial class GameState
     public string TransferHistorySummary => _transferHistory.Count == 0 ? "Transfer history starts when a recommendation, request, approach, or loan review is recorded." : string.Join("\n", _transferHistory);
     public string ContractFoundationSummary => BuildContractFoundationSummary();
     public string DirectorInfluenceSummary => BuildDirectorInfluenceSummary();
+    public string StaffImpactSummary => BuildStaffImpactSummary();
     public string RecruitmentFoundationSummary => CurrentRecruitmentTarget == null
         ? "Recruitment foundation pending scouting target."
         : $"{CurrentRecruitmentTarget.PlayerName} ({CurrentRecruitmentTarget.Position}) | {CurrentRecruitmentTarget.InformationSummary} | {CurrentRecruitmentTarget.InterestSummary} | {CurrentRecruitmentTarget.TacticalFitSummary} | Fee {CurrentRecruitmentTarget.EstimatedFeeRange} | Wage {CurrentRecruitmentTarget.EstimatedWageRange} | Status {CurrentRecruitmentTarget.TargetStatus} | Valuation {CurrentRecruitmentTarget.ClubValuation} | Agent {CurrentRecruitmentTarget.AgentMood} | Rival {CurrentRecruitmentTarget.RivalInterest} | Board {CurrentRecruitmentTarget.BoardStance} | Director {CurrentRecruitmentTarget.DirectorStance} | Outcome {CurrentRecruitmentTarget.OutcomeState} | {CurrentRecruitmentTarget.Status}\nDirector of Football\n{DirectorInfluenceSummary}\nShortlist\n{RecruitmentShortlistSummary}\nContracts\n{ContractFoundationSummary}\nTransfer history\n{TransferHistorySummary}";
-    public string TrainingScoutingSummary => $"{TrainingFocusName} ({TrainingIntensityName}): {TrainingStatusSummary}\nScouting depth: {ScoutingReportDepthName}\nScouting: {BuildScoutingSummary()}";
+    public string TrainingScoutingSummary => $"{TrainingFocusName} ({TrainingIntensityName}): {TrainingStatusSummary}\nScouting depth: {ScoutingReportDepthName}\nScouting: {BuildScoutingSummary()}\nStaff effects\n{StaffImpactSummary}";
     public string CareerMarketSummary => $"Job security: {JobSecurityName}\n{TrustSummary}\n{ReputationSummary}\n{PressureCategorySummary}\nLicense: {LicenseOpportunitySummary}\nJob market: {BuildJobOfferSummary()}";
     public string TacticsFoundationSummary => $"{TeamStyleName} | {TeamInstructionsSummary}\n{SetPieceSummary}\n{OpponentPreparationSummary}\n{PlayerRolesSummary}\n{PlayerInstructionsSummary}\n{TacticalRoleFitSummary}\n{PlayerFamiliaritySummary}\n{TacticalFitNotes}\n{TacticalRiskNotes}";
 
@@ -351,6 +378,7 @@ public partial class GameState
             DiscoverySummary = $"Initial {ScoutingReportDepthName.ToLowerInvariant()}: exact current role unknown, attribute ranges pending, personality ?.",
             ReportReady = false
         };
+        StaffReportSummary = BuildStaffReportSummary();
         AddNews(
             "Scouting assignment opened",
             NewsCategory.Scouting,
@@ -599,6 +627,77 @@ public partial class GameState
         return $"Contract negotiation resolved: {CurrentTransferContractOffer.PlayerName} {CurrentTransferContractOffer.Status}; {CurrentRenewalContractOffer.PlayerName} {CurrentRenewalContractOffer.Status}.";
     }
 
+    public string AttemptStaffMarketAction()
+    {
+        EnsureStaffImpactState();
+        if (CurrentStaffMarketCandidate == null)
+        {
+            return "Staff market candidate unavailable.";
+        }
+
+        var candidate = CurrentStaffMarketCandidate;
+        if (CareerProfile.Role == ManagerRole.AssistantManager)
+        {
+            CurrentStaffMarketCandidate = CloneStaffMarketCandidate(candidate, "Recommended", "Assistant Manager recommended the staff upgrade; no hiring authority.");
+            RecordStaffHistory($"{candidate.Name}: recommended by Assistant Manager; hiring authority sits above role.");
+            AddNews(
+                "Staff recommendation filed",
+                NewsCategory.Club,
+                "Internal",
+                $"{ManagerName} recommended {candidate.Name} for {CareerFoundation.GetDisplayName(candidate.Role)}.",
+                2);
+            return "Assistant Manager staff recommendation logged; no hire made.";
+        }
+
+        if (CareerProfile.Role == ManagerRole.HeadCoach)
+        {
+            CurrentStaffMarketCandidate = CloneStaffMarketCandidate(candidate, "Requested", "Head Coach requested staff change; board approval required.");
+            CareerProfile.StaffTrust = Math.Clamp(CareerProfile.StaffTrust + 1, 0, 100);
+            RecordStaffHistory($"{candidate.Name}: staff change requested by Head Coach; board approval pending.");
+            AddNews(
+                "Staff change requested",
+                NewsCategory.Club,
+                "Internal",
+                $"{ManagerName} requested {candidate.Name}; staff authority remains limited.",
+                3);
+            return "Head Coach staff request submitted; board approval required.";
+        }
+
+        var approvalScore = BuildStaffHiringApprovalScore(candidate);
+        if (approvalScore < 50)
+        {
+            CurrentStaffMarketCandidate = CloneStaffMarketCandidate(candidate, "Board rejected", $"Board rejected the staff hire: wage, reputation, and trust score {approvalScore}/100 do not align.");
+            FinancialPressure = Math.Clamp(FinancialPressure + 2, 0, 100);
+            RecordStaffHistory($"{candidate.Name}: board rejected staff hire; score {approvalScore}/100.");
+            AddNews(
+                "Staff hire blocked",
+                NewsCategory.Club,
+                "Board report",
+                $"{candidate.Name} was rejected as a staff hire because board approval was insufficient.",
+                4);
+            return CurrentStaffMarketCandidate.OutcomeSummary;
+        }
+
+        HireStaffCandidate(candidate);
+        CurrentStaffMarketCandidate = CloneStaffMarketCandidate(candidate, "Hired", $"Board approved staff hire with score {approvalScore}/100; staff reports and quality updated.");
+        CareerProfile.StaffTrust = Math.Clamp(CareerProfile.StaffTrust + 2, 0, 100);
+        FinancialPressure = Math.Clamp(FinancialPressure + 2, 0, 100);
+        StaffReportSummary = BuildStaffReportSummary();
+        StaffMarketSummary = $"Hired {candidate.Name} as {CareerFoundation.GetDisplayName(candidate.Role)}; wage impact {candidate.Wage}/w.";
+        RecordStaffHistory($"{candidate.Name}: hired as {CareerFoundation.GetDisplayName(candidate.Role)}; quality {candidate.Quality}, wage {candidate.Wage}/w, approval {approvalScore}/100.");
+        AddNews(
+            "Staff hire completed",
+            NewsCategory.Club,
+            "Club announcement",
+            $"{SelectedClubName} hired {candidate.Name} as {CareerFoundation.GetDisplayName(candidate.Role)}.",
+            4,
+            sourceType: "Club announcement",
+            relatedEntity: candidate.Name,
+            effectSummary: $"Staff trust {CareerProfile.StaffTrust}; financial pressure {FinancialPressure}; {StaffReportSummary}",
+            cooldownKey: "staff-market");
+        return CurrentStaffMarketCandidate.OutcomeSummary;
+    }
+
     public void GenerateJobMarketEvent()
     {
         var otherClub = ResolveDifferentClub(SelectedClubName);
@@ -747,7 +846,11 @@ public partial class GameState
             DirectorTransferPreference = DirectorTransferPreference,
             DirectorSalesPressureSummary = DirectorSalesPressureSummary,
             DirectorBoardReportSummary = DirectorBoardReportSummary,
-            DirectorActionHistory = _directorActionHistory.ToArray()
+            DirectorActionHistory = _directorActionHistory.ToArray(),
+            StaffMarketCandidate = CurrentStaffMarketCandidate == null ? null : BuildStaffMarketCandidateSaveData(CurrentStaffMarketCandidate),
+            StaffReportSummary = StaffReportSummary,
+            StaffMarketSummary = StaffMarketSummary,
+            StaffHistory = _staffHistory.ToArray()
         };
     }
 
@@ -931,6 +1034,17 @@ public partial class GameState
             _directorActionHistory.AddRange(data.DirectorActionHistory);
         }
 
+        CurrentStaffMarketCandidate = data.StaffMarketCandidate == null
+            ? null
+            : RestoreStaffMarketCandidate(data.StaffMarketCandidate);
+        StaffReportSummary = string.IsNullOrWhiteSpace(data.StaffReportSummary) ? BuildStaffReportSummary() : data.StaffReportSummary;
+        StaffMarketSummary = string.IsNullOrWhiteSpace(data.StaffMarketSummary) ? "Staff market restored; no action yet." : data.StaffMarketSummary;
+        _staffHistory.Clear();
+        if (data.StaffHistory != null)
+        {
+            _staffHistory.AddRange(data.StaffHistory);
+        }
+
         EnsureRecruitmentTarget();
         EnsureJobMarketFoundation();
         RefreshPressureCategories();
@@ -986,6 +1100,9 @@ public partial class GameState
         DirectorTransferPreference = "Director transfer preference pending.";
         DirectorSalesPressureSummary = "Director sales pressure pending.";
         DirectorBoardReportSummary = "Director board report pending.";
+        CurrentStaffMarketCandidate = null;
+        StaffReportSummary = "Staff reports pending.";
+        StaffMarketSummary = "Staff market pending.";
         _foundationNewsEvents.Clear();
         _activeDecisionEvents.Clear();
         _resolvedDecisionEvents.Clear();
@@ -996,6 +1113,7 @@ public partial class GameState
         _transferHistory.Clear();
         _contractHistory.Clear();
         _directorActionHistory.Clear();
+        _staffHistory.Clear();
     }
 
     public void InitializeStageFoundationsForClub()
@@ -1012,6 +1130,7 @@ public partial class GameState
 
         RefreshTacticFoundation(TacticalFormation, TeamStyle);
         EnsureDirectorConflictState();
+        EnsureStaffImpactState();
         if (CurrentScoutingAssignment == null)
         {
             StartBasicScoutingAssignment("Position need: versatile midfielder");
@@ -2253,6 +2372,124 @@ public partial class GameState
         return MatchPlaybackContractValidator.PassMessage;
     }
 
+    public string ValidatePhase12StaffImpactMarketContract()
+    {
+        InitializeStageFoundationsForClub();
+        EnsureStaffImpactState();
+        if (CurrentStaffMarketCandidate == null)
+        {
+            return "Staff market candidate was not generated.";
+        }
+
+        if (!StaffImpactSummary.Contains("training", StringComparison.OrdinalIgnoreCase) ||
+            !StaffImpactSummary.Contains("scouting", StringComparison.OrdinalIgnoreCase) ||
+            !StaffImpactSummary.Contains("injury risk", StringComparison.OrdinalIgnoreCase) ||
+            !StaffImpactSummary.Contains("media", StringComparison.OrdinalIgnoreCase) ||
+            !StaffImpactSummary.Contains("Staff market", StringComparison.Ordinal))
+        {
+            return "Staff impact summary does not cover training, scouting, injury, media, and market effects.";
+        }
+
+        var beforeStaffTrust = CareerProfile.StaffTrust;
+        var beforeNewsCount = CurrentClub?.NewsFeed.Length ?? 0;
+        var candidateName = CurrentStaffMarketCandidate.Name;
+        var highWageCandidate = CloneStaffMarketCandidateWithWage(CurrentStaffMarketCandidate, 60000);
+        if (BuildStaffHiringApprovalScore(highWageCandidate) >= 50)
+        {
+            return "Staff board approval logic did not reject an excessive wage case.";
+        }
+
+        var result = AttemptStaffMarketAction();
+        if (string.IsNullOrWhiteSpace(result) || CurrentStaffMarketCandidate == null)
+        {
+            return "Staff market action did not produce a result.";
+        }
+
+        if (CareerProfile.Role == ManagerRole.AssistantManager &&
+            !CurrentStaffMarketCandidate.Status.Contains("Recommended", StringComparison.Ordinal))
+        {
+            return "Assistant Manager staff role restriction was not respected.";
+        }
+
+        if (CareerProfile.Role == ManagerRole.HeadCoach &&
+            !CurrentStaffMarketCandidate.Status.Contains("Requested", StringComparison.Ordinal))
+        {
+            return "Head Coach staff role restriction was not respected.";
+        }
+
+        if (CareerProfile.Role == ManagerRole.Manager)
+        {
+            if (!CurrentStaffMarketCandidate.Status.Contains("Hired", StringComparison.Ordinal))
+            {
+                return "Manager staff market action did not complete a hire.";
+            }
+
+            var hired = false;
+            foreach (var staff in CurrentClub?.Staff ?? Array.Empty<StaffMember>())
+            {
+                hired = hired || staff.Name == candidateName;
+            }
+
+            if (!hired)
+            {
+                return "Completed staff hire did not update the staff list.";
+            }
+
+            if (CareerProfile.StaffTrust <= beforeStaffTrust)
+            {
+                return "Completed staff hire did not affect staff trust.";
+            }
+
+            if ((CurrentClub?.NewsFeed.Length ?? 0) <= beforeNewsCount)
+            {
+                return "Staff market action did not update news.";
+            }
+        }
+
+        if (_staffHistory.Count == 0 || !StaffImpactSummary.Contains("Staff history", StringComparison.Ordinal))
+        {
+            return "Staff market action did not record staff history.";
+        }
+
+        SetTrainingPlanByName("Pressing", "Demanding");
+        ApplyWeeklyFoundationProgress();
+        if (!TrainingStatusSummary.Contains("Staff modifiers", StringComparison.Ordinal))
+        {
+            return "Training consequences do not expose staff modifiers.";
+        }
+
+        StartScoutingAssignment("Specific player: staff-influenced target", "Full report");
+        if (CurrentScoutingAssignment == null ||
+            CurrentScoutingAssignment.ReportQuality <= 0 ||
+            !StaffReportSummary.Contains("scouting", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Scouting assignment did not retain staff report influence.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
+    public string ValidatePhase12StoredStaffImpactMarketContract()
+    {
+        EnsureStaffImpactState();
+        if (CurrentStaffMarketCandidate == null ||
+            _staffHistory.Count == 0 ||
+            string.IsNullOrWhiteSpace(StaffReportSummary) ||
+            !StaffImpactSummary.Contains("Staff history", StringComparison.Ordinal))
+        {
+            return "Saved staff impact/market state did not restore.";
+        }
+
+        if (CurrentClub == null || CurrentClub.Staff.Length == 0 ||
+            CurrentClub.Staff[0].Wage <= 0 ||
+            string.IsNullOrWhiteSpace(CurrentClub.Staff[0].Relationship))
+        {
+            return "Saved staff contract details did not restore.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
     public string ValidatePhase3PromiseLifecycleContract()
     {
         InitializeStageFoundationsForClub();
@@ -2516,8 +2753,10 @@ public partial class GameState
             TrainingIntensity.Demanding => 2,
             _ => 0
         };
-        var familiarityDelta = Math.Max(0, baseFamiliarityDelta + intensityFamiliarityDelta);
+        var coachingModifier = Math.Clamp((GetStaffQuality(StaffRole.FirstTeamCoach) + GetStaffQuality(StaffRole.AssistantManager) - 110) / 20, -2, 4);
+        var familiarityDelta = Math.Max(0, baseFamiliarityDelta + intensityFamiliarityDelta + coachingModifier);
         TacticalFamiliarityScore = Math.Clamp(TacticalFamiliarityScore + familiarityDelta, 0, 100);
+        var fitnessStaffModifier = Math.Clamp((GetStaffQuality(StaffRole.FitnessCoach) + GetStaffQuality(StaffRole.Physio) - 110) / 25, -2, 3);
 
         for (var index = 0; index < SquadPlayers.Length; index++)
         {
@@ -2534,10 +2773,10 @@ public partial class GameState
                 TrainingFocus.Recovery => -12,
                 _ => 2
             };
-            var fitnessDelta = baseFitnessDelta + (CurrentTrainingIntensity == TrainingIntensity.Controlled ? 2 : CurrentTrainingIntensity == TrainingIntensity.Demanding ? -2 : 0);
-            var fatigueDelta = baseFatigueDelta + (CurrentTrainingIntensity == TrainingIntensity.Controlled ? -4 : CurrentTrainingIntensity == TrainingIntensity.Demanding ? 6 : 0);
+            var fitnessDelta = baseFitnessDelta + fitnessStaffModifier + (CurrentTrainingIntensity == TrainingIntensity.Controlled ? 2 : CurrentTrainingIntensity == TrainingIntensity.Demanding ? -2 : 0);
+            var fatigueDelta = baseFatigueDelta - fitnessStaffModifier + (CurrentTrainingIntensity == TrainingIntensity.Controlled ? -4 : CurrentTrainingIntensity == TrainingIntensity.Demanding ? 6 : 0);
             var moraleDelta = CurrentTrainingFocus == TrainingFocus.TeamCohesion ? 2 : CurrentTrainingIntensity == TrainingIntensity.Demanding ? -1 : 0;
-            var injuryDelta = fatigueDelta > 0 ? 1 + (CurrentTrainingIntensity == TrainingIntensity.Demanding ? 2 : 0) : -2;
+            var injuryDelta = fatigueDelta > 0 ? 1 + (CurrentTrainingIntensity == TrainingIntensity.Demanding ? 2 : 0) - fitnessStaffModifier : -2 - fitnessStaffModifier;
             SquadPlayers[index] = player.With(
                 fitness: Math.Clamp(player.Fitness + fitnessDelta, 35, 99),
                 morale: Math.Clamp(player.Morale + moraleDelta, 0, 100),
@@ -2548,7 +2787,8 @@ public partial class GameState
         }
 
         RefreshTacticFoundation(TacticalFormation, TeamStyle);
-        TrainingStatusSummary = $"{TrainingFocusName} at {TrainingIntensityName.ToLowerInvariant()} intensity changed tactical familiarity to {TacticalFamiliarityName}, updated condition, and raised staff familiarity with the squad.";
+        StaffReportSummary = BuildStaffReportSummary();
+        TrainingStatusSummary = $"{TrainingFocusName} at {TrainingIntensityName.ToLowerInvariant()} intensity changed tactical familiarity to {TacticalFamiliarityName}, updated condition, and raised staff familiarity with the squad. Staff modifiers: coaching {coachingModifier}, fitness/physio {fitnessStaffModifier}.";
         SquadStatusSummary = BuildSquadStatusSummary();
     }
 
@@ -3754,6 +3994,288 @@ public partial class GameState
             OutcomeSummary = offer.OutcomeSummary,
             IsAccepted = offer.IsAccepted
         };
+    }
+
+    private void EnsureStaffImpactState()
+    {
+        if (string.IsNullOrWhiteSpace(StaffReportSummary) || StaffReportSummary.Contains("pending", StringComparison.OrdinalIgnoreCase))
+        {
+            StaffReportSummary = BuildStaffReportSummary();
+        }
+
+        if (CurrentStaffMarketCandidate == null)
+        {
+            CurrentStaffMarketCandidate = BuildStaffMarketCandidate();
+        }
+
+        if (string.IsNullOrWhiteSpace(StaffMarketSummary) || StaffMarketSummary.Contains("pending", StringComparison.OrdinalIgnoreCase))
+        {
+            StaffMarketSummary = CurrentStaffMarketCandidate == null
+                ? "Staff market unavailable."
+                : $"{CurrentStaffMarketCandidate.Name}, {CareerFoundation.GetDisplayName(CurrentStaffMarketCandidate.Role)} | quality {CurrentStaffMarketCandidate.Quality} | wage {CurrentStaffMarketCandidate.Wage}/w | {CurrentStaffMarketCandidate.InterestSummary} | {CurrentStaffMarketCandidate.BoardApproval} | {CurrentStaffMarketCandidate.Status}";
+        }
+    }
+
+    private string BuildStaffImpactSummary()
+    {
+        EnsureStaffImpactState();
+        var history = _staffHistory.Count == 0
+            ? "Staff history starts when reports, requests, hires, rejections, poaching, or leaving events are recorded."
+            : string.Join("\n", _staffHistory);
+        return $"{StaffReportSummary}\nStaff market: {StaffMarketSummary}\nStaff history\n{history}";
+    }
+
+    private string BuildStaffReportSummary()
+    {
+        var training = (GetStaffQuality(StaffRole.FirstTeamCoach) + GetStaffQuality(StaffRole.AssistantManager)) / 2;
+        var scouting = (GetStaffQuality(StaffRole.Scout) + GetStaffQuality(StaffRole.HeadOfRecruitment) + GetStaffQuality(StaffRole.DataAnalyst)) / 3;
+        var risk = (GetStaffQuality(StaffRole.FitnessCoach) + GetStaffQuality(StaffRole.Physio)) / 2;
+        var tactics = (GetStaffQuality(StaffRole.FirstTeamCoach) + GetStaffQuality(StaffRole.DataAnalyst)) / 2;
+        var morale = (CareerProfile.StaffTrust + GetStaffQuality(StaffRole.AssistantManager)) / 2;
+        var media = (GetStaffQuality(StaffRole.MediaOfficer) + MediaTrust) / 2;
+        var recruitment = (GetStaffQuality(StaffRole.HeadOfRecruitment) + GetStaffQuality(StaffRole.Scout) + CareerProfile.DirectorTrust) / 3;
+        return $"Staff report | training {training}, scouting {scouting}, injury risk control {risk}, tactical analysis {tactics}, morale support {morale}, media risk control {media}, recruitment support {recruitment}.";
+    }
+
+    private StaffMarketCandidate? BuildStaffMarketCandidate()
+    {
+        if (CurrentClub == null || CurrentClub.Staff.Length == 0)
+        {
+            return null;
+        }
+
+        var targetRole = FindWeakestStaffRole();
+        var currentQuality = GetStaffQuality(targetRole);
+        var quality = Math.Clamp(currentQuality + 8 + CareerProfile.Reputation / 12, 45, 88);
+        var wage = 6000 + quality * 210 + (CareerProfile.Reputation * 60);
+        var name = targetRole switch
+        {
+            StaffRole.FitnessCoach => "Mira Voss",
+            StaffRole.Scout => "Tomas Iliev",
+            StaffRole.DataAnalyst => "Lea Novak",
+            StaffRole.HeadOfRecruitment => "Anika Sato",
+            StaffRole.MediaOfficer => "Nora Vale",
+            _ => "Dario Kelm"
+        };
+        var preferredStyle = targetRole switch
+        {
+            StaffRole.DataAnalyst => "Evidence-led",
+            StaffRole.Scout => "Scouting network",
+            StaffRole.FitnessCoach => "Recovery discipline",
+            StaffRole.HeadOfRecruitment => "Value recruitment",
+            StaffRole.MediaOfficer => "Calm communication",
+            _ => TeamStyleName
+        };
+        return new StaffMarketCandidate
+        {
+            Name = name,
+            Role = targetRole,
+            Quality = quality,
+            Wage = wage,
+            ContractExpiryYear = CurrentDate.Year + 2,
+            Reputation = Math.Clamp(quality + 4, 0, 100),
+            Loyalty = Math.Clamp(48 + CareerProfile.StaffTrust / 4, 0, 100),
+            Ambition = Math.Clamp(42 + quality / 3, 0, 100),
+            PreferredStyle = preferredStyle,
+            Relationship = "Interested but needs role clarity.",
+            InterestSummary = $"Interest depends on club reputation {ClubReputation}, staff trust {CareerProfile.StaffTrust}, and wage fit.",
+            BoardApproval = BuildStaffBoardApproval(wage, quality),
+            Status = "Available",
+            OutcomeSummary = "Candidate available for a bounded staff market action."
+        };
+    }
+
+    private StaffRole FindWeakestStaffRole()
+    {
+        var targetRole = StaffRole.FirstTeamCoach;
+        var weakestQuality = 101;
+        foreach (var staff in CurrentClub?.Staff ?? Array.Empty<StaffMember>())
+        {
+            if (staff.Role is StaffRole.AssistantManager)
+            {
+                continue;
+            }
+
+            if (staff.Quality < weakestQuality)
+            {
+                weakestQuality = staff.Quality;
+                targetRole = staff.Role;
+            }
+        }
+
+        return targetRole;
+    }
+
+    private string BuildStaffBoardApproval(int wage, int quality)
+    {
+        var strict = CurrentClub?.BoardPhilosophy == BoardPhilosophy.FinanciallyStrictBoard ? "strict board wage review applies" : "board checks wage against staff quality";
+        var value = quality >= 68 ? "quality upgrade is credible" : "upgrade case is modest";
+        return $"{value}; wage {wage}/w; {strict}; board trust {CareerProfile.BoardTrust}/100.";
+    }
+
+    private int BuildStaffHiringApprovalScore(StaffMarketCandidate candidate)
+    {
+        var score = 42 + CareerProfile.BoardTrust / 4 + CareerProfile.StaffTrust / 5 + Math.Max(0, candidate.Quality - GetStaffQuality(candidate.Role));
+        if (candidate.Wage > 22000)
+        {
+            score -= 8;
+        }
+
+        if (candidate.Wage > 35000)
+        {
+            score -= 45;
+        }
+
+        if (CurrentClub?.BoardPhilosophy == BoardPhilosophy.FinanciallyStrictBoard)
+        {
+            score -= candidate.Wage > 18000 ? 12 : 4;
+        }
+
+        if (CareerProfile.Role == ManagerRole.Manager)
+        {
+            score += 8;
+        }
+
+        return Math.Clamp(score, 0, 100);
+    }
+
+    private void HireStaffCandidate(StaffMarketCandidate candidate)
+    {
+        if (CurrentClub == null)
+        {
+            return;
+        }
+
+        var replacement = new StaffMember
+        {
+            Name = candidate.Name,
+            Role = candidate.Role,
+            Quality = candidate.Quality,
+            InfluenceSummary = $"Hired staff upgrade: {candidate.PreferredStyle}; {candidate.OutcomeSummary}",
+            ContractExpiryYear = candidate.ContractExpiryYear,
+            Wage = candidate.Wage,
+            Reputation = candidate.Reputation,
+            Loyalty = candidate.Loyalty,
+            Ambition = candidate.Ambition,
+            PreferredStyle = candidate.PreferredStyle,
+            Relationship = candidate.Relationship
+        };
+        var replaceIndex = -1;
+        for (var index = 0; index < CurrentClub.Staff.Length; index++)
+        {
+            if (CurrentClub.Staff[index].Role == candidate.Role)
+            {
+                replaceIndex = index;
+                break;
+            }
+        }
+
+        if (replaceIndex < 0)
+        {
+            replaceIndex = 0;
+            for (var index = 1; index < CurrentClub.Staff.Length; index++)
+            {
+                if (CurrentClub.Staff[index].Quality < CurrentClub.Staff[replaceIndex].Quality)
+                {
+                    replaceIndex = index;
+                }
+            }
+        }
+
+        CurrentClub.Staff[replaceIndex] = replacement;
+    }
+
+    private static SaveSlotStaffMarketCandidateData BuildStaffMarketCandidateSaveData(StaffMarketCandidate candidate)
+    {
+        return new SaveSlotStaffMarketCandidateData
+        {
+            Name = candidate.Name,
+            RoleName = CareerFoundation.GetDisplayName(candidate.Role),
+            Quality = candidate.Quality,
+            Wage = candidate.Wage,
+            ContractExpiryYear = candidate.ContractExpiryYear,
+            Reputation = candidate.Reputation,
+            Loyalty = candidate.Loyalty,
+            Ambition = candidate.Ambition,
+            PreferredStyle = candidate.PreferredStyle,
+            Relationship = candidate.Relationship,
+            InterestSummary = candidate.InterestSummary,
+            BoardApproval = candidate.BoardApproval,
+            Status = candidate.Status,
+            OutcomeSummary = candidate.OutcomeSummary
+        };
+    }
+
+    private static StaffMarketCandidate RestoreStaffMarketCandidate(SaveSlotStaffMarketCandidateData data)
+    {
+        return new StaffMarketCandidate
+        {
+            Name = string.IsNullOrWhiteSpace(data.Name) ? "Unknown staff candidate" : data.Name,
+            Role = CareerFoundation.ParseStaffRole(data.RoleName),
+            Quality = Math.Clamp(data.Quality <= 0 ? 58 : data.Quality, 0, 100),
+            Wage = data.Wage <= 0 ? 12000 : data.Wage,
+            ContractExpiryYear = data.ContractExpiryYear <= 0 ? 2028 : data.ContractExpiryYear,
+            Reputation = Math.Clamp(data.Reputation <= 0 ? 55 : data.Reputation, 0, 100),
+            Loyalty = Math.Clamp(data.Loyalty <= 0 ? 55 : data.Loyalty, 0, 100),
+            Ambition = Math.Clamp(data.Ambition <= 0 ? 45 : data.Ambition, 0, 100),
+            PreferredStyle = string.IsNullOrWhiteSpace(data.PreferredStyle) ? "Balanced" : data.PreferredStyle,
+            Relationship = string.IsNullOrWhiteSpace(data.Relationship) ? "Professional" : data.Relationship,
+            InterestSummary = string.IsNullOrWhiteSpace(data.InterestSummary) ? "Interest restored from saved staff market." : data.InterestSummary,
+            BoardApproval = string.IsNullOrWhiteSpace(data.BoardApproval) ? "Board approval restored from saved staff market." : data.BoardApproval,
+            Status = string.IsNullOrWhiteSpace(data.Status) ? "Available" : data.Status,
+            OutcomeSummary = string.IsNullOrWhiteSpace(data.OutcomeSummary) ? "Staff market candidate restored." : data.OutcomeSummary
+        };
+    }
+
+    private static StaffMarketCandidate CloneStaffMarketCandidate(StaffMarketCandidate candidate, string status, string outcomeSummary)
+    {
+        return new StaffMarketCandidate
+        {
+            Name = candidate.Name,
+            Role = candidate.Role,
+            Quality = candidate.Quality,
+            Wage = candidate.Wage,
+            ContractExpiryYear = candidate.ContractExpiryYear,
+            Reputation = candidate.Reputation,
+            Loyalty = candidate.Loyalty,
+            Ambition = candidate.Ambition,
+            PreferredStyle = candidate.PreferredStyle,
+            Relationship = candidate.Relationship,
+            InterestSummary = candidate.InterestSummary,
+            BoardApproval = candidate.BoardApproval,
+            Status = status,
+            OutcomeSummary = outcomeSummary
+        };
+    }
+
+    private static StaffMarketCandidate CloneStaffMarketCandidateWithWage(StaffMarketCandidate candidate, int wage)
+    {
+        return new StaffMarketCandidate
+        {
+            Name = candidate.Name,
+            Role = candidate.Role,
+            Quality = candidate.Quality,
+            Wage = wage,
+            ContractExpiryYear = candidate.ContractExpiryYear,
+            Reputation = candidate.Reputation,
+            Loyalty = candidate.Loyalty,
+            Ambition = candidate.Ambition,
+            PreferredStyle = candidate.PreferredStyle,
+            Relationship = candidate.Relationship,
+            InterestSummary = candidate.InterestSummary,
+            BoardApproval = $"High wage stress case: {wage}/w.",
+            Status = candidate.Status,
+            OutcomeSummary = candidate.OutcomeSummary
+        };
+    }
+
+    private void RecordStaffHistory(string detail)
+    {
+        _staffHistory.Insert(0, $"{CurrentDateLabel}: {detail}");
+        if (_staffHistory.Count > 12)
+        {
+            _staffHistory.RemoveAt(_staffHistory.Count - 1);
+        }
     }
 
     private void GenerateContextDecisionEvent(string trigger)

@@ -82,6 +82,13 @@ public sealed class SaveSlotStaffMemberData
     public string RoleName { get; set; } = "First-Team Coach";
     public int Quality { get; set; }
     public string InfluenceSummary { get; set; } = string.Empty;
+    public int ContractExpiryYear { get; set; }
+    public int Wage { get; set; }
+    public int Reputation { get; set; }
+    public int Loyalty { get; set; }
+    public int Ambition { get; set; }
+    public string PreferredStyle { get; set; } = string.Empty;
+    public string Relationship { get; set; } = string.Empty;
 }
 
 public sealed class SaveSlotObjectiveData
@@ -190,7 +197,7 @@ public partial class SaveSystem : Node
         WriteIndented = true,
         PropertyNameCaseInsensitive = true
     };
-    public const int CurrentSaveVersion = 13;
+    public const int CurrentSaveVersion = 14;
 
     public static SaveSystem? Instance { get; private set; }
     public string LastStatusMessage { get; private set; } = "Save system idle.";
@@ -765,7 +772,14 @@ public partial class SaveSystem : Node
                     Name = staff.Name,
                     RoleName = CareerFoundation.GetDisplayName(staff.Role),
                     Quality = staff.Quality,
-                    InfluenceSummary = staff.InfluenceSummary
+                    InfluenceSummary = staff.InfluenceSummary,
+                    ContractExpiryYear = staff.ContractExpiryYear,
+                    Wage = staff.Wage,
+                    Reputation = staff.Reputation,
+                    Loyalty = staff.Loyalty,
+                    Ambition = staff.Ambition,
+                    PreferredStyle = staff.PreferredStyle,
+                    Relationship = staff.Relationship
                 }),
             Objectives = Array.ConvertAll(
                 club.Objectives,
@@ -835,7 +849,14 @@ public partial class SaveSystem : Node
                         Name = staff.Name,
                         RoleName = staff.RoleName,
                         Quality = staff.Quality,
-                        InfluenceSummary = staff.InfluenceSummary
+                        InfluenceSummary = staff.InfluenceSummary,
+                        ContractExpiryYear = staff.ContractExpiryYear,
+                        Wage = staff.Wage,
+                        Reputation = staff.Reputation,
+                        Loyalty = staff.Loyalty,
+                        Ambition = staff.Ambition,
+                        PreferredStyle = staff.PreferredStyle,
+                        Relationship = staff.Relationship
                     }),
             Objectives = source.Objectives == null
                 ? null
@@ -1033,7 +1054,32 @@ public partial class SaveSystem : Node
             DirectorTransferPreference = source.DirectorTransferPreference,
             DirectorSalesPressureSummary = source.DirectorSalesPressureSummary,
             DirectorBoardReportSummary = source.DirectorBoardReportSummary,
-            DirectorActionHistory = source.DirectorActionHistory == null ? null : (string[])source.DirectorActionHistory.Clone()
+            DirectorActionHistory = source.DirectorActionHistory == null ? null : (string[])source.DirectorActionHistory.Clone(),
+            StaffMarketCandidate = source.StaffMarketCandidate == null ? null : CloneStaffMarketCandidateData(source.StaffMarketCandidate),
+            StaffReportSummary = source.StaffReportSummary,
+            StaffMarketSummary = source.StaffMarketSummary,
+            StaffHistory = source.StaffHistory == null ? null : (string[])source.StaffHistory.Clone()
+        };
+    }
+
+    private static SaveSlotStaffMarketCandidateData CloneStaffMarketCandidateData(SaveSlotStaffMarketCandidateData source)
+    {
+        return new SaveSlotStaffMarketCandidateData
+        {
+            Name = source.Name,
+            RoleName = source.RoleName,
+            Quality = source.Quality,
+            Wage = source.Wage,
+            ContractExpiryYear = source.ContractExpiryYear,
+            Reputation = source.Reputation,
+            Loyalty = source.Loyalty,
+            Ambition = source.Ambition,
+            PreferredStyle = source.PreferredStyle,
+            Relationship = source.Relationship,
+            InterestSummary = source.InterestSummary,
+            BoardApproval = source.BoardApproval,
+            Status = source.Status,
+            OutcomeSummary = source.OutcomeSummary
         };
     }
 
