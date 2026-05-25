@@ -41,6 +41,13 @@ public partial class GameState : Node
         public required string ClubName { get; init; }
         public required string IdentitySummary { get; init; }
         public required string ExpectationSummary { get; init; }
+        public required string ArchetypeName { get; init; }
+        public required string BoardPhilosophyName { get; init; }
+        public required string FanCultureName { get; init; }
+        public required string DirectorOfFootballStyleName { get; init; }
+        public required string DirectorRelationshipName { get; init; }
+        public required string BudgetSummary { get; init; }
+        public required string ObjectivesSummary { get; init; }
         public required string OpeningFixtureSummary { get; init; }
     }
 
@@ -71,6 +78,13 @@ public partial class GameState : Node
 
     public string ManagerName { get; private set; } = "Manager";
     public int CareerSeed { get; private set; }
+    public CareerProfile CareerProfile { get; private set; } = CareerFoundation.CreateCareerProfile(
+        "Manager",
+        0,
+        ManagerRole.Manager,
+        ManagerBackground.UnknownUpstart,
+        ManagerLicense.NationalCLicense);
+    public Club? CurrentClub { get; private set; }
     public bool CareerInitialized { get; private set; }
     public int WorldSeed { get; private set; }
     public string CountryPackId { get; private set; } = "country-pack-alpha";
@@ -101,6 +115,31 @@ public partial class GameState : Node
     public CompetitionRow[] CompetitionTable { get; private set; } = Array.Empty<CompetitionRow>();
     public CompetitionFixture[] CompetitionFixtures { get; private set; } = Array.Empty<CompetitionFixture>();
     public MatchPlaybackResult? CurrentMatchResult { get; private set; }
+    public string CurrentRoleName => CareerFoundation.GetDisplayName(CareerProfile.Role);
+    public string ManagerBackgroundName => CareerFoundation.GetDisplayName(CareerProfile.Background);
+    public string LicenseName => CareerFoundation.GetDisplayName(CareerProfile.License);
+    public string ClubArchetypeName => CurrentClub == null ? "Club archetype unavailable" : CareerFoundation.GetDisplayName(CurrentClub.Archetype);
+    public string BoardPhilosophyName => CurrentClub == null ? "Board philosophy unavailable" : CareerFoundation.GetDisplayName(CurrentClub.BoardPhilosophy);
+    public string FanCultureName => CurrentClub == null ? "Fan culture unavailable" : CareerFoundation.GetDisplayName(CurrentClub.FanCulture);
+    public string DirectorOfFootballStyleName => CurrentClub == null ? "Director style unavailable" : CareerFoundation.GetDisplayName(CurrentClub.DirectorOfFootballStyle);
+    public string DirectorRelationshipName => CurrentClub == null ? "Director relationship unavailable" : CareerFoundation.GetDisplayName(CurrentClub.DirectorRelationshipState);
+    public int BoardMorale => CurrentClub?.BoardMorale ?? BoardConfidence;
+    public int FanMorale => CurrentClub?.FanMorale ?? FanSentiment;
+    public int SquadMorale => CurrentClub?.SquadMorale ?? TeamMorale;
+    public int JobPressure => CurrentClub?.JobPressure ?? CareerFoundation.CalculateJobPressure(
+        ClubArchetype.MidTableStabilizer,
+        BoardPhilosophy.PatientLongTermBoard,
+        CareerProfile.Role,
+        CareerProfile.Background,
+        CareerProfile.License,
+        BoardConfidence,
+        FanSentiment,
+        TeamMorale);
+    public string RoleAuthoritySummary => CareerFoundation.GetRoleAuthoritySummary(CareerProfile.Role);
+    public string MainObjectivesSummary => CareerFoundation.BuildObjectivesSummary(CurrentClub);
+    public string StaffSummary => CareerFoundation.BuildStaffSummary(CurrentClub);
+    public string NewsFeedSummary => CareerFoundation.BuildNewsSummary(CurrentClub);
+    public string BudgetSummary => CareerFoundation.BuildBudgetSummary(CurrentClub);
 
     public override void _EnterTree()
     {
@@ -124,6 +163,13 @@ public partial class GameState : Node
     {
         ManagerName = bootstrap.ManagerName;
         CareerSeed = bootstrap.CareerSeed;
+        CareerProfile = CareerFoundation.CreateCareerProfile(
+            bootstrap.ManagerName,
+            bootstrap.CareerSeed,
+            bootstrap.Role,
+            bootstrap.Background,
+            bootstrap.License);
+        CurrentClub = null;
         CareerInitialized = true;
         WorldSeed = bootstrap.WorldSeed;
         CountryPackId = bootstrap.CountryPackId;
@@ -162,6 +208,8 @@ public partial class GameState : Node
     public void ApplyClubSelection(ClubSelectionState selection)
     {
         SelectedClubName = selection.ClubName;
+        CurrentClub = selection.Club;
+        CareerProfile.CurrentClubName = selection.ClubName;
         CompetitionName = selection.CompetitionName;
         CurrentMatchday = selection.CurrentMatchday;
         TeamMorale = selection.TeamMorale;
@@ -175,6 +223,7 @@ public partial class GameState : Node
         CompetitionFixtures = selection.CompetitionFixtures;
         CurrentOpponentName = selection.CurrentOpponentName;
         NextFixtureSummary = selection.NextFixtureSummary;
+        SyncCurrentClubMoraleFromRuntime();
         SquadStatusSummary = BuildSquadStatusSummary();
     }
 
@@ -960,6 +1009,7 @@ public partial class GameState : Node
         TeamMorale = Math.Clamp(TeamMorale + consequence.MoraleDelta, 0, 100);
         FanSentiment = Math.Clamp(FanSentiment + consequence.FanDelta, 0, 100);
         BoardConfidence = Math.Clamp(BoardConfidence + consequence.BoardDelta, 0, 100);
+        SyncCurrentClubMoraleFromRuntime();
         if (!string.IsNullOrWhiteSpace(SelectedClubName))
         {
             SquadPlayers = DevelopmentSystem.ApplyPostMatchChanges(SquadPlayers, SelectedClubName, result);
@@ -998,6 +1048,7 @@ public partial class GameState : Node
     {
         ManagerName = data.ManagerName;
         CareerSeed = data.CareerSeed;
+        CareerProfile = RestoreCareerProfile(data.CareerProfile, data.ManagerName, data.CareerSeed, data.SelectedClubName);
         CareerInitialized = data.CareerInitialized;
         WorldSeed = data.WorldSeed;
         CountryPackId = data.CountryPackId;
@@ -1016,6 +1067,7 @@ public partial class GameState : Node
         TeamMorale = data.TeamMorale;
         FanSentiment = data.FanSentiment;
         BoardConfidence = data.BoardConfidence;
+        CurrentClub = RestoreClubFoundation(data.CurrentClub);
         CurrentDate = DateTime.Parse(data.CurrentDateIso);
         SeasonStartYear = data.SeasonStartYear;
         FormSummary = data.FormSummary;
@@ -1093,6 +1145,19 @@ public partial class GameState : Node
             });
         SelectedPlayerProfileName = data.SelectedPlayerProfileName;
         CurrentMatchResult = null;
+        if (CurrentClub == null && !string.IsNullOrWhiteSpace(SelectedClubName))
+        {
+            CurrentClub = CareerFoundation.BuildFallbackClubFoundation(
+                SelectedClubName,
+                TeamMorale,
+                FanSentiment,
+                BoardConfidence,
+                CareerProfile,
+                WorldSeed);
+        }
+
+        CareerProfile.CurrentClubName = SelectedClubName;
+        SyncCurrentClubMoraleFromRuntime();
         RefreshFixtureContext();
     }
 
@@ -1149,6 +1214,73 @@ public partial class GameState : Node
             : TouchlineWorldGenerator.Instance.ResolveClubSquad(clubName, WorldSeed);
     }
 
+    public string ValidateStage1CareerFoundationContract()
+    {
+        if (!CareerInitialized)
+        {
+            return "Career foundation is not initialized.";
+        }
+
+        if (string.IsNullOrWhiteSpace(ManagerName) ||
+            string.IsNullOrWhiteSpace(CurrentRoleName) ||
+            string.IsNullOrWhiteSpace(ManagerBackgroundName) ||
+            string.IsNullOrWhiteSpace(LicenseName))
+        {
+            return "Career profile is missing role, background, or license context.";
+        }
+
+        if (string.IsNullOrWhiteSpace(SelectedClubName) || CurrentClub == null)
+        {
+            return "Career foundation is missing selected club foundation state.";
+        }
+
+        if (CurrentClub.Staff.Length == 0)
+        {
+            return "Club foundation is missing starting staff.";
+        }
+
+        if (CurrentClub.Objectives.Length == 0)
+        {
+            return "Club foundation is missing objectives.";
+        }
+
+        if (CurrentClub.TransferBudget <= 0 || CurrentClub.WageBudget <= 0)
+        {
+            return "Club foundation is missing readable budget data.";
+        }
+
+        if (!IsInPercentRange(BoardMorale) ||
+            !IsInPercentRange(FanMorale) ||
+            !IsInPercentRange(SquadMorale) ||
+            !IsInPercentRange(JobPressure))
+        {
+            return "Morale or pressure values are outside 0-100 bounds.";
+        }
+
+        if (CareerProfile.Role == ManagerRole.AssistantManager &&
+            RoleAuthoritySummary.Contains("Can suggest", StringComparison.Ordinal) &&
+            RoleAuthoritySummary.Contains("Cannot finalize", StringComparison.Ordinal))
+        {
+            return MatchPlaybackContractValidator.PassMessage;
+        }
+
+        if (CareerProfile.Role == ManagerRole.HeadCoach &&
+            RoleAuthoritySummary.Contains("Controls lineups", StringComparison.Ordinal) &&
+            RoleAuthoritySummary.Contains("Does not fully control", StringComparison.Ordinal))
+        {
+            return MatchPlaybackContractValidator.PassMessage;
+        }
+
+        if (CareerProfile.Role == ManagerRole.Manager &&
+            RoleAuthoritySummary.Contains("Controls the broad football project", StringComparison.Ordinal) &&
+            RoleAuthoritySummary.Contains("Cannot control ownership", StringComparison.Ordinal))
+        {
+            return MatchPlaybackContractValidator.PassMessage;
+        }
+
+        return "Role authority summary does not match the selected role.";
+    }
+
     public string TogglePlayerLineupStatus(string playerName)
     {
         var targetIndex = Array.FindIndex(SquadPlayers, player => player.Name == playerName);
@@ -1190,6 +1322,123 @@ public partial class GameState : Node
         SetPlayerStartingStatus(playerToBenchIndex, false);
         SetPlayerStartingStatus(targetIndex, true);
         return $"{targetPlayer.Name} enters the XI for {benchPlayer.Name}.";
+    }
+
+    private static CareerProfile RestoreCareerProfile(
+        SaveSlotCareerProfileData? data,
+        string managerName,
+        int careerSeed,
+        string? selectedClubName)
+    {
+        if (data == null)
+        {
+            var fallbackProfile = CareerFoundation.CreateCareerProfile(
+                managerName,
+                careerSeed,
+                ManagerRole.Manager,
+                ManagerBackground.UnknownUpstart,
+                ManagerLicense.NationalCLicense);
+            fallbackProfile.CurrentClubName = selectedClubName;
+            return fallbackProfile;
+        }
+
+        var profile = CareerFoundation.CreateCareerProfile(
+            string.IsNullOrWhiteSpace(data.ManagerName) ? managerName : data.ManagerName,
+            data.CareerSeed == 0 ? careerSeed : data.CareerSeed,
+            CareerFoundation.ParseRole(data.RoleName),
+            CareerFoundation.ParseBackground(data.BackgroundName),
+            CareerFoundation.ParseLicense(data.LicenseName));
+        profile.CurrentClubName = string.IsNullOrWhiteSpace(data.CurrentClubName) ? selectedClubName : data.CurrentClubName;
+        profile.Reputation = data.Reputation > 0 ? data.Reputation : profile.Reputation;
+        profile.BoardTrust = data.BoardTrust > 0 ? data.BoardTrust : profile.BoardTrust;
+        profile.PlayerTrust = data.PlayerTrust > 0 ? data.PlayerTrust : profile.PlayerTrust;
+        profile.StaffTrust = data.StaffTrust > 0 ? data.StaffTrust : profile.StaffTrust;
+        profile.DirectorTrust = data.DirectorTrust > 0 ? data.DirectorTrust : profile.DirectorTrust;
+        profile.MediaPressure = data.MediaPressure > 0 ? data.MediaPressure : profile.MediaPressure;
+        return profile;
+    }
+
+    private Club? RestoreClubFoundation(SaveSlotClubFoundationData? data)
+    {
+        if (data == null || string.IsNullOrWhiteSpace(data.Name))
+        {
+            return null;
+        }
+
+        var staff = Array.ConvertAll(
+            data.Staff ?? Array.Empty<SaveSlotStaffMemberData>(),
+            RestoreStaffMember);
+        var objectives = Array.ConvertAll(
+            data.Objectives ?? Array.Empty<SaveSlotObjectiveData>(),
+            RestoreObjective);
+        return new Club
+        {
+            Name = data.Name,
+            IdentitySummary = string.IsNullOrWhiteSpace(data.IdentitySummary)
+                ? "Club identity context unavailable from save."
+                : data.IdentitySummary,
+            ExpectationSummary = string.IsNullOrWhiteSpace(data.ExpectationSummary)
+                ? "Board line: saved objective context unavailable."
+                : data.ExpectationSummary,
+            Archetype = CareerFoundation.ParseClubArchetype(data.ArchetypeName),
+            BoardPhilosophy = CareerFoundation.ParseBoardPhilosophy(data.BoardPhilosophyName),
+            FanCulture = CareerFoundation.ParseFanCulture(data.FanCultureName),
+            DirectorOfFootballStyle = CareerFoundation.ParseDirectorStyle(data.DirectorOfFootballStyleName),
+            DirectorRelationshipState = CareerFoundation.ParseDirectorRelationship(data.DirectorRelationshipName),
+            Staff = staff,
+            Objectives = objectives,
+            TransferBudget = data.TransferBudget,
+            WageBudget = data.WageBudget,
+            BoardMorale = data.BoardMorale,
+            FanMorale = data.FanMorale,
+            SquadMorale = data.SquadMorale,
+            JobPressure = data.JobPressure,
+            NewsFeed = data.NewsFeed ?? Array.Empty<string>()
+        };
+    }
+
+    private static StaffMember RestoreStaffMember(SaveSlotStaffMemberData data)
+    {
+        return new StaffMember
+        {
+            Name = string.IsNullOrWhiteSpace(data.Name) ? "Unnamed staff member" : data.Name,
+            Role = CareerFoundation.ParseStaffRole(data.RoleName),
+            Quality = data.Quality,
+            InfluenceSummary = string.IsNullOrWhiteSpace(data.InfluenceSummary)
+                ? "Influence summary unavailable."
+                : data.InfluenceSummary
+        };
+    }
+
+    private static Objective RestoreObjective(SaveSlotObjectiveData data)
+    {
+        return new Objective
+        {
+            Summary = string.IsNullOrWhiteSpace(data.Summary) ? "Objective summary unavailable." : data.Summary,
+            Priority = CareerFoundation.ParseObjectivePriority(data.PriorityName),
+            Type = CareerFoundation.ParseObjectiveType(data.TypeName)
+        };
+    }
+
+    private void SyncCurrentClubMoraleFromRuntime()
+    {
+        if (CurrentClub == null)
+        {
+            return;
+        }
+
+        CurrentClub.BoardMorale = BoardConfidence;
+        CurrentClub.FanMorale = FanSentiment;
+        CurrentClub.SquadMorale = TeamMorale;
+        CurrentClub.JobPressure = CareerFoundation.CalculateJobPressure(
+            CurrentClub.Archetype,
+            CurrentClub.BoardPhilosophy,
+            CareerProfile.Role,
+            CareerProfile.Background,
+            CareerProfile.License,
+            BoardConfidence,
+            FanSentiment,
+            TeamMorale);
     }
 
     private string BuildSquadStatusSummary()

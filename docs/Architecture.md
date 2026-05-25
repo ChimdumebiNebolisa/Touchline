@@ -2,9 +2,9 @@
 
 ## 1. Source Of Truth
 
-`touchline_master_design_decisions.md` is the highest-level product design source of truth. This architecture describes how the Godot/C# codebase should support that design.
+`docs/touchline_master_design_decisions.md` is the highest-level product design source of truth. This architecture describes how the Godot/C# codebase should support that design.
 
-If Architecture conflicts with `touchline_master_design_decisions.md`, `docs/PRD.md`, `docs/Guardrails.md`, or `docs/Plan.md`, stop and reconcile the docs before changing product code.
+If Architecture conflicts with `docs/touchline_master_design_decisions.md`, `docs/PRD.md`, `docs/Guardrails.md`, or `docs/Plan.md`, stop and reconcile the docs before changing product code.
 
 ## 2. Technical Direction
 

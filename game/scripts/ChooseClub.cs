@@ -97,7 +97,7 @@ public partial class ChooseClub : Control
         }
 
         _careerSummaryLabel.Text =
-            $"Manager {GameState.Instance.ManagerName} | Seed {GameState.Instance.WorldSeed} | {GameState.Instance.CountryPackId}";
+            $"{GameState.Instance.CurrentRoleName} {GameState.Instance.ManagerName} | {GameState.Instance.ManagerBackgroundName} | {GameState.Instance.LicenseName} | Seed {GameState.Instance.WorldSeed} | {GameState.Instance.CountryPackId}";
         _selectionStatusLabel.Text = "Select a club to preview its identity and pressure before you confirm.";
         _confirmSelectionButton.Disabled = false;
         PopulateClubRows();
@@ -251,8 +251,10 @@ public partial class ChooseClub : Control
         _previewClubNameLabel.Text = preview.ClubName;
         _identityTagLabel.Text = BuildStyleTag(preview);
         _pressureTagLabel.Text = BuildPressureTag(preview);
-        _identityLabel.Text = $"Identity | {preview.IdentitySummary}";
-        _expectationLabel.Text = $"Board line | {preview.ExpectationSummary.Replace("Board line: ", string.Empty)}";
+        _identityLabel.Text =
+            $"Identity | {preview.IdentitySummary}\nArchetype | {preview.ArchetypeName}\nFan culture | {preview.FanCultureName}";
+        _expectationLabel.Text =
+            $"Board line | {preview.ExpectationSummary.Replace("Board line: ", string.Empty)}\nBoard philosophy | {preview.BoardPhilosophyName}\nDirector of Football | {preview.DirectorOfFootballStyleName} ({preview.DirectorRelationshipName})\nBudgets | {preview.BudgetSummary}\nObjectives | {preview.ObjectivesSummary}";
         _openingFixtureLabel.Text = preview.OpeningFixtureSummary;
         _selectionStatusLabel.Text = $"Selected | {preview.ClubName}";
         _confirmSelectionButton.Text = $"Take Charge of {preview.ClubName}";
@@ -301,7 +303,7 @@ public partial class ChooseClub : Control
             return "Preview unavailable.";
         }
 
-        return $"{BuildStyleTag(preview)} | {BuildPressureTag(preview)}";
+        return $"{preview.ArchetypeName} | {preview.BoardPhilosophyName} | {preview.FanCultureName}";
     }
 
     private static string BuildStyleTag(GameState.ClubPreview? preview)
@@ -309,6 +311,11 @@ public partial class ChooseClub : Control
         if (preview == null)
         {
             return "Unknown";
+        }
+
+        if (!string.IsNullOrWhiteSpace(preview.ArchetypeName))
+        {
+            return preview.ArchetypeName;
         }
 
         var identity = preview.IdentitySummary.ToLowerInvariant();
@@ -340,6 +347,11 @@ public partial class ChooseClub : Control
         if (preview == null)
         {
             return "No brief";
+        }
+
+        if (!string.IsNullOrWhiteSpace(preview.BoardPhilosophyName))
+        {
+            return preview.BoardPhilosophyName;
         }
 
         var expectation = preview.ExpectationSummary.ToLowerInvariant();

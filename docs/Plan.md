@@ -4,11 +4,12 @@
 
 ### Active
 
-- Stage 1: Career foundation
+- Stage 2: Player and squad identity
 
 ### Done
 
 - Stage 0: Documentation reconciliation
+- Stage 1: Career foundation
 
 ### Blocked
 
@@ -16,7 +17,7 @@
 
 ## 2. Plan Rules
 
-1. `touchline_master_design_decisions.md` is the highest-level product design source of truth.
+1. `docs/touchline_master_design_decisions.md` is the highest-level product design source of truth.
 2. Only one stage or bounded subtask should be active at a time.
 3. Each stage must be verified before the next stage starts.
 4. Implement the smallest coherent playable slice for the active stage.
@@ -48,7 +49,7 @@ Make repo docs consistent with the master design.
 
 ### Verification
 
-- Docs no longer contradict `touchline_master_design_decisions.md`.
+- Docs no longer contradict `docs/touchline_master_design_decisions.md`.
 - Repo docs no longer state that master-design systems are permanently out of scope.
 - `git diff --check` passes.
 - Product code remains unchanged.

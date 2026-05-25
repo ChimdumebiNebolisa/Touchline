@@ -4,31 +4,39 @@
 - Stage 1: Career foundation.
 
 ## Last completed verified task
-- Stage 0 documentation reconciliation complete: `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md` now align with `touchline_master_design_decisions.md` as the highest-level product design source of truth.
+- Stage 1 career foundation complete: new career setup now captures role, manager background, starting license, selected club foundation metadata, staff, objectives, budgets, morale, pressure, dashboard visibility, and save/load persistence.
 
 ## Current subtask in progress
-- None. Ready to begin the smallest valid Stage 1 implementation slice.
+- None.
 
 ## Next queued subtasks
-- Stage 1: add career foundation state for role, starting license, manager background, club archetype, board philosophy, fan culture, Director of Football style, staff, objectives, and starting squad.
-- Verify Stage 1 by starting a new career, rendering the dashboard from authoritative state, and preserving the new state through save/load.
+- Stage 2: expand player and squad identity with partial information, styles, traits, personality, tactical fit, form, morale, fitness, and contract basics.
+- Update squad/profile screens to show exact ratings, estimated ranges, unknown question marks, and scouting language.
+- Preserve existing lineup and match preparation flows while adding player identity state.
 
 ## Known blockers
 - No active blockers.
-- Product code is still unchanged after Stage 0.
-- `docs/audit/` remains untracked and intentionally excluded from this documentation reconciliation commit.
+- `docs/audit/` remains untracked and intentionally excluded from this Stage 1 commit.
 
 ## Last verification run
-- Stage 0 verification:
-  - `git diff --check` passed.
-  - `dotnet build game/Touchline.sln` passed.
-  - Stale source-doc exclusion scan had no matches for old v1-only exclusions in `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`.
-  - Stage 1 through Stage 8 headings are present in `docs/Plan.md`.
+- Stage 1 verification:
+  - `git diff --check` passed with only CRLF normalization warnings.
+  - `dotnet build game/Touchline.sln` passed with 0 warnings and 0 errors.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/stage1_career_foundation_check.gd` passed.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step2_career_setup_check.gd` passed.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step3_club_selection_check.gd` passed.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step27_save_compat_check.gd` passed.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step30_navigation_flow_check.gd` passed.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step48_dashboard_context_check.gd` passed.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step50_end_to_end_user_flow_check.gd` passed.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step23_post_match_check.gd` passed.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step51_squad_profile_check.gd` passed.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step52_tactics_context_check.gd` passed.
 
 ## Last commit hash
-- 7f2eace
+- Pending until the Stage 1 commit is created.
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`.
-- Re-read `C:\Users\Chimdumebi\Desktop\touchline_master_design_decisions.md`.
-- Start Stage 1 with the smallest coherent career foundation slice.
+- Re-read `docs/touchline_master_design_decisions.md`.
+- Start Stage 2 with the smallest coherent player and squad identity slice.

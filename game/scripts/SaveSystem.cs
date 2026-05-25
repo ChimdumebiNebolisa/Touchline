@@ -12,6 +12,8 @@ public sealed class SaveSlotData
     public string CountryPackId { get; set; } = "country-pack-alpha";
     public string[]? AvailableClubs { get; set; }
     public string? SelectedClubName { get; set; }
+    public SaveSlotCareerProfileData? CareerProfile { get; set; }
+    public SaveSlotClubFoundationData? CurrentClub { get; set; }
     public string NextFixtureSummary { get; set; } = "Fixture context unavailable.";
     public string SquadStatusSummary { get; set; } = "Squad status unavailable.";
     public SaveSlotPlayerData[]? SquadPlayers { get; set; }
@@ -34,6 +36,58 @@ public sealed class SaveSlotData
     public string? SelectedPlayerProfileName { get; set; }
     public SaveSlotCompetitionRowData[]? CompetitionTable { get; set; }
     public SaveSlotCompetitionFixtureData[]? CompetitionFixtures { get; set; }
+}
+
+public sealed class SaveSlotCareerProfileData
+{
+    public string ManagerName { get; set; } = "Manager";
+    public int CareerSeed { get; set; }
+    public string RoleName { get; set; } = "Manager";
+    public string BackgroundName { get; set; } = "Unknown Upstart";
+    public string LicenseName { get; set; } = "National C License";
+    public string? CurrentClubName { get; set; }
+    public int Reputation { get; set; }
+    public int BoardTrust { get; set; }
+    public int PlayerTrust { get; set; }
+    public int StaffTrust { get; set; }
+    public int DirectorTrust { get; set; }
+    public int MediaPressure { get; set; }
+}
+
+public sealed class SaveSlotClubFoundationData
+{
+    public string Name { get; set; } = string.Empty;
+    public string IdentitySummary { get; set; } = string.Empty;
+    public string ExpectationSummary { get; set; } = string.Empty;
+    public string ArchetypeName { get; set; } = "Mid-table Stabilizer";
+    public string BoardPhilosophyName { get; set; } = "Patient Long-Term Board";
+    public string FanCultureName { get; set; } = "Attacking Football";
+    public string DirectorOfFootballStyleName { get; set; } = "Data Operator";
+    public string DirectorRelationshipName { get; set; } = "Neutral";
+    public SaveSlotStaffMemberData[]? Staff { get; set; }
+    public SaveSlotObjectiveData[]? Objectives { get; set; }
+    public int TransferBudget { get; set; }
+    public int WageBudget { get; set; }
+    public int BoardMorale { get; set; }
+    public int FanMorale { get; set; }
+    public int SquadMorale { get; set; }
+    public int JobPressure { get; set; }
+    public string[]? NewsFeed { get; set; }
+}
+
+public sealed class SaveSlotStaffMemberData
+{
+    public string Name { get; set; } = string.Empty;
+    public string RoleName { get; set; } = "First-Team Coach";
+    public int Quality { get; set; }
+    public string InfluenceSummary { get; set; } = string.Empty;
+}
+
+public sealed class SaveSlotObjectiveData
+{
+    public string Summary { get; set; } = string.Empty;
+    public string PriorityName { get; set; } = "Important";
+    public string TypeName { get; set; } = "League objective";
 }
 
 public sealed class SaveSlotPlayerData
@@ -372,6 +426,8 @@ public partial class SaveSystem : Node
             CountryPackId = state.CountryPackId,
             AvailableClubs = state.AvailableClubs,
             SelectedClubName = state.SelectedClubName,
+            CareerProfile = BuildCareerProfileData(state.CareerProfile),
+            CurrentClub = BuildClubFoundationData(state.CurrentClub),
             NextFixtureSummary = state.NextFixtureSummary,
             SquadStatusSummary = state.SquadStatusSummary,
             SquadPlayers = Array.ConvertAll(
@@ -461,6 +517,8 @@ public partial class SaveSystem : Node
             CountryPackId = source.CountryPackId,
             AvailableClubs = source.AvailableClubs == null ? null : (string[])source.AvailableClubs.Clone(),
             SelectedClubName = source.SelectedClubName,
+            CareerProfile = CloneCareerProfileData(source.CareerProfile),
+            CurrentClub = CloneClubFoundationData(source.CurrentClub),
             NextFixtureSummary = source.NextFixtureSummary,
             SquadStatusSummary = source.SquadStatusSummary,
             SquadPlayers = source.SquadPlayers == null
@@ -540,7 +598,142 @@ public partial class SaveSystem : Node
                         IsComplete = fixture.IsComplete,
                         Scoreline = fixture.Scoreline,
                         ResultSummary = fixture.ResultSummary
-                    })
+                })
+        };
+    }
+
+    private static SaveSlotCareerProfileData BuildCareerProfileData(CareerProfile profile)
+    {
+        return new SaveSlotCareerProfileData
+        {
+            ManagerName = profile.ManagerName,
+            CareerSeed = profile.CareerSeed,
+            RoleName = CareerFoundation.GetDisplayName(profile.Role),
+            BackgroundName = CareerFoundation.GetDisplayName(profile.Background),
+            LicenseName = CareerFoundation.GetDisplayName(profile.License),
+            CurrentClubName = profile.CurrentClubName,
+            Reputation = profile.Reputation,
+            BoardTrust = profile.BoardTrust,
+            PlayerTrust = profile.PlayerTrust,
+            StaffTrust = profile.StaffTrust,
+            DirectorTrust = profile.DirectorTrust,
+            MediaPressure = profile.MediaPressure
+        };
+    }
+
+    private static SaveSlotClubFoundationData? BuildClubFoundationData(Club? club)
+    {
+        if (club == null)
+        {
+            return null;
+        }
+
+        return new SaveSlotClubFoundationData
+        {
+            Name = club.Name,
+            IdentitySummary = club.IdentitySummary,
+            ExpectationSummary = club.ExpectationSummary,
+            ArchetypeName = CareerFoundation.GetDisplayName(club.Archetype),
+            BoardPhilosophyName = CareerFoundation.GetDisplayName(club.BoardPhilosophy),
+            FanCultureName = CareerFoundation.GetDisplayName(club.FanCulture),
+            DirectorOfFootballStyleName = CareerFoundation.GetDisplayName(club.DirectorOfFootballStyle),
+            DirectorRelationshipName = CareerFoundation.GetDisplayName(club.DirectorRelationshipState),
+            Staff = Array.ConvertAll(
+                club.Staff,
+                staff => new SaveSlotStaffMemberData
+                {
+                    Name = staff.Name,
+                    RoleName = CareerFoundation.GetDisplayName(staff.Role),
+                    Quality = staff.Quality,
+                    InfluenceSummary = staff.InfluenceSummary
+                }),
+            Objectives = Array.ConvertAll(
+                club.Objectives,
+                objective => new SaveSlotObjectiveData
+                {
+                    Summary = objective.Summary,
+                    PriorityName = CareerFoundation.GetDisplayName(objective.Priority),
+                    TypeName = CareerFoundation.GetDisplayName(objective.Type)
+                }),
+            TransferBudget = club.TransferBudget,
+            WageBudget = club.WageBudget,
+            BoardMorale = club.BoardMorale,
+            FanMorale = club.FanMorale,
+            SquadMorale = club.SquadMorale,
+            JobPressure = club.JobPressure,
+            NewsFeed = club.NewsFeed
+        };
+    }
+
+    private static SaveSlotCareerProfileData? CloneCareerProfileData(SaveSlotCareerProfileData? source)
+    {
+        if (source == null)
+        {
+            return null;
+        }
+
+        return new SaveSlotCareerProfileData
+        {
+            ManagerName = source.ManagerName,
+            CareerSeed = source.CareerSeed,
+            RoleName = source.RoleName,
+            BackgroundName = source.BackgroundName,
+            LicenseName = source.LicenseName,
+            CurrentClubName = source.CurrentClubName,
+            Reputation = source.Reputation,
+            BoardTrust = source.BoardTrust,
+            PlayerTrust = source.PlayerTrust,
+            StaffTrust = source.StaffTrust,
+            DirectorTrust = source.DirectorTrust,
+            MediaPressure = source.MediaPressure
+        };
+    }
+
+    private static SaveSlotClubFoundationData? CloneClubFoundationData(SaveSlotClubFoundationData? source)
+    {
+        if (source == null)
+        {
+            return null;
+        }
+
+        return new SaveSlotClubFoundationData
+        {
+            Name = source.Name,
+            IdentitySummary = source.IdentitySummary,
+            ExpectationSummary = source.ExpectationSummary,
+            ArchetypeName = source.ArchetypeName,
+            BoardPhilosophyName = source.BoardPhilosophyName,
+            FanCultureName = source.FanCultureName,
+            DirectorOfFootballStyleName = source.DirectorOfFootballStyleName,
+            DirectorRelationshipName = source.DirectorRelationshipName,
+            Staff = source.Staff == null
+                ? null
+                : Array.ConvertAll(
+                    source.Staff,
+                    staff => new SaveSlotStaffMemberData
+                    {
+                        Name = staff.Name,
+                        RoleName = staff.RoleName,
+                        Quality = staff.Quality,
+                        InfluenceSummary = staff.InfluenceSummary
+                    }),
+            Objectives = source.Objectives == null
+                ? null
+                : Array.ConvertAll(
+                    source.Objectives,
+                    objective => new SaveSlotObjectiveData
+                    {
+                        Summary = objective.Summary,
+                        PriorityName = objective.PriorityName,
+                        TypeName = objective.TypeName
+                    }),
+            TransferBudget = source.TransferBudget,
+            WageBudget = source.WageBudget,
+            BoardMorale = source.BoardMorale,
+            FanMorale = source.FanMorale,
+            SquadMorale = source.SquadMorale,
+            JobPressure = source.JobPressure,
+            NewsFeed = source.NewsFeed == null ? null : (string[])source.NewsFeed.Clone()
         };
     }
 

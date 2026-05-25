@@ -2,7 +2,7 @@
 
 ## 1. Source Of Truth Guardrails
 
-1. `touchline_master_design_decisions.md` is the highest-level product design source of truth.
+1. `docs/touchline_master_design_decisions.md` is the highest-level product design source of truth.
 2. `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md` must not contradict the master design.
 3. If repo docs conflict with each other or with the master design, stop and reconcile the docs before changing product code.
 4. Only one Plan stage or subtask should be active at a time.

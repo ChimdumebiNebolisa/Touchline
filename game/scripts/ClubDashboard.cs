@@ -15,6 +15,8 @@ public partial class ClubDashboard : Control
     private Label _seasonLabel = default!;
     private Label _competitionChipLabel = default!;
     private Label _clubContextLabel = default!;
+    private Label _careerFoundationLabel = default!;
+    private Label _clubFoundationLabel = default!;
     private Label _dateLabel = default!;
     private Label _priorityChipLabel = default!;
     private Label _stateChipLabel = default!;
@@ -40,6 +42,10 @@ public partial class ClubDashboard : Control
     private Label _pressureReasonsLabel = default!;
     private Label _squadStatusLabel = default!;
     private Label _tacticsSummaryLabel = default!;
+    private Label _roleAuthorityLabel = default!;
+    private Label _objectivesLabel = default!;
+    private Label _staffLabel = default!;
+    private Label _newsFeedLabel = default!;
     private Label _priorityLabel = default!;
     private Label _statusLabel = default!;
     private Label _saveHintLabel = default!;
@@ -89,7 +95,10 @@ public partial class ClubDashboard : Control
         _backButton = GetNode<Button>("RootMargin/Shell/RailCard/RailPadding/RailContent/FooterActions/BackButton");
 
         _headerCard = GetNode<PanelContainer>("RootMargin/Shell/MainColumn/HeaderCard");
+        EnsureStage1DashboardLabels();
         _clubContextLabel = GetNode<Label>("RootMargin/Shell/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderInfo/ClubContextLabel");
+        _careerFoundationLabel = GetNode<Label>("RootMargin/Shell/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderInfo/CareerFoundationLabel");
+        _clubFoundationLabel = GetNode<Label>("RootMargin/Shell/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderInfo/ClubFoundationLabel");
         _dateLabel = GetNode<Label>("RootMargin/Shell/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderInfo/DateLabel");
         _priorityChip = GetNode<PanelContainer>("RootMargin/Shell/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderStatus/ChipRow/PriorityChip");
         _priorityChipLabel = GetNode<Label>("RootMargin/Shell/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderStatus/ChipRow/PriorityChip/PriorityChipPadding/PriorityChipLabel");
@@ -126,8 +135,46 @@ public partial class ClubDashboard : Control
         _insightCard = GetNode<PanelContainer>("RootMargin/Shell/MainColumn/ContentRow/InsightCard");
         _squadStatusLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/SquadStatusLabel");
         _tacticsSummaryLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/TacticsSummaryLabel");
+        _roleAuthorityLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/RoleAuthorityLabel");
+        _objectivesLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/ObjectivesLabel");
+        _staffLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/StaffLabel");
+        _newsFeedLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/NewsFeedLabel");
         _priorityLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/PriorityLabel");
         _statusLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/StatusLabel");
+    }
+
+    private void EnsureStage1DashboardLabels()
+    {
+        var headerInfo = GetNode<VBoxContainer>("RootMargin/Shell/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderInfo");
+        var dateNode = headerInfo.GetNode("DateLabel");
+        var headerInsertIndex = dateNode.GetIndex();
+        EnsureLabel(headerInfo, ref headerInsertIndex, "CareerFoundationLabel");
+        EnsureLabel(headerInfo, ref headerInsertIndex, "ClubFoundationLabel");
+
+        var insightContent = GetNode<VBoxContainer>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent");
+        var priorityNode = insightContent.GetNode("PriorityLabel");
+        var insightInsertIndex = priorityNode.GetIndex();
+        EnsureLabel(insightContent, ref insightInsertIndex, "RoleAuthorityLabel");
+        EnsureLabel(insightContent, ref insightInsertIndex, "ObjectivesLabel");
+        EnsureLabel(insightContent, ref insightInsertIndex, "StaffLabel");
+        EnsureLabel(insightContent, ref insightInsertIndex, "NewsFeedLabel");
+    }
+
+    private static void EnsureLabel(VBoxContainer container, ref int insertIndex, string labelName)
+    {
+        var label = container.GetNodeOrNull<Label>(labelName);
+        if (label != null)
+        {
+            return;
+        }
+
+        label = new Label
+        {
+            Name = labelName,
+            AutowrapMode = TextServer.AutowrapMode.WordSmart
+        };
+        container.AddChild(label);
+        container.MoveChild(label, insertIndex++);
     }
 
     private void ApplyShellStyles()
@@ -167,6 +214,8 @@ public partial class ClubDashboard : Control
         TouchlineTheme.ApplyMutedStyle(_stateChipLabel, 13);
         TouchlineTheme.ApplyMutedStyle(_headerStatusLabel, 15);
         TouchlineTheme.ApplyMutedStyle(_clubContextLabel, 18);
+        TouchlineTheme.ApplyMutedStyle(_careerFoundationLabel, 14);
+        TouchlineTheme.ApplyMutedStyle(_clubFoundationLabel, 14);
         TouchlineTheme.ApplyMutedStyle(_dateLabel, 15);
         TouchlineTheme.ApplyValueStyle(_nextMatchValueLabel, 30);
         TouchlineTheme.ApplyAccentValueStyle(_tableValueLabel, 30);
@@ -185,6 +234,10 @@ public partial class ClubDashboard : Control
         TouchlineTheme.ApplyMutedStyle(_tableImpactLabel, 14);
         TouchlineTheme.ApplyMutedStyle(_pressureReasonsLabel, 14);
         TouchlineTheme.ApplyMutedStyle(_saveHintLabel, 14);
+        TouchlineTheme.ApplyMutedStyle(_roleAuthorityLabel, 14);
+        TouchlineTheme.ApplyMutedStyle(_objectivesLabel, 14);
+        TouchlineTheme.ApplyMutedStyle(_staffLabel, 14);
+        TouchlineTheme.ApplyMutedStyle(_newsFeedLabel, 14);
     }
 
     private void RenderState()
@@ -211,10 +264,14 @@ public partial class ClubDashboard : Control
 
         _clubBadgeLabel.Text = BuildClubMonogram(clubName);
         _clubNameLabel.Text = clubName;
-        _managerLabel.Text = $"Manager {state.ManagerName}";
+        _managerLabel.Text = $"{state.CurrentRoleName} {state.ManagerName}";
         _seasonLabel.Text = $"Season {state.SeasonLabel}";
         _competitionChipLabel.Text = state.CompetitionName.ToUpperInvariant();
-        _clubContextLabel.Text = $"{clubName} Manager Hub | Manager {state.ManagerName}";
+        _clubContextLabel.Text = $"{clubName} Manager Hub | {state.CurrentRoleName} {state.ManagerName}";
+        _careerFoundationLabel.Text =
+            $"Background: {state.ManagerBackgroundName} | License: {state.LicenseName}";
+        _clubFoundationLabel.Text =
+            $"Archetype: {state.ClubArchetypeName} | Board: {state.BoardPhilosophyName} | Fans: {state.FanCultureName} | Director of Football: {state.DirectorOfFootballStyleName} ({state.DirectorRelationshipName})";
         _dateLabel.Text = $"Season {state.SeasonLabel} | {state.CurrentDateLabel} | Matchday {state.CurrentMatchday}";
         _priorityChipLabel.Text = BuildPriorityTag(state);
         SetStateChip(hasMatchReport ? "POST-MATCH" : "MATCH WEEK", hasMatchReport);
@@ -226,10 +283,10 @@ public partial class ClubDashboard : Control
         _tableMetaLabel.Text = currentRow == null
             ? "Table position unavailable."
             : $"{currentRow.Points} pts | GD {FormatSigned(currentRow.GoalDifference)} | {currentRow.Played} played";
-        _moraleValueLabel.Text = $"{state.TeamMorale}";
-        _moraleMetaLabel.Text = $"Team morale {DescribePulse(state.TeamMorale)} | Fans {state.FanSentiment}";
-        _boardValueLabel.Text = $"{state.BoardConfidence}";
-        _boardMetaLabel.Text = $"Board confidence | Fan sentiment {state.FanSentiment}";
+        _moraleValueLabel.Text = $"{state.SquadMorale}";
+        _moraleMetaLabel.Text = $"Squad morale {DescribePulse(state.SquadMorale)} | Fan morale {state.FanMorale}";
+        _boardValueLabel.Text = $"{state.BoardMorale}";
+        _boardMetaLabel.Text = $"Board morale | Job pressure {state.JobPressure} | {state.BudgetSummary}";
         _shapeValueLabel.Text = state.TacticalFormation;
         _shapeMetaLabel.Text = $"Press {state.PressIntensity} | Tempo {state.Tempo} | Risk {state.Risk}";
 
@@ -249,11 +306,15 @@ public partial class ClubDashboard : Control
             : BuildTableLine(position, tableSize, currentRow);
 
         _pressureValueLabel.Text =
-            $"Morale {state.TeamMorale} | Fans {state.FanSentiment} | Board {state.BoardConfidence}";
+            $"Job pressure {state.JobPressure} | Board morale {state.BoardMorale} | Fan morale {state.FanMorale} | Squad morale {state.SquadMorale}";
         _pressureReasonsLabel.Text = PerceptionSystem.BuildPressureReasonSummary(state);
 
         _squadStatusLabel.Text = $"{state.BuildLineupReadinessSummary()}\n{state.SquadStatusSummary}";
         _tacticsSummaryLabel.Text = state.BuildTacticalPlanSummary();
+        _roleAuthorityLabel.Text = $"Role authority | {state.RoleAuthoritySummary}";
+        _objectivesLabel.Text = $"Main objectives\n{state.MainObjectivesSummary}";
+        _staffLabel.Text = $"Starting staff\n{state.StaffSummary}";
+        _newsFeedLabel.Text = $"News feed\n{state.NewsFeedSummary}";
         _priorityLabel.Text = BuildPrioritySummary(state);
         _statusLabel.Text = hasMatchReport
             ? $"{state.LastMatchReport!.FixtureLabel}: {state.LastMatchReport.Scoreline} | Cause: {state.LastMatchReport.CauseSummary}"
@@ -271,6 +332,8 @@ public partial class ClubDashboard : Control
         _seasonLabel.Text = "Season unavailable";
         _competitionChipLabel.Text = "NO COMPETITION";
         _clubContextLabel.Text = title;
+        _careerFoundationLabel.Text = "Career foundation unavailable.";
+        _clubFoundationLabel.Text = "Club foundation unavailable.";
         _dateLabel.Text = "Date unavailable";
         _priorityChipLabel.Text = "SETUP";
         SetStateChip("OFFLINE", false);
@@ -296,6 +359,10 @@ public partial class ClubDashboard : Control
         _pressureReasonsLabel.Text = "Pressure reasons unavailable.";
         _squadStatusLabel.Text = "Squad status unavailable.";
         _tacticsSummaryLabel.Text = "Tactical summary unavailable.";
+        _roleAuthorityLabel.Text = "Role authority unavailable.";
+        _objectivesLabel.Text = "Objectives unavailable.";
+        _staffLabel.Text = "Staff foundation unavailable.";
+        _newsFeedLabel.Text = "News feed unavailable.";
         _priorityLabel.Text = status;
         _statusLabel.Text = status;
         _saveHintLabel.Text = "Save unavailable.";

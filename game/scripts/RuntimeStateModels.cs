@@ -4,6 +4,9 @@ public sealed class CareerBootstrapState
 {
     public required string ManagerName { get; init; }
     public required int CareerSeed { get; init; }
+    public required ManagerRole Role { get; init; }
+    public required ManagerBackground Background { get; init; }
+    public required ManagerLicense License { get; init; }
     public required int WorldSeed { get; init; }
     public required string CountryPackId { get; init; }
     public required string[] AvailableClubs { get; init; }
@@ -24,6 +27,7 @@ public sealed class CareerBootstrapState
 public sealed class ClubSelectionState
 {
     public required string ClubName { get; init; }
+    public required Club Club { get; init; }
     public required string CompetitionName { get; init; }
     public required int CurrentMatchday { get; init; }
     public required int TeamMorale { get; init; }

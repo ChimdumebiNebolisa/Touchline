@@ -10,9 +10,16 @@ public partial class CareerSetup : Control
     private PanelContainer _previewCard = default!;
     private LineEdit _managerNameInput = default!;
     private SpinBox _seedInput = default!;
+    private OptionButton _roleOption = default!;
+    private OptionButton _backgroundOption = default!;
+    private OptionButton _licenseOption = default!;
     private Label _statusLabel = default!;
     private Label _managerPreviewLabel = default!;
     private Label _seedPreviewLabel = default!;
+    private Label _rolePreviewLabel = default!;
+    private Label _backgroundPreviewLabel = default!;
+    private Label _licensePreviewLabel = default!;
+    private Label _authorityPreviewLabel = default!;
     private Label _worldPackPreviewLabel = default!;
     private Label _startDatePreviewLabel = default!;
     private Label _persistencePreviewLabel = default!;
@@ -34,15 +41,99 @@ public partial class CareerSetup : Control
         _previewCard = GetNode<PanelContainer>("RootMargin/MainColumn/ContentRow/PreviewCard");
         _managerNameInput = GetNode<LineEdit>("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/ManagerNameInput");
         _seedInput = GetNode<SpinBox>("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/SeedInput");
+        EnsureCareerFoundationControls();
+        _roleOption = GetNode<OptionButton>("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/RoleOption");
+        _backgroundOption = GetNode<OptionButton>("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/BackgroundOption");
+        _licenseOption = GetNode<OptionButton>("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/LicenseOption");
         _statusLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/StatusLabel");
         _managerPreviewLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent/ManagerPreviewLabel");
         _seedPreviewLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent/SeedPreviewLabel");
+        _rolePreviewLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent/RolePreviewLabel");
+        _backgroundPreviewLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent/BackgroundPreviewLabel");
+        _licensePreviewLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent/LicensePreviewLabel");
+        _authorityPreviewLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent/AuthorityPreviewLabel");
         _worldPackPreviewLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent/WorldPackPreviewLabel");
         _startDatePreviewLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent/StartDatePreviewLabel");
         _persistencePreviewLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent/PersistencePreviewLabel");
         _seedImpactPreviewLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent/SeedImpactPreviewLabel");
         _startCareerButton = GetNode<Button>("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/ActionsRow/StartCareerButton");
         _backButton = GetNode<Button>("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/ActionsRow/BackButton");
+    }
+
+    private void EnsureCareerFoundationControls()
+    {
+        var formContent = GetNode<VBoxContainer>("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent");
+        var statusNode = formContent.GetNode("StatusLabel");
+        var insertIndex = statusNode.GetIndex();
+        EnsureSelectionField(formContent, ref insertIndex, "RoleLabel", "Role", "RoleOption", CareerFoundation.RoleDisplayNames, 2);
+        EnsureSelectionField(formContent, ref insertIndex, "BackgroundLabel", "Manager background", "BackgroundOption", CareerFoundation.BackgroundDisplayNames, 1);
+        EnsureSelectionField(formContent, ref insertIndex, "LicenseLabel", "Starting license", "LicenseOption", CareerFoundation.LicenseDisplayNames, 1);
+
+        var previewContent = GetNode<VBoxContainer>("RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent");
+        var worldPackNode = previewContent.GetNode("WorldPackPreviewLabel");
+        var previewIndex = worldPackNode.GetIndex();
+        EnsurePreviewLabel(previewContent, ref previewIndex, "RolePreviewLabel");
+        EnsurePreviewLabel(previewContent, ref previewIndex, "BackgroundPreviewLabel");
+        EnsurePreviewLabel(previewContent, ref previewIndex, "LicensePreviewLabel");
+        EnsurePreviewLabel(previewContent, ref previewIndex, "AuthorityPreviewLabel");
+    }
+
+    private void EnsureSelectionField(
+        VBoxContainer formContent,
+        ref int insertIndex,
+        string labelName,
+        string labelText,
+        string optionName,
+        string[] options,
+        int selectedIndex)
+    {
+        var label = formContent.GetNodeOrNull<Label>(labelName);
+        if (label == null)
+        {
+            label = new Label
+            {
+                Name = labelName,
+                Text = labelText
+            };
+            formContent.AddChild(label);
+            formContent.MoveChild(label, insertIndex++);
+        }
+
+        var option = formContent.GetNodeOrNull<OptionButton>(optionName);
+        if (option == null)
+        {
+            option = new OptionButton
+            {
+                Name = optionName,
+                SizeFlagsHorizontal = SizeFlags.ExpandFill
+            };
+            foreach (var item in options)
+            {
+                option.AddItem(item);
+            }
+
+            option.Select(selectedIndex);
+            option.ItemSelected += OnCareerFoundationOptionSelected;
+            formContent.AddChild(option);
+            formContent.MoveChild(option, insertIndex++);
+        }
+    }
+
+    private static void EnsurePreviewLabel(VBoxContainer previewContent, ref int insertIndex, string labelName)
+    {
+        var label = previewContent.GetNodeOrNull<Label>(labelName);
+        if (label != null)
+        {
+            return;
+        }
+
+        label = new Label
+        {
+            Name = labelName,
+            AutowrapMode = TextServer.AutowrapMode.WordSmart
+        };
+        previewContent.AddChild(label);
+        previewContent.MoveChild(label, insertIndex++);
     }
 
     private void ApplyShellStyles()
@@ -60,11 +151,18 @@ public partial class CareerSetup : Control
         TouchlineTheme.ApplyMutedStyle(GetNode<Label>("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/FormHintLabel"), 14);
         TouchlineTheme.ApplyMutedStyle(GetNode<Label>("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/ManagerNameLabel"), 14);
         TouchlineTheme.ApplyMutedStyle(GetNode<Label>("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/SeedLabel"), 14);
+        TouchlineTheme.ApplyMutedStyle(GetNode<Label>("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/RoleLabel"), 14);
+        TouchlineTheme.ApplyMutedStyle(GetNode<Label>("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/BackgroundLabel"), 14);
+        TouchlineTheme.ApplyMutedStyle(GetNode<Label>("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/LicenseLabel"), 14);
         TouchlineTheme.ApplyMutedStyle(_statusLabel, 14);
         TouchlineTheme.ApplyTitleStyle(GetNode<Label>("RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent/PreviewHeading"), 24);
         TouchlineTheme.ApplyMutedStyle(GetNode<Label>("RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent/PreviewHintLabel"), 14);
         TouchlineTheme.ApplyMutedStyle(_managerPreviewLabel, 15);
         TouchlineTheme.ApplyMutedStyle(_seedPreviewLabel, 15);
+        TouchlineTheme.ApplyMutedStyle(_rolePreviewLabel, 15);
+        TouchlineTheme.ApplyMutedStyle(_backgroundPreviewLabel, 15);
+        TouchlineTheme.ApplyMutedStyle(_licensePreviewLabel, 15);
+        TouchlineTheme.ApplyMutedStyle(_authorityPreviewLabel, 15);
         TouchlineTheme.ApplyMutedStyle(_worldPackPreviewLabel, 15);
         TouchlineTheme.ApplyMutedStyle(_startDatePreviewLabel, 15);
         TouchlineTheme.ApplyMutedStyle(_persistencePreviewLabel, 15);
@@ -80,12 +178,20 @@ public partial class CareerSetup : Control
         }
 
         var seed = (int)_seedInput.Value;
+        var roleName = GetSelectedText(_roleOption);
+        var backgroundName = GetSelectedText(_backgroundOption);
+        var licenseName = GetSelectedText(_licenseOption);
+        var role = CareerFoundation.ParseRole(roleName);
 
         if (!WorldSeedDataLoader.TryLoad(out var seedData, out var errorMessage))
         {
             _statusLabel.Text = errorMessage;
             _managerPreviewLabel.Text = $"Manager | {managerName}";
             _seedPreviewLabel.Text = $"Seed | {seed}";
+            _rolePreviewLabel.Text = $"Role | {roleName}";
+            _backgroundPreviewLabel.Text = $"Background | {backgroundName}";
+            _licensePreviewLabel.Text = $"License | {licenseName}";
+            _authorityPreviewLabel.Text = $"Authority | {CareerFoundation.GetRoleAuthoritySummary(role)}";
             _worldPackPreviewLabel.Text = "World pack unavailable.";
             _startDatePreviewLabel.Text = "Start date unavailable.";
             _persistencePreviewLabel.Text = "Persistence preview unavailable.";
@@ -97,6 +203,10 @@ public partial class CareerSetup : Control
         _statusLabel.Text = "Start a career to initialize the world, then move straight into club selection.";
         _managerPreviewLabel.Text = $"Manager | {managerName}";
         _seedPreviewLabel.Text = $"Seed | {seed}";
+        _rolePreviewLabel.Text = $"Role | {roleName}";
+        _backgroundPreviewLabel.Text = $"Background | {backgroundName}";
+        _licensePreviewLabel.Text = $"License | {licenseName}";
+        _authorityPreviewLabel.Text = $"Authority | {CareerFoundation.GetRoleAuthoritySummary(role)}";
         _worldPackPreviewLabel.Text = $"World pack | {seedData.CountryPackId}";
         _startDatePreviewLabel.Text = $"Start date | {startDate:ddd d MMM yyyy}";
         _persistencePreviewLabel.Text = "Persistence | Career state, squad, fixtures, and season context save to Slot 1.";
@@ -109,6 +219,11 @@ public partial class CareerSetup : Control
     }
 
     private void OnSeedValueChanged(double _value)
+    {
+        RefreshPreview();
+    }
+
+    private void OnCareerFoundationOptionSelected(long _index)
     {
         RefreshPreview();
     }
@@ -129,7 +244,12 @@ public partial class CareerSetup : Control
             return;
         }
 
-        if (!TouchlineWorldGenerator.Instance.BeginNewCareer(managerName, seed))
+        if (!TouchlineWorldGenerator.Instance.BeginNewCareer(
+            managerName,
+            seed,
+            GetSelectedText(_roleOption),
+            GetSelectedText(_backgroundOption),
+            GetSelectedText(_licenseOption)))
         {
             _statusLabel.Text = TouchlineWorldGenerator.Instance.LastStatusMessage;
             return;
@@ -142,5 +262,10 @@ public partial class CareerSetup : Control
     private void OnBackPressed()
     {
         GetTree().ChangeSceneToFile(MainMenuScenePath);
+    }
+
+    private static string GetSelectedText(OptionButton option)
+    {
+        return option.GetItemText(option.Selected);
     }
 }

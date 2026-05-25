@@ -24,6 +24,16 @@ public partial class TouchlineWorldGenerator : Node
 
     public bool BeginNewCareer(string managerName, int seed)
     {
+        return BeginNewCareer(
+            managerName,
+            seed,
+            CareerFoundation.GetDisplayName(ManagerRole.Manager),
+            CareerFoundation.GetDisplayName(ManagerBackground.UnknownUpstart),
+            CareerFoundation.GetDisplayName(ManagerLicense.NationalCLicense));
+    }
+
+    public bool BeginNewCareer(string managerName, int seed, string roleName, string backgroundName, string licenseName)
+    {
         if (GameState.Instance == null)
         {
             LastStatusMessage = "GameState singleton is unavailable.";
@@ -45,6 +55,9 @@ public partial class TouchlineWorldGenerator : Node
         {
             ManagerName = managerName,
             CareerSeed = seed,
+            Role = CareerFoundation.ParseRole(roleName),
+            Background = CareerFoundation.ParseBackground(backgroundName),
+            License = CareerFoundation.ParseLicense(licenseName),
             WorldSeed = seed,
             CountryPackId = seedData.CountryPackId,
             AvailableClubs = BuildAvailableClubs(seedData),
@@ -93,6 +106,15 @@ public partial class TouchlineWorldGenerator : Node
             return false;
         }
 
+        var selectedClub = CareerFoundation.BuildClubFoundation(
+            clubData.Name,
+            clubData.IdentitySummary,
+            clubData.ExpectationSummary,
+            clubData.TeamMorale ?? seedData.Defaults.TeamMorale,
+            clubData.FanSentiment ?? seedData.Defaults.FanSentiment,
+            clubData.BoardConfidence ?? seedData.Defaults.BoardConfidence,
+            GameState.Instance.CareerProfile,
+            GameState.Instance.WorldSeed);
         var competitionState = CompetitionRuntimeService.BuildInitialState(GameState.Instance.AvailableClubs, clubName);
         var fixtureContext = CompetitionRuntimeService.ResolveFixtureContext(
             competitionState.fixtures,
@@ -104,6 +126,7 @@ public partial class TouchlineWorldGenerator : Node
             new ClubSelectionState
             {
                 ClubName = clubData.Name,
+                Club = selectedClub,
                 CompetitionName = seedData.CompetitionName,
                 CurrentMatchday = 1,
                 TeamMorale = clubData.TeamMorale ?? seedData.Defaults.TeamMorale,
@@ -133,11 +156,35 @@ public partial class TouchlineWorldGenerator : Node
             return BuildFallbackPreview(clubName);
         }
 
+        var previewProfile = GameState.Instance?.CareerProfile ??
+            CareerFoundation.CreateCareerProfile(
+                "Manager",
+                0,
+                ManagerRole.Manager,
+                ManagerBackground.UnknownUpstart,
+                ManagerLicense.NationalCLicense);
+        var previewClub = CareerFoundation.BuildClubFoundation(
+            clubData.Name,
+            clubData.IdentitySummary,
+            clubData.ExpectationSummary,
+            clubData.TeamMorale ?? seedData.Defaults.TeamMorale,
+            clubData.FanSentiment ?? seedData.Defaults.FanSentiment,
+            clubData.BoardConfidence ?? seedData.Defaults.BoardConfidence,
+            previewProfile,
+            GameState.Instance?.WorldSeed ?? 0);
+
         return new GameState.ClubPreview
         {
             ClubName = clubData.Name,
             IdentitySummary = clubData.IdentitySummary,
             ExpectationSummary = clubData.ExpectationSummary,
+            ArchetypeName = CareerFoundation.GetDisplayName(previewClub.Archetype),
+            BoardPhilosophyName = CareerFoundation.GetDisplayName(previewClub.BoardPhilosophy),
+            FanCultureName = CareerFoundation.GetDisplayName(previewClub.FanCulture),
+            DirectorOfFootballStyleName = CareerFoundation.GetDisplayName(previewClub.DirectorOfFootballStyle),
+            DirectorRelationshipName = CareerFoundation.GetDisplayName(previewClub.DirectorRelationshipState),
+            BudgetSummary = CareerFoundation.BuildBudgetSummary(previewClub),
+            ObjectivesSummary = CareerFoundation.BuildObjectivesSummary(previewClub),
             OpeningFixtureSummary = $"Opening fixture: {clubData.Name} vs {GetOpeningOpponent(seedData, clubData.Name)}"
         };
     }
@@ -214,11 +261,25 @@ public partial class TouchlineWorldGenerator : Node
 
     private static GameState.ClubPreview BuildFallbackPreview(string clubName)
     {
+        var fallbackProfile = CareerFoundation.CreateCareerProfile(
+            "Manager",
+            0,
+            ManagerRole.Manager,
+            ManagerBackground.UnknownUpstart,
+            ManagerLicense.NationalCLicense);
+        var fallbackClub = CareerFoundation.BuildFallbackClubFoundation(clubName, 60, 60, 60, fallbackProfile, 0);
         return new GameState.ClubPreview
         {
             ClubName = clubName,
             IdentitySummary = "Club identity context unavailable because world seed data failed to load.",
             ExpectationSummary = "Board expectation context unavailable because world seed data failed to load.",
+            ArchetypeName = CareerFoundation.GetDisplayName(fallbackClub.Archetype),
+            BoardPhilosophyName = CareerFoundation.GetDisplayName(fallbackClub.BoardPhilosophy),
+            FanCultureName = CareerFoundation.GetDisplayName(fallbackClub.FanCulture),
+            DirectorOfFootballStyleName = CareerFoundation.GetDisplayName(fallbackClub.DirectorOfFootballStyle),
+            DirectorRelationshipName = CareerFoundation.GetDisplayName(fallbackClub.DirectorRelationshipState),
+            BudgetSummary = CareerFoundation.BuildBudgetSummary(fallbackClub),
+            ObjectivesSummary = CareerFoundation.BuildObjectivesSummary(fallbackClub),
             OpeningFixtureSummary = "Opening fixture unavailable."
         };
     }

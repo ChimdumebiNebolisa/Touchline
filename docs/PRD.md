@@ -2,9 +2,9 @@
 
 ## 1. Source Of Truth
 
-`touchline_master_design_decisions.md` is the highest-level product design source of truth for Touchline.
+`docs/touchline_master_design_decisions.md` is the highest-level product design source of truth for Touchline.
 
-This PRD summarizes that direction for implementation. If this PRD conflicts with `touchline_master_design_decisions.md`, stop and reconcile the docs before changing product code.
+This PRD summarizes that direction for implementation. If this PRD conflicts with `docs/touchline_master_design_decisions.md`, stop and reconcile the docs before changing product code.
 
 ## 2. Core Game Identity
 
@@ -55,7 +55,7 @@ Main menu -> new career or load -> choose role, background, license, and club ->
 
 ## 7. Main Systems
 
-The target product includes these systems from `touchline_master_design_decisions.md`:
+The target product includes these systems from `docs/touchline_master_design_decisions.md`:
 
 - career profile, manager background, licenses, reputation, and career history
 - Assistant Manager, Head Coach, and Manager role authority
