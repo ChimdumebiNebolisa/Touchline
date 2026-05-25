@@ -1,6 +1,12 @@
 # Architecture
 
-## 1. Technical Direction
+## 1. Source Of Truth
+
+`touchline_master_design_decisions.md` is the highest-level product design source of truth. This architecture describes how the Godot/C# codebase should support that design.
+
+If Architecture conflicts with `touchline_master_design_decisions.md`, `docs/PRD.md`, `docs/Guardrails.md`, or `docs/Plan.md`, stop and reconcile the docs before changing product code.
+
+## 2. Technical Direction
 
 Touchline is implemented as a Godot .NET game with C# domain logic.
 
@@ -8,36 +14,38 @@ Core principles:
 
 - scene-based UI and flow orchestration in Godot
 - simulation and business rules in C# domain systems
-- autoload singletons for persistent runtime state
-- local save and load for career continuity
-- one project path focused on football game flow, not web UI tooling
-- local-first single-player runtime; no backend, external API, account, or online service dependency
+- local-first single-player runtime
+- autoload singletons for persistent runtime state and scene handoff
+- authored or generated fictional data under `game/data`
+- local save/load for career continuity
+- no backend, external API, account system, or online dependency unless the source-of-truth docs change
 
-## 2. Repository Shape After Revamp
+## 3. Current Product Path
 
 Primary product path:
 
-- game/project.godot
-- game/Touchline.sln
-- game/scenes
-- game/scripts
-- game/assets
-- game/data
+- `game/project.godot`
+- `game/Touchline.sln`
+- `game/scenes`
+- `game/scripts`
+- `game/assets`
+- `game/data`
 
-Optional historical isolation path:
+Legacy or archived material is reference-only and not the active product path.
 
-- legacy (contains old web prototype and transitional artifacts for reference only; it is not the active product path)
+## 4. Runtime Layers
 
-## 3. Runtime Layers
+### 4.1 Presentation Layer
 
-### 3.1 Presentation Layer (Godot Scenes)
+Godot scenes own user flow, navigation, input collection, and football-facing visualization.
 
-Owns user flow, navigation, and football-facing visualization.
+Scenes may present state and request domain actions. They must not own core simulation, transfer, scouting, calendar, permission, or consequence rules.
 
-Target scenes:
+Current scenes include:
 
 - MainMenu
 - CareerSetup
+- ChooseClub
 - ClubDashboard
 - SquadScreen
 - PlayerProfile
@@ -49,123 +57,142 @@ Target scenes:
 - PostMatchScene
 - SaveLoadScene
 
-### 3.2 Application State Layer (Autoload Singletons)
+### 4.2 Application State Layer
 
-Owns long-lived runtime state and scene handoff context.
+Autoloads own long-lived runtime state and scene handoff context.
 
-Expected singletons:
+Current or expected autoloads:
 
-- GameState singleton for current career state
-- SaveSystem singleton for save slot operations
-- CalendarSystem singleton for date progression
-- WorldGenerator singleton for initial world creation
+- GameState: current career state and scene-facing state queries
+- SaveSystem: save slot operations and validation
+- CalendarSystem: date and season progression
+- WorldGenerator: fictional career/world bootstrap
+- TouchlineTheme: shared presentation styling
 
-### 3.3 Domain Layer (C# Models and Systems)
+As the master design is implemented, GameState should become a coordinator over clearer domain models rather than a container for every rule.
 
-Owns deterministic game logic.
+### 4.3 Domain Layer
 
-Core models:
+Domain models and systems own deterministic game logic and explainable outcomes.
+
+Rules belong here:
+
+- role authority and permissions
+- license eligibility and information quality
+- club identity and objective generation
+- player information visibility
+- staff, scouting, training, transfers, contracts, and promises
+- match simulation and post-match consequences
+- morale, trust, reputation, and pressure changes
+- job security, sackings, job offers, and career history
+
+## 5. Conceptual Modules
+
+The table marks architectural intent, not current implementation claims.
+
+| Module | Responsibility | Current status |
+|---|---|---|
+| Career profile | Manager name, role, background, license, reputation, history, job offers, sackings, promises, trophies | Partial: manager name/seed only |
+| Roles and licenses | Assistant Manager, Head Coach, Manager authority; license ladder and access/information effects | Planned |
+| Clubs | Club identity, archetype, board philosophy, fan culture, Director of Football, staff, objectives, budgets, squad, academy, rivals, history | Partial: seeded club names, summaries, squad, morale/fan/board values |
+| Leagues and calendar | Fictional league pyramid, fixtures, standings, season calendar, windows, cups, rollover | Partial: small seeded competition, fixtures, standings, weekly advance, rollover |
+| Players | Identity, ability, known/estimated/unknown attributes, style, traits, personality, fit, development, contract, morale, form, fitness, relationships | Partial: name, position, age, form, morale, fitness, lineup |
+| Staff | Staff roles, ratings, loyalty, ambition, reports, training/scouting/media effects | Planned |
+| Tactics | Formation, team style, instructions, player roles, player instructions, tactical familiarity, fit/risk notes | Partial: formation and numeric tactical inputs |
+| Match simulation | Shared stat-and-event-driven engine using ability, tactics, familiarity, morale, form, fitness, staff prep, opponent style | Partial: shared result/timeline engine exists with limited inputs |
+| Live playback | Visual renderer for the same simulated match timeline used by Instant Sim | Partial/current: live scene consumes shared playback result |
+| Transfers/contracts | Scouting-based recruitment, interest, fees, wages, agents, promises, board approval, loans, renewals, integration | Planned |
+| Scouting | Assignments, regions, report timing, confidence, partial discovery, scout accuracy, analyst support | Planned |
+| Training | Weekly focus, tactical familiarity, development, fatigue, morale, injury risk | Planned |
+| Youth academy | Academy quality, youth intake, generated prospects, promotion, loans, hidden potential, reactions | Planned |
+| Finance | Transfer budget, wage budget, debt, revenue, prize money, ticket income, commercial growth, financial rules | Planned |
+| News/media/world events | News categories, reliability labels, templates, media pressure, decision events, downstream effects | Planned |
+| Morale/trust/reputation/pressure | Separate state systems for mood, belief, world view, and consequence risk | Partial: team morale, fan sentiment, board confidence, simple pressure text |
+| Objectives/job security | Objectives by priority/type, board reviews, job security states, sackings | Planned |
+| Career job market | Club manager states, offers, applications, interim routes, license-gated hiring, aftermath | Planned |
+| Save/load | Complete persistent career state, versioning, migration, validation, history | Partial/current: v1 state saved and validated |
+
+## 6. Core Data Objects
+
+The target domain should represent these conceptual objects from the master design:
 
 - Player
 - Club
-- Squad
-- Fixture
-- Competition
-- Season
-- ManagerCareer
-- MatchResult
-- GameState
+- Staff
+- Match
+- NewsEvent
+- CareerProfile
+- Contract
+- Tactic
+- Objective
+- Promise
+- ScoutingReport
+- TrainingPlan
+- FinanceState
+- JobOffer
 
-Core systems:
+Implementation may introduce these incrementally. Do not create empty shell objects unless a stage needs them for real state or verified behavior.
 
-- MatchSimulator
-- DevelopmentSystem
-- PerceptionSystem
-- CalendarSystem
-- SaveSystem
-- WorldGenerator
+## 7. Match Simulation Contract
 
-## 4. Ownership Boundaries
+There is one shared match engine.
 
-### 4.1 Scene Layer
+The match is simulated first into an authoritative match object containing:
 
-- reads and presents state
-- sends commands to domain systems
-- does not contain simulation rules
+- home and away clubs
+- lineups and tactics
+- pre-match context
+- event timeline
+- match stats
+- player ratings or performance notes
+- injuries/cards/goals when implemented
+- tactical analysis
+- morale/reputation/news outputs or inputs for consequence systems
 
-### 4.2 Domain Systems
+Instant Sim resolves the authoritative match object immediately.
 
-- evaluate football outcomes
-- mutate game state through explicit methods
-- return explainable results and reason summaries
+Live Match Playback visualizes the same match event timeline. It must not create an alternate result, alternate event sequence, or separate rules path.
 
-### 4.3 Save Layer
+## 8. State And Save Strategy
 
-- serializes and restores complete career state
-- validates payload version and structure
-- never silently drops critical state
+Any state that affects career continuity must be save-compatible before it is exposed as gameplay.
 
-## 5. Data Strategy
+Save/load must eventually cover:
 
-### 5.1 Seed Data
+- career profile, role, background, license, reputation, history
+- current club, role authority, objectives, board/fan/director/staff relationships
+- players, contracts, promises, morale, form, fitness, partial information, development
+- tactics, training, scouting, transfers, finance, news, decisions
+- leagues, fixtures, standings, calendar, season state
+- match history, post-match reports, job security, job market
 
-- use generated or authored seed files in game/data
-- include clubs, named players, competitions, and season start state
+Until all modules exist, save payloads should only claim support for implemented state and should reject malformed critical state explicitly.
 
-### 5.2 Runtime State
+## 9. Data Strategy
 
-- keep mutable career state in memory via GameState singleton
-- persist to local save files on explicit save actions
+Touchline uses fictional content.
 
-### 5.3 Determinism
+Data can be authored, generated, or both, but generated content must remain constrained by game state and the master design. Generated names, clubs, headlines, scout reports, and media text should use structured templates first.
 
-- use seeded random streams where practical for reproducibility
-- keep deterministic logic in domain systems before heuristic tuning
+Seed data should eventually include:
 
-## 6. Scene Flow Contract
+- clubs with archetype, board philosophy, fan culture, Director of Football style, rivals, budget, staff, objectives, and academy quality
+- players with identity, attributes, partial-information state, style, traits, personality, contracts, and fit
+- staff roles and ratings
+- competitions, fixtures, calendars, and regions
 
-Primary user path:
+## 10. Scene Flow Target
 
-MainMenu -> CareerSetup -> ClubDashboard -> Squad or Tactics or Fixtures or Standings -> MatchdayScene -> LiveMatchScene -> PostMatchScene -> ClubDashboard -> Advance Date -> SaveLoadScene.
+Target flow:
 
-All transitions must preserve and reflect persistent career state.
+MainMenu -> CareerSetup -> ClubSelection -> ClubDashboard -> Squad/Profile/Tactics/Training/Scouting/Transfers/Fixtures/Standings/News -> Matchday -> InstantSim or LivePlayback -> PostMatchReport -> Dashboard -> CalendarAdvance -> repeat across seasons and career moves.
 
-## 7. Live Match Presentation Contract
+Stage implementations may expose only the screens needed by the active stage, but they must not contradict the target flow.
 
-LiveMatchScene presents domain simulation state with visible player movement.
+## 11. Build And Tooling
 
-Required outputs:
-
-- pitch with moving player markers or sprites
-- scoreline and match clock
-- key event feed (chances, goals, saves, pressure swings, and other simulated match actions)
-- tactical context display sufficient to feel football-native
-
-LiveMatchScene is a renderer and controller of simulation playback, not a rules engine.
-
-## 8. Build and Tooling Assumptions
-
-- Godot .NET project files are first-class
-- C# source lives under game/scripts
-- no requirement that old web stack remains main entry point
-- legacy stack may remain archived for reference only
-- local save data is stored through Godot `user://` paths
-- release proof is produced with Godot run/build/headless commands and manual export guidance, not npm/web commands
-
-## 9. Non-Goals for Current Foundation
-
-- no backend or service split
-- no online multiplayer or external account system
-- no playable football controls
-- no 3D match renderer requirement
-- no transfer market, contracts, wages, finance ledger, scouting, injuries, promotion/relegation, youth academy, deep training, complex xG, or multi-competition calendar
-- no real licensed teams
-- no broad feature expansion beyond active Plan step
-
-## 10. Final v1 Runtime Boundary
-
-The final v1 app should be understood as a polished local Godot management loop, not a complete football world simulation. The supported architecture is:
-
-Godot scenes -> autoload state/services -> C# domain systems -> local seed data and save file.
-
-Any future expansion must first update PRD, Architecture, Guardrails, and Plan. Until then, presentation scenes may clarify state and request actions, but they must not introduce new business rules or duplicate match/competition logic.
+- Godot .NET project files are first-class.
+- C# source lives under `game/scripts` unless the project is intentionally reorganized.
+- Local save data uses Godot `user://` paths.
+- Verification uses `dotnet build`, Godot headless checks, and focused route/domain checks.
+- Web/npm workflows are not active product gates unless the architecture is explicitly changed.
