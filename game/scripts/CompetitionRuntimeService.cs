@@ -52,7 +52,10 @@ public static class CompetitionRuntimeService
                 AwayClubName = fixture.AwayClubName,
                 IsComplete = fixture.IsComplete,
                 Scoreline = fixture.Scoreline,
-                ResultSummary = fixture.ResultSummary
+                ResultSummary = fixture.ResultSummary,
+                CompetitionType = fixture.CompetitionType,
+                CompetitionName = fixture.CompetitionName,
+                RoundName = fixture.RoundName
             });
 
         for (var index = 0; index < updatedFixtures.Length; index++)
@@ -101,9 +104,12 @@ public static class CompetitionRuntimeService
             ? currentFixture.AwayClubName
             : currentFixture.HomeClubName;
 
+        var prefix = IsCupFixture(currentFixture)
+            ? $"{currentFixture.CompetitionName} {currentFixture.RoundName}"
+            : $"Matchday {currentMatchday}";
         var nextFixtureSummary = currentFixture.IsComplete
-            ? $"{currentDateLabel} | Matchday {currentMatchday} complete | {currentFixture.ResultSummary}"
-            : $"{currentDateLabel} | Matchday {currentMatchday} | {currentFixture.HomeClubName} vs {currentFixture.AwayClubName}";
+            ? $"{currentDateLabel} | {prefix} complete | {currentFixture.ResultSummary}"
+            : $"{currentDateLabel} | {prefix} | {currentFixture.HomeClubName} vs {currentFixture.AwayClubName}";
 
         return (currentOpponentName, nextFixtureSummary);
     }
@@ -238,22 +244,26 @@ public static class CompetitionRuntimeService
 
         return new[]
         {
-            CreateCompetitionFixture(1, selectedClubName, rivals[0]),
-            CreateCompetitionFixture(1, rivals[1], rivals[2]),
-            CreateCompetitionFixture(2, selectedClubName, rivals[1]),
-            CreateCompetitionFixture(2, rivals[0], rivals[2]),
-            CreateCompetitionFixture(3, selectedClubName, rivals[2]),
-            CreateCompetitionFixture(3, rivals[0], rivals[1]),
-            CreateCompetitionFixture(4, selectedClubName, rivals[0]),
-            CreateCompetitionFixture(4, rivals[2], rivals[1]),
-            CreateCompetitionFixture(5, selectedClubName, rivals[1]),
-            CreateCompetitionFixture(5, rivals[2], rivals[0]),
-            CreateCompetitionFixture(6, selectedClubName, rivals[2]),
-            CreateCompetitionFixture(6, rivals[1], rivals[0])
+            CreateLeagueFixture(1, selectedClubName, rivals[0]),
+            CreateLeagueFixture(1, rivals[1], rivals[2]),
+            CreateLeagueFixture(2, selectedClubName, rivals[1]),
+            CreateLeagueFixture(2, rivals[0], rivals[2]),
+            CreateLeagueFixture(3, selectedClubName, rivals[2]),
+            CreateLeagueFixture(3, rivals[0], rivals[1]),
+            CreateLeagueFixture(4, selectedClubName, rivals[0]),
+            CreateLeagueFixture(4, rivals[2], rivals[1]),
+            CreateLeagueFixture(5, selectedClubName, rivals[1]),
+            CreateLeagueFixture(5, rivals[2], rivals[0]),
+            CreateLeagueFixture(6, selectedClubName, rivals[2]),
+            CreateLeagueFixture(6, rivals[1], rivals[0]),
+            CreateCupFixture(7, selectedClubName, rivals[0], "Quarterfinal"),
+            CreateCupFixture(7, rivals[1], rivals[2], "Quarterfinal"),
+            CreateCupFixture(8, selectedClubName, rivals[1], "Final"),
+            CreateCupFixture(8, rivals[0], rivals[2], "Final")
         };
     }
 
-    private static GameState.CompetitionFixture CreateCompetitionFixture(int matchday, string homeClubName, string awayClubName)
+    private static GameState.CompetitionFixture CreateLeagueFixture(int matchday, string homeClubName, string awayClubName)
     {
         return new GameState.CompetitionFixture
         {
@@ -262,7 +272,26 @@ public static class CompetitionRuntimeService
             AwayClubName = awayClubName,
             IsComplete = false,
             Scoreline = "vs",
-            ResultSummary = $"{homeClubName} vs {awayClubName}"
+            ResultSummary = $"{homeClubName} vs {awayClubName}",
+            CompetitionType = "League",
+            CompetitionName = "Novara Premier Division",
+            RoundName = $"Matchday {matchday}"
+        };
+    }
+
+    private static GameState.CompetitionFixture CreateCupFixture(int matchday, string homeClubName, string awayClubName, string roundName)
+    {
+        return new GameState.CompetitionFixture
+        {
+            Matchday = matchday,
+            HomeClubName = homeClubName,
+            AwayClubName = awayClubName,
+            IsComplete = false,
+            Scoreline = "vs",
+            ResultSummary = $"{homeClubName} vs {awayClubName}",
+            CompetitionType = "Cup",
+            CompetitionName = "Novara National Cup",
+            RoundName = roundName
         };
     }
 
@@ -275,7 +304,10 @@ public static class CompetitionRuntimeService
             AwayClubName = fixture.AwayClubName,
             IsComplete = true,
             Scoreline = $"{homeGoals} - {awayGoals}",
-            ResultSummary = $"{fixture.HomeClubName} {homeGoals} - {awayGoals} {fixture.AwayClubName}"
+            ResultSummary = $"{fixture.HomeClubName} {homeGoals} - {awayGoals} {fixture.AwayClubName}",
+            CompetitionType = fixture.CompetitionType,
+            CompetitionName = fixture.CompetitionName,
+            RoundName = fixture.RoundName
         };
     }
 
@@ -317,7 +349,7 @@ public static class CompetitionRuntimeService
 
         foreach (var fixture in fixtures)
         {
-            if (!fixture.IsComplete)
+            if (!fixture.IsComplete || IsCupFixture(fixture))
             {
                 continue;
             }
@@ -360,6 +392,11 @@ public static class CompetitionRuntimeService
             });
 
         return rows;
+    }
+
+    private static bool IsCupFixture(GameState.CompetitionFixture fixture)
+    {
+        return fixture.CompetitionType.Equals("Cup", StringComparison.OrdinalIgnoreCase);
     }
 
     private static (int homeGoals, int awayGoals) ParseScoreline(string scoreline)

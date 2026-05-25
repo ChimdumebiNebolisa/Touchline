@@ -84,7 +84,10 @@ public static class SaveMigrationService
                 AwayClubName = fixture.AwayClubName,
                 IsComplete = fixture.IsComplete,
                 Scoreline = fixture.Scoreline,
-                ResultSummary = fixture.ResultSummary
+                ResultSummary = fixture.ResultSummary,
+                CompetitionType = fixture.CompetitionType,
+                CompetitionName = fixture.CompetitionName,
+                RoundName = fixture.RoundName
             });
 
         errorMessage = "Legacy save migrated successfully.";

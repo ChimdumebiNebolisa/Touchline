@@ -174,6 +174,9 @@ public partial class GameState : Node
         public required bool IsComplete { get; init; }
         public required string Scoreline { get; init; }
         public required string ResultSummary { get; init; }
+        public string CompetitionType { get; init; } = "League";
+        public string CompetitionName { get; init; } = "Novara Premier Division";
+        public string RoundName { get; init; } = "League Matchday";
     }
 
     public static GameState? Instance { get; private set; }
@@ -242,6 +245,9 @@ public partial class GameState : Node
     public string StaffSummary => CareerFoundation.BuildStaffSummary(CurrentClub);
     public string NewsFeedSummary => CareerFoundation.BuildNewsSummary(CurrentClub);
     public string BudgetSummary => CareerFoundation.BuildBudgetSummary(CurrentClub);
+    public string CurrentFixtureCompetitionName => GetCurrentClubFixture()?.CompetitionName ?? CompetitionName;
+    public string CurrentFixtureRoundName => GetCurrentClubFixture()?.RoundName ?? $"Matchday {CurrentMatchday}";
+    public bool CurrentFixtureIsCup => IsCupFixture(GetCurrentClubFixture());
 
     public override void _EnterTree()
     {
@@ -1113,6 +1119,8 @@ public partial class GameState : Node
             return;
         }
 
+        var activeFixture = GetCurrentClubFixture();
+        var isCupFixture = IsCupFixture(activeFixture);
         CurrentMatchResult = result;
         var goalDifference = result.FinalHomeScore - result.FinalAwayScore;
         var previousPosition = GetClubTablePosition(SelectedClubName ?? string.Empty);
@@ -1134,11 +1142,16 @@ public partial class GameState : Node
         RecordCompetitionResults(result.FinalHomeScore, result.FinalAwayScore);
         RefreshFixtureContext();
         var currentPosition = GetClubTablePosition(SelectedClubName ?? string.Empty);
-        var tableImpactSummary = BuildTableImpactSummary(previousPosition, currentPosition);
+        var tableImpactSummary = isCupFixture && activeFixture != null
+            ? ApplyCupMatchResult(activeFixture, result)
+            : BuildTableImpactSummary(previousPosition, currentPosition);
+        RefreshFixtureContext();
 
         LastMatchReport = new MatchReport
         {
-            FixtureLabel = $"{result.HomeClubName} vs {result.AwayClubName}",
+            FixtureLabel = isCupFixture && activeFixture != null
+                ? $"{activeFixture.CompetitionName} {activeFixture.RoundName}: {result.HomeClubName} vs {result.AwayClubName}"
+                : $"{result.HomeClubName} vs {result.AwayClubName}",
             Scoreline = $"{result.FinalHomeScore} - {result.FinalAwayScore}",
             ResultLabel = consequence.ResultLabel,
             ConsequenceSummary = consequence.ConsequenceSummary,
@@ -1326,7 +1339,10 @@ public partial class GameState : Node
                 AwayClubName = fixture.AwayClubName,
                 IsComplete = fixture.IsComplete,
                 Scoreline = fixture.Scoreline,
-                ResultSummary = fixture.ResultSummary
+                ResultSummary = fixture.ResultSummary,
+                CompetitionType = string.IsNullOrWhiteSpace(fixture.CompetitionType) ? "League" : fixture.CompetitionType,
+                CompetitionName = string.IsNullOrWhiteSpace(fixture.CompetitionName) ? data.CompetitionName : fixture.CompetitionName,
+                RoundName = string.IsNullOrWhiteSpace(fixture.RoundName) ? $"Matchday {fixture.Matchday}" : fixture.RoundName
             });
         SelectedPlayerProfileName = data.SelectedPlayerProfileName;
         CurrentMatchResult = null;
@@ -2057,6 +2073,11 @@ public partial class GameState : Node
     private CompetitionFixture? GetCurrentClubFixture()
     {
         return CompetitionRuntimeService.GetCurrentClubFixture(CompetitionFixtures, CurrentMatchday, SelectedClubName);
+    }
+
+    private static bool IsCupFixture(CompetitionFixture? fixture)
+    {
+        return fixture != null && fixture.CompetitionType.Equals("Cup", StringComparison.OrdinalIgnoreCase);
     }
 
     private CompetitionRow? GetCompetitionRow(string clubName)

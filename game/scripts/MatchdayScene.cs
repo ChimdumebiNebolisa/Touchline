@@ -158,7 +158,9 @@ public partial class MatchdayScene : Control
         var fixtureComplete = IsCurrentFixtureComplete();
         var readinessValue = startingCount >= 11 ? "XI READY" : $"XI {startingCount}/11";
 
-        _competitionLabel.Text = $"Matchday {state.CurrentMatchday} | {state.CurrentDateLabel} | {state.CompetitionName}";
+        _competitionLabel.Text = state.CurrentFixtureIsCup
+            ? $"{state.CurrentFixtureCompetitionName} | {state.CurrentFixtureRoundName} | {state.CurrentDateLabel}"
+            : $"Matchday {state.CurrentMatchday} | {state.CurrentDateLabel} | {state.CompetitionName}";
         _fixtureLabel.Text = $"{state.SelectedClubName} vs {state.CurrentOpponentName}";
         _stakesLabel.Text = BuildStakesLabel();
         SetMatchStateChip(fixtureComplete ? "RECORDED" : "READY", fixtureComplete);

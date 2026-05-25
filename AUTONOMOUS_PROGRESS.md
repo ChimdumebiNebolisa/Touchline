@@ -1,24 +1,38 @@
 # Autonomous Progress
 
 ## Current active Plan step
-- Phase 17: Cup competitions.
+- Phase 18: Squad registration rules.
 
 ## Last completed verified task
-- Phase 16: League structure and promotion/relegation foundation implemented and verified locally.
+- Phase 17: Cup competitions foundation implemented and verified locally.
 
 ## Current subtask in progress
-- Prepare Phase 16 commit and push, then begin Phase 17.
+- Prepare Phase 17 commit and push, then begin Phase 18.
 
 ## Next queued subtasks
-- Commit and push `phase-16: add league pyramid and promotion foundation`.
-- Begin Phase 17 cup competitions inspection.
-- Keep cup expansion bounded to domestic cup draw, round progression, fixture insertion, prize/reputation/objective hooks, and post-match/news context.
+- Commit and push `phase-17: add domestic cup competition foundation`.
+- Begin Phase 18 squad registration rules inspection.
+- Keep registration expansion bounded to squad size, youth eligibility, loan limits, wage structure limits, clear validation, and matchday/transfer blocking.
 
 ## Known blockers
 - No active blockers.
 - `docs/audit/` remains untracked and intentionally excluded from phase commits.
 
 ## Last verification run
+- Phase 17 local verification:
+  - `dotnet build game/Touchline.sln` passed with 0 warnings and 0 errors.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/phase17_cup_competition_check.gd` passed.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step53_competition_surfaces_check.gd` passed.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step42_matchday_progression_check.gd` passed.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step23_post_match_check.gd` passed.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step27_save_compat_check.gd` passed.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step47_full_season_regression_check.gd` passed.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/phase15_finance_check.gd` passed.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step50_end_to_end_user_flow_check.gd` passed.
+  - `git diff --check` pending.
+  - `git diff --cached --check` pending.
+
+## Previous verification notes
 - Phase 16 local verification:
   - `dotnet build game/Touchline.sln` passed with 0 warnings and 0 errors.
   - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/phase16_league_structure_check.gd` passed.
@@ -28,8 +42,8 @@
   - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step27_save_compat_check.gd` passed.
   - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/phase15_finance_check.gd` passed.
   - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step50_end_to_end_user_flow_check.gd` passed.
-  - `git diff --check` pending.
-  - `git diff --cached --check` pending.
+  - `git diff --check` passed.
+  - `git diff --cached --check` passed.
 
 ## Previous verification notes
 - Phase 15 local verification:
@@ -147,11 +161,12 @@
 - Phase 13 completed at `3199f75`.
 - Phase 14 completed at `d46f51f`.
 - Phase 15 completed at `6fbd971`.
-- Phase 16 commit pending.
+- Phase 16 completed at `6ee63b0`.
+- Phase 17 commit pending.
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`.
 - Re-read `docs/touchline_master_design_decisions.md`.
 - Re-read `docs/MASTER_IMPLEMENTATION_ROADMAP.md`.
-- Resume at Phase 17 after the Phase 16 commit/push completes.
+- Resume at Phase 18 after the Phase 17 commit/push completes.
 - Keep `docs/audit/` untouched unless a future task explicitly uses it.

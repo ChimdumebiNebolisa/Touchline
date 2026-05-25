@@ -187,6 +187,9 @@ public sealed class SaveSlotCompetitionFixtureData
     public bool IsComplete { get; set; }
     public string Scoreline { get; set; } = "vs";
     public string ResultSummary { get; set; } = string.Empty;
+    public string CompetitionType { get; set; } = "League";
+    public string CompetitionName { get; set; } = string.Empty;
+    public string RoundName { get; set; } = string.Empty;
 }
 
 public partial class SaveSystem : Node
@@ -197,7 +200,7 @@ public partial class SaveSystem : Node
         WriteIndented = true,
         PropertyNameCaseInsensitive = true
     };
-    public const int CurrentSaveVersion = 18;
+    public const int CurrentSaveVersion = 19;
 
     public static SaveSystem? Instance { get; private set; }
     public string LastStatusMessage { get; private set; } = "Save system idle.";
@@ -587,7 +590,10 @@ public partial class SaveSystem : Node
                     AwayClubName = fixture.AwayClubName,
                     IsComplete = fixture.IsComplete,
                     Scoreline = fixture.Scoreline,
-                    ResultSummary = fixture.ResultSummary
+                    ResultSummary = fixture.ResultSummary,
+                    CompetitionType = fixture.CompetitionType,
+                    CompetitionName = fixture.CompetitionName,
+                    RoundName = fixture.RoundName
                 })
         };
     }
@@ -724,7 +730,10 @@ public partial class SaveSystem : Node
                         AwayClubName = fixture.AwayClubName,
                         IsComplete = fixture.IsComplete,
                         Scoreline = fixture.Scoreline,
-                        ResultSummary = fixture.ResultSummary
+                        ResultSummary = fixture.ResultSummary,
+                        CompetitionType = fixture.CompetitionType,
+                        CompetitionName = fixture.CompetitionName,
+                        RoundName = fixture.RoundName
                 })
         };
     }
@@ -1095,7 +1104,15 @@ public partial class SaveSystem : Node
             LeaguePyramidSummary = source.LeaguePyramidSummary,
             PromotionRelegationSummary = source.PromotionRelegationSummary,
             ShadowLeagueSummary = source.ShadowLeagueSummary,
-            LeagueHistory = source.LeagueHistory == null ? null : (string[])source.LeagueHistory.Clone()
+            LeagueHistory = source.LeagueHistory == null ? null : (string[])source.LeagueHistory.Clone(),
+            CupCompetitionName = source.CupCompetitionName,
+            CupStatusSummary = source.CupStatusSummary,
+            CupDrawSummary = source.CupDrawSummary,
+            CupObjectiveSummary = source.CupObjectiveSummary,
+            CupPrizeMoney = source.CupPrizeMoney,
+            CupEliminated = source.CupEliminated,
+            CupWon = source.CupWon,
+            CupHistory = source.CupHistory == null ? null : (string[])source.CupHistory.Clone()
         };
     }
 

@@ -314,7 +314,7 @@ public partial class FixturesScreen : Control
 
         var matchdayLabel = new Label
         {
-            Text = $"MD {fixture.Matchday}",
+            Text = fixture.CompetitionType.Equals("Cup", System.StringComparison.OrdinalIgnoreCase) ? $"CUP {fixture.Matchday}" : $"MD {fixture.Matchday}",
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Center,
             CustomMinimumSize = new Vector2(66, 0)
@@ -358,7 +358,7 @@ public partial class FixturesScreen : Control
 
         var resultLabel = new Label
         {
-            Text = fixture.IsComplete ? fixture.Scoreline : (isClubFixture ? BuildVenueTag(fixture) : "Upcoming league round"),
+            Text = fixture.IsComplete ? fixture.Scoreline : (isClubFixture ? BuildVenueTag(fixture) : fixture.CompetitionType.Equals("Cup", System.StringComparison.OrdinalIgnoreCase) ? "Upcoming cup tie" : "Upcoming league round"),
             HorizontalAlignment = HorizontalAlignment.Right
         };
         resultLabel.AddThemeFontSizeOverride("font_size", 14);
@@ -449,12 +449,14 @@ public partial class FixturesScreen : Control
     {
         if (!isClubFixture || GameState.Instance == null || string.IsNullOrWhiteSpace(GameState.Instance.SelectedClubName))
         {
-            return fixture.IsComplete ? "Completed fixture | Scoreline recorded" : "Upcoming fixture | League round";
+            return fixture.IsComplete
+                ? $"Completed {fixture.CompetitionType.ToLowerInvariant()} fixture | Scoreline recorded"
+                : $"Upcoming fixture | {fixture.CompetitionName} {fixture.RoundName}";
         }
 
         return fixture.IsComplete
-            ? $"{BuildVenueTag(fixture)} | Completed fixture | Scoreline recorded"
-            : $"{BuildVenueTag(fixture)} | {(IsCurrentFixture(fixture) ? "Next fixture" : "Upcoming fixture")}";
+            ? $"{BuildVenueTag(fixture)} | Completed {fixture.CompetitionType.ToLowerInvariant()} fixture | Scoreline recorded"
+            : $"{BuildVenueTag(fixture)} | {fixture.CompetitionName} {fixture.RoundName} | {(IsCurrentFixture(fixture) ? "Next fixture" : "Upcoming fixture")}";
     }
 
     private static string BuildFixtureChipText(GameState.CompetitionFixture fixture, bool isCurrentWeek)

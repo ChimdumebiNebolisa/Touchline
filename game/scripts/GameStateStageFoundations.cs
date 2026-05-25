@@ -102,6 +102,14 @@ public sealed class SaveSlotStageFoundationData
     public string PromotionRelegationSummary { get; set; } = string.Empty;
     public string ShadowLeagueSummary { get; set; } = string.Empty;
     public string[]? LeagueHistory { get; set; }
+    public string CupCompetitionName { get; set; } = string.Empty;
+    public string CupStatusSummary { get; set; } = string.Empty;
+    public string CupDrawSummary { get; set; } = string.Empty;
+    public string CupObjectiveSummary { get; set; } = string.Empty;
+    public int CupPrizeMoney { get; set; }
+    public bool CupEliminated { get; set; }
+    public bool CupWon { get; set; }
+    public string[]? CupHistory { get; set; }
 }
 
 public sealed class SaveSlotStaffMarketCandidateData
@@ -274,6 +282,7 @@ public partial class GameState
     private readonly List<string> _playerDevelopmentHistory = new();
     private readonly List<string> _financeHistory = new();
     private readonly List<string> _leagueHistory = new();
+    private readonly List<string> _cupHistory = new();
 
     private readonly record struct ContractResolution(
         ContractOffer Offer,
@@ -365,6 +374,13 @@ public partial class GameState
     public string LeaguePyramidSummary { get; private set; } = "League pyramid pending.";
     public string PromotionRelegationSummary { get; private set; } = "Promotion/relegation review pending.";
     public string ShadowLeagueSummary { get; private set; } = "Shadow league summary pending.";
+    public string CupCompetitionName { get; private set; } = "Novara National Cup";
+    public string CupStatusSummary { get; private set; } = "Cup foundation pending.";
+    public string CupDrawSummary { get; private set; } = "Cup draw pending.";
+    public string CupObjectiveSummary { get; private set; } = "Cup objective pending.";
+    public int CupPrizeMoney { get; private set; }
+    public bool CupEliminated { get; private set; }
+    public bool CupWon { get; private set; }
 
     public string TeamStyleName => StageFoundationText.GetDisplayName(TeamStyle);
     public string TacticalFamiliarityName => StageFoundationText.GetDisplayName(TacticsFoundation.FamiliarityFromScore(TacticalFamiliarityScore));
@@ -390,11 +406,12 @@ public partial class GameState
     public string PlayerDevelopmentHistorySummary => _playerDevelopmentHistory.Count == 0 ? "Player development history starts after weekly training, match minutes, loan review, or season aging." : string.Join("\n", _playerDevelopmentHistory);
     public string FinanceHistorySummary => _financeHistory.Count == 0 ? "Finance history starts after weekly revenue, transfer, contract, staff, board cut, or board injection events." : string.Join("\n", _financeHistory);
     public string LeagueHistorySummary => _leagueHistory.Count == 0 ? "League history starts after promotion, relegation, prize, shadow simulation, or season rollover events." : string.Join("\n", _leagueHistory);
+    public string CupHistorySummary => _cupHistory.Count == 0 ? "Cup history starts after draws, cup fixtures, prize money, upsets, or exits." : string.Join("\n", _cupHistory);
     public string RecruitmentFoundationSummary => CurrentRecruitmentTarget == null
         ? "Recruitment foundation pending scouting target."
         : $"{CurrentRecruitmentTarget.PlayerName} ({CurrentRecruitmentTarget.Position}) | {CurrentRecruitmentTarget.InformationSummary} | {CurrentRecruitmentTarget.InterestSummary} | {CurrentRecruitmentTarget.TacticalFitSummary} | Fee {CurrentRecruitmentTarget.EstimatedFeeRange} | Wage {CurrentRecruitmentTarget.EstimatedWageRange} | Status {CurrentRecruitmentTarget.TargetStatus} | Valuation {CurrentRecruitmentTarget.ClubValuation} | Agent {CurrentRecruitmentTarget.AgentMood} | Rival {CurrentRecruitmentTarget.RivalInterest} | Board {CurrentRecruitmentTarget.BoardStance} | Director {CurrentRecruitmentTarget.DirectorStance} | Outcome {CurrentRecruitmentTarget.OutcomeState} | {CurrentRecruitmentTarget.Status}\nDirector of Football\n{DirectorInfluenceSummary}\nShortlist\n{RecruitmentShortlistSummary}\nContracts\n{ContractFoundationSummary}\nTransfer history\n{TransferHistorySummary}";
     public string TrainingScoutingSummary => $"{TrainingFocusName} ({TrainingIntensityName}): {TrainingStatusSummary}\nScouting depth: {ScoutingReportDepthName}\nScouting: {BuildScoutingSummary()}\nDevelopment\n{PlayerDevelopmentSummary}\nDevelopment history\n{PlayerDevelopmentHistorySummary}\nStaff effects\n{StaffImpactSummary}";
-    public string CareerMarketSummary => $"Job security: {JobSecurityName}\n{TrustSummary}\n{ReputationSummary}\n{PressureCategorySummary}\nLeague system\n{LeaguePyramidSummary}\n{PromotionRelegationSummary}\n{ShadowLeagueSummary}\nLeague history\n{LeagueHistorySummary}\nFinance\n{FinanceSummary}\nFinance history\n{FinanceHistorySummary}\nLicense: {LicenseOpportunitySummary}\nJob market: {BuildJobOfferSummary()}";
+    public string CareerMarketSummary => $"Job security: {JobSecurityName}\n{TrustSummary}\n{ReputationSummary}\n{PressureCategorySummary}\nLeague system\n{LeaguePyramidSummary}\n{PromotionRelegationSummary}\n{ShadowLeagueSummary}\nLeague history\n{LeagueHistorySummary}\nCup competitions\n{CupStatusSummary}\n{CupDrawSummary}\n{CupObjectiveSummary}\nCup history\n{CupHistorySummary}\nFinance\n{FinanceSummary}\nFinance history\n{FinanceHistorySummary}\nLicense: {LicenseOpportunitySummary}\nJob market: {BuildJobOfferSummary()}";
     public string TacticsFoundationSummary => $"{TeamStyleName} | {TeamInstructionsSummary}\n{SetPieceSummary}\n{OpponentPreparationSummary}\n{PlayerRolesSummary}\n{PlayerInstructionsSummary}\n{TacticalRoleFitSummary}\n{PlayerFamiliaritySummary}\n{TacticalFitNotes}\n{TacticalRiskNotes}";
 
     public void UpdateTactics(string formation, string teamStyle, int pressIntensity, int tempo, int width, int risk)
@@ -1009,7 +1026,15 @@ public partial class GameState
             LeaguePyramidSummary = LeaguePyramidSummary,
             PromotionRelegationSummary = PromotionRelegationSummary,
             ShadowLeagueSummary = ShadowLeagueSummary,
-            LeagueHistory = _leagueHistory.ToArray()
+            LeagueHistory = _leagueHistory.ToArray(),
+            CupCompetitionName = CupCompetitionName,
+            CupStatusSummary = CupStatusSummary,
+            CupDrawSummary = CupDrawSummary,
+            CupObjectiveSummary = CupObjectiveSummary,
+            CupPrizeMoney = CupPrizeMoney,
+            CupEliminated = CupEliminated,
+            CupWon = CupWon,
+            CupHistory = _cupHistory.ToArray()
         };
     }
 
@@ -1269,7 +1294,21 @@ public partial class GameState
             _leagueHistory.AddRange(data.LeagueHistory);
         }
 
+        CupCompetitionName = string.IsNullOrWhiteSpace(data.CupCompetitionName) ? "Novara National Cup" : data.CupCompetitionName;
+        CupStatusSummary = string.IsNullOrWhiteSpace(data.CupStatusSummary) ? "Cup restored with no current status." : data.CupStatusSummary;
+        CupDrawSummary = string.IsNullOrWhiteSpace(data.CupDrawSummary) ? "Cup draw restored with no draw detail." : data.CupDrawSummary;
+        CupObjectiveSummary = string.IsNullOrWhiteSpace(data.CupObjectiveSummary) ? "Cup objective restored with no board review yet." : data.CupObjectiveSummary;
+        CupPrizeMoney = Math.Max(0, data.CupPrizeMoney);
+        CupEliminated = data.CupEliminated;
+        CupWon = data.CupWon;
+        _cupHistory.Clear();
+        if (data.CupHistory != null)
+        {
+            _cupHistory.AddRange(data.CupHistory);
+        }
+
         EnsureLeaguePyramidState();
+        EnsureCupCompetitionState();
         EnsureFinanceState();
         EnsureRecruitmentTarget();
         EnsureJobMarketFoundation();
@@ -1361,6 +1400,13 @@ public partial class GameState
         LeaguePyramidSummary = "League pyramid pending.";
         PromotionRelegationSummary = "Promotion/relegation review pending.";
         ShadowLeagueSummary = "Shadow league summary pending.";
+        CupCompetitionName = "Novara National Cup";
+        CupStatusSummary = "Cup foundation pending.";
+        CupDrawSummary = "Cup draw pending.";
+        CupObjectiveSummary = "Cup objective pending.";
+        CupPrizeMoney = 0;
+        CupEliminated = false;
+        CupWon = false;
         _foundationNewsEvents.Clear();
         _activeDecisionEvents.Clear();
         _resolvedDecisionEvents.Clear();
@@ -1377,6 +1423,7 @@ public partial class GameState
         _playerDevelopmentHistory.Clear();
         _financeHistory.Clear();
         _leagueHistory.Clear();
+        _cupHistory.Clear();
     }
 
     public void InitializeStageFoundationsForClub()
@@ -1398,6 +1445,7 @@ public partial class GameState
         EnsurePlayerDevelopmentState();
         EnsureFinanceState();
         EnsureLeaguePyramidState();
+        EnsureCupCompetitionState();
         if (CurrentScoutingAssignment == null)
         {
             StartBasicScoutingAssignment("Position need: versatile midfielder");
@@ -3152,6 +3200,114 @@ public partial class GameState
             !LeagueHistorySummary.Contains("relegated", StringComparison.OrdinalIgnoreCase))
         {
             return "Saved league structure summary/history is not surfaced.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
+    public string ValidatePhase17CupCompetitionContract()
+    {
+        InitializeStageFoundationsForClub();
+        EnsureCupCompetitionState();
+        var selectedCupFixtureCount = 0;
+        foreach (var fixture in CompetitionFixtures)
+        {
+            if (fixture.CompetitionType.Equals("Cup", StringComparison.OrdinalIgnoreCase) &&
+                (fixture.HomeClubName == SelectedClubName || fixture.AwayClubName == SelectedClubName))
+            {
+                selectedCupFixtureCount++;
+            }
+        }
+
+        if (selectedCupFixtureCount == 0 ||
+            !CupDrawSummary.Contains("quarterfinal", StringComparison.OrdinalIgnoreCase) ||
+            !CupObjectiveSummary.Contains("Cup objective", StringComparison.Ordinal))
+        {
+            return "Cup fixtures, draw summary, or objective summary were not generated.";
+        }
+
+        var guard = 0;
+        while (!CurrentFixtureIsCup && guard < 10)
+        {
+            if (!IsCurrentClubFixtureComplete())
+            {
+                ResolveCurrentMatchInstantly();
+            }
+
+            if (TouchlineCalendarSystem.Instance == null)
+            {
+                return "Calendar system unavailable during cup validation.";
+            }
+
+            if (!TouchlineCalendarSystem.Instance.AdvanceCareerDate())
+            {
+                return TouchlineCalendarSystem.Instance.LastStatusMessage;
+            }
+
+            guard++;
+        }
+
+        if (!CurrentFixtureIsCup ||
+            !NextFixtureSummary.Contains(CupCompetitionName, StringComparison.OrdinalIgnoreCase) ||
+            !CurrentFixtureRoundName.Contains("Quarterfinal", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Calendar did not advance into a generated cup fixture.";
+        }
+
+        var cupStartLeagueRow = GetCompetitionRow(SelectedClubName ?? string.Empty);
+        var cupStartLeaguePlayed = cupStartLeagueRow?.Played ?? -1;
+        var beforePrizeMoney = CupPrizeMoney;
+        var beforeFinancePrizeMoney = FinancePrizeMoney;
+        ResolveCurrentMatchInstantly();
+        EnsureCupCompetitionState();
+        var afterLeagueRow = GetCompetitionRow(SelectedClubName ?? string.Empty);
+        if (CupPrizeMoney <= beforePrizeMoney ||
+            FinancePrizeMoney <= beforeFinancePrizeMoney ||
+            _cupHistory.Count == 0 ||
+            !FinanceHistorySummary.Contains("Cup finance", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Cup result did not update prize money, finance, or cup history.";
+        }
+
+        if (afterLeagueRow == null || afterLeagueRow.Played != cupStartLeaguePlayed)
+        {
+            return "Cup result incorrectly changed the league table row.";
+        }
+
+        if (LastMatchReport == null ||
+            !LastMatchReport.FixtureLabel.Contains(CupCompetitionName, StringComparison.OrdinalIgnoreCase) ||
+            !LastMatchReport.TableImpactSummary.Contains("Cup result", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Cup post-match report does not identify the cup and league-table separation.";
+        }
+
+        if (!NewsFeedSummary.Contains("Cup", StringComparison.OrdinalIgnoreCase) ||
+            !CareerMarketSummary.Contains("Cup competitions", StringComparison.Ordinal) ||
+            !CareerMarketSummary.Contains("Cup history", StringComparison.Ordinal))
+        {
+            return "Cup result was not surfaced in news and career summary.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
+    public string ValidatePhase17StoredCupCompetitionContract()
+    {
+        EnsureCupCompetitionState();
+        var hasCupFixture = false;
+        foreach (var fixture in CompetitionFixtures)
+        {
+            hasCupFixture = hasCupFixture || fixture.CompetitionType.Equals("Cup", StringComparison.OrdinalIgnoreCase);
+        }
+
+        if (!hasCupFixture ||
+            CupPrizeMoney <= 0 ||
+            _cupHistory.Count == 0 ||
+            string.IsNullOrWhiteSpace(CupStatusSummary) ||
+            !CareerMarketSummary.Contains("Cup competitions", StringComparison.Ordinal) ||
+            !CupHistorySummary.Contains(CupCompetitionName, StringComparison.OrdinalIgnoreCase))
+        {
+            return "Saved cup competition state did not restore.";
         }
 
         return MatchPlaybackContractValidator.PassMessage;
@@ -5649,6 +5805,169 @@ public partial class GameState
         if (PromotionRelegationSummary.Contains("pending", StringComparison.OrdinalIgnoreCase))
         {
             PromotionRelegationSummary = BuildPromotionRelegationRuleSummary(CurrentDivisionTier);
+        }
+    }
+
+    private void EnsureCupCompetitionState()
+    {
+        CupCompetitionName = string.IsNullOrWhiteSpace(CupCompetitionName) ? "Novara National Cup" : CupCompetitionName;
+        var hasCupFixture = false;
+        var nextCupFixture = string.Empty;
+        foreach (var fixture in CompetitionFixtures)
+        {
+            if (!fixture.CompetitionType.Equals("Cup", StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            hasCupFixture = true;
+            if (!fixture.IsComplete && string.IsNullOrWhiteSpace(nextCupFixture))
+            {
+                nextCupFixture = $"{fixture.RoundName}: {fixture.HomeClubName} vs {fixture.AwayClubName}";
+            }
+        }
+
+        if (!hasCupFixture)
+        {
+            CupStatusSummary = "Cup competitions: no domestic cup fixtures have been generated for this compact season.";
+            CupDrawSummary = "Cup draw unavailable until fixtures are generated.";
+            CupObjectiveSummary = "Cup objective unavailable until the club enters a domestic cup.";
+            return;
+        }
+
+        CupDrawSummary = $"Cup draw: {CupCompetitionName} uses compact quarterfinal and final fixtures after the league schedule; rotation pressure and upset risk are handled through the shared match path.";
+        if (CupWon)
+        {
+            CupStatusSummary = $"{CupCompetitionName}: trophy won; prize money {FormatFinanceMoney(CupPrizeMoney)} recorded.";
+        }
+        else if (CupEliminated)
+        {
+            CupStatusSummary = $"{CupCompetitionName}: eliminated; prize money {FormatFinanceMoney(CupPrizeMoney)} recorded.";
+        }
+        else
+        {
+            CupStatusSummary = string.IsNullOrWhiteSpace(nextCupFixture)
+                ? $"{CupCompetitionName}: all current cup fixtures are resolved; awaiting season review."
+                : $"{CupCompetitionName}: next cup fixture {nextCupFixture}; prize pool {FormatFinanceMoney(CupPrizeMoney)} already earned.";
+        }
+
+        CupObjectiveSummary = CurrentClub?.BoardPhilosophy == BoardPhilosophy.WinNowBoard || CurrentClub?.Archetype == ClubArchetype.TitleContender
+            ? "Cup objective: board expects a serious run; exit raises pressure, progress improves trust and reputation."
+            : "Cup objective: board values progress, rotation discipline, prize money, and development minutes without treating the cup as the only job-security measure.";
+    }
+
+    public string ApplyCupMatchResult(CompetitionFixture fixture, MatchPlaybackResult result)
+    {
+        EnsureCupCompetitionState();
+        if (string.IsNullOrWhiteSpace(SelectedClubName))
+        {
+            return "Cup update skipped because no selected club is active.";
+        }
+
+        var selectedAtHome = fixture.HomeClubName == SelectedClubName;
+        var selectedGoals = selectedAtHome ? result.FinalHomeScore : result.FinalAwayScore;
+        var opponentGoals = selectedAtHome ? result.FinalAwayScore : result.FinalHomeScore;
+        var selectedAdvanced = selectedGoals > opponentGoals ||
+            (selectedGoals == opponentGoals && ResolveCupTieBreaker(fixture));
+        var isFinal = fixture.RoundName.Contains("Final", StringComparison.OrdinalIgnoreCase);
+        var prize = isFinal
+            ? selectedAdvanced ? 850000 : 360000
+            : selectedAdvanced ? 280000 : 125000;
+        AddCupPrizeMoney(prize, $"{CupCompetitionName} {fixture.RoundName}");
+        CupEliminated = !selectedAdvanced || CupEliminated;
+        CupWon = isFinal && selectedAdvanced;
+
+        var status = selectedAdvanced
+            ? isFinal
+                ? $"{SelectedClubName} won {CupCompetitionName} after {fixture.RoundName}; trophy, prize money, board/fan reaction, reputation, and history updated."
+                : $"{SelectedClubName} advanced from the {fixture.RoundName}; prize money, rotation pressure, board/fan reaction, and news updated."
+            : $"{SelectedClubName} exited {CupCompetitionName} in the {fixture.RoundName}; pressure, fan reaction, board review, and prize money updated.";
+
+        if (!selectedAdvanced)
+        {
+            ReplaceFutureSelectedCupFixturesAfterExit(fixture.Matchday);
+        }
+
+        var boardDelta = selectedAdvanced ? isFinal ? 5 : 2 : -3;
+        var fanDelta = selectedAdvanced ? isFinal ? 6 : 3 : -4;
+        BoardConfidence = Math.Clamp(BoardConfidence + boardDelta, 0, 100);
+        FanSentiment = Math.Clamp(FanSentiment + fanDelta, 0, 100);
+        SyncCurrentClubMoraleFromRuntime();
+        ClubReputation = Math.Clamp(ClubReputation + (selectedAdvanced ? isFinal ? 4 : 1 : -1), 0, 100);
+        WorldReputation = Math.Clamp(WorldReputation + (selectedAdvanced ? isFinal ? 3 : 1 : 0), 0, 100);
+        FanPressure = Math.Clamp(FanPressure + (selectedAdvanced ? -2 : 4), 0, 100);
+        BoardPressure = Math.Clamp(BoardPressure + (selectedAdvanced ? -1 : 3), 0, 100);
+        RefreshPressureCategories();
+        EnsureCupCompetitionState();
+        RecordCupHistory(status);
+        AddNews(
+            selectedAdvanced ? isFinal ? "Cup trophy secured" : "Cup progress confirmed" : "Cup exit confirmed",
+            NewsCategory.Career,
+            "Cup desk",
+            status,
+            isFinal || !selectedAdvanced ? 5 : 4,
+            sourceType: "Cup desk",
+            relatedEntity: SelectedClubName,
+            effectSummary: $"Cup prize {FormatFinanceMoney(CupPrizeMoney)}; board {BoardConfidence}; fans {FanSentiment}; pressure board {BoardPressure}, fans {FanPressure}.",
+            cooldownKey: $"cup-{fixture.RoundName}-{CurrentMatchday}");
+        return $"{status} Cup result did not alter the league table.";
+    }
+
+    private bool ResolveCupTieBreaker(CompetitionFixture fixture)
+    {
+        var seed = Math.Abs(HashCode.Combine(WorldSeed, SeasonStartYear, fixture.Matchday, fixture.HomeClubName, fixture.AwayClubName, "cup-tie"));
+        return seed % 2 == 0;
+    }
+
+    private void ReplaceFutureSelectedCupFixturesAfterExit(int completedMatchday)
+    {
+        if (string.IsNullOrWhiteSpace(SelectedClubName))
+        {
+            return;
+        }
+
+        CompetitionFixtures = Array.ConvertAll(
+            CompetitionFixtures,
+            fixture =>
+            {
+                if (fixture.Matchday <= completedMatchday ||
+                    !fixture.CompetitionType.Equals("Cup", StringComparison.OrdinalIgnoreCase) ||
+                    (fixture.HomeClubName != SelectedClubName && fixture.AwayClubName != SelectedClubName))
+                {
+                    return fixture;
+                }
+
+                return new CompetitionFixture
+                {
+                    Matchday = fixture.Matchday,
+                    HomeClubName = "Eastvale Rovers",
+                    AwayClubName = "Southgate Athletic",
+                    IsComplete = fixture.IsComplete,
+                    Scoreline = fixture.Scoreline,
+                    ResultSummary = "Cup path adjusted after selected club exit.",
+                    CompetitionType = fixture.CompetitionType,
+                    CompetitionName = fixture.CompetitionName,
+                    RoundName = fixture.RoundName
+                };
+            });
+    }
+
+    private void AddCupPrizeMoney(int amount, string reason)
+    {
+        EnsureFinanceState();
+        CupPrizeMoney += amount;
+        FinancePrizeMoney += amount;
+        FinanceRevenue += amount;
+        RefreshFinanceProjection();
+        RecordFinanceHistory($"Cup finance: {reason} added {FormatFinanceMoney(amount)}; projected balance {FormatFinanceMoney(FinanceProjectedBalance)}.");
+    }
+
+    private void RecordCupHistory(string detail)
+    {
+        _cupHistory.Insert(0, $"{CurrentDateLabel}: {detail}");
+        if (_cupHistory.Count > 16)
+        {
+            _cupHistory.RemoveAt(_cupHistory.Count - 1);
         }
     }
 

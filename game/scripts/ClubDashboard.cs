@@ -379,7 +379,7 @@ public partial class ClubDashboard : Control
         _clubNameLabel.Text = clubName;
         _managerLabel.Text = $"{state.CurrentRoleName} {state.ManagerName}";
         _seasonLabel.Text = $"Season {state.SeasonLabel}";
-        _competitionChipLabel.Text = state.CompetitionName.ToUpperInvariant();
+        _competitionChipLabel.Text = state.CurrentFixtureCompetitionName.ToUpperInvariant();
         _clubContextLabel.Text = $"{clubName} Manager Hub | {state.CurrentRoleName} {state.ManagerName}";
         _careerFoundationLabel.Text =
             $"Background: {state.ManagerBackgroundName} | License: {state.LicenseName}";
@@ -404,7 +404,9 @@ public partial class ClubDashboard : Control
         _shapeMetaLabel.Text = $"{state.TeamStyleName} | Press {state.PressIntensity} | Tempo {state.Tempo} | Risk {state.Risk}";
 
         _fixturePreviewLabel.Text = $"{careerPhase}\n{state.NextFixtureSummary}";
-        _focusContextLabel.Text = $"{state.CompetitionName} | {state.BuildLeaguePositionSummary()}";
+        _focusContextLabel.Text = state.CurrentFixtureIsCup
+            ? $"{state.CurrentFixtureCompetitionName} | {state.CurrentFixtureRoundName} | {state.BuildLeaguePositionSummary()}"
+            : $"{state.CompetitionName} | {state.BuildLeaguePositionSummary()}";
         _recommendedMoveLabel.Text = BuildPrioritySummary(state);
         _actionHintLabel.Text = state.IsCurrentClubFixtureComplete()
             ? "Next match: advance after the post-match review, not replay the completed fixture."
