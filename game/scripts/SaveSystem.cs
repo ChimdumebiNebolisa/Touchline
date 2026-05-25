@@ -197,7 +197,7 @@ public partial class SaveSystem : Node
         WriteIndented = true,
         PropertyNameCaseInsensitive = true
     };
-    public const int CurrentSaveVersion = 14;
+    public const int CurrentSaveVersion = 15;
 
     public static SaveSystem? Instance { get; private set; }
     public string LastStatusMessage { get; private set; } = "Save system idle.";
@@ -1058,7 +1058,37 @@ public partial class SaveSystem : Node
             StaffMarketCandidate = source.StaffMarketCandidate == null ? null : CloneStaffMarketCandidateData(source.StaffMarketCandidate),
             StaffReportSummary = source.StaffReportSummary,
             StaffMarketSummary = source.StaffMarketSummary,
-            StaffHistory = source.StaffHistory == null ? null : (string[])source.StaffHistory.Clone()
+            StaffHistory = source.StaffHistory == null ? null : (string[])source.StaffHistory.Clone(),
+            YouthAcademyQuality = source.YouthAcademyQuality,
+            YouthRecruitmentReach = source.YouthRecruitmentReach,
+            YouthCoachingQuality = source.YouthCoachingQuality,
+            YouthFacilitiesSummary = source.YouthFacilitiesSummary,
+            YouthIntakeDateSummary = source.YouthIntakeDateSummary,
+            YouthBoardExpectation = source.YouthBoardExpectation,
+            YouthFanExpectation = source.YouthFanExpectation,
+            YouthProspects = source.YouthProspects == null ? null : Array.ConvertAll(source.YouthProspects, CloneYouthProspectData),
+            YouthHistory = source.YouthHistory == null ? null : (string[])source.YouthHistory.Clone()
+        };
+    }
+
+    private static SaveSlotYouthProspectData CloneYouthProspectData(SaveSlotYouthProspectData source)
+    {
+        return new SaveSlotYouthProspectData
+        {
+            ProspectId = source.ProspectId,
+            Name = source.Name,
+            Age = source.Age,
+            Position = source.Position,
+            Region = source.Region,
+            PlayingStyle = source.PlayingStyle,
+            Personality = source.Personality,
+            VisibleInfo = source.VisibleInfo,
+            HiddenPotentialBand = source.HiddenPotentialBand,
+            PotentialCertainty = source.PotentialCertainty,
+            DevelopmentCurve = source.DevelopmentCurve,
+            LoanSuitability = source.LoanSuitability,
+            IsPromoted = source.IsPromoted,
+            Status = source.Status
         };
     }
 

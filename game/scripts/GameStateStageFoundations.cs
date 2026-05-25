@@ -65,6 +65,15 @@ public sealed class SaveSlotStageFoundationData
     public string StaffReportSummary { get; set; } = string.Empty;
     public string StaffMarketSummary { get; set; } = string.Empty;
     public string[]? StaffHistory { get; set; }
+    public int YouthAcademyQuality { get; set; }
+    public int YouthRecruitmentReach { get; set; }
+    public int YouthCoachingQuality { get; set; }
+    public string YouthFacilitiesSummary { get; set; } = string.Empty;
+    public string YouthIntakeDateSummary { get; set; } = string.Empty;
+    public string YouthBoardExpectation { get; set; } = string.Empty;
+    public string YouthFanExpectation { get; set; } = string.Empty;
+    public SaveSlotYouthProspectData[]? YouthProspects { get; set; }
+    public string[]? YouthHistory { get; set; }
 }
 
 public sealed class SaveSlotStaffMarketCandidateData
@@ -83,6 +92,24 @@ public sealed class SaveSlotStaffMarketCandidateData
     public string BoardApproval { get; set; } = string.Empty;
     public string Status { get; set; } = string.Empty;
     public string OutcomeSummary { get; set; } = string.Empty;
+}
+
+public sealed class SaveSlotYouthProspectData
+{
+    public string ProspectId { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public int Age { get; set; }
+    public string Position { get; set; } = string.Empty;
+    public string Region { get; set; } = string.Empty;
+    public string PlayingStyle { get; set; } = string.Empty;
+    public string Personality { get; set; } = string.Empty;
+    public string VisibleInfo { get; set; } = string.Empty;
+    public string HiddenPotentialBand { get; set; } = string.Empty;
+    public int PotentialCertainty { get; set; }
+    public string DevelopmentCurve { get; set; } = string.Empty;
+    public string LoanSuitability { get; set; } = string.Empty;
+    public bool IsPromoted { get; set; }
+    public string Status { get; set; } = string.Empty;
 }
 public sealed class SaveSlotScoutingAssignmentData
 {
@@ -214,6 +241,8 @@ public partial class GameState
     private readonly List<string> _contractHistory = new();
     private readonly List<string> _directorActionHistory = new();
     private readonly List<string> _staffHistory = new();
+    private readonly List<YouthProspect> _youthProspects = new();
+    private readonly List<string> _youthHistory = new();
 
     private readonly record struct ContractResolution(
         ContractOffer Offer,
@@ -273,6 +302,13 @@ public partial class GameState
     public StaffMarketCandidate? CurrentStaffMarketCandidate { get; private set; }
     public string StaffReportSummary { get; private set; } = "Staff reports pending.";
     public string StaffMarketSummary { get; private set; } = "Staff market pending.";
+    public int YouthAcademyQuality { get; private set; }
+    public int YouthRecruitmentReach { get; private set; }
+    public int YouthCoachingQuality { get; private set; }
+    public string YouthFacilitiesSummary { get; private set; } = "Youth facilities pending.";
+    public string YouthIntakeDateSummary { get; private set; } = "Youth intake pending.";
+    public string YouthBoardExpectation { get; private set; } = "Youth board expectation pending.";
+    public string YouthFanExpectation { get; private set; } = "Youth fan expectation pending.";
 
     public string TeamStyleName => StageFoundationText.GetDisplayName(TeamStyle);
     public string TacticalFamiliarityName => StageFoundationText.GetDisplayName(TacticsFoundation.FamiliarityFromScore(TacticalFamiliarityScore));
@@ -294,6 +330,7 @@ public partial class GameState
     public string ContractFoundationSummary => BuildContractFoundationSummary();
     public string DirectorInfluenceSummary => BuildDirectorInfluenceSummary();
     public string StaffImpactSummary => BuildStaffImpactSummary();
+    public string YouthAcademySummary => BuildYouthAcademySummary();
     public string RecruitmentFoundationSummary => CurrentRecruitmentTarget == null
         ? "Recruitment foundation pending scouting target."
         : $"{CurrentRecruitmentTarget.PlayerName} ({CurrentRecruitmentTarget.Position}) | {CurrentRecruitmentTarget.InformationSummary} | {CurrentRecruitmentTarget.InterestSummary} | {CurrentRecruitmentTarget.TacticalFitSummary} | Fee {CurrentRecruitmentTarget.EstimatedFeeRange} | Wage {CurrentRecruitmentTarget.EstimatedWageRange} | Status {CurrentRecruitmentTarget.TargetStatus} | Valuation {CurrentRecruitmentTarget.ClubValuation} | Agent {CurrentRecruitmentTarget.AgentMood} | Rival {CurrentRecruitmentTarget.RivalInterest} | Board {CurrentRecruitmentTarget.BoardStance} | Director {CurrentRecruitmentTarget.DirectorStance} | Outcome {CurrentRecruitmentTarget.OutcomeState} | {CurrentRecruitmentTarget.Status}\nDirector of Football\n{DirectorInfluenceSummary}\nShortlist\n{RecruitmentShortlistSummary}\nContracts\n{ContractFoundationSummary}\nTransfer history\n{TransferHistorySummary}";
@@ -698,6 +735,18 @@ public partial class GameState
         return CurrentStaffMarketCandidate.OutcomeSummary;
     }
 
+    public string AdvanceYouthAcademyAction()
+    {
+        EnsureYouthAcademyState();
+        if (_youthProspects.Count == 0)
+        {
+            GenerateYouthIntake();
+            return "Youth intake generated; prospects are available for academy review.";
+        }
+
+        return PromoteYouthProspect();
+    }
+
     public void GenerateJobMarketEvent()
     {
         var otherClub = ResolveDifferentClub(SelectedClubName);
@@ -850,7 +899,16 @@ public partial class GameState
             StaffMarketCandidate = CurrentStaffMarketCandidate == null ? null : BuildStaffMarketCandidateSaveData(CurrentStaffMarketCandidate),
             StaffReportSummary = StaffReportSummary,
             StaffMarketSummary = StaffMarketSummary,
-            StaffHistory = _staffHistory.ToArray()
+            StaffHistory = _staffHistory.ToArray(),
+            YouthAcademyQuality = YouthAcademyQuality,
+            YouthRecruitmentReach = YouthRecruitmentReach,
+            YouthCoachingQuality = YouthCoachingQuality,
+            YouthFacilitiesSummary = YouthFacilitiesSummary,
+            YouthIntakeDateSummary = YouthIntakeDateSummary,
+            YouthBoardExpectation = YouthBoardExpectation,
+            YouthFanExpectation = YouthFanExpectation,
+            YouthProspects = Array.ConvertAll(_youthProspects.ToArray(), BuildYouthProspectSaveData),
+            YouthHistory = _youthHistory.ToArray()
         };
     }
 
@@ -1045,6 +1103,28 @@ public partial class GameState
             _staffHistory.AddRange(data.StaffHistory);
         }
 
+        YouthAcademyQuality = Math.Clamp(data.YouthAcademyQuality <= 0 ? BuildYouthAcademyQuality() : data.YouthAcademyQuality, 0, 100);
+        YouthRecruitmentReach = Math.Clamp(data.YouthRecruitmentReach <= 0 ? BuildYouthRecruitmentReach() : data.YouthRecruitmentReach, 0, 100);
+        YouthCoachingQuality = Math.Clamp(data.YouthCoachingQuality <= 0 ? GetStaffQuality(StaffRole.YouthCoach) : data.YouthCoachingQuality, 0, 100);
+        YouthFacilitiesSummary = string.IsNullOrWhiteSpace(data.YouthFacilitiesSummary) ? BuildYouthFacilitiesSummary() : data.YouthFacilitiesSummary;
+        YouthIntakeDateSummary = string.IsNullOrWhiteSpace(data.YouthIntakeDateSummary) ? BuildYouthIntakeDateSummary() : data.YouthIntakeDateSummary;
+        YouthBoardExpectation = string.IsNullOrWhiteSpace(data.YouthBoardExpectation) ? BuildYouthBoardExpectation() : data.YouthBoardExpectation;
+        YouthFanExpectation = string.IsNullOrWhiteSpace(data.YouthFanExpectation) ? BuildYouthFanExpectation() : data.YouthFanExpectation;
+        _youthProspects.Clear();
+        if (data.YouthProspects != null)
+        {
+            foreach (var prospect in data.YouthProspects)
+            {
+                _youthProspects.Add(RestoreYouthProspect(prospect));
+            }
+        }
+
+        _youthHistory.Clear();
+        if (data.YouthHistory != null)
+        {
+            _youthHistory.AddRange(data.YouthHistory);
+        }
+
         EnsureRecruitmentTarget();
         EnsureJobMarketFoundation();
         RefreshPressureCategories();
@@ -1103,6 +1183,13 @@ public partial class GameState
         CurrentStaffMarketCandidate = null;
         StaffReportSummary = "Staff reports pending.";
         StaffMarketSummary = "Staff market pending.";
+        YouthAcademyQuality = 0;
+        YouthRecruitmentReach = 0;
+        YouthCoachingQuality = 0;
+        YouthFacilitiesSummary = "Youth facilities pending.";
+        YouthIntakeDateSummary = "Youth intake pending.";
+        YouthBoardExpectation = "Youth board expectation pending.";
+        YouthFanExpectation = "Youth fan expectation pending.";
         _foundationNewsEvents.Clear();
         _activeDecisionEvents.Clear();
         _resolvedDecisionEvents.Clear();
@@ -1114,6 +1201,8 @@ public partial class GameState
         _contractHistory.Clear();
         _directorActionHistory.Clear();
         _staffHistory.Clear();
+        _youthProspects.Clear();
+        _youthHistory.Clear();
     }
 
     public void InitializeStageFoundationsForClub()
@@ -1131,6 +1220,7 @@ public partial class GameState
         RefreshTacticFoundation(TacticalFormation, TeamStyle);
         EnsureDirectorConflictState();
         EnsureStaffImpactState();
+        EnsureYouthAcademyState();
         if (CurrentScoutingAssignment == null)
         {
             StartBasicScoutingAssignment("Position need: versatile midfielder");
@@ -2485,6 +2575,105 @@ public partial class GameState
             string.IsNullOrWhiteSpace(CurrentClub.Staff[0].Relationship))
         {
             return "Saved staff contract details did not restore.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
+    public string ValidatePhase13YouthAcademyContract()
+    {
+        InitializeStageFoundationsForClub();
+        EnsureYouthAcademyState();
+        if (!YouthAcademySummary.Contains("Academy quality", StringComparison.Ordinal) ||
+            !YouthAcademySummary.Contains("Board:", StringComparison.Ordinal) ||
+            !YouthAcademySummary.Contains("Fans:", StringComparison.Ordinal))
+        {
+            return "Youth academy summary does not expose quality, board expectation, and fan expectation.";
+        }
+
+        var beforeNewsCount = CurrentClub?.NewsFeed.Length ?? 0;
+        var beforeYouthReputation = YouthReputation;
+        var beforeSquadCount = SquadPlayers.Length;
+        var intakeResult = AdvanceYouthAcademyAction();
+        if (!intakeResult.Contains("Youth intake generated", StringComparison.Ordinal) ||
+            _youthProspects.Count == 0 ||
+            !YouthAcademySummary.Contains("hidden potential", StringComparison.OrdinalIgnoreCase) ||
+            !YouthAcademySummary.Contains("loan:", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Youth intake did not generate prospects with hidden potential and loan suitability.";
+        }
+
+        if (YouthReputation <= beforeYouthReputation)
+        {
+            return "Youth intake did not affect youth reputation.";
+        }
+
+        var firstProspectName = _youthProspects[0].Name;
+        var beforeBoardMorale = BoardMorale;
+        var beforeFanMorale = FanMorale;
+        var actionResult = AdvanceYouthAcademyAction();
+        if (string.IsNullOrWhiteSpace(actionResult))
+        {
+            return "Youth academy action did not return a result.";
+        }
+
+        if (CareerProfile.Role == ManagerRole.AssistantManager)
+        {
+            if (SquadPlayers.Length != beforeSquadCount ||
+                !_youthProspects[0].Status.Contains("recommended", StringComparison.OrdinalIgnoreCase))
+            {
+                return "Assistant Manager youth authority was not respected.";
+            }
+        }
+        else
+        {
+            if (SquadPlayers.Length <= beforeSquadCount)
+            {
+                return "Youth promotion did not add a senior squad player.";
+            }
+
+            var promoted = SquadPlayers[^1];
+            if (promoted.Name != firstProspectName ||
+                !promoted.UnknownAttributeGroups.Contains("hidden potential", StringComparison.OrdinalIgnoreCase) ||
+                !promoted.TransferInterest.Contains("Loan", StringComparison.OrdinalIgnoreCase))
+            {
+                return "Promoted academy player did not retain partial information, hidden potential, and loan suitability.";
+            }
+
+            if (BoardMorale <= beforeBoardMorale || FanMorale <= beforeFanMorale)
+            {
+                return "Youth promotion did not affect board and fan reaction.";
+            }
+        }
+
+        if ((CurrentClub?.NewsFeed.Length ?? 0) <= beforeNewsCount)
+        {
+            return "Youth academy action did not update news.";
+        }
+
+        if (_youthHistory.Count == 0 || !YouthAcademySummary.Contains("Youth history", StringComparison.Ordinal))
+        {
+            return "Youth academy action did not record history.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
+    public string ValidatePhase13StoredYouthAcademyContract()
+    {
+        EnsureYouthAcademyState();
+        if (_youthProspects.Count == 0 ||
+            _youthHistory.Count == 0 ||
+            string.IsNullOrWhiteSpace(YouthFacilitiesSummary) ||
+            !YouthAcademySummary.Contains("Prospects", StringComparison.Ordinal) ||
+            !YouthAcademySummary.Contains("Youth history", StringComparison.Ordinal))
+        {
+            return "Saved youth academy state did not restore.";
+        }
+
+        if (YouthAcademyQuality <= 0 || YouthRecruitmentReach <= 0 || YouthCoachingQuality <= 0)
+        {
+            return "Saved youth academy quality, reach, or coaching state is invalid.";
         }
 
         return MatchPlaybackContractValidator.PassMessage;
@@ -4275,6 +4464,335 @@ public partial class GameState
         if (_staffHistory.Count > 12)
         {
             _staffHistory.RemoveAt(_staffHistory.Count - 1);
+        }
+    }
+
+    private void EnsureYouthAcademyState()
+    {
+        if (YouthAcademyQuality <= 0)
+        {
+            YouthAcademyQuality = BuildYouthAcademyQuality();
+        }
+
+        if (YouthRecruitmentReach <= 0)
+        {
+            YouthRecruitmentReach = BuildYouthRecruitmentReach();
+        }
+
+        if (YouthCoachingQuality <= 0)
+        {
+            YouthCoachingQuality = Math.Clamp(GetStaffQuality(StaffRole.YouthCoach), 0, 100);
+        }
+
+        if (string.IsNullOrWhiteSpace(YouthFacilitiesSummary) || YouthFacilitiesSummary.Contains("pending", StringComparison.OrdinalIgnoreCase))
+        {
+            YouthFacilitiesSummary = BuildYouthFacilitiesSummary();
+        }
+
+        if (string.IsNullOrWhiteSpace(YouthIntakeDateSummary) || YouthIntakeDateSummary.Contains("pending", StringComparison.OrdinalIgnoreCase))
+        {
+            YouthIntakeDateSummary = BuildYouthIntakeDateSummary();
+        }
+
+        if (string.IsNullOrWhiteSpace(YouthBoardExpectation) || YouthBoardExpectation.Contains("pending", StringComparison.OrdinalIgnoreCase))
+        {
+            YouthBoardExpectation = BuildYouthBoardExpectation();
+        }
+
+        if (string.IsNullOrWhiteSpace(YouthFanExpectation) || YouthFanExpectation.Contains("pending", StringComparison.OrdinalIgnoreCase))
+        {
+            YouthFanExpectation = BuildYouthFanExpectation();
+        }
+    }
+
+    private string BuildYouthAcademySummary()
+    {
+        EnsureYouthAcademyState();
+        var prospects = _youthProspects.Count == 0
+            ? "No youth intake generated yet."
+            : string.Join("\n", _youthProspects.ConvertAll(BuildYouthProspectLine));
+        var history = _youthHistory.Count == 0
+            ? "Youth history starts after intake, review, promotion, or loan planning."
+            : string.Join("\n", _youthHistory);
+        return $"Academy quality {YouthAcademyQuality} | recruitment reach {YouthRecruitmentReach} | coaching {YouthCoachingQuality}\nFacilities: {YouthFacilitiesSummary}\nIntake: {YouthIntakeDateSummary}\nBoard: {YouthBoardExpectation}\nFans: {YouthFanExpectation}\nProspects\n{prospects}\nYouth history\n{history}";
+    }
+
+    private string BuildYouthProspectLine(YouthProspect prospect)
+    {
+        return $"{prospect.Name} ({prospect.Age}, {prospect.Position}, {prospect.Region}) | {prospect.Status} | {prospect.VisibleInfo} | hidden potential {prospect.HiddenPotentialBand} ({prospect.PotentialCertainty}% certainty) | {prospect.PlayingStyle} | {prospect.Personality} | {prospect.DevelopmentCurve} | loan: {prospect.LoanSuitability}";
+    }
+
+    private int BuildYouthAcademyQuality()
+    {
+        var archetypeBonus = CurrentClub?.Archetype == ClubArchetype.YouthAcademyClub ? 18 : 0;
+        var boardBonus = CurrentClub?.BoardPhilosophy == BoardPhilosophy.YouthDevelopmentBoard ? 8 : 0;
+        return Math.Clamp(42 + GetStaffQuality(StaffRole.YouthCoach) / 3 + archetypeBonus + boardBonus, 0, 100);
+    }
+
+    private int BuildYouthRecruitmentReach()
+    {
+        var directorBonus = CurrentClub?.DirectorOfFootballStyle == DirectorOfFootballStyle.AcademyBuilder ? 12 : 0;
+        return Math.Clamp(40 + GetStaffQuality(StaffRole.Scout) / 4 + GetStaffQuality(StaffRole.HeadOfRecruitment) / 5 + directorBonus, 0, 100);
+    }
+
+    private string BuildYouthFacilitiesSummary()
+    {
+        return YouthAcademyQuality >= 75
+            ? "Strong academy setup with meaningful first-team pathway."
+            : YouthAcademyQuality >= 58
+                ? "Functional academy setup; standout prospects remain rare."
+                : "Limited academy setup; pathway needs staff and facility support.";
+    }
+
+    private string BuildYouthIntakeDateSummary()
+    {
+        return $"Next intake review around {CurrentDate.AddDays(28):yyyy-MM-dd}; early review can generate a small foundation intake.";
+    }
+
+    private string BuildYouthBoardExpectation()
+    {
+        return CurrentClub?.BoardPhilosophy == BoardPhilosophy.YouthDevelopmentBoard
+            ? "Board expects visible academy pathway without sacrificing results."
+            : "Board treats academy use as positive if first-team standards hold.";
+    }
+
+    private string BuildYouthFanExpectation()
+    {
+        return CurrentClub?.FanCulture == FanCulture.AcademyLoyalists
+            ? "Fans respond strongly to credible academy minutes."
+            : "Fans welcome academy stories if performances stay credible.";
+    }
+
+    private void GenerateYouthIntake()
+    {
+        EnsureYouthAcademyState();
+        _youthProspects.Clear();
+        for (var index = 0; index < 3; index++)
+        {
+            _youthProspects.Add(BuildYouthProspect(index));
+        }
+
+        YouthIntakeDateSummary = $"{CurrentDateLabel}: foundation youth intake generated; hidden potential remains partially unknown.";
+        YouthReputation = Math.Clamp(YouthReputation + 2, 0, 100);
+        RecordYouthHistory($"Youth intake generated with {_youthProspects.Count} prospects; academy quality {YouthAcademyQuality}, reach {YouthRecruitmentReach}, coaching {YouthCoachingQuality}.");
+        AddNews(
+            "Youth intake reviewed",
+            NewsCategory.Club,
+            "Academy report",
+            $"{SelectedClubName} reviewed {_youthProspects.Count} academy prospects with hidden potential still uncertain.",
+            4,
+            sourceType: "Academy staff",
+            relatedEntity: SelectedClubName ?? "academy",
+            effectSummary: $"Youth reputation {YouthReputation}; board/fan expectations now visible.",
+            cooldownKey: "youth-intake");
+    }
+
+    private YouthProspect BuildYouthProspect(int index)
+    {
+        var positions = new[] { "CM", "CB", "LW", "ST", "RB", "AM" };
+        var firstNames = new[] { "Milo", "Ivo", "Tariq", "Noel", "Sami", "Ren" };
+        var lastNames = new[] { "Vale", "Koric", "Amani", "Ilic", "Soren", "Dalo" };
+        var styles = new[] { "Tempo-setting prospect", "Front-foot defender", "Direct runner", "Pressing forward", "Inverted fullback", "Between-lines creator" };
+        var personalities = new[] { "Grounded", "Driven", "Quiet learner", "Confident", "Resilient", "Raw but receptive" };
+        var seed = BuildStableTextHash($"{WorldSeed}|{SelectedClubName}|youth|{index}");
+        var position = positions[Math.Abs(seed + index) % positions.Length];
+        var name = $"{firstNames[Math.Abs(seed) % firstNames.Length]} {lastNames[Math.Abs(seed / 7 + index) % lastNames.Length]}";
+        var certainty = Math.Clamp(35 + YouthCoachingQuality / 4 + GetStaffQuality(StaffRole.DataAnalyst) / 5 - index * 5, 20, 85);
+        var potentialTop = Math.Clamp(62 + YouthAcademyQuality / 4 + YouthRecruitmentReach / 6 - index * 3, 58, 88);
+        var potentialLow = Math.Max(45, potentialTop - (certainty >= 65 ? 8 : 16));
+        return new YouthProspect
+        {
+            ProspectId = $"youth-{BuildStableTextHash(name):x8}-{index}",
+            Name = name,
+            Age = 16 + Math.Abs(seed + index) % 3,
+            Position = position,
+            Region = SelectedClubName ?? "Local academy",
+            PlayingStyle = styles[Math.Abs(seed / 11 + index) % styles.Length],
+            Personality = personalities[Math.Abs(seed / 13 + index) % personalities.Length],
+            VisibleInfo = $"Known: role {position}, age, broad style. Estimated: current ability {46 + index * 2}-{58 + index * 2}. Unknown: exact potential ?, pressure response ?.",
+            HiddenPotentialBand = $"{potentialLow}-{potentialTop}",
+            PotentialCertainty = certainty,
+            DevelopmentCurve = potentialTop >= 78 ? "High-upside but needs careful minutes." : "Steady development path if training and loan fit are credible.",
+            LoanSuitability = potentialTop >= 72 ? "Future loan could help after senior promotion if minutes are guaranteed." : "Keep in academy/senior training before loan review.",
+            IsPromoted = false,
+            Status = "Academy prospect"
+        };
+    }
+
+    private string PromoteYouthProspect()
+    {
+        for (var index = 0; index < _youthProspects.Count; index++)
+        {
+            var prospect = _youthProspects[index];
+            if (prospect.IsPromoted)
+            {
+                continue;
+            }
+
+            if (CareerProfile.Role == ManagerRole.AssistantManager)
+            {
+                _youthProspects[index] = CloneYouthProspect(prospect, false, "Promotion recommended by Assistant Manager");
+                RecordYouthHistory($"{prospect.Name}: promotion recommended; Assistant Manager authority cannot finalize senior registration.");
+                AddNews(
+                    "Youth promotion recommended",
+                    NewsCategory.Club,
+                    "Academy report",
+                    $"{ManagerName} recommended {prospect.Name} for senior review.",
+                    2);
+                return "Assistant Manager youth recommendation logged; senior promotion not finalized.";
+            }
+
+            PromoteProspectToSeniorSquad(prospect);
+            _youthProspects[index] = CloneYouthProspect(prospect, true, "Promoted to senior squad");
+            var boardDelta = CurrentClub?.BoardPhilosophy == BoardPhilosophy.YouthDevelopmentBoard ? 2 : 1;
+            var fanDelta = CurrentClub?.FanCulture == FanCulture.AcademyLoyalists ? 3 : 1;
+            BoardConfidence = Math.Clamp(BoardConfidence + boardDelta, 0, 100);
+            FanSentiment = Math.Clamp(FanSentiment + fanDelta, 0, 100);
+            YouthReputation = Math.Clamp(YouthReputation + 3, 0, 100);
+            SyncCurrentClubMoraleFromRuntime();
+            RecordYouthHistory($"{prospect.Name}: promoted to senior squad; board +{boardDelta}, fans +{fanDelta}, youth reputation {YouthReputation}.");
+            AddNews(
+                "Academy prospect promoted",
+                NewsCategory.Club,
+                "Academy report",
+                $"{prospect.Name} joined the senior squad from the academy pathway.",
+                4,
+                sourceType: "Academy staff",
+                relatedEntity: prospect.Name,
+                effectSummary: $"Board morale {BoardMorale}; fan morale {FanMorale}; youth reputation {YouthReputation}.",
+                cooldownKey: "youth-promotion");
+            SquadStatusSummary = BuildSquadStatusSummary();
+            return $"{prospect.Name} promoted to the senior squad with loan suitability noted: {prospect.LoanSuitability}";
+        }
+
+        return "No unpromoted youth prospects available.";
+    }
+
+    private void PromoteProspectToSeniorSquad(YouthProspect prospect)
+    {
+        var abilityTop = ExtractPotentialTop(prospect.HiddenPotentialBand);
+        var currentAbility = Math.Clamp(48 + YouthAcademyQuality / 10 + prospect.PotentialCertainty / 12, 42, Math.Max(55, abilityTop - 8));
+        var seniorPlayer = new SquadPlayer
+        {
+            PlayerId = prospect.ProspectId,
+            Name = prospect.Name,
+            Position = prospect.Position,
+            Age = prospect.Age,
+            Nationality = "Novaran",
+            TrueAbility = currentAbility,
+            TechnicalAttribute = Math.Clamp(currentAbility + 1, 0, 100),
+            TacticalAttribute = Math.Clamp(currentAbility + YouthCoachingQuality / 20, 0, 100),
+            PhysicalAttribute = Math.Clamp(currentAbility - 1, 0, 100),
+            MentalAttribute = Math.Clamp(currentAbility + prospect.PotentialCertainty / 20, 0, 100),
+            KnownAttributesSummary = $"Known: academy role {prospect.Position}, fitness baseline, training response.",
+            EstimatedAttributesSummary = $"Estimated: current ability {Math.Max(40, currentAbility - 4)}-{currentAbility + 5}, potential {prospect.HiddenPotentialBand}.",
+            UnknownAttributesSummary = "Unknown: exact hidden potential ?, senior pressure response ?, agent loyalty ?.",
+            PlayingStyle = prospect.PlayingStyle,
+            Tendencies = "Learning senior habits.",
+            Traits = "academy graduate, coachable",
+            Personality = prospect.Personality,
+            TacticalFit = $"Academy pathway fit for {TeamStyleName}; senior role still estimated.",
+            DevelopmentCurve = prospect.DevelopmentCurve,
+            Form = 58,
+            Morale = 68,
+            Fitness = 82,
+            Fatigue = 10,
+            InjuryRisk = 18,
+            Wage = 3500 + currentAbility * 80,
+            ContractExpiryYear = CurrentDate.Year + 2,
+            ContractRole = "Youth Prospect",
+            Relationship = "Academy pathway",
+            PromiseSummary = "Promotion pathway promise active; senior minutes not guaranteed.",
+            TransferInterest = "Loan development suitability recorded.",
+            TacticalFitScore = Math.Clamp(55 + YouthCoachingQuality / 4, 0, 100),
+            PlayerFamiliarity = 70,
+            ScoutingConfidence = prospect.PotentialCertainty,
+            KnownAttributeGroups = "role,style,fitness",
+            EstimatedAttributeGroups = "technical,tactical,physical,mental,potential",
+            UnknownAttributeGroups = "hidden potential,pressure response,agent loyalty",
+            IsStarting = false
+        };
+        var updated = new SquadPlayer[SquadPlayers.Length + 1];
+        Array.Copy(SquadPlayers, updated, SquadPlayers.Length);
+        updated[^1] = seniorPlayer;
+        SquadPlayers = updated;
+    }
+
+    private static int ExtractPotentialTop(string potentialBand)
+    {
+        var parts = potentialBand.Split('-', StringSplitOptions.RemoveEmptyEntries);
+        return parts.Length == 2 && int.TryParse(parts[1], out var top) ? top : 70;
+    }
+
+    private static YouthProspect CloneYouthProspect(YouthProspect prospect, bool isPromoted, string status)
+    {
+        return new YouthProspect
+        {
+            ProspectId = prospect.ProspectId,
+            Name = prospect.Name,
+            Age = prospect.Age,
+            Position = prospect.Position,
+            Region = prospect.Region,
+            PlayingStyle = prospect.PlayingStyle,
+            Personality = prospect.Personality,
+            VisibleInfo = prospect.VisibleInfo,
+            HiddenPotentialBand = prospect.HiddenPotentialBand,
+            PotentialCertainty = prospect.PotentialCertainty,
+            DevelopmentCurve = prospect.DevelopmentCurve,
+            LoanSuitability = prospect.LoanSuitability,
+            IsPromoted = isPromoted,
+            Status = status
+        };
+    }
+
+    private static SaveSlotYouthProspectData BuildYouthProspectSaveData(YouthProspect prospect)
+    {
+        return new SaveSlotYouthProspectData
+        {
+            ProspectId = prospect.ProspectId,
+            Name = prospect.Name,
+            Age = prospect.Age,
+            Position = prospect.Position,
+            Region = prospect.Region,
+            PlayingStyle = prospect.PlayingStyle,
+            Personality = prospect.Personality,
+            VisibleInfo = prospect.VisibleInfo,
+            HiddenPotentialBand = prospect.HiddenPotentialBand,
+            PotentialCertainty = prospect.PotentialCertainty,
+            DevelopmentCurve = prospect.DevelopmentCurve,
+            LoanSuitability = prospect.LoanSuitability,
+            IsPromoted = prospect.IsPromoted,
+            Status = prospect.Status
+        };
+    }
+
+    private static YouthProspect RestoreYouthProspect(SaveSlotYouthProspectData data)
+    {
+        return new YouthProspect
+        {
+            ProspectId = string.IsNullOrWhiteSpace(data.ProspectId) ? $"youth-{BuildStableTextHash(data.Name):x8}" : data.ProspectId,
+            Name = string.IsNullOrWhiteSpace(data.Name) ? "Unknown academy prospect" : data.Name,
+            Age = data.Age <= 0 ? 17 : data.Age,
+            Position = string.IsNullOrWhiteSpace(data.Position) ? "CM" : data.Position,
+            Region = string.IsNullOrWhiteSpace(data.Region) ? "Local academy" : data.Region,
+            PlayingStyle = string.IsNullOrWhiteSpace(data.PlayingStyle) ? "Balanced academy prospect" : data.PlayingStyle,
+            Personality = string.IsNullOrWhiteSpace(data.Personality) ? "Grounded" : data.Personality,
+            VisibleInfo = string.IsNullOrWhiteSpace(data.VisibleInfo) ? "Known: academy role. Estimated: current ability range. Unknown: potential ?." : data.VisibleInfo,
+            HiddenPotentialBand = string.IsNullOrWhiteSpace(data.HiddenPotentialBand) ? "55-70" : data.HiddenPotentialBand,
+            PotentialCertainty = Math.Clamp(data.PotentialCertainty <= 0 ? 45 : data.PotentialCertainty, 0, 100),
+            DevelopmentCurve = string.IsNullOrWhiteSpace(data.DevelopmentCurve) ? "Development path pending." : data.DevelopmentCurve,
+            LoanSuitability = string.IsNullOrWhiteSpace(data.LoanSuitability) ? "Loan suitability pending." : data.LoanSuitability,
+            IsPromoted = data.IsPromoted,
+            Status = string.IsNullOrWhiteSpace(data.Status) ? "Academy prospect" : data.Status
+        };
+    }
+
+    private void RecordYouthHistory(string detail)
+    {
+        _youthHistory.Insert(0, $"{CurrentDateLabel}: {detail}");
+        if (_youthHistory.Count > 12)
+        {
+            _youthHistory.RemoveAt(_youthHistory.Count - 1);
         }
     }
 

@@ -47,6 +47,7 @@ public partial class ClubDashboard : Control
     private Label _staffLabel = default!;
     private Label _newsFeedLabel = default!;
     private Label _trainingScoutingLabel = default!;
+    private Label _youthAcademyLabel = default!;
     private Label _recruitmentLabel = default!;
     private Label _careerMarketLabel = default!;
     private Label _priorityLabel = default!;
@@ -77,6 +78,7 @@ public partial class ClubDashboard : Control
     private Button _advanceDayButton = default!;
     private Button _advanceWeekButton = default!;
     private Button _staffMarketButton = default!;
+    private Button _youthAcademyButton = default!;
     private Button _recruitmentButton = default!;
     private Button _contractButton = default!;
     private Button _jobMarketButton = default!;
@@ -165,6 +167,8 @@ public partial class ClubDashboard : Control
         _advanceDayButton = GetNode<Button>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/AdvanceDayButton");
         _advanceWeekButton = GetNode<Button>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/AdvanceWeekButton");
         _staffMarketButton = GetNode<Button>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/StaffMarketButton");
+        _youthAcademyLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/YouthAcademyLabel");
+        _youthAcademyButton = GetNode<Button>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/YouthAcademyButton");
         _recruitmentLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/RecruitmentLabel");
         _careerMarketLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/CareerMarketLabel");
         _recruitmentButton = GetNode<Button>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/RecruitmentButton");
@@ -200,6 +204,8 @@ public partial class ClubDashboard : Control
         EnsureButton(insightContent, ref insightInsertIndex, "AdvanceDayButton", "Advance Day");
         EnsureButton(insightContent, ref insightInsertIndex, "AdvanceWeekButton", "Advance Week");
         EnsureButton(insightContent, ref insightInsertIndex, "StaffMarketButton", "Review Staff Market");
+        EnsureLabel(insightContent, ref insightInsertIndex, "YouthAcademyLabel");
+        EnsureButton(insightContent, ref insightInsertIndex, "YouthAcademyButton", "Review Youth Academy");
         EnsureLabel(insightContent, ref insightInsertIndex, "RecruitmentLabel");
         EnsureButton(insightContent, ref insightInsertIndex, "RecruitmentButton", "Progress Recruitment Foundation");
         EnsureButton(insightContent, ref insightInsertIndex, "ContractButton", "Review Contract Terms");
@@ -322,6 +328,7 @@ public partial class ClubDashboard : Control
         TouchlineTheme.ApplyMutedStyle(_staffLabel, 14);
         TouchlineTheme.ApplyMutedStyle(_newsFeedLabel, 14);
         TouchlineTheme.ApplyMutedStyle(_trainingScoutingLabel, 14);
+        TouchlineTheme.ApplyMutedStyle(_youthAcademyLabel, 14);
         TouchlineTheme.ApplyMutedStyle(_recruitmentLabel, 14);
         TouchlineTheme.ApplyMutedStyle(_careerMarketLabel, 14);
         TouchlineTheme.ApplyButtonVariant(_applyTrainingButton, TouchlineButtonVariant.Secondary);
@@ -329,6 +336,7 @@ public partial class ClubDashboard : Control
         TouchlineTheme.ApplyButtonVariant(_advanceDayButton, TouchlineButtonVariant.Secondary);
         TouchlineTheme.ApplyButtonVariant(_advanceWeekButton, TouchlineButtonVariant.Secondary);
         TouchlineTheme.ApplyButtonVariant(_staffMarketButton, TouchlineButtonVariant.Secondary);
+        TouchlineTheme.ApplyButtonVariant(_youthAcademyButton, TouchlineButtonVariant.Secondary);
         TouchlineTheme.ApplyButtonVariant(_recruitmentButton, TouchlineButtonVariant.Secondary);
         TouchlineTheme.ApplyButtonVariant(_contractButton, TouchlineButtonVariant.Secondary);
         TouchlineTheme.ApplyButtonVariant(_jobMarketButton, TouchlineButtonVariant.Secondary);
@@ -338,6 +346,7 @@ public partial class ClubDashboard : Control
         _advanceDayButton.Pressed += OnAdvanceDayPressed;
         _advanceWeekButton.Pressed += OnAdvanceWeekPressed;
         _staffMarketButton.Pressed += OnStaffMarketPressed;
+        _youthAcademyButton.Pressed += OnYouthAcademyPressed;
         _recruitmentButton.Pressed += OnRecruitmentPressed;
         _contractButton.Pressed += OnContractPressed;
         _jobMarketButton.Pressed += OnJobMarketPressed;
@@ -420,6 +429,8 @@ public partial class ClubDashboard : Control
         _newsFeedLabel.Text = $"News feed\n{state.NewsFeedSummary}\nDecision events\n{state.DecisionEventSummary}";
         _trainingScoutingLabel.Text = $"Training and scouting\n{state.TrainingScoutingSummary}";
         PopulateTrainingScoutingControls(state);
+        _youthAcademyLabel.Text = $"Youth academy\n{state.YouthAcademySummary}";
+        _youthAcademyButton.Disabled = false;
         _recruitmentLabel.Text = $"Recruitment and contracts\n{state.RecruitmentFoundationSummary}\nPromises\n{state.PromiseSummary}";
         _careerMarketLabel.Text = $"Career and job market\n{state.CareerMarketSummary}\nCareer history\n{state.CareerHistorySummary}";
         _priorityLabel.Text = BuildPrioritySummary(state);
@@ -471,6 +482,7 @@ public partial class ClubDashboard : Control
         _staffLabel.Text = "Staff foundation unavailable.";
         _newsFeedLabel.Text = "News feed unavailable.";
         _trainingScoutingLabel.Text = "Training and scouting unavailable.";
+        _youthAcademyLabel.Text = "Youth academy unavailable.";
         _trainingFocusOption.Disabled = true;
         _trainingIntensityOption.Disabled = true;
         _applyTrainingButton.Disabled = true;
@@ -479,6 +491,7 @@ public partial class ClubDashboard : Control
         _startScoutingButton.Disabled = true;
         _advanceDayButton.Disabled = true;
         _advanceWeekButton.Disabled = true;
+        _youthAcademyButton.Disabled = true;
         _staffMarketButton.Disabled = true;
         _recruitmentLabel.Text = "Recruitment unavailable.";
         _careerMarketLabel.Text = "Career market unavailable.";
@@ -792,6 +805,17 @@ public partial class ClubDashboard : Control
         }
 
         _statusLabel.Text = GameState.Instance.AttemptStaffMarketAction();
+        RenderState();
+    }
+
+    private void OnYouthAcademyPressed()
+    {
+        if (GameState.Instance == null)
+        {
+            return;
+        }
+
+        _statusLabel.Text = GameState.Instance.AdvanceYouthAcademyAction();
         RenderState();
     }
 

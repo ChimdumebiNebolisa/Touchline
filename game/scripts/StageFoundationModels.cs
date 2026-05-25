@@ -242,6 +242,24 @@ public sealed class StaffMarketCandidate
     public required string OutcomeSummary { get; init; }
 }
 
+public sealed class YouthProspect
+{
+    public required string ProspectId { get; init; }
+    public required string Name { get; init; }
+    public required int Age { get; init; }
+    public required string Position { get; init; }
+    public required string Region { get; init; }
+    public required string PlayingStyle { get; init; }
+    public required string Personality { get; init; }
+    public required string VisibleInfo { get; init; }
+    public required string HiddenPotentialBand { get; init; }
+    public required int PotentialCertainty { get; init; }
+    public required string DevelopmentCurve { get; init; }
+    public required string LoanSuitability { get; init; }
+    public required bool IsPromoted { get; init; }
+    public required string Status { get; init; }
+}
+
 public sealed class PromiseRecord
 {
     public required string PromiseType { get; init; }

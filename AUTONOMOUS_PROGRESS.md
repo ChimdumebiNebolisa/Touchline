@@ -1,24 +1,37 @@
 # Autonomous Progress
 
 ## Current active Plan step
-- Phase 13: Youth academy.
+- Phase 14: Player development and aging depth.
 
 ## Last completed verified task
-- Phase 12: Staff impact and staff market implemented and verified locally.
+- Phase 13: Youth academy foundation implemented and verified locally.
 
 ## Current subtask in progress
-- Prepare Phase 12 commit and push, then begin Phase 13.
+- Prepare Phase 13 commit and push, then begin Phase 14.
 
 ## Next queued subtasks
-- Commit and push `phase-12: deepen staff impact and market foundation`.
-- Begin Phase 13 youth academy inspection.
-- Keep youth academy bounded to intake/prospects/promotion/loan suitability without playable youth leagues.
+- Commit and push `phase-13: add youth academy foundation`.
+- Begin Phase 14 player development and aging inspection.
+- Keep development bounded to update cadence, training/minutes/form/morale/age/staff/loan inputs, profile notes, and save-backed history.
 
 ## Known blockers
 - No active blockers.
 - `docs/audit/` remains untracked and intentionally excluded from phase commits.
 
 ## Last verification run
+- Phase 13 local verification:
+  - `dotnet build game/Touchline.sln` passed with 0 warnings and 0 errors.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/phase13_youth_academy_check.gd` passed.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/stage2_player_identity_check.gd` passed.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step48_dashboard_context_check.gd` passed.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step51_squad_profile_check.gd` passed.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/phase12_staff_market_check.gd` passed.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step27_save_compat_check.gd` passed.
+  - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step50_end_to_end_user_flow_check.gd` passed.
+  - `git diff --check` pending.
+  - `git diff --cached --check` pending.
+
+## Previous verification notes
 - Phase 12 local verification:
   - `dotnet build game/Touchline.sln` passed with 0 warnings and 0 errors.
   - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/phase12_staff_market_check.gd` passed.
@@ -29,8 +42,8 @@
   - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/step50_end_to_end_user_flow_check.gd` passed.
   - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/stage_role_authority_stabilization_check.gd` passed.
   - `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path game -s res://scripts/phase10_contract_negotiation_check.gd` passed.
-  - `git diff --check` pending.
-  - `git diff --cached --check` pending.
+  - `git diff --check` passed.
+  - `git diff --cached --check` passed.
 
 ## Previous verification notes
 - Phase 11 local verification:
@@ -90,11 +103,12 @@
 - Phase 9 completed at `4cbc244`.
 - Phase 10 completed at `de5f7d3`.
 - Phase 11 completed at `7474ddb`.
-- Phase 12 commit pending.
+- Phase 12 completed at `ab74018`.
+- Phase 13 commit pending.
 
 ## Resume instructions
 - Re-read `docs/PRD.md`, `docs/Architecture.md`, `docs/Guardrails.md`, and `docs/Plan.md`.
 - Re-read `docs/touchline_master_design_decisions.md`.
 - Re-read `docs/MASTER_IMPLEMENTATION_ROADMAP.md`.
-- Resume at Phase 13 after the Phase 12 commit/push completes.
+- Resume at Phase 14 after the Phase 13 commit/push completes.
 - Keep `docs/audit/` untouched unless a future task explicitly uses it.
