@@ -190,7 +190,7 @@ public partial class SaveSystem : Node
         WriteIndented = true,
         PropertyNameCaseInsensitive = true
     };
-    public const int CurrentSaveVersion = 9;
+    public const int CurrentSaveVersion = 10;
 
     public static SaveSystem? Instance { get; private set; }
     public string LastStatusMessage { get; private set; } = "Save system idle.";
@@ -907,8 +907,18 @@ public partial class SaveSystem : Node
                         CategoryName = newsEvent.CategoryName,
                         Reliability = newsEvent.Reliability,
                         Text = newsEvent.Text,
-                        Importance = newsEvent.Importance
+                        Importance = newsEvent.Importance,
+                        SourceType = newsEvent.SourceType,
+                        RelatedEntity = newsEvent.RelatedEntity,
+                        EffectSummary = newsEvent.EffectSummary,
+                        CooldownKey = newsEvent.CooldownKey
                     }),
+            ActiveDecisionEvents = source.ActiveDecisionEvents == null
+                ? null
+                : Array.ConvertAll(source.ActiveDecisionEvents, CloneDecisionEventData),
+            ResolvedDecisionEvents = source.ResolvedDecisionEvents == null
+                ? null
+                : Array.ConvertAll(source.ResolvedDecisionEvents, CloneDecisionEventData),
             RecruitmentTarget = source.RecruitmentTarget == null
                 ? null
                 : new SaveSlotRecruitmentTargetData
@@ -970,6 +980,29 @@ public partial class SaveSystem : Node
             TransferPressure = source.TransferPressure,
             FinancialPressure = source.FinancialPressure,
             PerceptionHistory = source.PerceptionHistory == null ? null : (string[])source.PerceptionHistory.Clone()
+        };
+    }
+
+    private static SaveSlotDecisionEventData CloneDecisionEventData(SaveSlotDecisionEventData source)
+    {
+        return new SaveSlotDecisionEventData
+        {
+            EventId = source.EventId,
+            EventTypeName = source.EventTypeName,
+            Title = source.Title,
+            SourceType = source.SourceType,
+            Reliability = source.Reliability,
+            RelatedEntity = source.RelatedEntity,
+            Importance = source.Importance,
+            Prompt = source.Prompt,
+            PrimaryOption = source.PrimaryOption,
+            SecondaryOption = source.SecondaryOption,
+            PrimaryEffectSummary = source.PrimaryEffectSummary,
+            SecondaryEffectSummary = source.SecondaryEffectSummary,
+            CooldownKey = source.CooldownKey,
+            DaysUntilRepeat = source.DaysUntilRepeat,
+            IsResolved = source.IsResolved,
+            OutcomeSummary = source.OutcomeSummary
         };
     }
 

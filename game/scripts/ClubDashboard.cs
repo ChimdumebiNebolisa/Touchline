@@ -78,6 +78,7 @@ public partial class ClubDashboard : Control
     private Button _advanceWeekButton = default!;
     private Button _recruitmentButton = default!;
     private Button _jobMarketButton = default!;
+    private Button _resolveEventButton = default!;
     private Button _backButton = default!;
 
     public override void _Ready()
@@ -165,6 +166,7 @@ public partial class ClubDashboard : Control
         _careerMarketLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/CareerMarketLabel");
         _recruitmentButton = GetNode<Button>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/RecruitmentButton");
         _jobMarketButton = GetNode<Button>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/JobMarketButton");
+        _resolveEventButton = GetNode<Button>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/ResolveEventButton");
         _priorityLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/PriorityLabel");
         _statusLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/StatusLabel");
     }
@@ -197,6 +199,7 @@ public partial class ClubDashboard : Control
         EnsureButton(insightContent, ref insightInsertIndex, "RecruitmentButton", "Progress Recruitment Foundation");
         EnsureLabel(insightContent, ref insightInsertIndex, "CareerMarketLabel");
         EnsureButton(insightContent, ref insightInsertIndex, "JobMarketButton", "Generate Job Market Event");
+        EnsureButton(insightContent, ref insightInsertIndex, "ResolveEventButton", "Resolve Decision Event");
     }
 
     private static void EnsureLabel(VBoxContainer container, ref int insertIndex, string labelName)
@@ -321,12 +324,14 @@ public partial class ClubDashboard : Control
         TouchlineTheme.ApplyButtonVariant(_advanceWeekButton, TouchlineButtonVariant.Secondary);
         TouchlineTheme.ApplyButtonVariant(_recruitmentButton, TouchlineButtonVariant.Secondary);
         TouchlineTheme.ApplyButtonVariant(_jobMarketButton, TouchlineButtonVariant.Secondary);
+        TouchlineTheme.ApplyButtonVariant(_resolveEventButton, TouchlineButtonVariant.Secondary);
         _applyTrainingButton.Pressed += OnApplyTrainingPressed;
         _startScoutingButton.Pressed += OnStartScoutingPressed;
         _advanceDayButton.Pressed += OnAdvanceDayPressed;
         _advanceWeekButton.Pressed += OnAdvanceWeekPressed;
         _recruitmentButton.Pressed += OnRecruitmentPressed;
         _jobMarketButton.Pressed += OnJobMarketPressed;
+        _resolveEventButton.Pressed += OnResolveEventPressed;
     }
 
     private void RenderState()
@@ -402,7 +407,7 @@ public partial class ClubDashboard : Control
         _roleAuthorityLabel.Text = $"Role authority | {state.RoleAuthoritySummary}";
         _objectivesLabel.Text = $"Main objectives\n{state.MainObjectivesSummary}";
         _staffLabel.Text = $"Starting staff\n{state.StaffSummary}";
-        _newsFeedLabel.Text = $"News feed\n{state.NewsFeedSummary}";
+        _newsFeedLabel.Text = $"News feed\n{state.NewsFeedSummary}\nDecision events\n{state.DecisionEventSummary}";
         _trainingScoutingLabel.Text = $"Training and scouting\n{state.TrainingScoutingSummary}";
         PopulateTrainingScoutingControls(state);
         _recruitmentLabel.Text = $"Recruitment and contracts\n{state.RecruitmentFoundationSummary}\nPromises\n{state.PromiseSummary}";
@@ -787,6 +792,17 @@ public partial class ClubDashboard : Control
 
         GameState.Instance.GenerateJobMarketEvent();
         _statusLabel.Text = "Job market event generated from current reputation, license, role, and pressure.";
+        RenderState();
+    }
+
+    private void OnResolveEventPressed()
+    {
+        if (GameState.Instance == null)
+        {
+            return;
+        }
+
+        _statusLabel.Text = GameState.Instance.ResolveActiveDecisionEvent();
         RenderState();
     }
 }

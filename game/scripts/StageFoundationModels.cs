@@ -86,6 +86,19 @@ public enum NewsCategory
     Pressure
 }
 
+public enum DecisionEventType
+{
+    PlayerMeeting,
+    BoardMeeting,
+    MediaQuestion,
+    AgentCall,
+    StaffDisagreement,
+    TrainingIssue,
+    FanPressureMoment,
+    DirectorConflict,
+    CrisisEvent
+}
+
 public enum PromiseStatus
 {
     Active,
@@ -125,6 +138,30 @@ public sealed class NewsEvent
     public required string Reliability { get; init; }
     public required string Text { get; init; }
     public required int Importance { get; init; }
+    public string SourceType { get; init; } = "Club source";
+    public string RelatedEntity { get; init; } = string.Empty;
+    public string EffectSummary { get; init; } = string.Empty;
+    public string CooldownKey { get; init; } = string.Empty;
+}
+
+public sealed class DecisionEvent
+{
+    public required string EventId { get; init; }
+    public required DecisionEventType EventType { get; init; }
+    public required string Title { get; init; }
+    public required string SourceType { get; init; }
+    public required string Reliability { get; init; }
+    public required string RelatedEntity { get; init; }
+    public required int Importance { get; init; }
+    public required string Prompt { get; init; }
+    public required string PrimaryOption { get; init; }
+    public required string SecondaryOption { get; init; }
+    public required string PrimaryEffectSummary { get; init; }
+    public required string SecondaryEffectSummary { get; init; }
+    public required string CooldownKey { get; init; }
+    public required int DaysUntilRepeat { get; init; }
+    public required bool IsResolved { get; init; }
+    public required string OutcomeSummary { get; init; }
 }
 
 public sealed class ScoutingAssignment
@@ -391,6 +428,40 @@ public static class StageFoundationText
             "Career" => NewsCategory.Career,
             "Pressure" => NewsCategory.Pressure,
             _ => NewsCategory.Club
+        };
+    }
+
+    public static string GetDisplayName(DecisionEventType value)
+    {
+        return value switch
+        {
+            DecisionEventType.PlayerMeeting => "Player meeting",
+            DecisionEventType.BoardMeeting => "Board meeting",
+            DecisionEventType.MediaQuestion => "Media question",
+            DecisionEventType.AgentCall => "Agent call",
+            DecisionEventType.StaffDisagreement => "Staff disagreement",
+            DecisionEventType.TrainingIssue => "Training issue",
+            DecisionEventType.FanPressureMoment => "Fan pressure moment",
+            DecisionEventType.DirectorConflict => "Director of Football conflict",
+            DecisionEventType.CrisisEvent => "Crisis event",
+            _ => "Media question"
+        };
+    }
+
+    public static DecisionEventType ParseDecisionEventType(string value)
+    {
+        return value switch
+        {
+            "Player meeting" => DecisionEventType.PlayerMeeting,
+            "Board meeting" => DecisionEventType.BoardMeeting,
+            "Media question" => DecisionEventType.MediaQuestion,
+            "Agent call" => DecisionEventType.AgentCall,
+            "Staff disagreement" => DecisionEventType.StaffDisagreement,
+            "Training issue" => DecisionEventType.TrainingIssue,
+            "Fan pressure moment" => DecisionEventType.FanPressureMoment,
+            "Director of Football conflict" => DecisionEventType.DirectorConflict,
+            "Crisis event" => DecisionEventType.CrisisEvent,
+            _ => DecisionEventType.MediaQuestion
         };
     }
 

@@ -26,6 +26,8 @@ public sealed class SaveSlotStageFoundationData
     public string ScoutingReportDepthName { get; set; } = "Standard report";
     public SaveSlotScoutingAssignmentData? ScoutingAssignment { get; set; }
     public SaveSlotNewsEventData[]? NewsEvents { get; set; }
+    public SaveSlotDecisionEventData[]? ActiveDecisionEvents { get; set; }
+    public SaveSlotDecisionEventData[]? ResolvedDecisionEvents { get; set; }
     public SaveSlotRecruitmentTargetData? RecruitmentTarget { get; set; }
     public SaveSlotPromiseRecordData[]? PromiseRecords { get; set; }
     public string JobSecurityName { get; set; } = "Stable";
@@ -64,6 +66,30 @@ public sealed class SaveSlotNewsEventData
     public string Reliability { get; set; } = "Confirmed";
     public string Text { get; set; } = string.Empty;
     public int Importance { get; set; }
+    public string SourceType { get; set; } = "Club source";
+    public string RelatedEntity { get; set; } = string.Empty;
+    public string EffectSummary { get; set; } = string.Empty;
+    public string CooldownKey { get; set; } = string.Empty;
+}
+
+public sealed class SaveSlotDecisionEventData
+{
+    public string EventId { get; set; } = string.Empty;
+    public string EventTypeName { get; set; } = "Media question";
+    public string Title { get; set; } = string.Empty;
+    public string SourceType { get; set; } = string.Empty;
+    public string Reliability { get; set; } = "Confirmed";
+    public string RelatedEntity { get; set; } = string.Empty;
+    public int Importance { get; set; }
+    public string Prompt { get; set; } = string.Empty;
+    public string PrimaryOption { get; set; } = string.Empty;
+    public string SecondaryOption { get; set; } = string.Empty;
+    public string PrimaryEffectSummary { get; set; } = string.Empty;
+    public string SecondaryEffectSummary { get; set; } = string.Empty;
+    public string CooldownKey { get; set; } = string.Empty;
+    public int DaysUntilRepeat { get; set; }
+    public bool IsResolved { get; set; }
+    public string OutcomeSummary { get; set; } = string.Empty;
 }
 
 public sealed class SaveSlotRecruitmentTargetData
@@ -107,6 +133,8 @@ public sealed class SaveSlotJobOfferEventData
 public partial class GameState
 {
     private readonly List<NewsEvent> _foundationNewsEvents = new();
+    private readonly List<DecisionEvent> _activeDecisionEvents = new();
+    private readonly List<DecisionEvent> _resolvedDecisionEvents = new();
     private readonly List<PromiseRecord> _promiseRecords = new();
     private readonly List<string> _careerHistory = new();
     private readonly List<string> _perceptionHistory = new();
@@ -166,6 +194,7 @@ public partial class GameState
     public string ReputationSummary => $"Reputation | world {WorldReputation}, club {ClubReputation}, tactical {TacticalReputation}, youth {YouthReputation}, recruitment {RecruitmentReputation}, media {MediaReputation}";
     public string PressureCategorySummary => $"Pressure | job {JobPressure}, board {BoardPressure}, fans {FanPressure}, media {CareerProfile.MediaPressure}, dressing room {DressingRoomPressure}, transfer {TransferPressure}, financial {FinancialPressure}";
     public string PerceptionHistorySummary => _perceptionHistory.Count == 0 ? "Perception history starts after matches, promises, or recruitment decisions." : string.Join("\n", _perceptionHistory);
+    public string DecisionEventSummary => BuildDecisionEventSummary();
     public string RecruitmentFoundationSummary => CurrentRecruitmentTarget == null
         ? "Recruitment foundation pending scouting target."
         : $"{CurrentRecruitmentTarget.PlayerName} ({CurrentRecruitmentTarget.Position}) | {CurrentRecruitmentTarget.InformationSummary} | {CurrentRecruitmentTarget.InterestSummary} | {CurrentRecruitmentTarget.TacticalFitSummary} | Fee {CurrentRecruitmentTarget.EstimatedFeeRange} | Wage {CurrentRecruitmentTarget.EstimatedWageRange} | {CurrentRecruitmentTarget.Status}";
@@ -266,6 +295,7 @@ public partial class GameState
         }
 
         CurrentDate = CurrentDate.AddDays(1);
+        TickDecisionEventCooldowns(1);
         ApplyScoutingProgress(1);
         TrainingStatusSummary = $"Daily work completed under {TrainingFocusName.ToLowerInvariant()} focus.";
         AddNews(
@@ -279,10 +309,12 @@ public partial class GameState
 
     public void ApplyWeeklyFoundationProgress()
     {
+        TickDecisionEventCooldowns(7);
         ApplyTrainingEffects();
         ApplyScoutingProgress(7);
         ReviewPromiseLifecycle("Weekly review", 7);
         EvaluateCareerFoundationState();
+        GenerateContextDecisionEvent("Weekly review");
         AddNews(
             "Weekly football report",
             NewsCategory.Training,
@@ -471,8 +503,14 @@ public partial class GameState
                     CategoryName = StageFoundationText.GetDisplayName(newsEvent.Category),
                     Reliability = newsEvent.Reliability,
                     Text = newsEvent.Text,
-                    Importance = newsEvent.Importance
+                    Importance = newsEvent.Importance,
+                    SourceType = newsEvent.SourceType,
+                    RelatedEntity = newsEvent.RelatedEntity,
+                    EffectSummary = newsEvent.EffectSummary,
+                    CooldownKey = newsEvent.CooldownKey
                 }),
+            ActiveDecisionEvents = Array.ConvertAll(_activeDecisionEvents.ToArray(), BuildDecisionEventSaveData),
+            ResolvedDecisionEvents = Array.ConvertAll(_resolvedDecisionEvents.ToArray(), BuildDecisionEventSaveData),
             RecruitmentTarget = CurrentRecruitmentTarget == null
                 ? null
                 : new SaveSlotRecruitmentTargetData
@@ -586,8 +624,30 @@ public partial class GameState
                     Category = StageFoundationText.ParseNewsCategory(newsEvent.CategoryName),
                     Reliability = string.IsNullOrWhiteSpace(newsEvent.Reliability) ? "Confirmed" : newsEvent.Reliability,
                     Text = string.IsNullOrWhiteSpace(newsEvent.Text) ? "Saved news text unavailable." : newsEvent.Text,
-                    Importance = newsEvent.Importance
+                    Importance = newsEvent.Importance,
+                    SourceType = string.IsNullOrWhiteSpace(newsEvent.SourceType) ? "Club source" : newsEvent.SourceType,
+                    RelatedEntity = newsEvent.RelatedEntity,
+                    EffectSummary = newsEvent.EffectSummary,
+                    CooldownKey = newsEvent.CooldownKey
                 });
+            }
+        }
+
+        _activeDecisionEvents.Clear();
+        if (data.ActiveDecisionEvents != null)
+        {
+            foreach (var decisionEvent in data.ActiveDecisionEvents)
+            {
+                _activeDecisionEvents.Add(RestoreDecisionEvent(decisionEvent, false));
+            }
+        }
+
+        _resolvedDecisionEvents.Clear();
+        if (data.ResolvedDecisionEvents != null)
+        {
+            foreach (var decisionEvent in data.ResolvedDecisionEvents)
+            {
+                _resolvedDecisionEvents.Add(RestoreDecisionEvent(decisionEvent, true));
             }
         }
 
@@ -717,6 +777,8 @@ public partial class GameState
         TransferPressure = 25;
         FinancialPressure = 25;
         _foundationNewsEvents.Clear();
+        _activeDecisionEvents.Clear();
+        _resolvedDecisionEvents.Clear();
         _promiseRecords.Clear();
         _careerHistory.Clear();
         _perceptionHistory.Clear();
@@ -787,6 +849,7 @@ public partial class GameState
             "Confirmed",
             $"{result.FinalResultSummary}: morale moved quickly, trust moved slowly, and reputation/pressure categories were updated separately.",
             5);
+        GenerateContextDecisionEvent("Post-match");
         ReviewPromiseLifecycle("Post-match review", 0);
     }
 
@@ -1495,6 +1558,104 @@ public partial class GameState
         return MatchPlaybackContractValidator.PassMessage;
     }
 
+    public string ValidatePhase8DecisionEventsContract()
+    {
+        InitializeStageFoundationsForClub();
+        _activeDecisionEvents.Clear();
+        _resolvedDecisionEvents.Clear();
+
+        var eventTypes = new[]
+        {
+            DecisionEventType.PlayerMeeting,
+            DecisionEventType.BoardMeeting,
+            DecisionEventType.MediaQuestion,
+            DecisionEventType.AgentCall,
+            DecisionEventType.StaffDisagreement,
+            DecisionEventType.TrainingIssue,
+            DecisionEventType.FanPressureMoment,
+            DecisionEventType.DirectorConflict,
+            DecisionEventType.CrisisEvent
+        };
+
+        foreach (var eventType in eventTypes)
+        {
+            if (!TryCreateDecisionEvent(eventType, "Phase 8 validation", out var decisionEvent))
+            {
+                return $"Could not generate decision event type {StageFoundationText.GetDisplayName(eventType)}.";
+            }
+
+            _activeDecisionEvents.Add(decisionEvent);
+        }
+
+        if (_activeDecisionEvents.Count != eventTypes.Length ||
+            !DecisionEventSummary.Contains("A:", StringComparison.Ordinal) ||
+            !DecisionEventSummary.Contains("B:", StringComparison.Ordinal))
+        {
+            return "Decision event summary does not expose active choices.";
+        }
+
+        var startingNewsCount = CurrentClub?.NewsFeed.Length ?? 0;
+        var startingBoardTrust = CareerProfile.BoardTrust;
+        var startingMediaPressure = CareerProfile.MediaPressure;
+        var playerOutcome = ResolveActiveDecisionEvent(0);
+        var boardOutcome = ResolveActiveDecisionEvent(1);
+        var mediaOutcome = ResolveActiveDecisionEvent(0);
+        if (string.IsNullOrWhiteSpace(playerOutcome) ||
+            string.IsNullOrWhiteSpace(boardOutcome) ||
+            string.IsNullOrWhiteSpace(mediaOutcome) ||
+            _resolvedDecisionEvents.Count < 3)
+        {
+            return "Decision event choices did not resolve into stored outcomes.";
+        }
+
+        if (CareerProfile.BoardTrust == startingBoardTrust &&
+            CareerProfile.MediaPressure == startingMediaPressure)
+        {
+            return "Decision event outcomes did not affect trust or pressure.";
+        }
+
+        if ((CurrentClub?.NewsFeed.Length ?? 0) <= startingNewsCount ||
+            !NewsFeedSummary.Contains("Decision resolved", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Decision event resolution did not update structured news.";
+        }
+
+        if (TryCreateDecisionEvent(DecisionEventType.PlayerMeeting, "Cooldown validation", out _))
+        {
+            return "Decision event cooldown allowed immediate repeat.";
+        }
+
+        if (!PerceptionHistorySummary.Contains("Decision event", StringComparison.Ordinal))
+        {
+            return "Decision event did not record perception history.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
+    public string ValidatePhase8StoredDecisionEventsContract()
+    {
+        if (_resolvedDecisionEvents.Count == 0)
+        {
+            return "Saved resolved decision events did not restore.";
+        }
+
+        if (string.IsNullOrWhiteSpace(_resolvedDecisionEvents[0].OutcomeSummary) ||
+            !_resolvedDecisionEvents[0].IsResolved)
+        {
+            return "Saved decision event outcome did not restore.";
+        }
+
+        if (string.IsNullOrWhiteSpace(DecisionEventSummary) ||
+            (!DecisionEventSummary.Contains("Last resolved", StringComparison.Ordinal) &&
+             !DecisionEventSummary.Contains("A:", StringComparison.Ordinal)))
+        {
+            return "Saved decision event summary is unavailable.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
     private static bool HasActionKind(MatchPlaybackResult result, MatchActionKind kind)
     {
         foreach (var action in result.Timeline.Actions)
@@ -2042,7 +2203,369 @@ public partial class GameState
         }
     }
 
-    private void AddNews(string title, NewsCategory category, string reliability, string text, int importance)
+    private static SaveSlotDecisionEventData BuildDecisionEventSaveData(DecisionEvent decisionEvent)
+    {
+        return new SaveSlotDecisionEventData
+        {
+            EventId = decisionEvent.EventId,
+            EventTypeName = StageFoundationText.GetDisplayName(decisionEvent.EventType),
+            Title = decisionEvent.Title,
+            SourceType = decisionEvent.SourceType,
+            Reliability = decisionEvent.Reliability,
+            RelatedEntity = decisionEvent.RelatedEntity,
+            Importance = decisionEvent.Importance,
+            Prompt = decisionEvent.Prompt,
+            PrimaryOption = decisionEvent.PrimaryOption,
+            SecondaryOption = decisionEvent.SecondaryOption,
+            PrimaryEffectSummary = decisionEvent.PrimaryEffectSummary,
+            SecondaryEffectSummary = decisionEvent.SecondaryEffectSummary,
+            CooldownKey = decisionEvent.CooldownKey,
+            DaysUntilRepeat = decisionEvent.DaysUntilRepeat,
+            IsResolved = decisionEvent.IsResolved,
+            OutcomeSummary = decisionEvent.OutcomeSummary
+        };
+    }
+
+    private static DecisionEvent RestoreDecisionEvent(SaveSlotDecisionEventData data, bool forceResolved)
+    {
+        var eventType = StageFoundationText.ParseDecisionEventType(data.EventTypeName);
+        var title = string.IsNullOrWhiteSpace(data.Title)
+            ? StageFoundationText.GetDisplayName(eventType)
+            : data.Title;
+        var cooldownKey = string.IsNullOrWhiteSpace(data.CooldownKey)
+            ? StageFoundationText.GetDisplayName(eventType)
+            : data.CooldownKey;
+        return new DecisionEvent
+        {
+            EventId = string.IsNullOrWhiteSpace(data.EventId) ? cooldownKey : data.EventId,
+            EventType = eventType,
+            Title = title,
+            SourceType = string.IsNullOrWhiteSpace(data.SourceType) ? "Club source" : data.SourceType,
+            Reliability = string.IsNullOrWhiteSpace(data.Reliability) ? "Confirmed" : data.Reliability,
+            RelatedEntity = data.RelatedEntity,
+            Importance = data.Importance <= 0 ? 3 : data.Importance,
+            Prompt = string.IsNullOrWhiteSpace(data.Prompt) ? title : data.Prompt,
+            PrimaryOption = string.IsNullOrWhiteSpace(data.PrimaryOption) ? "Handle privately" : data.PrimaryOption,
+            SecondaryOption = string.IsNullOrWhiteSpace(data.SecondaryOption) ? "Set a firm line" : data.SecondaryOption,
+            PrimaryEffectSummary = string.IsNullOrWhiteSpace(data.PrimaryEffectSummary) ? "Trust improves slightly; pressure falls slightly." : data.PrimaryEffectSummary,
+            SecondaryEffectSummary = string.IsNullOrWhiteSpace(data.SecondaryEffectSummary) ? "Authority improves slightly; relationship pressure rises slightly." : data.SecondaryEffectSummary,
+            CooldownKey = cooldownKey,
+            DaysUntilRepeat = Math.Clamp(data.DaysUntilRepeat, 0, 60),
+            IsResolved = forceResolved || data.IsResolved,
+            OutcomeSummary = data.OutcomeSummary
+        };
+    }
+
+    private string BuildDecisionEventSummary()
+    {
+        if (_activeDecisionEvents.Count == 0)
+        {
+            var resolved = _resolvedDecisionEvents.Count == 0
+                ? "No resolved decision events yet."
+                : $"Last resolved: {_resolvedDecisionEvents[0].Title} - {_resolvedDecisionEvents[0].OutcomeSummary}";
+            return $"No active decision event. {resolved}";
+        }
+
+        var activeEvent = _activeDecisionEvents[0];
+        return $"{StageFoundationText.GetDisplayName(activeEvent.EventType)} | {activeEvent.Reliability} | {activeEvent.SourceType} | {activeEvent.Title}\n{activeEvent.Prompt}\nA: {activeEvent.PrimaryOption} ({activeEvent.PrimaryEffectSummary})\nB: {activeEvent.SecondaryOption} ({activeEvent.SecondaryEffectSummary})";
+    }
+
+    private void GenerateContextDecisionEvent(string trigger)
+    {
+        var eventType = ResolveContextDecisionEventType();
+        if (TryCreateDecisionEvent(eventType, trigger, out var decisionEvent))
+        {
+            _activeDecisionEvents.Add(decisionEvent);
+            AddNews(
+                decisionEvent.Title,
+                NewsCategory.Pressure,
+                decisionEvent.Reliability,
+                decisionEvent.Prompt,
+                decisionEvent.Importance,
+                decisionEvent.SourceType,
+                decisionEvent.RelatedEntity,
+                $"Decision pending: {decisionEvent.PrimaryEffectSummary} / {decisionEvent.SecondaryEffectSummary}",
+                decisionEvent.CooldownKey);
+        }
+    }
+
+    private DecisionEventType ResolveContextDecisionEventType()
+    {
+        if (DressingRoomPressure >= 64)
+        {
+            return DecisionEventType.PlayerMeeting;
+        }
+
+        if (BoardPressure >= 64)
+        {
+            return DecisionEventType.BoardMeeting;
+        }
+
+        if (CareerProfile.MediaPressure >= 58)
+        {
+            return DecisionEventType.MediaQuestion;
+        }
+
+        if (TransferPressure >= 60)
+        {
+            return DecisionEventType.AgentCall;
+        }
+
+        if (CurrentTrainingIntensity == TrainingIntensity.Demanding)
+        {
+            return DecisionEventType.TrainingIssue;
+        }
+
+        if (CurrentClub?.DirectorRelationshipState is DirectorRelationshipState.Tense or DirectorRelationshipState.Hostile)
+        {
+            return DecisionEventType.DirectorConflict;
+        }
+
+        if (FanPressure >= 60)
+        {
+            return DecisionEventType.FanPressureMoment;
+        }
+
+        return DecisionEventType.StaffDisagreement;
+    }
+
+    private bool TryCreateDecisionEvent(DecisionEventType eventType, string trigger, out DecisionEvent decisionEvent)
+    {
+        decisionEvent = BuildDecisionEvent(eventType, trigger);
+        if (!CanGenerateDecisionEvent(decisionEvent.CooldownKey))
+        {
+            decisionEvent = null!;
+            return false;
+        }
+
+        return true;
+    }
+
+    private bool CanGenerateDecisionEvent(string cooldownKey)
+    {
+        foreach (var activeEvent in _activeDecisionEvents)
+        {
+            if (activeEvent.CooldownKey == cooldownKey)
+            {
+                return false;
+            }
+        }
+
+        foreach (var resolvedEvent in _resolvedDecisionEvents)
+        {
+            if (resolvedEvent.CooldownKey == cooldownKey && resolvedEvent.DaysUntilRepeat > 0)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private DecisionEvent BuildDecisionEvent(DecisionEventType eventType, string trigger)
+    {
+        var relatedPlayer = SquadPlayers.Length == 0 ? "senior squad" : SquadPlayers[Math.Abs(WorldSeed + (int)eventType) % SquadPlayers.Length].Name;
+        var id = $"{CurrentDate:yyyyMMdd}-{eventType}-{_activeDecisionEvents.Count + _resolvedDecisionEvents.Count + 1}";
+        return eventType switch
+        {
+            DecisionEventType.PlayerMeeting => BuildDecisionEventCore(eventType, id, "Player wants clarity", "Player meeting", "Private", relatedPlayer, 4, $"{relatedPlayer} asks how the current plan affects minutes and role security.", "Listen and explain the pathway", "Set selection standards", "Player trust +1, dressing-room pressure -2", "Board trust +1, player trust -1", trigger),
+            DecisionEventType.BoardMeeting => BuildDecisionEventCore(eventType, id, "Board requests a pressure briefing", "Board room", "Confirmed", BoardPhilosophyName, 5, $"The board wants a response to job pressure {JobPressure} and board pressure {BoardPressure}.", "Show evidence and ask for patience", "Promise immediate results", "Board trust +1, board pressure -2", "Board trust -1, media pressure +1", trigger),
+            DecisionEventType.MediaQuestion => BuildDecisionEventCore(eventType, id, "Media questions the story", "Media", "Press room", SelectedClubName ?? "club", 4, $"Reporters ask about {PressureCategorySummary}.", "Stay calm and factual", "Push back publicly", "Media trust +1, media pressure -2", "Fan trust +1, media pressure +2", trigger),
+            DecisionEventType.AgentCall => BuildDecisionEventCore(eventType, id, "Agent asks for assurances", "Agent call", "Agent briefing", relatedPlayer, 4, $"{relatedPlayer}'s camp wants clarity while transfer pressure sits at {TransferPressure}.", "Offer a private pathway", "Refuse guarantees", "Player trust +1, transfer pressure -2", "Board trust +1, transfer pressure +2", trigger),
+            DecisionEventType.StaffDisagreement => BuildDecisionEventCore(eventType, id, "Staff disagree on the next plan", "Staff room", "Internal", "first-team staff", 3, "Staff are split between tactical caution and pressing work.", "Back the staff recommendation", "Hold the current line", "Staff trust +1, tactical reputation +1", "Staff trust -1, tactical familiarity +1", trigger),
+            DecisionEventType.TrainingIssue => BuildDecisionEventCore(eventType, id, "Training load draws concern", "Fitness staff", "Internal", TrainingFocusName, 3, $"The {TrainingFocusName.ToLowerInvariant()} block at {TrainingIntensityName.ToLowerInvariant()} intensity is raising workload questions.", "Reduce load and recover", "Maintain intensity", "Dressing-room pressure -2, tactical familiarity -1", "Tactical familiarity +1, injury risk concern rises", trigger),
+            DecisionEventType.FanPressureMoment => BuildDecisionEventCore(eventType, id, "Supporters demand a response", "Supporter groups", "Club sources", FanCultureName, 4, $"Fan pressure {FanPressure} brings the club identity debate forward.", "Acknowledge supporter standards", "Focus only on the dressing room", "Fan trust +1, fan pressure -2", "Board trust +1, fan trust -1", trigger),
+            DecisionEventType.DirectorConflict => BuildDecisionEventCore(eventType, id, "Director of Football challenges the approach", "Director of Football", "Internal", DirectorOfFootballStyleName, 5, $"The Director questions recruitment and squad planning while Director trust is {CareerProfile.DirectorTrust}.", "Share evidence and compromise", "Assert manager authority", "Director trust +1, transfer pressure -2", "Director trust -2, board trust +1", trigger),
+            DecisionEventType.CrisisEvent => BuildDecisionEventCore(eventType, id, "Crisis meeting called", "Club leadership", "Confirmed", SelectedClubName ?? "club", 6, $"A crisis check is triggered by job pressure {JobPressure}, media pressure {CareerProfile.MediaPressure}, and dressing-room pressure {DressingRoomPressure}.", "Stabilize privately", "Make a public reset", "Board trust +1, dressing-room pressure -2", "Media reputation +1, media pressure +2", trigger),
+            _ => BuildDecisionEventCore(eventType, id, "Media asks for clarity", "Media", "Press room", SelectedClubName ?? "club", 3, "The football story needs a clear response.", "Stay factual", "Create a headline", "Media trust +1", "Media pressure +1", trigger)
+        };
+    }
+
+    private static DecisionEvent BuildDecisionEventCore(
+        DecisionEventType eventType,
+        string id,
+        string title,
+        string sourceType,
+        string reliability,
+        string relatedEntity,
+        int importance,
+        string prompt,
+        string primaryOption,
+        string secondaryOption,
+        string primaryEffect,
+        string secondaryEffect,
+        string trigger)
+    {
+        return new DecisionEvent
+        {
+            EventId = id,
+            EventType = eventType,
+            Title = title,
+            SourceType = sourceType,
+            Reliability = reliability,
+            RelatedEntity = relatedEntity,
+            Importance = importance,
+            Prompt = $"{trigger}: {prompt}",
+            PrimaryOption = primaryOption,
+            SecondaryOption = secondaryOption,
+            PrimaryEffectSummary = primaryEffect,
+            SecondaryEffectSummary = secondaryEffect,
+            CooldownKey = StageFoundationText.GetDisplayName(eventType),
+            DaysUntilRepeat = 14,
+            IsResolved = false,
+            OutcomeSummary = "Pending."
+        };
+    }
+
+    public string ResolveActiveDecisionEvent(int optionIndex = 0)
+    {
+        if (_activeDecisionEvents.Count == 0)
+        {
+            return "No active decision event to resolve.";
+        }
+
+        var decisionEvent = _activeDecisionEvents[0];
+        _activeDecisionEvents.RemoveAt(0);
+        var outcome = ApplyDecisionEventChoice(decisionEvent, optionIndex <= 0 ? 0 : 1);
+        var resolved = CloneResolvedDecisionEvent(decisionEvent, outcome);
+        _resolvedDecisionEvents.Insert(0, resolved);
+        if (_resolvedDecisionEvents.Count > 12)
+        {
+            _resolvedDecisionEvents.RemoveAt(_resolvedDecisionEvents.Count - 1);
+        }
+
+        RecordPerceptionHistory("Decision event", $"{decisionEvent.Title}; {outcome}");
+        AddNews(
+            $"Decision resolved: {decisionEvent.Title}",
+            NewsCategory.Pressure,
+            decisionEvent.Reliability,
+            outcome,
+            decisionEvent.Importance,
+            decisionEvent.SourceType,
+            decisionEvent.RelatedEntity,
+            outcome,
+            decisionEvent.CooldownKey);
+        return outcome;
+    }
+
+    private string ApplyDecisionEventChoice(DecisionEvent decisionEvent, int optionIndex)
+    {
+        var primary = optionIndex == 0;
+        switch (decisionEvent.EventType)
+        {
+            case DecisionEventType.PlayerMeeting:
+                CareerProfile.PlayerTrust = Math.Clamp(CareerProfile.PlayerTrust + (primary ? 1 : -1), 0, 100);
+                DressingRoomPressure = Math.Clamp(DressingRoomPressure + (primary ? -2 : 1), 0, 100);
+                break;
+            case DecisionEventType.BoardMeeting:
+                CareerProfile.BoardTrust = Math.Clamp(CareerProfile.BoardTrust + (primary ? 1 : -1), 0, 100);
+                BoardPressure = Math.Clamp(BoardPressure + (primary ? -2 : 2), 0, 100);
+                break;
+            case DecisionEventType.MediaQuestion:
+                MediaTrust = Math.Clamp(MediaTrust + (primary ? 1 : -1), 0, 100);
+                CareerProfile.MediaPressure = Math.Clamp(CareerProfile.MediaPressure + (primary ? -2 : 2), 0, 100);
+                MediaReputation = Math.Clamp(MediaReputation + (primary ? 0 : 1), 0, 100);
+                break;
+            case DecisionEventType.AgentCall:
+                CareerProfile.PlayerTrust = Math.Clamp(CareerProfile.PlayerTrust + (primary ? 1 : -1), 0, 100);
+                TransferPressure = Math.Clamp(TransferPressure + (primary ? -2 : 2), 0, 100);
+                break;
+            case DecisionEventType.StaffDisagreement:
+                CareerProfile.StaffTrust = Math.Clamp(CareerProfile.StaffTrust + (primary ? 1 : -1), 0, 100);
+                TacticalReputation = Math.Clamp(TacticalReputation + (primary ? 1 : 0), 0, 100);
+                TacticalFamiliarityScore = Math.Clamp(TacticalFamiliarityScore + (primary ? 0 : 1), 0, 100);
+                break;
+            case DecisionEventType.TrainingIssue:
+                DressingRoomPressure = Math.Clamp(DressingRoomPressure + (primary ? -2 : 1), 0, 100);
+                TacticalFamiliarityScore = Math.Clamp(TacticalFamiliarityScore + (primary ? -1 : 1), 0, 100);
+                break;
+            case DecisionEventType.FanPressureMoment:
+                FanTrust = Math.Clamp(FanTrust + (primary ? 1 : -1), 0, 100);
+                FanPressure = Math.Clamp(FanPressure + (primary ? -2 : 1), 0, 100);
+                break;
+            case DecisionEventType.DirectorConflict:
+                CareerProfile.DirectorTrust = Math.Clamp(CareerProfile.DirectorTrust + (primary ? 1 : -2), 0, 100);
+                TransferPressure = Math.Clamp(TransferPressure + (primary ? -2 : 2), 0, 100);
+                break;
+            case DecisionEventType.CrisisEvent:
+                CareerProfile.BoardTrust = Math.Clamp(CareerProfile.BoardTrust + (primary ? 1 : -1), 0, 100);
+                DressingRoomPressure = Math.Clamp(DressingRoomPressure + (primary ? -2 : 1), 0, 100);
+                CareerProfile.MediaPressure = Math.Clamp(CareerProfile.MediaPressure + (primary ? -1 : 2), 0, 100);
+                break;
+        }
+
+        RefreshPressureCategories();
+        EvaluateCareerFoundationState();
+        return primary
+            ? $"{decisionEvent.PrimaryOption}: {decisionEvent.PrimaryEffectSummary}"
+            : $"{decisionEvent.SecondaryOption}: {decisionEvent.SecondaryEffectSummary}";
+    }
+
+    private static DecisionEvent CloneResolvedDecisionEvent(DecisionEvent decisionEvent, string outcome)
+    {
+        return new DecisionEvent
+        {
+            EventId = decisionEvent.EventId,
+            EventType = decisionEvent.EventType,
+            Title = decisionEvent.Title,
+            SourceType = decisionEvent.SourceType,
+            Reliability = decisionEvent.Reliability,
+            RelatedEntity = decisionEvent.RelatedEntity,
+            Importance = decisionEvent.Importance,
+            Prompt = decisionEvent.Prompt,
+            PrimaryOption = decisionEvent.PrimaryOption,
+            SecondaryOption = decisionEvent.SecondaryOption,
+            PrimaryEffectSummary = decisionEvent.PrimaryEffectSummary,
+            SecondaryEffectSummary = decisionEvent.SecondaryEffectSummary,
+            CooldownKey = decisionEvent.CooldownKey,
+            DaysUntilRepeat = decisionEvent.DaysUntilRepeat,
+            IsResolved = true,
+            OutcomeSummary = outcome
+        };
+    }
+
+    private void TickDecisionEventCooldowns(int days)
+    {
+        for (var index = 0; index < _resolvedDecisionEvents.Count; index++)
+        {
+            var decisionEvent = _resolvedDecisionEvents[index];
+            if (decisionEvent.DaysUntilRepeat <= 0)
+            {
+                continue;
+            }
+
+            _resolvedDecisionEvents[index] = new DecisionEvent
+            {
+                EventId = decisionEvent.EventId,
+                EventType = decisionEvent.EventType,
+                Title = decisionEvent.Title,
+                SourceType = decisionEvent.SourceType,
+                Reliability = decisionEvent.Reliability,
+                RelatedEntity = decisionEvent.RelatedEntity,
+                Importance = decisionEvent.Importance,
+                Prompt = decisionEvent.Prompt,
+                PrimaryOption = decisionEvent.PrimaryOption,
+                SecondaryOption = decisionEvent.SecondaryOption,
+                PrimaryEffectSummary = decisionEvent.PrimaryEffectSummary,
+                SecondaryEffectSummary = decisionEvent.SecondaryEffectSummary,
+                CooldownKey = decisionEvent.CooldownKey,
+                DaysUntilRepeat = Math.Max(0, decisionEvent.DaysUntilRepeat - days),
+                IsResolved = true,
+                OutcomeSummary = decisionEvent.OutcomeSummary
+            };
+        }
+    }
+
+    private void AddNews(
+        string title,
+        NewsCategory category,
+        string reliability,
+        string text,
+        int importance,
+        string sourceType = "Club source",
+        string relatedEntity = "",
+        string effectSummary = "",
+        string cooldownKey = "")
     {
         var newsEvent = new NewsEvent
         {
@@ -2050,7 +2573,11 @@ public partial class GameState
             Category = category,
             Reliability = reliability,
             Text = text,
-            Importance = importance
+            Importance = importance,
+            SourceType = sourceType,
+            RelatedEntity = relatedEntity,
+            EffectSummary = effectSummary,
+            CooldownKey = cooldownKey
         };
         _foundationNewsEvents.Insert(0, newsEvent);
         if (_foundationNewsEvents.Count > 12)
@@ -2063,7 +2590,9 @@ public partial class GameState
             return;
         }
 
-        var formatted = $"{StageFoundationText.GetDisplayName(category)} | {reliability}: {title} - {text}";
+        var relatedText = string.IsNullOrWhiteSpace(relatedEntity) ? string.Empty : $" | Related: {relatedEntity}";
+        var effectText = string.IsNullOrWhiteSpace(effectSummary) ? string.Empty : $" | Effect: {effectSummary}";
+        var formatted = $"{StageFoundationText.GetDisplayName(category)} | {reliability} | {sourceType}: {title} - {text}{relatedText}{effectText}";
         var feed = new List<string> { formatted };
         feed.AddRange(CurrentClub.NewsFeed);
         if (feed.Count > 8)
