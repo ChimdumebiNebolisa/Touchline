@@ -162,7 +162,7 @@ func _run_check() -> void:
     var migrated_json := migrated_file.get_as_text()
     migrated_file.close()
 
-    if migrated_json.find("\"SaveVersion\": 19") == -1 or migrated_json.find("\"CompetitionTable\"") == -1:
+    if migrated_json.find("\"SaveVersion\": 20") == -1 or migrated_json.find("\"CompetitionTable\"") == -1:
         _fail("Legacy migration did not rewrite the save file in the current versioned format")
         return
 

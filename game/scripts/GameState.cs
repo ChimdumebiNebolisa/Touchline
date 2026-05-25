@@ -427,6 +427,11 @@ public partial class GameState : Node
             return $"Season transition: {SeasonLabel} has no active fixture for matchday {CurrentMatchday}.";
         }
 
+        if (!CanPlayCurrentFixture)
+        {
+            return $"Registration block: {RegistrationIssuesSummary}";
+        }
+
         if (currentFixture.IsComplete)
         {
             return $"Between matches: matchday {CurrentMatchday} result is recorded. Advance to the next fixture.";
@@ -1684,7 +1689,7 @@ public partial class GameState : Node
             averageForm = totalForm / SquadPlayers.Length;
         }
 
-        return $"{SquadPlayers.Length} registered players | avg fitness {averageFitness} | avg form {averageForm} | morale {DescribeLevel(TeamMorale)} | fans {DescribeLevel(FanSentiment)} | board {DescribeLevel(BoardConfidence)}";
+        return $"{SquadPlayers.Length} squad players | avg fitness {averageFitness} | avg form {averageForm} | morale {DescribeLevel(TeamMorale)} | fans {DescribeLevel(FanSentiment)} | board {DescribeLevel(BoardConfidence)} | {RegistrationStatusSummary}";
     }
 
     private void RecordCompetitionResults(int homeGoals, int awayGoals)

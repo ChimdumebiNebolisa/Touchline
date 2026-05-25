@@ -110,6 +110,13 @@ public sealed class SaveSlotStageFoundationData
     public bool CupEliminated { get; set; }
     public bool CupWon { get; set; }
     public string[]? CupHistory { get; set; }
+    public string RegistrationRulesSummary { get; set; } = string.Empty;
+    public string RegistrationStatusSummary { get; set; } = string.Empty;
+    public string RegistrationIssuesSummary { get; set; } = string.Empty;
+    public bool RegistrationValid { get; set; }
+    public bool RegistrationSubmitted { get; set; }
+    public string[]? RegisteredPlayerIds { get; set; }
+    public string[]? RegistrationHistory { get; set; }
 }
 
 public sealed class SaveSlotStaffMarketCandidateData
@@ -283,6 +290,8 @@ public partial class GameState
     private readonly List<string> _financeHistory = new();
     private readonly List<string> _leagueHistory = new();
     private readonly List<string> _cupHistory = new();
+    private readonly List<string> _registeredPlayerIds = new();
+    private readonly List<string> _registrationHistory = new();
 
     private readonly record struct ContractResolution(
         ContractOffer Offer,
@@ -381,6 +390,13 @@ public partial class GameState
     public int CupPrizeMoney { get; private set; }
     public bool CupEliminated { get; private set; }
     public bool CupWon { get; private set; }
+    public string RegistrationRulesSummary { get; private set; } = "Registration rules pending.";
+    public string RegistrationStatusSummary { get; private set; } = "Registration pending.";
+    public string RegistrationIssuesSummary { get; private set; } = "Registration issues pending.";
+    public bool RegistrationValid { get; private set; } = true;
+    public bool RegistrationSubmitted { get; private set; }
+    public string RegistrationHistorySummary => _registrationHistory.Count == 0 ? "Registration history starts after submission, youth promotion, transfer, loan, wage, or matchday validation." : string.Join("\n", _registrationHistory);
+    public bool CanPlayCurrentFixture => RegistrationValid && CountStartingPlayers() >= 11;
 
     public string TeamStyleName => StageFoundationText.GetDisplayName(TeamStyle);
     public string TacticalFamiliarityName => StageFoundationText.GetDisplayName(TacticsFoundation.FamiliarityFromScore(TacticalFamiliarityScore));
@@ -410,7 +426,7 @@ public partial class GameState
     public string RecruitmentFoundationSummary => CurrentRecruitmentTarget == null
         ? "Recruitment foundation pending scouting target."
         : $"{CurrentRecruitmentTarget.PlayerName} ({CurrentRecruitmentTarget.Position}) | {CurrentRecruitmentTarget.InformationSummary} | {CurrentRecruitmentTarget.InterestSummary} | {CurrentRecruitmentTarget.TacticalFitSummary} | Fee {CurrentRecruitmentTarget.EstimatedFeeRange} | Wage {CurrentRecruitmentTarget.EstimatedWageRange} | Status {CurrentRecruitmentTarget.TargetStatus} | Valuation {CurrentRecruitmentTarget.ClubValuation} | Agent {CurrentRecruitmentTarget.AgentMood} | Rival {CurrentRecruitmentTarget.RivalInterest} | Board {CurrentRecruitmentTarget.BoardStance} | Director {CurrentRecruitmentTarget.DirectorStance} | Outcome {CurrentRecruitmentTarget.OutcomeState} | {CurrentRecruitmentTarget.Status}\nDirector of Football\n{DirectorInfluenceSummary}\nShortlist\n{RecruitmentShortlistSummary}\nContracts\n{ContractFoundationSummary}\nTransfer history\n{TransferHistorySummary}";
-    public string TrainingScoutingSummary => $"{TrainingFocusName} ({TrainingIntensityName}): {TrainingStatusSummary}\nScouting depth: {ScoutingReportDepthName}\nScouting: {BuildScoutingSummary()}\nDevelopment\n{PlayerDevelopmentSummary}\nDevelopment history\n{PlayerDevelopmentHistorySummary}\nStaff effects\n{StaffImpactSummary}";
+    public string TrainingScoutingSummary => $"{TrainingFocusName} ({TrainingIntensityName}): {TrainingStatusSummary}\nScouting depth: {ScoutingReportDepthName}\nScouting: {BuildScoutingSummary()}\nDevelopment\n{PlayerDevelopmentSummary}\nDevelopment history\n{PlayerDevelopmentHistorySummary}\nRegistration\n{RegistrationStatusSummary}\n{RegistrationIssuesSummary}\nStaff effects\n{StaffImpactSummary}";
     public string CareerMarketSummary => $"Job security: {JobSecurityName}\n{TrustSummary}\n{ReputationSummary}\n{PressureCategorySummary}\nLeague system\n{LeaguePyramidSummary}\n{PromotionRelegationSummary}\n{ShadowLeagueSummary}\nLeague history\n{LeagueHistorySummary}\nCup competitions\n{CupStatusSummary}\n{CupDrawSummary}\n{CupObjectiveSummary}\nCup history\n{CupHistorySummary}\nFinance\n{FinanceSummary}\nFinance history\n{FinanceHistorySummary}\nLicense: {LicenseOpportunitySummary}\nJob market: {BuildJobOfferSummary()}";
     public string TacticsFoundationSummary => $"{TeamStyleName} | {TeamInstructionsSummary}\n{SetPieceSummary}\n{OpponentPreparationSummary}\n{PlayerRolesSummary}\n{PlayerInstructionsSummary}\n{TacticalRoleFitSummary}\n{PlayerFamiliaritySummary}\n{TacticalFitNotes}\n{TacticalRiskNotes}";
 
@@ -526,6 +542,7 @@ public partial class GameState
         ApplyTrainingEffects();
         ApplyPlayerDevelopmentProgress();
         ApplyWeeklyFinanceProgress();
+        EnsureSquadRegistrationState();
         ApplyScoutingProgress(7);
         ReviewPromiseLifecycle("Weekly review", 7);
         EvaluateCareerFoundationState();
@@ -629,6 +646,7 @@ public partial class GameState
         if (approved)
         {
             ApplyRecruitmentFinanceImpact(target);
+            EnsureSquadRegistrationState();
         }
 
         if (approved && !target.IsLoanCandidate)
@@ -1034,7 +1052,14 @@ public partial class GameState
             CupPrizeMoney = CupPrizeMoney,
             CupEliminated = CupEliminated,
             CupWon = CupWon,
-            CupHistory = _cupHistory.ToArray()
+            CupHistory = _cupHistory.ToArray(),
+            RegistrationRulesSummary = RegistrationRulesSummary,
+            RegistrationStatusSummary = RegistrationStatusSummary,
+            RegistrationIssuesSummary = RegistrationIssuesSummary,
+            RegistrationValid = RegistrationValid,
+            RegistrationSubmitted = RegistrationSubmitted,
+            RegisteredPlayerIds = _registeredPlayerIds.ToArray(),
+            RegistrationHistory = _registrationHistory.ToArray()
         };
     }
 
@@ -1307,9 +1332,27 @@ public partial class GameState
             _cupHistory.AddRange(data.CupHistory);
         }
 
+        RegistrationRulesSummary = string.IsNullOrWhiteSpace(data.RegistrationRulesSummary) ? "Registration rules restored; pending validation." : data.RegistrationRulesSummary;
+        RegistrationStatusSummary = string.IsNullOrWhiteSpace(data.RegistrationStatusSummary) ? "Registration restored; pending validation." : data.RegistrationStatusSummary;
+        RegistrationIssuesSummary = string.IsNullOrWhiteSpace(data.RegistrationIssuesSummary) ? "Registration issues restored; pending validation." : data.RegistrationIssuesSummary;
+        RegistrationValid = data.RegistrationValid;
+        RegistrationSubmitted = data.RegistrationSubmitted;
+        _registeredPlayerIds.Clear();
+        if (data.RegisteredPlayerIds != null)
+        {
+            _registeredPlayerIds.AddRange(data.RegisteredPlayerIds);
+        }
+
+        _registrationHistory.Clear();
+        if (data.RegistrationHistory != null)
+        {
+            _registrationHistory.AddRange(data.RegistrationHistory);
+        }
+
         EnsureLeaguePyramidState();
         EnsureCupCompetitionState();
         EnsureFinanceState();
+        EnsureSquadRegistrationState();
         EnsureRecruitmentTarget();
         EnsureJobMarketFoundation();
         RefreshPressureCategories();
@@ -1407,6 +1450,11 @@ public partial class GameState
         CupPrizeMoney = 0;
         CupEliminated = false;
         CupWon = false;
+        RegistrationRulesSummary = "Registration rules pending.";
+        RegistrationStatusSummary = "Registration pending.";
+        RegistrationIssuesSummary = "Registration issues pending.";
+        RegistrationValid = true;
+        RegistrationSubmitted = false;
         _foundationNewsEvents.Clear();
         _activeDecisionEvents.Clear();
         _resolvedDecisionEvents.Clear();
@@ -1424,6 +1472,8 @@ public partial class GameState
         _financeHistory.Clear();
         _leagueHistory.Clear();
         _cupHistory.Clear();
+        _registeredPlayerIds.Clear();
+        _registrationHistory.Clear();
     }
 
     public void InitializeStageFoundationsForClub()
@@ -1446,6 +1496,7 @@ public partial class GameState
         EnsureFinanceState();
         EnsureLeaguePyramidState();
         EnsureCupCompetitionState();
+        EnsureSquadRegistrationState();
         if (CurrentScoutingAssignment == null)
         {
             StartBasicScoutingAssignment("Position need: versatile midfielder");
@@ -3308,6 +3359,76 @@ public partial class GameState
             !CupHistorySummary.Contains(CupCompetitionName, StringComparison.OrdinalIgnoreCase))
         {
             return "Saved cup competition state did not restore.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
+    public string ValidatePhase18SquadRegistrationContract()
+    {
+        InitializeStageFoundationsForClub();
+        EnsureSquadRegistrationState();
+        if (!RegistrationRulesSummary.Contains("max 25", StringComparison.OrdinalIgnoreCase) ||
+            !RegistrationRulesSummary.Contains("youth exemptions", StringComparison.OrdinalIgnoreCase) ||
+            !RegistrationRulesSummary.Contains("homegrown", StringComparison.OrdinalIgnoreCase) ||
+            !RegistrationRulesSummary.Contains("wage budget", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Registration rules do not explain squad size, youth, homegrown, loan, and wage constraints.";
+        }
+
+        if (!RegistrationValid ||
+            !CanPlayCurrentFixture ||
+            !RegistrationStatusSummary.Contains("Registration valid", StringComparison.OrdinalIgnoreCase))
+        {
+            return $"Seeded squad should be valid for registration: {RegistrationIssuesSummary}";
+        }
+
+        var beforeNews = NewsFeedSummary;
+        var submitMessage = SubmitSquadRegistration();
+        if (!RegistrationSubmitted ||
+            _registeredPlayerIds.Count == 0 ||
+            _registrationHistory.Count == 0 ||
+            !submitMessage.Contains("submitted", StringComparison.OrdinalIgnoreCase) ||
+            beforeNews == NewsFeedSummary)
+        {
+            return "Registration submission did not persist state, history, and news.";
+        }
+
+        var originalSquad = SquadPlayers;
+        SquadPlayers = Array.ConvertAll(SquadPlayers, player => player.With(isStarting: false));
+        EnsureSquadRegistrationState();
+        if (RegistrationValid ||
+            CanPlayCurrentFixture ||
+            !RegistrationIssuesSummary.Contains("matchday XI incomplete", StringComparison.OrdinalIgnoreCase) ||
+            !BuildCareerPhaseSummary().Contains("Registration block", StringComparison.OrdinalIgnoreCase))
+        {
+            SquadPlayers = originalSquad;
+            EnsureSquadRegistrationState();
+            return "Invalid matchday registration did not block kickoff with a clear issue.";
+        }
+
+        SquadPlayers = originalSquad;
+        EnsureSquadRegistrationState();
+        if (!RegistrationValid || !CanPlayCurrentFixture)
+        {
+            return "Registration validation did not recover after restoring the valid squad.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
+    public string ValidatePhase18StoredSquadRegistrationContract()
+    {
+        EnsureSquadRegistrationState();
+        if (!RegistrationSubmitted ||
+            !RegistrationValid ||
+            _registeredPlayerIds.Count == 0 ||
+            _registrationHistory.Count == 0 ||
+            string.IsNullOrWhiteSpace(RegistrationRulesSummary) ||
+            !TrainingScoutingSummary.Contains("Registration", StringComparison.Ordinal) ||
+            !RegistrationHistorySummary.Contains("Registration submitted", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Saved squad registration state did not restore.";
         }
 
         return MatchPlaybackContractValidator.PassMessage;
@@ -5296,6 +5417,7 @@ public partial class GameState
                 relatedEntity: prospect.Name,
                 effectSummary: $"Board morale {BoardMorale}; fan morale {FanMorale}; youth reputation {YouthReputation}.",
                 cooldownKey: "youth-promotion");
+            EnsureSquadRegistrationState();
             SquadStatusSummary = BuildSquadStatusSummary();
             return $"{prospect.Name} promoted to the senior squad with loan suitability noted: {prospect.LoanSuitability}";
         }
@@ -5854,6 +5976,145 @@ public partial class GameState
         CupObjectiveSummary = CurrentClub?.BoardPhilosophy == BoardPhilosophy.WinNowBoard || CurrentClub?.Archetype == ClubArchetype.TitleContender
             ? "Cup objective: board expects a serious run; exit raises pressure, progress improves trust and reputation."
             : "Cup objective: board values progress, rotation discipline, prize money, and development minutes without treating the cup as the only job-security measure.";
+    }
+
+    private void EnsureSquadRegistrationState()
+    {
+        _registeredPlayerIds.Clear();
+        var seniorCount = 0;
+        var youthExemptions = 0;
+        var homegrownCount = 0;
+        var overseasCount = 0;
+        var outgoingLoans = 0;
+        var expiringContracts = 0;
+        var goalkeepers = 0;
+        var startingCount = 0;
+        foreach (var player in SquadPlayers)
+        {
+            if (player.Age <= 21)
+            {
+                youthExemptions++;
+            }
+            else
+            {
+                seniorCount++;
+                _registeredPlayerIds.Add(player.PlayerId);
+            }
+
+            if (player.Nationality == "Novaran" || player.Age <= 21)
+            {
+                homegrownCount++;
+            }
+            else
+            {
+                overseasCount++;
+            }
+
+            if (player.TransferInterest.Contains("loan", StringComparison.OrdinalIgnoreCase))
+            {
+                outgoingLoans++;
+            }
+
+            if (player.ContractExpiryYear <= SeasonStartYear + 1)
+            {
+                expiringContracts++;
+            }
+
+            if (player.Position == "GK")
+            {
+                goalkeepers++;
+            }
+
+            if (player.IsStarting)
+            {
+                startingCount++;
+            }
+        }
+
+        EnsureFinanceState();
+        var issues = new List<string>();
+        if (seniorCount > 25)
+        {
+            issues.Add($"senior squad limit exceeded ({seniorCount}/25)");
+        }
+
+        if (SquadPlayers.Length < 14)
+        {
+            issues.Add($"squad depth below registration floor ({SquadPlayers.Length}/14)");
+        }
+
+        if (goalkeepers < 1)
+        {
+            issues.Add("no goalkeeper registered");
+        }
+
+        if (homegrownCount < 3)
+        {
+            issues.Add($"fictional homegrown-style count too low ({homegrownCount}/3)");
+        }
+
+        if (overseasCount > 12)
+        {
+            issues.Add($"overseas-player limit exceeded ({overseasCount}/12)");
+        }
+
+        if (outgoingLoans > 4)
+        {
+            issues.Add($"loan limit exceeded ({outgoingLoans}/4)");
+        }
+
+        var seasonWageEnvelope = FinanceWageBudget * 12;
+        if (FinanceCurrentWageBill > seasonWageEnvelope + seasonWageEnvelope / 10)
+        {
+            issues.Add($"wage structure above tolerance ({FormatFinanceMoney(FinanceCurrentWageBill)} vs season envelope {FormatFinanceMoney(seasonWageEnvelope)})");
+        }
+
+        if (startingCount < 11)
+        {
+            issues.Add($"matchday XI incomplete ({startingCount}/11)");
+        }
+
+        RegistrationRulesSummary = "Registration rules: max 25 senior players, under-21 youth exemptions, at least 3 homegrown-style players, max 12 overseas players, max 4 loan-tagged players, wage budget tolerance, and 11 selected starters for matchday.";
+        RegistrationValid = issues.Count == 0;
+        RegistrationStatusSummary = RegistrationValid
+            ? $"Registration valid for {CurrentDivisionName} and {CupCompetitionName}: {seniorCount} senior registered, {youthExemptions} youth exemptions, {homegrownCount} homegrown-style, {overseasCount} overseas, {outgoingLoans} loan-tagged, wage bill {FormatFinanceMoney(FinanceCurrentWageBill)}."
+            : $"Registration invalid for {CurrentDivisionName} and {CupCompetitionName}: {issues.Count} blocking issue(s).";
+        var warning = expiringContracts > 0
+            ? $" Contract warning: {expiringContracts} player(s) expire by {SeasonStartYear + 1}."
+            : string.Empty;
+        RegistrationIssuesSummary = RegistrationValid
+            ? $"Registration issues: no blockers.{warning}"
+            : $"Registration issues: {string.Join("; ", issues)}.{warning}";
+    }
+
+    public string SubmitSquadRegistration()
+    {
+        EnsureSquadRegistrationState();
+        RegistrationSubmitted = RegistrationValid;
+        var detail = RegistrationValid
+            ? $"Registration submitted for {CurrentDivisionName} and {CupCompetitionName}: {_registeredPlayerIds.Count} senior players plus youth exemptions."
+            : $"Registration submission blocked: {RegistrationIssuesSummary}";
+        RecordRegistrationHistory(detail);
+        AddNews(
+            RegistrationValid ? "Squad registration submitted" : "Squad registration blocked",
+            NewsCategory.Career,
+            "Club administration",
+            detail,
+            RegistrationValid ? 3 : 4,
+            sourceType: "Club administration",
+            relatedEntity: SelectedClubName ?? string.Empty,
+            effectSummary: RegistrationIssuesSummary,
+            cooldownKey: $"registration-{SeasonStartYear}-{RegistrationValid}");
+        return detail;
+    }
+
+    private void RecordRegistrationHistory(string detail)
+    {
+        _registrationHistory.Insert(0, $"{CurrentDateLabel}: {detail}");
+        if (_registrationHistory.Count > 16)
+        {
+            _registrationHistory.RemoveAt(_registrationHistory.Count - 1);
+        }
     }
 
     public string ApplyCupMatchResult(CompetitionFixture fixture, MatchPlaybackResult result)

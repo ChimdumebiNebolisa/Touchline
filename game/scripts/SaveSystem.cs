@@ -200,7 +200,7 @@ public partial class SaveSystem : Node
         WriteIndented = true,
         PropertyNameCaseInsensitive = true
     };
-    public const int CurrentSaveVersion = 19;
+    public const int CurrentSaveVersion = 20;
 
     public static SaveSystem? Instance { get; private set; }
     public string LastStatusMessage { get; private set; } = "Save system idle.";
@@ -1112,7 +1112,14 @@ public partial class SaveSystem : Node
             CupPrizeMoney = source.CupPrizeMoney,
             CupEliminated = source.CupEliminated,
             CupWon = source.CupWon,
-            CupHistory = source.CupHistory == null ? null : (string[])source.CupHistory.Clone()
+            CupHistory = source.CupHistory == null ? null : (string[])source.CupHistory.Clone(),
+            RegistrationRulesSummary = source.RegistrationRulesSummary,
+            RegistrationStatusSummary = source.RegistrationStatusSummary,
+            RegistrationIssuesSummary = source.RegistrationIssuesSummary,
+            RegistrationValid = source.RegistrationValid,
+            RegistrationSubmitted = source.RegistrationSubmitted,
+            RegisteredPlayerIds = source.RegisteredPlayerIds == null ? null : (string[])source.RegisteredPlayerIds.Clone(),
+            RegistrationHistory = source.RegistrationHistory == null ? null : (string[])source.RegistrationHistory.Clone()
         };
     }
 

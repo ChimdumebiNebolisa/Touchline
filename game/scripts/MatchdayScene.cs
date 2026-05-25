@@ -156,6 +156,7 @@ public partial class MatchdayScene : Control
 
         var averageFitness = startingCount == 0 ? 0 : totalFitness / startingCount;
         var fixtureComplete = IsCurrentFixtureComplete();
+        var registrationBlocked = !state.CanPlayCurrentFixture;
         var readinessValue = startingCount >= 11 ? "XI READY" : $"XI {startingCount}/11";
 
         _competitionLabel.Text = state.CurrentFixtureIsCup
@@ -172,9 +173,9 @@ public partial class MatchdayScene : Control
         _pulseValueLabel.Text = $"{state.TeamMorale}/{state.FanSentiment}/{state.BoardConfidence}";
         _pulseMetaLabel.Text = "Morale / Fans / Board";
         _readinessValueLabel.Text = readinessValue;
-        _readinessMetaLabel.Text = startingCount >= 11
+        _readinessMetaLabel.Text = state.CanPlayCurrentFixture
             ? $"Avg fitness {averageFitness} | Bench {benchCount}"
-            : $"Bench {benchCount} | Auto-fill active if launched";
+            : $"{state.RegistrationStatusSummary} | {state.RegistrationIssuesSummary}";
 
         _kickoffContextLabel.Text = $"Dressing Room Brief | {state.BuildCareerPhaseSummary()} Keep the message tight before kickoff.";
         _lineupLabel.Text = $"Team News | {state.BuildLineupReadinessSummary()}";
@@ -184,15 +185,17 @@ public partial class MatchdayScene : Control
         _pressureLabel.Text = $"Club Mood | Morale {state.TeamMorale} | Fans {state.FanSentiment} | Board {state.BoardConfidence}\n{state.PressureCategorySummary}";
         _tacticsLabel.Text = $"Match Plan | {state.BuildTacticalPlanSummary()}";
         _opponentFocusLabel.Text = $"Opponent Brief | {state.BuildOpponentContextSummary()}";
-        _readinessLabel.Text = startingCount >= 11
+        _readinessLabel.Text = state.CanPlayCurrentFixture
             ? "Selection call | The XI is complete and ready for kickoff."
-            : "Selection call | The engine will complete the XI from the remaining squad list.";
+            : $"Registration call | {state.RegistrationIssuesSummary}";
 
         _statusLabel.Text = fixtureComplete
             ? "Fixture complete: this match is already in the season record. Return to the Manager Hub and advance instead of replaying it."
-            : "Match Controls | Watch Live Match uses the 2D replay; Instant Result resolves the same shared engine immediately.";
-        _instantResultButton.Disabled = fixtureComplete;
-        _startMatchButton.Disabled = fixtureComplete;
+            : registrationBlocked
+                ? "Match Controls | Registration or matchday XI validation blocks kickoff until the issue is fixed."
+                : "Match Controls | Watch Live Match uses the 2D replay; Instant Result resolves the same shared engine immediately.";
+        _instantResultButton.Disabled = fixtureComplete || registrationBlocked;
+        _startMatchButton.Disabled = fixtureComplete || registrationBlocked;
     }
 
     private void RenderUnavailableState()
