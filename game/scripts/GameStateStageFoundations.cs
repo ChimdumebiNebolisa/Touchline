@@ -29,6 +29,8 @@ public sealed class SaveSlotStageFoundationData
     public SaveSlotDecisionEventData[]? ActiveDecisionEvents { get; set; }
     public SaveSlotDecisionEventData[]? ResolvedDecisionEvents { get; set; }
     public SaveSlotRecruitmentTargetData? RecruitmentTarget { get; set; }
+    public SaveSlotRecruitmentTargetData[]? RecruitmentShortlist { get; set; }
+    public string[]? TransferHistory { get; set; }
     public SaveSlotPromiseRecordData[]? PromiseRecords { get; set; }
     public string JobSecurityName { get; set; } = "Stable";
     public SaveSlotJobOfferEventData? JobOffer { get; set; }
@@ -103,6 +105,19 @@ public sealed class SaveSlotRecruitmentTargetData
     public string EstimatedWageRange { get; set; } = string.Empty;
     public string DirectorResponse { get; set; } = string.Empty;
     public string BoardResponse { get; set; } = string.Empty;
+    public string TargetStatus { get; set; } = string.Empty;
+    public string ClubValuation { get; set; } = string.Empty;
+    public string AgentMood { get; set; } = string.Empty;
+    public string RivalInterest { get; set; } = string.Empty;
+    public string BoardStance { get; set; } = string.Empty;
+    public string DirectorStance { get; set; } = string.Empty;
+    public string OutcomeState { get; set; } = string.Empty;
+    public bool IsLoanCandidate { get; set; }
+    public string LoanDirection { get; set; } = string.Empty;
+    public string DevelopmentLoanSuitability { get; set; } = string.Empty;
+    public string PlayingTimeExpectation { get; set; } = string.Empty;
+    public string LoanClubFit { get; set; } = string.Empty;
+    public string LoanReviewSummary { get; set; } = string.Empty;
     public string Status { get; set; } = string.Empty;
 }
 
@@ -135,9 +150,11 @@ public partial class GameState
     private readonly List<NewsEvent> _foundationNewsEvents = new();
     private readonly List<DecisionEvent> _activeDecisionEvents = new();
     private readonly List<DecisionEvent> _resolvedDecisionEvents = new();
+    private readonly List<RecruitmentTarget> _recruitmentShortlist = new();
     private readonly List<PromiseRecord> _promiseRecords = new();
     private readonly List<string> _careerHistory = new();
     private readonly List<string> _perceptionHistory = new();
+    private readonly List<string> _transferHistory = new();
 
     public TacticalTeamStyle TeamStyle { get; private set; } = TacticalTeamStyle.Balanced;
     public int PassingDirectness { get; private set; } = 52;
@@ -195,9 +212,11 @@ public partial class GameState
     public string PressureCategorySummary => $"Pressure | job {JobPressure}, board {BoardPressure}, fans {FanPressure}, media {CareerProfile.MediaPressure}, dressing room {DressingRoomPressure}, transfer {TransferPressure}, financial {FinancialPressure}";
     public string PerceptionHistorySummary => _perceptionHistory.Count == 0 ? "Perception history starts after matches, promises, or recruitment decisions." : string.Join("\n", _perceptionHistory);
     public string DecisionEventSummary => BuildDecisionEventSummary();
+    public string RecruitmentShortlistSummary => BuildRecruitmentShortlistSummary();
+    public string TransferHistorySummary => _transferHistory.Count == 0 ? "Transfer history starts when a recommendation, request, approach, or loan review is recorded." : string.Join("\n", _transferHistory);
     public string RecruitmentFoundationSummary => CurrentRecruitmentTarget == null
         ? "Recruitment foundation pending scouting target."
-        : $"{CurrentRecruitmentTarget.PlayerName} ({CurrentRecruitmentTarget.Position}) | {CurrentRecruitmentTarget.InformationSummary} | {CurrentRecruitmentTarget.InterestSummary} | {CurrentRecruitmentTarget.TacticalFitSummary} | Fee {CurrentRecruitmentTarget.EstimatedFeeRange} | Wage {CurrentRecruitmentTarget.EstimatedWageRange} | {CurrentRecruitmentTarget.Status}";
+        : $"{CurrentRecruitmentTarget.PlayerName} ({CurrentRecruitmentTarget.Position}) | {CurrentRecruitmentTarget.InformationSummary} | {CurrentRecruitmentTarget.InterestSummary} | {CurrentRecruitmentTarget.TacticalFitSummary} | Fee {CurrentRecruitmentTarget.EstimatedFeeRange} | Wage {CurrentRecruitmentTarget.EstimatedWageRange} | Status {CurrentRecruitmentTarget.TargetStatus} | Valuation {CurrentRecruitmentTarget.ClubValuation} | Agent {CurrentRecruitmentTarget.AgentMood} | Rival {CurrentRecruitmentTarget.RivalInterest} | Board {CurrentRecruitmentTarget.BoardStance} | Director {CurrentRecruitmentTarget.DirectorStance} | Outcome {CurrentRecruitmentTarget.OutcomeState} | {CurrentRecruitmentTarget.Status}\nShortlist\n{RecruitmentShortlistSummary}\nTransfer history\n{TransferHistorySummary}";
     public string TrainingScoutingSummary => $"{TrainingFocusName} ({TrainingIntensityName}): {TrainingStatusSummary}\nScouting depth: {ScoutingReportDepthName}\nScouting: {BuildScoutingSummary()}";
     public string CareerMarketSummary => $"Job security: {JobSecurityName}\n{TrustSummary}\n{ReputationSummary}\n{PressureCategorySummary}\nLicense: {LicenseOpportunitySummary}\nJob market: {BuildJobOfferSummary()}";
     public string TacticsFoundationSummary => $"{TeamStyleName} | {TeamInstructionsSummary}\n{SetPieceSummary}\n{OpponentPreparationSummary}\n{PlayerRolesSummary}\n{PlayerInstructionsSummary}\n{TacticalRoleFitSummary}\n{PlayerFamiliaritySummary}\n{TacticalFitNotes}\n{TacticalRiskNotes}";
@@ -353,9 +372,15 @@ public partial class GameState
         var role = CareerProfile.Role;
         if (role == ManagerRole.AssistantManager)
         {
-            CurrentRecruitmentTarget = CloneRecruitmentTarget(target, "Recommended by Assistant Manager; final authority sits with senior staff.");
+            CurrentRecruitmentTarget = CloneRecruitmentTarget(
+                target,
+                "Recommended by Assistant Manager; final authority sits with senior staff.",
+                "Recommended",
+                "Recommended only");
+            SyncCurrentRecruitmentTargetToShortlist();
             TransferPressure = Math.Clamp(TransferPressure + 1, 0, 100);
             RefreshPressureCategories();
+            RecordTransferHistory($"{target.PlayerName}: Assistant Manager recommendation filed; board and Director approval still required.");
             RecordPerceptionHistory("Recruitment recommendation", $"role authority limited action; transfer pressure {TransferPressure}, recruitment reputation {RecruitmentReputation}");
             AddNews(
                 "Recruitment recommendation filed",
@@ -368,9 +393,15 @@ public partial class GameState
 
         if (role == ManagerRole.HeadCoach)
         {
-            CurrentRecruitmentTarget = CloneRecruitmentTarget(target, "Requested by Head Coach; Director of Football and board review required.");
+            CurrentRecruitmentTarget = CloneRecruitmentTarget(
+                target,
+                "Requested by Head Coach; Director of Football and board review required.",
+                "Requested",
+                "Requested for review");
+            SyncCurrentRecruitmentTargetToShortlist();
             TransferPressure = Math.Clamp(TransferPressure + 2, 0, 100);
             RefreshPressureCategories();
+            RecordTransferHistory($"{target.PlayerName}: Head Coach request submitted; Director stance {target.DirectorStance}; board stance {target.BoardStance}.");
             RecordPerceptionHistory("Recruitment request", $"Head Coach authority created review pressure; transfer pressure {TransferPressure}, board trust {CareerProfile.BoardTrust}");
             AddNews(
                 "Head Coach submits recruitment request",
@@ -383,14 +414,17 @@ public partial class GameState
 
         var trustSupport = CareerProfile.BoardTrust >= 62 || CareerProfile.DirectorTrust >= 62;
         var lowTrustBlock = CareerProfile.BoardTrust < 42 && !target.TacticalFitSummary.Contains("Strong", StringComparison.Ordinal);
-        var approved = !lowTrustBlock && (target.TacticalFitSummary.Contains("Strong", StringComparison.Ordinal) ||
+        var marketScore = BuildRecruitmentMarketScore(target);
+        var approved = !lowTrustBlock && (marketScore >= 62 ||
             trustSupport ||
             CurrentClub?.DirectorRelationshipState is DirectorRelationshipState.Ally or DirectorRelationshipState.Supportive);
         var status = approved
-            ? "Board approval granted for a basic approach; promise logged around squad role."
-            : "Board rejects the basic approach: fit, wage, and Director confidence do not align.";
-        CurrentRecruitmentTarget = CloneRecruitmentTarget(target, status);
-        if (approved)
+            ? "Board approval granted for a basic approach after fit, agent, rival, board, and Director review."
+            : "Board rejects the basic approach: fit, wage, agent mood, rival pressure, and Director confidence do not align.";
+        var outcomeState = approved ? "Approach approved" : "Blocked by review";
+        CurrentRecruitmentTarget = CloneRecruitmentTarget(target, status, approved ? "Approved" : "Blocked", outcomeState);
+        SyncCurrentRecruitmentTargetToShortlist();
+        if (approved && !target.IsLoanCandidate)
         {
             _promiseRecords.Add(new PromiseRecord
             {
@@ -411,13 +445,18 @@ public partial class GameState
         TransferPressure = Math.Clamp(TransferPressure + (approved ? 4 : 7), 0, 100);
         RecruitmentReputation = Math.Clamp(RecruitmentReputation + (approved ? 1 : -1), 0, 100);
         RefreshPressureCategories();
-        RecordPerceptionHistory("Recruitment decision", $"approved {approved}; board trust {CareerProfile.BoardTrust}, Director trust {CareerProfile.DirectorTrust}, transfer pressure {TransferPressure}, recruitment reputation {RecruitmentReputation}");
+        RecordTransferHistory($"{target.PlayerName}: {outcomeState}; market score {marketScore}; agent {target.AgentMood}; rival {target.RivalInterest}; board {target.BoardStance}; Director {target.DirectorStance}.");
+        RecordPerceptionHistory("Recruitment decision", $"approved {approved}; board trust {CareerProfile.BoardTrust}, Director trust {CareerProfile.DirectorTrust}, transfer pressure {TransferPressure}, recruitment reputation {RecruitmentReputation}; market score {marketScore}");
         AddNews(
             approved ? "Transfer approach approved" : "Transfer approach blocked",
             NewsCategory.Transfer,
             "Club sources",
             $"{target.PlayerName}: {status}",
-            approved ? 4 : 5);
+            approved ? 4 : 5,
+            sourceType: "Recruitment desk",
+            relatedEntity: target.PlayerName,
+            effectSummary: $"Outcome {outcomeState}; transfer pressure {TransferPressure}; recruitment reputation {RecruitmentReputation}.",
+            cooldownKey: "transfer-approach");
         return status;
     }
 
@@ -513,19 +552,9 @@ public partial class GameState
             ResolvedDecisionEvents = Array.ConvertAll(_resolvedDecisionEvents.ToArray(), BuildDecisionEventSaveData),
             RecruitmentTarget = CurrentRecruitmentTarget == null
                 ? null
-                : new SaveSlotRecruitmentTargetData
-                {
-                    PlayerName = CurrentRecruitmentTarget.PlayerName,
-                    Position = CurrentRecruitmentTarget.Position,
-                    InformationSummary = CurrentRecruitmentTarget.InformationSummary,
-                    InterestSummary = CurrentRecruitmentTarget.InterestSummary,
-                    TacticalFitSummary = CurrentRecruitmentTarget.TacticalFitSummary,
-                    EstimatedFeeRange = CurrentRecruitmentTarget.EstimatedFeeRange,
-                    EstimatedWageRange = CurrentRecruitmentTarget.EstimatedWageRange,
-                    DirectorResponse = CurrentRecruitmentTarget.DirectorResponse,
-                    BoardResponse = CurrentRecruitmentTarget.BoardResponse,
-                    Status = CurrentRecruitmentTarget.Status
-                },
+                : BuildRecruitmentTargetSaveData(CurrentRecruitmentTarget),
+            RecruitmentShortlist = Array.ConvertAll(_recruitmentShortlist.ToArray(), BuildRecruitmentTargetSaveData),
+            TransferHistory = _transferHistory.ToArray(),
             PromiseRecords = Array.ConvertAll(
                 _promiseRecords.ToArray(),
                 promise => new SaveSlotPromiseRecordData
@@ -653,21 +682,21 @@ public partial class GameState
 
         CurrentRecruitmentTarget = data.RecruitmentTarget == null
             ? null
-            : new RecruitmentTarget
+            : RestoreRecruitmentTarget(data.RecruitmentTarget);
+        _recruitmentShortlist.Clear();
+        if (data.RecruitmentShortlist != null)
+        {
+            foreach (var target in data.RecruitmentShortlist)
             {
-                PlayerName = data.RecruitmentTarget.PlayerName,
-                Position = data.RecruitmentTarget.Position,
-                InformationSummary = string.IsNullOrWhiteSpace(data.RecruitmentTarget.InformationSummary)
-                    ? "Knowledge: saved target visibility unavailable; scout confidence should be rebuilt by a new report."
-                    : data.RecruitmentTarget.InformationSummary,
-                InterestSummary = data.RecruitmentTarget.InterestSummary,
-                TacticalFitSummary = data.RecruitmentTarget.TacticalFitSummary,
-                EstimatedFeeRange = data.RecruitmentTarget.EstimatedFeeRange,
-                EstimatedWageRange = data.RecruitmentTarget.EstimatedWageRange,
-                DirectorResponse = data.RecruitmentTarget.DirectorResponse,
-                BoardResponse = data.RecruitmentTarget.BoardResponse,
-                Status = data.RecruitmentTarget.Status
-            };
+                _recruitmentShortlist.Add(RestoreRecruitmentTarget(target));
+            }
+        }
+
+        _transferHistory.Clear();
+        if (data.TransferHistory != null)
+        {
+            _transferHistory.AddRange(data.TransferHistory);
+        }
 
         _promiseRecords.Clear();
         if (data.PromiseRecords != null)
@@ -779,9 +808,11 @@ public partial class GameState
         _foundationNewsEvents.Clear();
         _activeDecisionEvents.Clear();
         _resolvedDecisionEvents.Clear();
+        _recruitmentShortlist.Clear();
         _promiseRecords.Clear();
         _careerHistory.Clear();
         _perceptionHistory.Clear();
+        _transferHistory.Clear();
     }
 
     public void InitializeStageFoundationsForClub()
@@ -1713,6 +1744,130 @@ public partial class GameState
         return MatchPlaybackContractValidator.PassMessage;
     }
 
+    public string ValidatePhase9TransferMarketContract()
+    {
+        InitializeStageFoundationsForClub();
+        EnsureRecruitmentTarget();
+        if (CurrentRecruitmentTarget == null)
+        {
+            return "Transfer market foundation did not create a current recruitment target.";
+        }
+
+        if (_recruitmentShortlist.Count < 2)
+        {
+            return "Transfer market foundation did not create a shortlist.";
+        }
+
+        var hasLoanTarget = false;
+        var hasIncomingLoan = false;
+        var hasOutgoingLoan = false;
+        foreach (var target in _recruitmentShortlist)
+        {
+            if (target.IsLoanCandidate)
+            {
+                hasLoanTarget = true;
+                hasIncomingLoan = hasIncomingLoan || target.LoanDirection == "Incoming loan";
+                hasOutgoingLoan = hasOutgoingLoan || target.LoanDirection == "Outgoing loan";
+            }
+        }
+
+        if (!hasLoanTarget || !hasIncomingLoan || !hasOutgoingLoan)
+        {
+            return "Loan foundation did not expose incoming and outgoing loan target support.";
+        }
+
+        var current = CurrentRecruitmentTarget;
+        if (string.IsNullOrWhiteSpace(current.TargetStatus) ||
+            string.IsNullOrWhiteSpace(current.ClubValuation) ||
+            string.IsNullOrWhiteSpace(current.AgentMood) ||
+            string.IsNullOrWhiteSpace(current.RivalInterest) ||
+            string.IsNullOrWhiteSpace(current.BoardStance) ||
+            string.IsNullOrWhiteSpace(current.DirectorStance) ||
+            string.IsNullOrWhiteSpace(current.OutcomeState))
+        {
+            return "Transfer target is missing status, valuation, agent, rival, board, Director, or outcome state.";
+        }
+
+        if (!RecruitmentFoundationSummary.Contains("Shortlist", StringComparison.Ordinal) ||
+            !RecruitmentFoundationSummary.Contains("Agent", StringComparison.Ordinal) ||
+            !RecruitmentFoundationSummary.Contains("Rival", StringComparison.Ordinal) ||
+            !RecruitmentFoundationSummary.Contains("Board", StringComparison.Ordinal) ||
+            !RecruitmentFoundationSummary.Contains("Director", StringComparison.Ordinal))
+        {
+            return "Recruitment UI summary does not expose market state.";
+        }
+
+        var beforeHistoryCount = _transferHistory.Count;
+        var beforeNewsCount = CurrentClub?.NewsFeed.Length ?? 0;
+        var result = AttemptBasicRecruitmentAction();
+        if (string.IsNullOrWhiteSpace(result) || CurrentRecruitmentTarget == null)
+        {
+            return "Transfer market action did not produce a result.";
+        }
+
+        if (CareerProfile.Role == ManagerRole.AssistantManager &&
+            !CurrentRecruitmentTarget.Status.Contains("Recommended", StringComparison.Ordinal))
+        {
+            return "Assistant Manager transfer role restriction was not preserved.";
+        }
+
+        if (CareerProfile.Role == ManagerRole.HeadCoach &&
+            !CurrentRecruitmentTarget.Status.Contains("Requested", StringComparison.Ordinal))
+        {
+            return "Head Coach transfer role restriction was not preserved.";
+        }
+
+        if (CareerProfile.Role == ManagerRole.Manager)
+        {
+            if (!CurrentRecruitmentTarget.Status.Contains("Board", StringComparison.Ordinal) ||
+                !CurrentRecruitmentTarget.Status.Contains("agent", StringComparison.OrdinalIgnoreCase) ||
+                !CurrentRecruitmentTarget.Status.Contains("rival", StringComparison.OrdinalIgnoreCase) ||
+                !CurrentRecruitmentTarget.Status.Contains("Director", StringComparison.Ordinal))
+            {
+                return "Manager transfer review did not consider board, agent, rival, and Director factors.";
+            }
+        }
+
+        if (_transferHistory.Count <= beforeHistoryCount)
+        {
+            return "Transfer market action did not record transfer history.";
+        }
+
+        if ((CurrentClub?.NewsFeed.Length ?? 0) <= beforeNewsCount)
+        {
+            return "Transfer market action did not update the news feed.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
+    public string ValidatePhase9StoredTransferMarketContract()
+    {
+        EnsureRecruitmentTarget();
+        if (CurrentRecruitmentTarget == null)
+        {
+            return "Saved transfer market target did not restore.";
+        }
+
+        if (_recruitmentShortlist.Count < 2 || !_recruitmentShortlist[0].OutcomeState.Contains("Recommended", StringComparison.Ordinal) && !_recruitmentShortlist[0].OutcomeState.Contains("Requested", StringComparison.Ordinal) && !_recruitmentShortlist[0].OutcomeState.Contains("approved", StringComparison.OrdinalIgnoreCase) && !_recruitmentShortlist[0].OutcomeState.Contains("Blocked", StringComparison.Ordinal))
+        {
+            return "Saved transfer shortlist did not preserve target outcomes.";
+        }
+
+        if (_transferHistory.Count == 0 || !TransferHistorySummary.Contains(":", StringComparison.Ordinal))
+        {
+            return "Saved transfer history did not restore.";
+        }
+
+        if (!RecruitmentShortlistSummary.Contains("Loan", StringComparison.Ordinal) ||
+            !RecruitmentFoundationSummary.Contains("Transfer history", StringComparison.Ordinal))
+        {
+            return "Saved transfer market summaries did not restore loan and history visibility.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
     public string ValidatePhase3PromiseLifecycleContract()
     {
         InitializeStageFoundationsForClub();
@@ -2033,6 +2188,7 @@ public partial class GameState
             DiscoverySummary = discovery,
             ReportReady = ready
         };
+        RefreshRecruitmentMarketInformation();
 
         if (ready)
         {
@@ -2049,6 +2205,7 @@ public partial class GameState
     {
         if (CurrentRecruitmentTarget != null)
         {
+            EnsureRecruitmentShortlist();
             return;
         }
 
@@ -2057,19 +2214,174 @@ public partial class GameState
         var candidate = sourceSquad.Length == 0
             ? ClubSquadFactory.BuildFallbackSquad(sourceClub, WorldSeed)[0]
             : sourceSquad[Math.Min(8, sourceSquad.Length - 1)];
+        CurrentRecruitmentTarget = BuildRecruitmentTarget(candidate, "Shortlisted", "Identified by scouting", false, "Not a loan target");
+        EnsureRecruitmentShortlist();
+    }
+
+    private void EnsureRecruitmentShortlist()
+    {
+        if (_recruitmentShortlist.Count > 0)
+        {
+            return;
+        }
+
+        if (CurrentRecruitmentTarget != null)
+        {
+            _recruitmentShortlist.Add(CurrentRecruitmentTarget);
+        }
+
+        var sourceClub = string.IsNullOrWhiteSpace(CurrentOpponentName) ? ResolveDifferentClub(SelectedClubName) : CurrentOpponentName;
+        var sourceSquad = GetClubSquad(sourceClub);
+        if (sourceSquad.Length == 0)
+        {
+            sourceSquad = ClubSquadFactory.BuildFallbackSquad(sourceClub, WorldSeed);
+        }
+
+        var incomingLoan = FindLoanCandidate(sourceSquad, preferExternal: true);
+        if (incomingLoan != null)
+        {
+            _recruitmentShortlist.Add(BuildRecruitmentTarget(incomingLoan, "Loan shortlist", "Incoming loan review", true, "Incoming loan"));
+        }
+
+        var outgoingLoan = FindLoanCandidate(Array.ConvertAll(SquadPlayers, ConvertSquadPlayerToClubSquadPlayer), preferExternal: false);
+        if (outgoingLoan != null)
+        {
+            _recruitmentShortlist.Add(BuildRecruitmentTarget(outgoingLoan, "Loan shortlist", "Outgoing development loan review", true, "Outgoing loan"));
+        }
+    }
+
+    private ClubSquadPlayer? FindLoanCandidate(ClubSquadPlayer[] squad, bool preferExternal)
+    {
+        ClubSquadPlayer? fallback = null;
+        foreach (var player in squad)
+        {
+            if (player.Age > 24)
+            {
+                continue;
+            }
+
+            fallback ??= player;
+            if (preferExternal || !player.IsStarting)
+            {
+                return player;
+            }
+        }
+
+        return fallback;
+    }
+
+    private void RefreshRecruitmentMarketInformation()
+    {
+        if (CurrentRecruitmentTarget == null)
+        {
+            return;
+        }
+
+        var candidate = FindRecruitmentCandidateByName(CurrentRecruitmentTarget.PlayerName);
+        if (candidate == null)
+        {
+            return;
+        }
+
+        var refreshed = BuildRecruitmentTarget(
+            candidate,
+            CurrentRecruitmentTarget.TargetStatus,
+            CurrentRecruitmentTarget.OutcomeState,
+            CurrentRecruitmentTarget.IsLoanCandidate,
+            CurrentRecruitmentTarget.LoanDirection);
+        CurrentRecruitmentTarget = CloneRecruitmentTarget(refreshed, CurrentRecruitmentTarget.Status, CurrentRecruitmentTarget.TargetStatus, CurrentRecruitmentTarget.OutcomeState);
+        SyncCurrentRecruitmentTargetToShortlist();
+    }
+
+    private ClubSquadPlayer? FindRecruitmentCandidateByName(string playerName)
+    {
+        foreach (var player in SquadPlayers)
+        {
+            if (player.Name == playerName)
+            {
+                return ConvertSquadPlayerToClubSquadPlayer(player);
+            }
+        }
+
+        var sourceClub = string.IsNullOrWhiteSpace(CurrentOpponentName) ? ResolveDifferentClub(SelectedClubName) : CurrentOpponentName;
+        foreach (var player in GetClubSquad(sourceClub))
+        {
+            if (player.Name == playerName)
+            {
+                return player;
+            }
+        }
+
+        foreach (var clubName in AvailableClubs)
+        {
+            foreach (var player in GetClubSquad(clubName))
+            {
+                if (player.Name == playerName)
+                {
+                    return player;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private static ClubSquadPlayer ConvertSquadPlayerToClubSquadPlayer(SquadPlayer player)
+    {
+        return new ClubSquadPlayer
+        {
+            PlayerId = player.PlayerId,
+            ClubName = string.Empty,
+            Name = player.Name,
+            Position = player.Position,
+            Age = player.Age,
+            TrueAbility = player.TrueAbility,
+            TacticalFitScore = player.TacticalFitScore,
+            PlayingStyle = player.PlayingStyle,
+            TacticalFit = player.TacticalFit,
+            Form = player.Form,
+            Morale = player.Morale,
+            Fitness = player.Fitness,
+            Fatigue = player.Fatigue,
+            IsStarting = player.IsStarting
+        };
+    }
+
+    private RecruitmentTarget BuildRecruitmentTarget(ClubSquadPlayer candidate, string targetStatus, string outcomeState, bool isLoanCandidate, string loanDirection)
+    {
         var strongFit = candidate.TacticalFitScore >= 68;
-        CurrentRecruitmentTarget = new RecruitmentTarget
+        var information = BuildRecruitmentInformationSummary(candidate);
+        var feeRange = isLoanCandidate
+            ? loanDirection == "Outgoing loan" ? "Wage coverage 40%-70%" : "Loan fee $0.0m-$0.3m"
+            : BuildFeeRange(candidate.TrueAbility, candidate.Age);
+        var wageRange = BuildWageRange(candidate.TrueAbility);
+        var boardStance = BuildBoardRecruitmentStance(candidate, isLoanCandidate, loanDirection);
+        var directorStance = BuildDirectorRecruitmentStance(candidate, isLoanCandidate, loanDirection);
+        return new RecruitmentTarget
         {
             PlayerName = candidate.Name,
             Position = candidate.Position,
-            InformationSummary = BuildRecruitmentInformationSummary(candidate),
-            InterestSummary = candidate.Age <= 23 ? "Open to a development pathway if minutes are credible." : "Interest depends on role, wage, and club trajectory.",
+            InformationSummary = information,
+            InterestSummary = BuildPlayerInterestSummary(candidate, isLoanCandidate, loanDirection),
             TacticalFitSummary = strongFit ? $"Strong fit for {TeamStyleName}." : $"Partial fit for {TeamStyleName}; scouting recommends caution.",
-            EstimatedFeeRange = BuildFeeRange(candidate.TrueAbility, candidate.Age),
-            EstimatedWageRange = BuildWageRange(candidate.TrueAbility),
+            EstimatedFeeRange = feeRange,
+            EstimatedWageRange = wageRange,
             DirectorResponse = BuildDirectorRecruitmentResponse(candidate),
             BoardResponse = BuildBoardRecruitmentResponse(candidate),
-            Status = "Shortlisted foundation target; no negotiation started."
+            TargetStatus = targetStatus,
+            ClubValuation = isLoanCandidate ? BuildLoanValuation(candidate, loanDirection) : $"Selling club valuation tracks {feeRange}, with interest and rival pressure still material.",
+            AgentMood = BuildAgentMood(candidate, isLoanCandidate),
+            RivalInterest = BuildRivalInterest(candidate, isLoanCandidate),
+            BoardStance = boardStance,
+            DirectorStance = directorStance,
+            OutcomeState = outcomeState,
+            IsLoanCandidate = isLoanCandidate,
+            LoanDirection = loanDirection,
+            DevelopmentLoanSuitability = isLoanCandidate ? BuildDevelopmentLoanSuitability(candidate, loanDirection) : "Not assessed: permanent transfer target.",
+            PlayingTimeExpectation = isLoanCandidate ? BuildLoanPlayingTimeExpectation(candidate, loanDirection) : "Contract role promise to be handled in contract phase.",
+            LoanClubFit = isLoanCandidate ? BuildLoanClubFit(candidate, loanDirection) : "Not a loan pathway.",
+            LoanReviewSummary = isLoanCandidate ? "Loan review placeholder: suitability, minutes, and recall/review timing must be checked before completion." : "No loan review opened.",
+            Status = isLoanCandidate ? $"{loanDirection} target listed for review; no loan agreement started." : "Shortlisted foundation target; no negotiation started."
         };
     }
 
@@ -2203,6 +2515,48 @@ public partial class GameState
         }
     }
 
+    private void RecordTransferHistory(string detail)
+    {
+        _transferHistory.Insert(0, $"{CurrentDateLabel}: {detail}");
+        if (_transferHistory.Count > 12)
+        {
+            _transferHistory.RemoveAt(_transferHistory.Count - 1);
+        }
+    }
+
+    private void SyncCurrentRecruitmentTargetToShortlist()
+    {
+        if (CurrentRecruitmentTarget == null)
+        {
+            return;
+        }
+
+        for (var index = 0; index < _recruitmentShortlist.Count; index++)
+        {
+            if (_recruitmentShortlist[index].PlayerName == CurrentRecruitmentTarget.PlayerName)
+            {
+                _recruitmentShortlist[index] = CurrentRecruitmentTarget;
+                return;
+            }
+        }
+
+        _recruitmentShortlist.Insert(0, CurrentRecruitmentTarget);
+    }
+
+    private int BuildRecruitmentMarketScore(RecruitmentTarget target)
+    {
+        var score = 42;
+        score += target.TacticalFitSummary.Contains("Strong", StringComparison.Ordinal) ? 16 : 4;
+        score += target.AgentMood.Contains("receptive", StringComparison.OrdinalIgnoreCase) || target.AgentMood.Contains("curious", StringComparison.OrdinalIgnoreCase) ? 9 : 2;
+        score += target.RivalInterest.Contains("likely", StringComparison.OrdinalIgnoreCase) ? -7 : 4;
+        score += target.BoardStance.Contains("support", StringComparison.OrdinalIgnoreCase) || target.BoardStance.Contains("open", StringComparison.OrdinalIgnoreCase) ? 10 : -5;
+        score += target.DirectorStance.Contains("support", StringComparison.OrdinalIgnoreCase) || target.DirectorStance.Contains("acceptable", StringComparison.OrdinalIgnoreCase) ? 10 : -5;
+        score += CareerProfile.BoardTrust >= 60 ? 5 : CareerProfile.BoardTrust < 45 ? -6 : 0;
+        score += CareerProfile.DirectorTrust >= 60 ? 5 : CareerProfile.DirectorTrust < 45 ? -6 : 0;
+        score += target.IsLoanCandidate ? 5 : 0;
+        return Math.Clamp(score, 0, 100);
+    }
+
     private static SaveSlotDecisionEventData BuildDecisionEventSaveData(DecisionEvent decisionEvent)
     {
         return new SaveSlotDecisionEventData
@@ -2256,6 +2610,75 @@ public partial class GameState
         };
     }
 
+    private static SaveSlotRecruitmentTargetData BuildRecruitmentTargetSaveData(RecruitmentTarget target)
+    {
+        return new SaveSlotRecruitmentTargetData
+        {
+            PlayerName = target.PlayerName,
+            Position = target.Position,
+            InformationSummary = target.InformationSummary,
+            InterestSummary = target.InterestSummary,
+            TacticalFitSummary = target.TacticalFitSummary,
+            EstimatedFeeRange = target.EstimatedFeeRange,
+            EstimatedWageRange = target.EstimatedWageRange,
+            DirectorResponse = target.DirectorResponse,
+            BoardResponse = target.BoardResponse,
+            TargetStatus = target.TargetStatus,
+            ClubValuation = target.ClubValuation,
+            AgentMood = target.AgentMood,
+            RivalInterest = target.RivalInterest,
+            BoardStance = target.BoardStance,
+            DirectorStance = target.DirectorStance,
+            OutcomeState = target.OutcomeState,
+            IsLoanCandidate = target.IsLoanCandidate,
+            LoanDirection = target.LoanDirection,
+            DevelopmentLoanSuitability = target.DevelopmentLoanSuitability,
+            PlayingTimeExpectation = target.PlayingTimeExpectation,
+            LoanClubFit = target.LoanClubFit,
+            LoanReviewSummary = target.LoanReviewSummary,
+            Status = target.Status
+        };
+    }
+
+    private static RecruitmentTarget RestoreRecruitmentTarget(SaveSlotRecruitmentTargetData data)
+    {
+        var information = string.IsNullOrWhiteSpace(data.InformationSummary)
+            ? "Knowledge: saved target visibility unavailable; scout confidence should be rebuilt by a new report."
+            : data.InformationSummary;
+        var fee = string.IsNullOrWhiteSpace(data.EstimatedFeeRange) ? "Fee estimate pending" : data.EstimatedFeeRange;
+        var wage = string.IsNullOrWhiteSpace(data.EstimatedWageRange) ? "Wage estimate pending" : data.EstimatedWageRange;
+        var targetStatus = string.IsNullOrWhiteSpace(data.TargetStatus) ? "Shortlisted" : data.TargetStatus;
+        var boardStance = string.IsNullOrWhiteSpace(data.BoardStance) ? "Board stance pending evidence review." : data.BoardStance;
+        var directorStance = string.IsNullOrWhiteSpace(data.DirectorStance) ? "Director stance pending evidence review." : data.DirectorStance;
+        var loanDirection = string.IsNullOrWhiteSpace(data.LoanDirection) ? "Not a loan target" : data.LoanDirection;
+        return new RecruitmentTarget
+        {
+            PlayerName = string.IsNullOrWhiteSpace(data.PlayerName) ? "Unknown target" : data.PlayerName,
+            Position = string.IsNullOrWhiteSpace(data.Position) ? "Unknown" : data.Position,
+            InformationSummary = information,
+            InterestSummary = string.IsNullOrWhiteSpace(data.InterestSummary) ? "Interest pending scouting confidence." : data.InterestSummary,
+            TacticalFitSummary = string.IsNullOrWhiteSpace(data.TacticalFitSummary) ? "Fit pending tactical review." : data.TacticalFitSummary,
+            EstimatedFeeRange = fee,
+            EstimatedWageRange = wage,
+            DirectorResponse = string.IsNullOrWhiteSpace(data.DirectorResponse) ? directorStance : data.DirectorResponse,
+            BoardResponse = string.IsNullOrWhiteSpace(data.BoardResponse) ? boardStance : data.BoardResponse,
+            TargetStatus = targetStatus,
+            ClubValuation = string.IsNullOrWhiteSpace(data.ClubValuation) ? fee : data.ClubValuation,
+            AgentMood = string.IsNullOrWhiteSpace(data.AgentMood) ? "Agent mood unknown until contact." : data.AgentMood,
+            RivalInterest = string.IsNullOrWhiteSpace(data.RivalInterest) ? "No rival pressure confirmed." : data.RivalInterest,
+            BoardStance = boardStance,
+            DirectorStance = directorStance,
+            OutcomeState = string.IsNullOrWhiteSpace(data.OutcomeState) ? targetStatus : data.OutcomeState,
+            IsLoanCandidate = data.IsLoanCandidate,
+            LoanDirection = loanDirection,
+            DevelopmentLoanSuitability = string.IsNullOrWhiteSpace(data.DevelopmentLoanSuitability) ? "Loan suitability not assessed." : data.DevelopmentLoanSuitability,
+            PlayingTimeExpectation = string.IsNullOrWhiteSpace(data.PlayingTimeExpectation) ? "Playing-time expectation pending." : data.PlayingTimeExpectation,
+            LoanClubFit = string.IsNullOrWhiteSpace(data.LoanClubFit) ? "Loan club fit pending." : data.LoanClubFit,
+            LoanReviewSummary = string.IsNullOrWhiteSpace(data.LoanReviewSummary) ? "Loan review not opened." : data.LoanReviewSummary,
+            Status = string.IsNullOrWhiteSpace(data.Status) ? "Shortlisted foundation target; no negotiation started." : data.Status
+        };
+    }
+
     private string BuildDecisionEventSummary()
     {
         if (_activeDecisionEvents.Count == 0)
@@ -2268,6 +2691,26 @@ public partial class GameState
 
         var activeEvent = _activeDecisionEvents[0];
         return $"{StageFoundationText.GetDisplayName(activeEvent.EventType)} | {activeEvent.Reliability} | {activeEvent.SourceType} | {activeEvent.Title}\n{activeEvent.Prompt}\nA: {activeEvent.PrimaryOption} ({activeEvent.PrimaryEffectSummary})\nB: {activeEvent.SecondaryOption} ({activeEvent.SecondaryEffectSummary})";
+    }
+
+    private string BuildRecruitmentShortlistSummary()
+    {
+        EnsureRecruitmentTarget();
+        if (_recruitmentShortlist.Count == 0)
+        {
+            return "No active recruitment shortlist.";
+        }
+
+        var lines = new List<string>();
+        foreach (var target in _recruitmentShortlist)
+        {
+            var loan = target.IsLoanCandidate
+                ? $" | Loan {target.LoanDirection}: {target.DevelopmentLoanSuitability}; {target.PlayingTimeExpectation}; {target.LoanClubFit}"
+                : string.Empty;
+            lines.Add($"{target.PlayerName} ({target.Position}) - {target.TargetStatus}; {target.OutcomeState}; {target.AgentMood}; {target.RivalInterest}{loan}");
+        }
+
+        return string.Join("\n", lines);
     }
 
     private void GenerateContextDecisionEvent(string trigger)
@@ -2808,6 +3251,149 @@ public partial class GameState
         return "License progression: no active course yet; reputation, trust, and pressure need a stronger trend.";
     }
 
+    private string BuildPlayerInterestSummary(ClubSquadPlayer candidate, bool isLoanCandidate, string loanDirection)
+    {
+        if (isLoanCandidate && loanDirection == "Outgoing loan")
+        {
+            return candidate.Age <= 21
+                ? "Open to a development loan if minutes and role are credible."
+                : "Loan interest is cautious; player needs a strong competitive reason.";
+        }
+
+        if (isLoanCandidate)
+        {
+            return "Loan interest depends on role clarity, wage coverage, and parent-club trust.";
+        }
+
+        if (candidate.Age <= 23)
+        {
+            return "Open to a development pathway if minutes are credible.";
+        }
+
+        return "Interest depends on role, wage, club trajectory, and agent confidence.";
+    }
+
+    private string BuildBoardRecruitmentStance(ClubSquadPlayer candidate, bool isLoanCandidate, string loanDirection)
+    {
+        if (isLoanCandidate && loanDirection == "Outgoing loan")
+        {
+            return candidate.Age <= 21 ? "Board supports a minutes-led development loan." : "Board wants senior-depth risk checked before approval.";
+        }
+
+        if (isLoanCandidate)
+        {
+            return "Board will consider a low-risk loan if wage exposure is controlled.";
+        }
+
+        if (CurrentClub?.BoardPhilosophy == BoardPhilosophy.FinanciallyStrictBoard && candidate.TrueAbility < 74)
+        {
+            return "Board skeptical: value and wage discipline need stronger proof.";
+        }
+
+        if (CurrentClub?.BoardPhilosophy == BoardPhilosophy.YouthDevelopmentBoard && candidate.Age <= 23)
+        {
+            return "Board supportive: age profile matches youth pathway.";
+        }
+
+        return candidate.TacticalFitScore >= 68
+            ? "Board open if total cost, role, and Director support remain aligned."
+            : "Board cautious: tactical fit and resale evidence are incomplete.";
+    }
+
+    private string BuildDirectorRecruitmentStance(ClubSquadPlayer candidate, bool isLoanCandidate, string loanDirection)
+    {
+        if (isLoanCandidate && loanDirection == "Outgoing loan")
+        {
+            return "Director wants loan-club fit and recall review before sign-off.";
+        }
+
+        if (isLoanCandidate)
+        {
+            return "Director sees a squad-depth loan as acceptable if it does not block owned-player minutes.";
+        }
+
+        return CurrentClub?.DirectorOfFootballStyle switch
+        {
+            DirectorOfFootballStyle.AcademyBuilder when candidate.Age > 25 => "Director skeptical: target blocks academy minutes.",
+            DirectorOfFootballStyle.BargainHunter => "Director demands value discipline and rival-pressure awareness.",
+            DirectorOfFootballStyle.StarChaser when candidate.TrueAbility >= 75 => "Director supportive: profile carries ambition signal.",
+            DirectorOfFootballStyle.ControlFreak => "Director guarded: wants the approach routed through his shortlist.",
+            _ => candidate.TacticalFitScore >= 68 ? "Director supportive with scouting evidence." : "Director wants more fit evidence before backing the move."
+        };
+    }
+
+    private string BuildLoanValuation(ClubSquadPlayer candidate, string loanDirection)
+    {
+        if (loanDirection == "Outgoing loan")
+        {
+            return $"Development value: minutes required; wage coverage target {Math.Clamp(35 + candidate.TrueAbility / 3, 45, 75)}%.";
+        }
+
+        return $"Parent club likely asks wage coverage around {Math.Clamp(45 + candidate.TrueAbility / 4, 50, 85)}%.";
+    }
+
+    private string BuildAgentMood(ClubSquadPlayer candidate, bool isLoanCandidate)
+    {
+        if (isLoanCandidate)
+        {
+            return candidate.Age <= 22 ? "Agent receptive if minutes are written into the pathway." : "Agent neutral; wants role clarity.";
+        }
+
+        if (candidate.TrueAbility >= 76)
+        {
+            return "Agent ambitious; wage, role, and rival interest matter.";
+        }
+
+        return candidate.Age <= 23 ? "Agent curious about pathway and development minutes." : "Agent pragmatic; contract fit and club trajectory matter.";
+    }
+
+    private string BuildRivalInterest(ClubSquadPlayer candidate, bool isLoanCandidate)
+    {
+        if (isLoanCandidate)
+        {
+            return candidate.Age <= 21 ? "Several clubs could offer minutes; fit matters more than fee." : "Limited rival loan pressure.";
+        }
+
+        if (candidate.TrueAbility >= 76)
+        {
+            return "Rival interest likely; delay could raise cost or agent demands.";
+        }
+
+        return candidate.TacticalFitScore >= 70 ? "Niche tactical fit lowers rival pressure." : "Rival pressure unknown until deeper scouting.";
+    }
+
+    private string BuildDevelopmentLoanSuitability(ClubSquadPlayer candidate, string loanDirection)
+    {
+        if (loanDirection == "Outgoing loan")
+        {
+            return candidate.Age <= 21 && !candidate.IsStarting
+                ? "High suitability: young non-starter needs senior minutes."
+                : "Moderate suitability: depth risk must be reviewed.";
+        }
+
+        return candidate.Age <= 23 ? "Suitable incoming loan if minutes do not block owned prospects." : "Short-term cover only; limited development upside.";
+    }
+
+    private string BuildLoanPlayingTimeExpectation(ClubSquadPlayer candidate, string loanDirection)
+    {
+        if (loanDirection == "Outgoing loan")
+        {
+            return candidate.TrueAbility >= 68 ? "Expected role: regular starter at loan club." : "Expected role: rotation minutes with development plan.";
+        }
+
+        return candidate.TrueAbility >= 72 ? "Expected role: first-team rotation." : "Expected role: squad depth with clear minutes cap.";
+    }
+
+    private string BuildLoanClubFit(ClubSquadPlayer candidate, string loanDirection)
+    {
+        if (loanDirection == "Outgoing loan")
+        {
+            return candidate.TacticalFitScore >= 68 ? "Loan club fit should match current tactical identity." : "Loan club fit needs careful style screening.";
+        }
+
+        return candidate.TacticalFitScore >= 68 ? $"Fits {TeamStyleName} cover needs." : $"Partial fit for {TeamStyleName}; loan risk is manageable only as short cover.";
+    }
+
     private string BuildFeeRange(int ability, int age)
     {
         var baseFee = ability * 65000 + (age <= 23 ? 800000 : 250000);
@@ -2888,7 +3474,7 @@ public partial class GameState
         };
     }
 
-    private RecruitmentTarget CloneRecruitmentTarget(RecruitmentTarget target, string status)
+    private RecruitmentTarget CloneRecruitmentTarget(RecruitmentTarget target, string status, string? targetStatus = null, string? outcomeState = null)
     {
         return new RecruitmentTarget
         {
@@ -2901,6 +3487,19 @@ public partial class GameState
             EstimatedWageRange = target.EstimatedWageRange,
             DirectorResponse = target.DirectorResponse,
             BoardResponse = target.BoardResponse,
+            TargetStatus = targetStatus ?? target.TargetStatus,
+            ClubValuation = target.ClubValuation,
+            AgentMood = target.AgentMood,
+            RivalInterest = target.RivalInterest,
+            BoardStance = target.BoardStance,
+            DirectorStance = target.DirectorStance,
+            OutcomeState = outcomeState ?? target.OutcomeState,
+            IsLoanCandidate = target.IsLoanCandidate,
+            LoanDirection = target.LoanDirection,
+            DevelopmentLoanSuitability = target.DevelopmentLoanSuitability,
+            PlayingTimeExpectation = target.PlayingTimeExpectation,
+            LoanClubFit = target.LoanClubFit,
+            LoanReviewSummary = target.LoanReviewSummary,
             Status = status
         };
     }

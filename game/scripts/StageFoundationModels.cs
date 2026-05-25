@@ -184,6 +184,19 @@ public sealed class RecruitmentTarget
     public required string EstimatedWageRange { get; init; }
     public required string DirectorResponse { get; init; }
     public required string BoardResponse { get; init; }
+    public required string TargetStatus { get; init; }
+    public required string ClubValuation { get; init; }
+    public required string AgentMood { get; init; }
+    public required string RivalInterest { get; init; }
+    public required string BoardStance { get; init; }
+    public required string DirectorStance { get; init; }
+    public required string OutcomeState { get; init; }
+    public required bool IsLoanCandidate { get; init; }
+    public required string LoanDirection { get; init; }
+    public required string DevelopmentLoanSuitability { get; init; }
+    public required string PlayingTimeExpectation { get; init; }
+    public required string LoanClubFit { get; init; }
+    public required string LoanReviewSummary { get; init; }
     public required string Status { get; init; }
 }
 

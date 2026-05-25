@@ -190,7 +190,7 @@ public partial class SaveSystem : Node
         WriteIndented = true,
         PropertyNameCaseInsensitive = true
     };
-    public const int CurrentSaveVersion = 10;
+    public const int CurrentSaveVersion = 11;
 
     public static SaveSystem? Instance { get; private set; }
     public string LastStatusMessage { get; private set; } = "Save system idle.";
@@ -932,8 +932,52 @@ public partial class SaveSystem : Node
                     EstimatedWageRange = source.RecruitmentTarget.EstimatedWageRange,
                     DirectorResponse = source.RecruitmentTarget.DirectorResponse,
                     BoardResponse = source.RecruitmentTarget.BoardResponse,
+                    TargetStatus = source.RecruitmentTarget.TargetStatus,
+                    ClubValuation = source.RecruitmentTarget.ClubValuation,
+                    AgentMood = source.RecruitmentTarget.AgentMood,
+                    RivalInterest = source.RecruitmentTarget.RivalInterest,
+                    BoardStance = source.RecruitmentTarget.BoardStance,
+                    DirectorStance = source.RecruitmentTarget.DirectorStance,
+                    OutcomeState = source.RecruitmentTarget.OutcomeState,
+                    IsLoanCandidate = source.RecruitmentTarget.IsLoanCandidate,
+                    LoanDirection = source.RecruitmentTarget.LoanDirection,
+                    DevelopmentLoanSuitability = source.RecruitmentTarget.DevelopmentLoanSuitability,
+                    PlayingTimeExpectation = source.RecruitmentTarget.PlayingTimeExpectation,
+                    LoanClubFit = source.RecruitmentTarget.LoanClubFit,
+                    LoanReviewSummary = source.RecruitmentTarget.LoanReviewSummary,
                     Status = source.RecruitmentTarget.Status
                 },
+            RecruitmentShortlist = source.RecruitmentShortlist == null
+                ? null
+                : Array.ConvertAll(
+                    source.RecruitmentShortlist,
+                    target => new SaveSlotRecruitmentTargetData
+                    {
+                        PlayerName = target.PlayerName,
+                        Position = target.Position,
+                        InformationSummary = target.InformationSummary,
+                        InterestSummary = target.InterestSummary,
+                        TacticalFitSummary = target.TacticalFitSummary,
+                        EstimatedFeeRange = target.EstimatedFeeRange,
+                        EstimatedWageRange = target.EstimatedWageRange,
+                        DirectorResponse = target.DirectorResponse,
+                        BoardResponse = target.BoardResponse,
+                        TargetStatus = target.TargetStatus,
+                        ClubValuation = target.ClubValuation,
+                        AgentMood = target.AgentMood,
+                        RivalInterest = target.RivalInterest,
+                        BoardStance = target.BoardStance,
+                        DirectorStance = target.DirectorStance,
+                        OutcomeState = target.OutcomeState,
+                        IsLoanCandidate = target.IsLoanCandidate,
+                        LoanDirection = target.LoanDirection,
+                        DevelopmentLoanSuitability = target.DevelopmentLoanSuitability,
+                        PlayingTimeExpectation = target.PlayingTimeExpectation,
+                        LoanClubFit = target.LoanClubFit,
+                        LoanReviewSummary = target.LoanReviewSummary,
+                        Status = target.Status
+                    }),
+            TransferHistory = source.TransferHistory == null ? null : (string[])source.TransferHistory.Clone(),
             PromiseRecords = source.PromiseRecords == null
                 ? null
                 : Array.ConvertAll(
