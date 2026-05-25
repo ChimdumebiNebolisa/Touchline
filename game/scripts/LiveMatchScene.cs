@@ -366,7 +366,14 @@ public partial class LiveMatchScene : Control
             return;
         }
 
-        if (action == null || action.Kind is MatchActionKind.Carry or MatchActionKind.Kickoff or MatchActionKind.Reset)
+        if (action == null ||
+            action.Kind is MatchActionKind.Carry
+                or MatchActionKind.Kickoff
+                or MatchActionKind.Reset
+                or MatchActionKind.YellowCard
+                or MatchActionKind.InjuryConcern
+                or MatchActionKind.FatigueWarning
+                or MatchActionKind.TacticalShift)
         {
             _receiverTargetNode.Visible = false;
             return;
@@ -374,7 +381,7 @@ public partial class LiveMatchScene : Control
 
         var layerSize = _markersLayer.Size;
         var target = ToPitchPixel(action.ToPosition, layerSize);
-        var size = action.Kind is MatchActionKind.Shot or MatchActionKind.Goal ? 40.0f : 32.0f;
+        var size = action.Kind is MatchActionKind.BigChance or MatchActionKind.Shot or MatchActionKind.Goal ? 40.0f : 32.0f;
         _receiverTargetNode.Visible = true;
         _receiverTargetNode.CustomMinimumSize = new Vector2(size, size);
         _receiverTargetNode.Size = new Vector2(size, size);
@@ -398,11 +405,17 @@ public partial class LiveMatchScene : Control
         {
             MatchActionKind.Pass => $"PASS: {ResolveActionName(frame, action.FromPlayerId ?? action.Participants.PasserPlayerId)} -> {ResolveActionName(frame, action.ToPlayerId ?? action.Participants.ReceiverPlayerId)}",
             MatchActionKind.Carry => $"CARRY: {ResolveActionName(frame, action.FromPlayerId ?? action.Participants.CarrierPlayerId)}",
+            MatchActionKind.BigChance => $"BIG CHANCE: {ResolveActionName(frame, action.FromPlayerId ?? action.Participants.ShooterPlayerId)}",
             MatchActionKind.Shot => $"SHOT: {ResolveActionName(frame, action.FromPlayerId ?? action.Participants.ShooterPlayerId)}",
             MatchActionKind.Save => $"SAVE: {ResolveActionName(frame, action.Participants.GoalkeeperPlayerId ?? action.ToPlayerId)}",
             MatchActionKind.Clearance => $"CLEARANCE: {ResolveActionName(frame, action.Participants.ClearerPlayerId ?? action.FromPlayerId)}",
             MatchActionKind.Interception => $"INTERCEPTION: {ResolveActionName(frame, action.Participants.InterceptorPlayerId ?? action.FromPlayerId)}",
             MatchActionKind.Goal => $"GOAL: {ResolveActionName(frame, action.Participants.ScorerPlayerId ?? action.FromPlayerId)}",
+            MatchActionKind.Foul => $"FOUL: {ResolveActionName(frame, action.Participants.DefenderPlayerId ?? action.ToPlayerId)}",
+            MatchActionKind.YellowCard => $"YELLOW CARD: {ResolveActionName(frame, action.Participants.DefenderPlayerId ?? action.FromPlayerId)}",
+            MatchActionKind.InjuryConcern => $"INJURY CONCERN: {ResolveActionName(frame, action.Participants.CarrierPlayerId ?? action.FromPlayerId)}",
+            MatchActionKind.FatigueWarning => $"FATIGUE: {ResolveActionName(frame, action.Participants.CarrierPlayerId ?? action.FromPlayerId)}",
+            MatchActionKind.TacticalShift => $"TACTICAL SHIFT: {ResolveActionName(frame, action.Participants.CarrierPlayerId ?? action.FromPlayerId)}",
             MatchActionKind.Kickoff => "KICKOFF",
             _ => action.Label.ToUpperInvariant()
         };
@@ -441,10 +454,13 @@ public partial class LiveMatchScene : Control
         return action.Kind switch
         {
             MatchActionKind.Pass => ResolveActionName(frame, action.ToPlayerId ?? action.Participants.ReceiverPlayerId),
+            MatchActionKind.BigChance => "goal",
             MatchActionKind.Shot => "goal",
             MatchActionKind.Goal => "goal",
             MatchActionKind.Clearance => "clearance zone",
             MatchActionKind.Interception => ResolveActionName(frame, action.Participants.InterceptorPlayerId ?? action.ToPlayerId),
+            MatchActionKind.Foul => ResolveActionName(frame, action.Participants.DefenderPlayerId ?? action.ToPlayerId),
+            MatchActionKind.YellowCard => ResolveActionName(frame, action.Participants.DefenderPlayerId ?? action.FromPlayerId),
             _ => FormatPitchPoint(action.ToPosition)
         };
     }
@@ -846,11 +862,17 @@ public partial class LiveMatchScene : Control
         {
             MatchActionKind.Pass => 1.25f,
             MatchActionKind.Carry => 1.85f,
+            MatchActionKind.BigChance => 1.1f,
             MatchActionKind.Shot => 1.35f,
             MatchActionKind.Save => 1.45f,
             MatchActionKind.Goal => 1.55f,
             MatchActionKind.Clearance => 1.25f,
             MatchActionKind.Interception => 1.25f,
+            MatchActionKind.Foul => 1.0f,
+            MatchActionKind.YellowCard => 0.95f,
+            MatchActionKind.InjuryConcern => 1.15f,
+            MatchActionKind.FatigueWarning => 1.0f,
+            MatchActionKind.TacticalShift => 1.0f,
             MatchActionKind.Kickoff => 0.9f,
             _ => 0.85f
         };
@@ -858,7 +880,7 @@ public partial class LiveMatchScene : Control
 
     private static float ResolveActionProgress(MatchActionKind kind, float progress)
     {
-        if (kind is MatchActionKind.Shot or MatchActionKind.Save or MatchActionKind.Goal)
+        if (kind is MatchActionKind.BigChance or MatchActionKind.Shot or MatchActionKind.Save or MatchActionKind.Goal)
         {
             return Math.Clamp(progress / 0.72f, 0.0f, 1.0f);
         }

@@ -200,6 +200,36 @@ public static class MatchPlaybackContractValidator
             return "Match stats completed pass totals do not match playback actions.";
         }
 
+        if (stats.HomeBigChances != expected.HomeBigChances || stats.AwayBigChances != expected.AwayBigChances)
+        {
+            return "Match stats big-chance totals do not match playback actions.";
+        }
+
+        if (stats.HomeFouls != expected.HomeFouls || stats.AwayFouls != expected.AwayFouls)
+        {
+            return "Match stats foul totals do not match playback actions.";
+        }
+
+        if (stats.HomeYellowCards != expected.HomeYellowCards || stats.AwayYellowCards != expected.AwayYellowCards)
+        {
+            return "Match stats card totals do not match playback actions.";
+        }
+
+        if (stats.HomeInjuryConcerns != expected.HomeInjuryConcerns || stats.AwayInjuryConcerns != expected.AwayInjuryConcerns)
+        {
+            return "Match stats injury-concern totals do not match playback actions.";
+        }
+
+        if (stats.HomeFatigueWarnings != expected.HomeFatigueWarnings || stats.AwayFatigueWarnings != expected.AwayFatigueWarnings)
+        {
+            return "Match stats fatigue warning totals do not match playback actions.";
+        }
+
+        if (stats.TacticalShiftEvents != expected.TacticalShiftEvents)
+        {
+            return "Match stats tactical shift totals do not match playback actions.";
+        }
+
         if (stats.HomePossessionPhaseCount <= 0 || stats.AwayPossessionPhaseCount <= 0)
         {
             return "Match stats must include possession phases for both teams.";

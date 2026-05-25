@@ -155,6 +155,21 @@ public static class PostMatchConsequenceService
             causes.Add($"{analysis.HomeInterceptions + analysis.HomeClearances} defensive interventions");
         }
 
+        if (result.Stats.HomeBigChances > 0 || result.Stats.AwayBigChances > 0)
+        {
+            causes.Add($"{result.Stats.HomeBigChances}-{result.Stats.AwayBigChances} big-chance count");
+        }
+
+        if (result.Stats.HomeYellowCards > 0 || result.Stats.AwayYellowCards > 0)
+        {
+            causes.Add($"{result.Stats.HomeYellowCards + result.Stats.AwayYellowCards} yellow card(s) changed the discipline picture");
+        }
+
+        if (result.Stats.HomeFatigueWarnings > 0 || result.Stats.HomeInjuryConcerns > 0)
+        {
+            causes.Add("late condition warnings affected execution");
+        }
+
         if (analysis.HomeLateGoal)
         {
             causes.Add("late home goal shifted the mood");
@@ -197,7 +212,7 @@ public static class PostMatchConsequenceService
 
     private static string BuildStatsSummary(MatchStats stats)
     {
-        return $"Shots: {stats.HomeShots}-{stats.AwayShots} | Saves: {stats.HomeSaves}-{stats.AwaySaves} | Interceptions: {stats.HomeInterceptions}-{stats.AwayInterceptions} | Passes: {stats.HomeCompletedPasses}-{stats.AwayCompletedPasses}";
+        return $"Shots: {stats.HomeShots}-{stats.AwayShots} | Big chances: {stats.HomeBigChances}-{stats.AwayBigChances} | Saves: {stats.HomeSaves}-{stats.AwaySaves} | Interceptions: {stats.HomeInterceptions}-{stats.AwayInterceptions} | Passes: {stats.HomeCompletedPasses}-{stats.AwayCompletedPasses} | Cards: {stats.HomeYellowCards}-{stats.AwayYellowCards} | Fatigue: {stats.HomeFatigueWarnings}-{stats.AwayFatigueWarnings}";
     }
 
     private static string BuildTacticalExplanation(MatchPlaybackResult result, GameState state, MatchCauseAnalysis analysis)
@@ -206,6 +221,16 @@ public static class PostMatchConsequenceService
         if (!string.IsNullOrWhiteSpace(result.TacticalExplanation))
         {
             explanations.Add(result.TacticalExplanation);
+        }
+
+        if (result.TacticalCauses.Length > 0)
+        {
+            explanations.Add($"Tactical cause records: {string.Join("; ", Array.ConvertAll(result.TacticalCauses, cause => $"{cause.Category} {cause.HomeImpact:+0;-0;0}"))}.");
+        }
+
+        if (!string.IsNullOrWhiteSpace(result.OpponentStyleSummary))
+        {
+            explanations.Add(result.OpponentStyleSummary);
         }
 
         if (state.Risk >= 70)

@@ -29,11 +29,17 @@ public enum MatchActionKind
     Kickoff,
     Pass,
     Carry,
+    BigChance,
     Shot,
     Save,
     Clearance,
     Interception,
     Goal,
+    Foul,
+    YellowCard,
+    InjuryConcern,
+    FatigueWarning,
+    TacticalShift,
     Reset
 }
 
@@ -148,8 +154,37 @@ public sealed class MatchStats
     public required int AwayCompletedPasses { get; init; }
     public required int HomeLateGoals { get; init; }
     public required int AwayLateGoals { get; init; }
+    public required int HomeBigChances { get; init; }
+    public required int AwayBigChances { get; init; }
+    public required int HomeFouls { get; init; }
+    public required int AwayFouls { get; init; }
+    public required int HomeYellowCards { get; init; }
+    public required int AwayYellowCards { get; init; }
+    public required int HomeInjuryConcerns { get; init; }
+    public required int AwayInjuryConcerns { get; init; }
+    public required int HomeFatigueWarnings { get; init; }
+    public required int AwayFatigueWarnings { get; init; }
+    public required int TacticalShiftEvents { get; init; }
     public required int PressureTurnovers { get; init; }
     public required int LongestPossessionChain { get; init; }
+}
+
+public sealed class PlayerMatchRating
+{
+    public required string PlayerId { get; init; }
+    public required string Name { get; init; }
+    public required string Team { get; init; }
+    public required string Role { get; init; }
+    public required double Rating { get; init; }
+    public required string Note { get; init; }
+}
+
+public sealed class TacticalCauseRecord
+{
+    public required string Category { get; init; }
+    public required string Summary { get; init; }
+    public required int HomeImpact { get; init; }
+    public required int AwayImpact { get; init; }
 }
 
 public sealed class MatchPlaybackResult
@@ -160,6 +195,9 @@ public sealed class MatchPlaybackResult
     public string TacticalExplanation { get; init; } = string.Empty;
     public string PlayerRatingsSummary { get; init; } = string.Empty;
     public string PostMatchNotes { get; init; } = string.Empty;
+    public string MomentumSummary { get; init; } = string.Empty;
+    public string DisciplineSummary { get; init; } = string.Empty;
+    public string OpponentStyleSummary { get; init; } = string.Empty;
     public required int FinalHomeScore { get; init; }
     public required int FinalAwayScore { get; init; }
     public required MatchTimeline Timeline { get; init; }
@@ -169,6 +207,8 @@ public sealed class MatchPlaybackResult
     public required string PossessionTeam { get; init; }
     public required string[] ActionLabels { get; init; }
     public required MatchStats Stats { get; init; }
+    public required PlayerMatchRating[] PlayerRatings { get; init; }
+    public required TacticalCauseRecord[] TacticalCauses { get; init; }
     public required string FinalResultSummary { get; init; }
 
     public int HomeGoals => FinalHomeScore;

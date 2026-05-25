@@ -31,6 +31,7 @@ public static class MatchSimulator
         var tacticalShape = BuildTacticalShape(state.TacticalFormation, state.Width);
         var homeLineup = BuildHomeLineup(state, homeClubName);
         var awayLineup = BuildAwayLineup(state, awayClubName);
+        var opponentStyleSummary = BuildOpponentStyleSummary(awayLineup, state);
         var players = new List<RuntimePlayer>(22);
         players.AddRange(homeLineup);
         players.AddRange(awayLineup);
@@ -86,6 +87,9 @@ public static class MatchSimulator
         frames = AttachEventsToFrames(frames, events);
         var finalFrame = frames[^1];
         var stats = MatchStatsService.Build(homeClubName, awayClubName, actions);
+        var playerRatings = BuildPlayerMatchRatings(players, actions, state.TacticalFamiliarityScore);
+        var playerRatingsSummary = BuildPlayerRatingsSummary(playerRatings, homeClubName, awayClubName);
+        var tacticalCauses = BuildTacticalCauses(state, stats, roleFitEffect, setPieceEffect, opponentPrepEffect, moraleEffect, familiarityEffect);
 
         return new MatchPlaybackResult
         {
@@ -93,9 +97,12 @@ public static class MatchSimulator
             AwayClubName = awayClubName,
             TacticalSummary =
                 $"Shape {state.TacticalFormation} | Style {state.TeamStyleName} | Familiarity {state.TacticalFamiliarityName} | Role fit {state.TacticalRoleFitScore}/100 | Set pieces {state.SetPieceApproachName} | Opponent prep {state.OpponentPreparationFocusName} | Pressing {state.PressIntensity} | Tempo {state.Tempo} | Width {state.Width} | Mentality {state.Risk}",
-            TacticalExplanation = $"The match engine weighted player ability, form, morale, fitness, staff preparation, {state.TeamStyleName.ToLowerInvariant()} style, familiarity {state.TacticalFamiliarityName}, role fit {state.TacticalRoleFitScore}/100, set-piece approach {state.SetPieceApproachName.ToLowerInvariant()}, and opponent preparation {state.OpponentPreparationFocusName.ToLowerInvariant()}. {state.TacticalRoleFitSummary} {state.OpponentPreparationSummary}",
-            PlayerRatingsSummary = BuildPlayerRatingsSummary(homeLineup, awayLineup, homeClubName, awayClubName),
-            PostMatchNotes = $"Preparation {staffPreparation}/14 | Morale effect {moraleEffect:+0;-0;0} | Familiarity effect {familiarityEffect:+0;-0;0} | Role-fit effect {roleFitEffect:+0;-0;0} | Set-piece effect {setPieceEffect:+0;-0;0} | Opponent-prep effect {opponentPrepEffect:+0;-0;0} | Fit notes: {state.TacticalFitNotes}",
+            TacticalExplanation = $"The match engine weighted player ability, form, morale, fitness, staff preparation, {state.TeamStyleName.ToLowerInvariant()} style, familiarity {state.TacticalFamiliarityName}, role fit {state.TacticalRoleFitScore}/100, set-piece approach {state.SetPieceApproachName.ToLowerInvariant()}, and opponent preparation {state.OpponentPreparationFocusName.ToLowerInvariant()}. Tactical causes: {BuildTacticalCauseSummary(tacticalCauses)}. {state.TacticalRoleFitSummary} {state.OpponentPreparationSummary}",
+            PlayerRatingsSummary = playerRatingsSummary,
+            PostMatchNotes = $"Preparation {staffPreparation}/14 | Morale effect {moraleEffect:+0;-0;0} | Familiarity effect {familiarityEffect:+0;-0;0} | Role-fit effect {roleFitEffect:+0;-0;0} | Set-piece effect {setPieceEffect:+0;-0;0} | Opponent-prep effect {opponentPrepEffect:+0;-0;0} | Momentum: {BuildMomentumSummary(stats)} | Discipline: {BuildDisciplineSummary(stats)} | Fit notes: {state.TacticalFitNotes}",
+            MomentumSummary = BuildMomentumSummary(stats),
+            DisciplineSummary = BuildDisciplineSummary(stats),
+            OpponentStyleSummary = opponentStyleSummary,
             FinalHomeScore = finalFrame.HomeScore,
             FinalAwayScore = finalFrame.AwayScore,
             Timeline = new MatchTimeline
@@ -110,6 +117,8 @@ public static class MatchSimulator
             PossessionTeam = finalFrame.PossessionTeam,
             ActionLabels = Array.ConvertAll(actions, action => action.Label),
             Stats = stats,
+            PlayerRatings = playerRatings,
+            TacticalCauses = tacticalCauses,
             FinalResultSummary = $"{homeClubName} {finalFrame.HomeScore} - {finalFrame.AwayScore} {awayClubName}"
         };
     }
@@ -138,6 +147,102 @@ public static class MatchSimulator
             OpponentPreparationFocus.LowBlockPatience when state.Risk <= 50 => 1,
             _ => 0
         };
+    }
+
+    private static TacticalCauseRecord[] BuildTacticalCauses(
+        GameState state,
+        MatchStats stats,
+        int roleFitEffect,
+        int setPieceEffect,
+        int opponentPrepEffect,
+        int moraleEffect,
+        int familiarityEffect)
+    {
+        return new[]
+        {
+            new TacticalCauseRecord
+            {
+                Category = "Role fit",
+                Summary = $"Role fit {state.TacticalRoleFitScore}/100 shaped how well the XI could execute {state.TeamStyleName.ToLowerInvariant()} instructions.",
+                HomeImpact = roleFitEffect,
+                AwayImpact = -roleFitEffect / 2
+            },
+            new TacticalCauseRecord
+            {
+                Category = "Chance creation",
+                Summary = $"Big chances {stats.HomeBigChances}-{stats.AwayBigChances}, shots {stats.HomeShots}-{stats.AwayShots}, and longest chain {stats.LongestPossessionChain} show how possession turned into threat.",
+                HomeImpact = stats.HomeBigChances - stats.AwayBigChances,
+                AwayImpact = stats.AwayBigChances - stats.HomeBigChances
+            },
+            new TacticalCauseRecord
+            {
+                Category = "Preparation",
+                Summary = $"{state.OpponentPreparationFocusName} and {state.SetPieceApproachName.ToLowerInvariant()} changed the match inputs without creating a separate simulation path.",
+                HomeImpact = opponentPrepEffect + setPieceEffect,
+                AwayImpact = -opponentPrepEffect
+            },
+            new TacticalCauseRecord
+            {
+                Category = "Condition and pressure",
+                Summary = $"Morale effect {moraleEffect:+0;-0;0}, familiarity effect {familiarityEffect:+0;-0;0}, fatigue warnings {stats.HomeFatigueWarnings}-{stats.AwayFatigueWarnings}, and injury concerns {stats.HomeInjuryConcerns}-{stats.AwayInjuryConcerns} shaped late execution.",
+                HomeImpact = moraleEffect + familiarityEffect - stats.HomeFatigueWarnings - stats.HomeInjuryConcerns,
+                AwayImpact = stats.AwayFatigueWarnings + stats.AwayInjuryConcerns
+            },
+            new TacticalCauseRecord
+            {
+                Category = "Discipline",
+                Summary = $"Fouls {stats.HomeFouls}-{stats.AwayFouls} and yellow cards {stats.HomeYellowCards}-{stats.AwayYellowCards} captured tactical fouls and match control.",
+                HomeImpact = -stats.HomeYellowCards,
+                AwayImpact = -stats.AwayYellowCards
+            }
+        };
+    }
+
+    private static string BuildTacticalCauseSummary(IReadOnlyList<TacticalCauseRecord> causes)
+    {
+        var summaries = new List<string>();
+        foreach (var cause in causes)
+        {
+            summaries.Add($"{cause.Category} ({cause.HomeImpact:+0;-0;0})");
+            if (summaries.Count == 3)
+            {
+                break;
+            }
+        }
+
+        return string.Join(", ", summaries);
+    }
+
+    private static string BuildMomentumSummary(MatchStats stats)
+    {
+        return $"Momentum: big chances {stats.HomeBigChances}-{stats.AwayBigChances}, pressure turnovers {stats.PressureTurnovers}, tactical shifts {stats.TacticalShiftEvents}, longest chain {stats.LongestPossessionChain}.";
+    }
+
+    private static string BuildDisciplineSummary(MatchStats stats)
+    {
+        return $"Discipline: fouls {stats.HomeFouls}-{stats.AwayFouls}, yellow cards {stats.HomeYellowCards}-{stats.AwayYellowCards}, injury concerns {stats.HomeInjuryConcerns}-{stats.AwayInjuryConcerns}, fatigue warnings {stats.HomeFatigueWarnings}-{stats.AwayFatigueWarnings}.";
+    }
+
+    private static string BuildOpponentStyleSummary(IReadOnlyList<RuntimePlayer> awayLineup, GameState state)
+    {
+        var abilityTotal = 0;
+        var fatigueTotal = 0;
+        foreach (var player in awayLineup)
+        {
+            abilityTotal += player.Ability;
+            fatigueTotal += player.Fatigue;
+        }
+
+        var ability = awayLineup.Count == 0 ? 65 : abilityTotal / awayLineup.Count;
+        var fatigue = awayLineup.Count == 0 ? 15 : fatigueTotal / awayLineup.Count;
+        var style = ability >= 75
+            ? "high-quality opponent"
+            : fatigue >= 28
+                ? "condition-vulnerable opponent"
+                : state.Risk >= 68
+                    ? "counter-threat opponent"
+                    : "balanced opponent";
+        return $"Opponent style: {state.CurrentOpponentName} profiles as a {style}; strength {ability}/100, average fatigue {fatigue}.";
     }
 
     private static RuntimePlayer[] BuildHomeLineup(GameState state, string teamName)
@@ -298,6 +403,10 @@ public static class MatchSimulator
         var homeScore = 0;
         var awayScore = 0;
         var actionIndex = 1;
+        var disciplineEventAdded = false;
+        var fatigueEventAdded = false;
+        var injuryConcernAdded = false;
+        var tacticalShiftAdded = false;
 
         var kickoffPlayer = PickByRole(players, homeClubName, rng, 6, "CM", "AM");
         AddAction(
@@ -375,10 +484,42 @@ public static class MatchSimulator
                 0.12f,
                 0.52f);
 
+            if (!tacticalShiftAdded && phase >= phaseCount / 2)
+            {
+                var organiser = PickByRole(players, homeClubName, rng, 6, "CM", "AM", "CB");
+                var shiftSecond = Math.Clamp(sequenceStart - 26, 60, MatchDurationSeconds - 240);
+                AddAction(actions, ref actionIndex, MatchActionKind.TacticalShift, shiftSecond, shiftSecond + 10, homeClubName, BuildTacticalShiftLabel(organiser, pressIntensity, tempo, risk), organiser, organiser, GetShapePosition(organiser, shape, true), GetShapePosition(organiser, shape, false), homeScore, awayScore);
+                tacticalShiftAdded = true;
+            }
+
             AddAction(actions, ref actionIndex, MatchActionKind.Pass, currentSecond, currentSecond + passDuration, possessionTeam, BuildPassLabel(firstPasser, firstReceiver, wideAttack, directBreak), firstPasser, firstReceiver, passStart, passEnd, homeScore, awayScore);
             currentSecond += passDuration;
             AddAction(actions, ref actionIndex, MatchActionKind.Carry, currentSecond, currentSecond + carryDuration, possessionTeam, BuildCarryLabel(carrier, directBreak, wideAttack), carrier, carrier, passEnd, carryEnd, homeScore, awayScore);
             currentSecond += carryDuration;
+
+            if (!disciplineEventAdded && pressIntensity + risk >= 135 && phase >= 2)
+            {
+                var foulPoint = carryEnd.Lerp(finalPassEnd, 0.35f);
+                AddAction(actions, ref actionIndex, MatchActionKind.Foul, currentSecond, currentSecond + 8, defendingTeam, $"Foul: {defender.Name} stops the break as pressure rises", carrier, defender, foulPoint, foulPoint, homeScore, awayScore);
+                AddAction(actions, ref actionIndex, MatchActionKind.YellowCard, currentSecond + 8, currentSecond + 12, defendingTeam, $"Yellow card: {defender.Name} is booked for the tactical foul", defender, defender, foulPoint, foulPoint, homeScore, awayScore);
+                disciplineEventAdded = true;
+            }
+
+            if (!fatigueEventAdded && phase >= phaseCount - 4 && (pressIntensity >= 70 || tempo >= 70))
+            {
+                var tiredPlayer = PickByRole(players, homeClubName, rng, 5, "CM", "RB", "LB", "RW", "LW");
+                var fatiguePoint = GetShapePosition(tiredPlayer, shape, false);
+                AddAction(actions, ref actionIndex, MatchActionKind.FatigueWarning, currentSecond + 4, currentSecond + 14, homeClubName, $"Fatigue warning: {tiredPlayer.Name} is stretching the workload in this setup", tiredPlayer, tiredPlayer, fatiguePoint, fatiguePoint, homeScore, awayScore);
+                fatigueEventAdded = true;
+            }
+
+            if (!injuryConcernAdded && phase >= phaseCount - 3 && pressIntensity + tempo + risk >= 210)
+            {
+                var riskPlayer = PickMostFatigued(players, homeClubName);
+                var riskPoint = GetShapePosition(riskPlayer, shape, false);
+                AddAction(actions, ref actionIndex, MatchActionKind.InjuryConcern, currentSecond + 16, currentSecond + 26, homeClubName, $"Injury concern: {riskPlayer.Name} is flagged by the bench after repeated high-intensity actions", riskPlayer, riskPlayer, riskPoint, riskPoint, homeScore, awayScore);
+                injuryConcernAdded = true;
+            }
 
             if (!goalInPhase && rng.NextDouble() < pressureTurnoverChance)
             {
@@ -400,6 +541,8 @@ public static class MatchSimulator
                 currentSecond += finalPassDuration;
             }
 
+            AddAction(actions, ref actionIndex, MatchActionKind.BigChance, currentSecond, currentSecond + 8, possessionTeam, BuildBigChanceLabel(finalReceiver, directBreak, wideAttack), finalReceiver, finalReceiver, finalPassEnd, finalPassEnd.Lerp(goalTarget, 0.35f), homeScore, awayScore);
+            currentSecond += 8;
             AddAction(actions, ref actionIndex, MatchActionKind.Shot, currentSecond, currentSecond + 12, possessionTeam, BuildShotLabel(finalReceiver, risk, directBreak, wideAttack), finalReceiver, null, finalPassEnd, goalTarget, homeScore, awayScore);
             currentSecond += 12;
 
@@ -575,14 +718,16 @@ public static class MatchSimulator
 
             if (player.Id == action.FromPlayerId)
             {
-                target = action.Kind is MatchActionKind.Carry or MatchActionKind.Shot
+                target = action.Kind is MatchActionKind.Carry or MatchActionKind.Shot or MatchActionKind.BigChance
                     ? ball.Position
                     : ClampPitch(action.FromPosition.Lerp(action.ToPosition, progress * 0.35f));
                 intent = action.Kind switch
                 {
                     MatchActionKind.Carry => PlayerIntent.Carry,
+                    MatchActionKind.BigChance => PlayerIntent.Shoot,
                     MatchActionKind.Shot => PlayerIntent.Shoot,
                     MatchActionKind.Clearance => PlayerIntent.Recover,
+                    MatchActionKind.FatigueWarning or MatchActionKind.InjuryConcern => PlayerIntent.Recover,
                     _ => PlayerIntent.Support
                 };
             }
@@ -629,14 +774,16 @@ public static class MatchSimulator
         {
             MatchActionKind.Pass => BallMovementState.Passed,
             MatchActionKind.Carry => BallMovementState.Carried,
+            MatchActionKind.BigChance => BallMovementState.Shot,
             MatchActionKind.Shot => BallMovementState.Shot,
             MatchActionKind.Save => BallMovementState.Saved,
             MatchActionKind.Clearance => BallMovementState.Cleared,
             MatchActionKind.Goal => BallMovementState.Goal,
+            MatchActionKind.Foul or MatchActionKind.YellowCard => BallMovementState.Loose,
             MatchActionKind.Interception => BallMovementState.Loose,
             _ => BallMovementState.Carried
         };
-        var carrierId = action.Kind is MatchActionKind.Carry or MatchActionKind.Kickoff or MatchActionKind.Reset
+        var carrierId = action.Kind is MatchActionKind.Carry or MatchActionKind.Kickoff or MatchActionKind.Reset or MatchActionKind.TacticalShift
             ? action.FromPlayerId ?? action.ToPlayerId
             : action.Kind == MatchActionKind.Save ? action.ToPlayerId : null;
 
@@ -789,6 +936,10 @@ public static class MatchSimulator
             {
                 CarrierPlayerId = fromPlayer?.Id ?? toPlayer?.Id
             },
+            MatchActionKind.BigChance => new ActionParticipants
+            {
+                ShooterPlayerId = fromPlayer?.Id
+            },
             MatchActionKind.Shot => new ActionParticipants
             {
                 ShooterPlayerId = fromPlayer?.Id
@@ -814,6 +965,16 @@ public static class MatchSimulator
                 ShooterPlayerId = fromPlayer?.Id,
                 ScorerPlayerId = fromPlayer?.Id
             },
+            MatchActionKind.Foul or MatchActionKind.YellowCard => new ActionParticipants
+            {
+                DefenderPlayerId = toPlayer?.Id ?? fromPlayer?.Id,
+                InterceptorPlayerId = toPlayer?.Id ?? fromPlayer?.Id,
+                CarrierPlayerId = fromPlayer?.Id
+            },
+            MatchActionKind.InjuryConcern or MatchActionKind.FatigueWarning or MatchActionKind.TacticalShift => new ActionParticipants
+            {
+                CarrierPlayerId = fromPlayer?.Id ?? toPlayer?.Id
+            },
             MatchActionKind.Reset => new ActionParticipants
             {
                 CarrierPlayerId = fromPlayer?.Id ?? toPlayer?.Id
@@ -824,7 +985,19 @@ public static class MatchSimulator
 
     private static bool ShouldCreateEvent(MatchAction action)
     {
-        return action.Kind is MatchActionKind.Kickoff or MatchActionKind.Pass or MatchActionKind.Shot or MatchActionKind.Save or MatchActionKind.Clearance or MatchActionKind.Interception or MatchActionKind.Goal;
+        return action.Kind is MatchActionKind.Kickoff
+            or MatchActionKind.Pass
+            or MatchActionKind.BigChance
+            or MatchActionKind.Shot
+            or MatchActionKind.Save
+            or MatchActionKind.Clearance
+            or MatchActionKind.Interception
+            or MatchActionKind.Goal
+            or MatchActionKind.Foul
+            or MatchActionKind.YellowCard
+            or MatchActionKind.InjuryConcern
+            or MatchActionKind.FatigueWarning
+            or MatchActionKind.TacticalShift;
     }
 
     private static string BuildEventSummary(string homeClubName, string awayClubName, MatchAction action)
@@ -835,11 +1008,17 @@ public static class MatchSimulator
             MatchActionKind.Kickoff => $"{minute}' Kick-off. {homeClubName} start the match and the shape opens around the ball.",
             MatchActionKind.Pass => $"{minute}' {action.Label}.",
             MatchActionKind.Carry => $"{minute}' {action.Label}.",
+            MatchActionKind.BigChance => $"{minute}' {action.Label}.",
             MatchActionKind.Shot => $"{minute}' {action.Label}.",
             MatchActionKind.Save => $"{minute}' {action.Label}.",
             MatchActionKind.Clearance => $"{minute}' {action.Label}.",
             MatchActionKind.Interception => $"{minute}' {action.Label}.",
             MatchActionKind.Goal => $"{minute}' {action.Label}. {homeClubName} {action.HomeScoreAfter} - {action.AwayScoreAfter} {awayClubName}.",
+            MatchActionKind.Foul => $"{minute}' {action.Label}.",
+            MatchActionKind.YellowCard => $"{minute}' {action.Label}.",
+            MatchActionKind.InjuryConcern => $"{minute}' {action.Label}.",
+            MatchActionKind.FatigueWarning => $"{minute}' {action.Label}.",
+            MatchActionKind.TacticalShift => $"{minute}' {action.Label}.",
             _ => $"{minute}' {action.Label}."
         };
     }
@@ -891,32 +1070,151 @@ public static class MatchSimulator
         return Math.Clamp(quality / 14, 35, 96);
     }
 
+    private static PlayerMatchRating[] BuildPlayerMatchRatings(
+        IReadOnlyList<RuntimePlayer> players,
+        IReadOnlyList<MatchAction> actions,
+        int tacticalFamiliarity)
+    {
+        var ratings = new PlayerMatchRating[players.Count];
+        for (var index = 0; index < players.Count; index++)
+        {
+            var player = players[index];
+            var goals = CountActions(actions, player.Id, MatchActionKind.Goal);
+            var shots = CountActions(actions, player.Id, MatchActionKind.Shot) + CountActions(actions, player.Id, MatchActionKind.BigChance);
+            var saves = CountGoalkeeperActions(actions, player.Id, MatchActionKind.Save);
+            var turnovers = CountDefensiveActions(actions, player.Id, MatchActionKind.Interception);
+            var yellowCards = CountDefensiveActions(actions, player.Id, MatchActionKind.YellowCard);
+            var fatigueWarnings = CountActions(actions, player.Id, MatchActionKind.FatigueWarning);
+            var injuryConcerns = CountActions(actions, player.Id, MatchActionKind.InjuryConcern);
+            var baseRating = CalculatePlayerMatchQuality(player, tacticalFamiliarity) / 10.0;
+            var eventImpact = goals * 0.75 + saves * 0.35 + turnovers * 0.25 + Math.Min(2, shots) * 0.10 - yellowCards * 0.35 - fatigueWarnings * 0.15 - injuryConcerns * 0.20;
+            var rating = Math.Clamp(baseRating + eventImpact, 4.0, 9.8);
+            ratings[index] = new PlayerMatchRating
+            {
+                PlayerId = player.Id,
+                Name = player.Name,
+                Team = player.Team,
+                Role = player.Role,
+                Rating = rating,
+                Note = BuildPlayerRatingNote(player, goals, saves, turnovers, yellowCards, fatigueWarnings, injuryConcerns)
+            };
+        }
+
+        return ratings;
+    }
+
     private static string BuildPlayerRatingsSummary(
-        IReadOnlyList<RuntimePlayer> homeLineup,
-        IReadOnlyList<RuntimePlayer> awayLineup,
+        IReadOnlyList<PlayerMatchRating> ratings,
         string homeClubName,
         string awayClubName)
     {
-        var homeBest = PickBestMatchQuality(homeLineup, 58);
-        var awayBest = PickBestMatchQuality(awayLineup, 58);
-        return $"{homeClubName}: {homeBest.Name} {CalculatePlayerMatchQuality(homeBest, 58) / 10.0:0.0}; {awayClubName}: {awayBest.Name} {CalculatePlayerMatchQuality(awayBest, 58) / 10.0:0.0}. Ratings reflect ability, role fit, form, morale, fitness, and fatigue.";
+        var homeBest = PickBestRating(ratings, homeClubName);
+        var awayBest = PickBestRating(ratings, awayClubName);
+        return $"{homeClubName}: {homeBest.Name} {homeBest.Rating:0.0} ({homeBest.Note}); {awayClubName}: {awayBest.Name} {awayBest.Rating:0.0} ({awayBest.Note}). Ratings reflect ability, role fit, events, form, morale, fitness, and fatigue.";
     }
 
-    private static RuntimePlayer PickBestMatchQuality(IReadOnlyList<RuntimePlayer> lineup, int tacticalFamiliarity)
+    private static PlayerMatchRating PickBestRating(IReadOnlyList<PlayerMatchRating> ratings, string team)
     {
-        var best = lineup[0];
-        var bestQuality = CalculatePlayerMatchQuality(best, tacticalFamiliarity);
-        foreach (var player in lineup)
+        PlayerMatchRating? best = null;
+        foreach (var rating in ratings)
         {
-            var quality = CalculatePlayerMatchQuality(player, tacticalFamiliarity);
-            if (quality > bestQuality)
+            if (rating.Team != team)
             {
-                best = player;
-                bestQuality = quality;
+                continue;
+            }
+
+            if (best == null || rating.Rating > best.Rating)
+            {
+                best = rating;
             }
         }
 
-        return best;
+        return best ?? ratings[0];
+    }
+
+    private static string BuildPlayerRatingNote(RuntimePlayer player, int goals, int saves, int turnovers, int yellowCards, int fatigueWarnings, int injuryConcerns)
+    {
+        if (goals > 0)
+        {
+            return "goal involvement lifted the rating";
+        }
+
+        if (saves > 0)
+        {
+            return "goalkeeping interventions mattered";
+        }
+
+        if (turnovers > 0)
+        {
+            return "defensive reads helped the team";
+        }
+
+        if (yellowCards > 0)
+        {
+            return "discipline lowered the rating";
+        }
+
+        if (injuryConcerns > 0)
+        {
+            return "injury concern limited the finish";
+        }
+
+        if (fatigueWarnings > 0 || player.Fatigue >= 35)
+        {
+            return "fatigue shaped the match contribution";
+        }
+
+        return "role fit and condition set the baseline";
+    }
+
+    private static int CountActions(IReadOnlyList<MatchAction> actions, string playerId, MatchActionKind kind)
+    {
+        var count = 0;
+        foreach (var action in actions)
+        {
+            if (action.Kind == kind &&
+                (action.FromPlayerId == playerId ||
+                    action.ToPlayerId == playerId ||
+                    action.Participants.CarrierPlayerId == playerId ||
+                    action.Participants.ShooterPlayerId == playerId ||
+                    action.Participants.ScorerPlayerId == playerId))
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    private static int CountGoalkeeperActions(IReadOnlyList<MatchAction> actions, string playerId, MatchActionKind kind)
+    {
+        var count = 0;
+        foreach (var action in actions)
+        {
+            if (action.Kind == kind && action.Participants.GoalkeeperPlayerId == playerId)
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    private static int CountDefensiveActions(IReadOnlyList<MatchAction> actions, string playerId, MatchActionKind kind)
+    {
+        var count = 0;
+        foreach (var action in actions)
+        {
+            if (action.Kind == kind &&
+                (action.Participants.DefenderPlayerId == playerId ||
+                    action.Participants.InterceptorPlayerId == playerId ||
+                    action.Participants.ClearerPlayerId == playerId))
+            {
+                count++;
+            }
+        }
+
+        return count;
     }
 
     private static RuntimePlayer PickByRole(
@@ -941,6 +1239,25 @@ public static class MatchSimulator
         }
 
         return Pick(players, team, fallbackShapeIndex);
+    }
+
+    private static RuntimePlayer PickMostFatigued(IReadOnlyList<RuntimePlayer> players, string team)
+    {
+        RuntimePlayer? selected = null;
+        foreach (var player in players)
+        {
+            if (player.Team != team)
+            {
+                continue;
+            }
+
+            if (selected == null || player.Fatigue > selected.Fatigue)
+            {
+                selected = player;
+            }
+        }
+
+        return selected ?? players[0];
     }
 
     private static bool HasRole(RuntimePlayer player, params string[] roles)
@@ -1009,6 +1326,18 @@ public static class MatchSimulator
             : $"Pass: {passer.Name} releases {receiver.Name}";
     }
 
+    private static string BuildBigChanceLabel(RuntimePlayer receiver, bool directBreak, bool wideAttack)
+    {
+        if (directBreak)
+        {
+            return $"Big chance: {receiver.Name} breaks into a decisive lane";
+        }
+
+        return wideAttack
+            ? $"Big chance: {receiver.Name} arrives from the wide pattern"
+            : $"Big chance: {receiver.Name} receives in the danger zone";
+    }
+
     private static string BuildShotLabel(RuntimePlayer shooter, int risk, bool directBreak, bool wideAttack)
     {
         if (directBreak || risk >= 70)
@@ -1019,6 +1348,26 @@ public static class MatchSimulator
         return wideAttack
             ? $"Shot: {shooter.Name} meets the wide attack"
             : $"Shot: {shooter.Name} attacks the goal";
+    }
+
+    private static string BuildTacticalShiftLabel(RuntimePlayer organiser, int pressIntensity, int tempo, int risk)
+    {
+        if (risk >= 70)
+        {
+            return $"Tactical shift: {organiser.Name} waves the rest defense tighter behind the attack";
+        }
+
+        if (pressIntensity >= 70)
+        {
+            return $"Tactical shift: {organiser.Name} adjusts the press trigger after midfield pressure";
+        }
+
+        if (tempo >= 70)
+        {
+            return $"Tactical shift: {organiser.Name} asks for quicker support around second balls";
+        }
+
+        return $"Tactical shift: {organiser.Name} keeps the block connected";
     }
 
     private static string DescribeLane(float y)

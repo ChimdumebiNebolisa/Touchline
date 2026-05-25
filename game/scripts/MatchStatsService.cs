@@ -20,6 +20,17 @@ public static class MatchStatsService
         var awayPhases = 0;
         var homeLateGoals = 0;
         var awayLateGoals = 0;
+        var homeBigChances = 0;
+        var awayBigChances = 0;
+        var homeFouls = 0;
+        var awayFouls = 0;
+        var homeYellowCards = 0;
+        var awayYellowCards = 0;
+        var homeInjuryConcerns = 0;
+        var awayInjuryConcerns = 0;
+        var homeFatigueWarnings = 0;
+        var awayFatigueWarnings = 0;
+        var tacticalShiftEvents = 0;
         var pressureTurnovers = 0;
         var longestChain = 0;
         var currentChain = 0;
@@ -58,6 +69,16 @@ public static class MatchStatsService
             var isHomeAction = action.Team == homeClubName;
             switch (action.Kind)
             {
+                case MatchActionKind.BigChance:
+                    if (isHomeAction)
+                    {
+                        homeBigChances++;
+                    }
+                    else
+                    {
+                        awayBigChances++;
+                    }
+                    break;
                 case MatchActionKind.Pass:
                     if (isHomeAction)
                     {
@@ -129,6 +150,49 @@ public static class MatchStatsService
                         awayInterceptions++;
                     }
                     break;
+                case MatchActionKind.Foul:
+                    if (isHomeAction)
+                    {
+                        homeFouls++;
+                    }
+                    else
+                    {
+                        awayFouls++;
+                    }
+                    break;
+                case MatchActionKind.YellowCard:
+                    if (isHomeAction)
+                    {
+                        homeYellowCards++;
+                    }
+                    else
+                    {
+                        awayYellowCards++;
+                    }
+                    break;
+                case MatchActionKind.InjuryConcern:
+                    if (isHomeAction)
+                    {
+                        homeInjuryConcerns++;
+                    }
+                    else
+                    {
+                        awayInjuryConcerns++;
+                    }
+                    break;
+                case MatchActionKind.FatigueWarning:
+                    if (isHomeAction)
+                    {
+                        homeFatigueWarnings++;
+                    }
+                    else
+                    {
+                        awayFatigueWarnings++;
+                    }
+                    break;
+                case MatchActionKind.TacticalShift:
+                    tacticalShiftEvents++;
+                    break;
             }
         }
 
@@ -150,6 +214,17 @@ public static class MatchStatsService
             AwayCompletedPasses = awayPasses,
             HomeLateGoals = homeLateGoals,
             AwayLateGoals = awayLateGoals,
+            HomeBigChances = homeBigChances,
+            AwayBigChances = awayBigChances,
+            HomeFouls = homeFouls,
+            AwayFouls = awayFouls,
+            HomeYellowCards = homeYellowCards,
+            AwayYellowCards = awayYellowCards,
+            HomeInjuryConcerns = homeInjuryConcerns,
+            AwayInjuryConcerns = awayInjuryConcerns,
+            HomeFatigueWarnings = homeFatigueWarnings,
+            AwayFatigueWarnings = awayFatigueWarnings,
+            TacticalShiftEvents = tacticalShiftEvents,
             PressureTurnovers = pressureTurnovers,
             LongestPossessionChain = longestChain
         };
@@ -160,6 +235,7 @@ public static class MatchStatsService
         return kind is MatchActionKind.Kickoff
             or MatchActionKind.Pass
             or MatchActionKind.Carry
+            or MatchActionKind.BigChance
             or MatchActionKind.Shot
             or MatchActionKind.Goal
             or MatchActionKind.Interception;

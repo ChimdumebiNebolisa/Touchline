@@ -1118,6 +1118,60 @@ public partial class GameState
         return MatchPlaybackContractValidator.Validate(first);
     }
 
+    public string ValidatePhase5MatchEngineDepthContract()
+    {
+        InitializeStageFoundationsForClub();
+        UpdateTactics("4-2-3-1", "High Press", 88, 82, 62, 78);
+        var result = PrepareCurrentMatchResult(true);
+        var cached = PrepareCurrentMatchResult();
+        if (!ReferenceEquals(result, cached))
+        {
+            return "Match depth validation generated a second match object instead of reusing the shared result.";
+        }
+
+        if (result.PlayerRatings.Length != 22 ||
+            result.TacticalCauses.Length < 4 ||
+            string.IsNullOrWhiteSpace(result.MomentumSummary) ||
+            string.IsNullOrWhiteSpace(result.DisciplineSummary) ||
+            string.IsNullOrWhiteSpace(result.OpponentStyleSummary))
+        {
+            return "Match result is missing player ratings, tactical causes, momentum, discipline, or opponent style.";
+        }
+
+        if (!HasActionKind(result, MatchActionKind.BigChance) ||
+            !HasActionKind(result, MatchActionKind.TacticalShift) ||
+            !HasActionKind(result, MatchActionKind.FatigueWarning) ||
+            !HasActionKind(result, MatchActionKind.YellowCard) ||
+            !HasActionKind(result, MatchActionKind.InjuryConcern))
+        {
+            return "Richer match event timeline is missing big chance, tactical shift, fatigue, card, or injury-concern events.";
+        }
+
+        if (result.Stats.HomeBigChances + result.Stats.AwayBigChances <= 0 ||
+            result.Stats.HomeYellowCards + result.Stats.AwayYellowCards <= 0 ||
+            result.Stats.HomeFatigueWarnings + result.Stats.AwayFatigueWarnings <= 0 ||
+            result.Stats.HomeInjuryConcerns + result.Stats.AwayInjuryConcerns <= 0)
+        {
+            return "Expanded match stats did not count richer event types.";
+        }
+
+        if (!result.TacticalExplanation.Contains("Tactical causes", StringComparison.Ordinal) ||
+            !result.PlayerRatingsSummary.Contains("Ratings reflect", StringComparison.Ordinal))
+        {
+            return "Match explanation does not describe tactical causes or player rating basis.";
+        }
+
+        ApplyMatchResult(result);
+        if (LastMatchReport == null ||
+            !LastMatchReport.StatsSummary.Contains("Big chances", StringComparison.Ordinal) ||
+            !LastMatchReport.TacticalExplanation.Contains("Tactical cause records", StringComparison.Ordinal))
+        {
+            return "Post-match report did not receive expanded match stats or tactical cause records.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
     public string ValidateStage6ConsequencesPressureContract()
     {
         InitializeStageFoundationsForClub();
@@ -1147,6 +1201,19 @@ public partial class GameState
         }
 
         return MatchPlaybackContractValidator.PassMessage;
+    }
+
+    private static bool HasActionKind(MatchPlaybackResult result, MatchActionKind kind)
+    {
+        foreach (var action in result.Timeline.Actions)
+        {
+            if (action.Kind == kind)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public string ValidateStage7RecruitmentContract()
