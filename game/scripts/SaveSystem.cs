@@ -197,7 +197,7 @@ public partial class SaveSystem : Node
         WriteIndented = true,
         PropertyNameCaseInsensitive = true
     };
-    public const int CurrentSaveVersion = 15;
+    public const int CurrentSaveVersion = 16;
 
     public static SaveSystem? Instance { get; private set; }
     public string LastStatusMessage { get; private set; } = "Save system idle.";
@@ -1067,7 +1067,9 @@ public partial class SaveSystem : Node
             YouthBoardExpectation = source.YouthBoardExpectation,
             YouthFanExpectation = source.YouthFanExpectation,
             YouthProspects = source.YouthProspects == null ? null : Array.ConvertAll(source.YouthProspects, CloneYouthProspectData),
-            YouthHistory = source.YouthHistory == null ? null : (string[])source.YouthHistory.Clone()
+            YouthHistory = source.YouthHistory == null ? null : (string[])source.YouthHistory.Clone(),
+            PlayerDevelopmentSummary = source.PlayerDevelopmentSummary,
+            PlayerDevelopmentHistory = source.PlayerDevelopmentHistory == null ? null : (string[])source.PlayerDevelopmentHistory.Clone()
         };
     }
 

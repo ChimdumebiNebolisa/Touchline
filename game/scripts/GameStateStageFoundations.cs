@@ -74,6 +74,8 @@ public sealed class SaveSlotStageFoundationData
     public string YouthFanExpectation { get; set; } = string.Empty;
     public SaveSlotYouthProspectData[]? YouthProspects { get; set; }
     public string[]? YouthHistory { get; set; }
+    public string PlayerDevelopmentSummary { get; set; } = string.Empty;
+    public string[]? PlayerDevelopmentHistory { get; set; }
 }
 
 public sealed class SaveSlotStaffMarketCandidateData
@@ -243,6 +245,7 @@ public partial class GameState
     private readonly List<string> _staffHistory = new();
     private readonly List<YouthProspect> _youthProspects = new();
     private readonly List<string> _youthHistory = new();
+    private readonly List<string> _playerDevelopmentHistory = new();
 
     private readonly record struct ContractResolution(
         ContractOffer Offer,
@@ -309,6 +312,7 @@ public partial class GameState
     public string YouthIntakeDateSummary { get; private set; } = "Youth intake pending.";
     public string YouthBoardExpectation { get; private set; } = "Youth board expectation pending.";
     public string YouthFanExpectation { get; private set; } = "Youth fan expectation pending.";
+    public string PlayerDevelopmentSummary { get; private set; } = "Player development cadence pending.";
 
     public string TeamStyleName => StageFoundationText.GetDisplayName(TeamStyle);
     public string TacticalFamiliarityName => StageFoundationText.GetDisplayName(TacticsFoundation.FamiliarityFromScore(TacticalFamiliarityScore));
@@ -331,10 +335,11 @@ public partial class GameState
     public string DirectorInfluenceSummary => BuildDirectorInfluenceSummary();
     public string StaffImpactSummary => BuildStaffImpactSummary();
     public string YouthAcademySummary => BuildYouthAcademySummary();
+    public string PlayerDevelopmentHistorySummary => _playerDevelopmentHistory.Count == 0 ? "Player development history starts after weekly training, match minutes, loan review, or season aging." : string.Join("\n", _playerDevelopmentHistory);
     public string RecruitmentFoundationSummary => CurrentRecruitmentTarget == null
         ? "Recruitment foundation pending scouting target."
         : $"{CurrentRecruitmentTarget.PlayerName} ({CurrentRecruitmentTarget.Position}) | {CurrentRecruitmentTarget.InformationSummary} | {CurrentRecruitmentTarget.InterestSummary} | {CurrentRecruitmentTarget.TacticalFitSummary} | Fee {CurrentRecruitmentTarget.EstimatedFeeRange} | Wage {CurrentRecruitmentTarget.EstimatedWageRange} | Status {CurrentRecruitmentTarget.TargetStatus} | Valuation {CurrentRecruitmentTarget.ClubValuation} | Agent {CurrentRecruitmentTarget.AgentMood} | Rival {CurrentRecruitmentTarget.RivalInterest} | Board {CurrentRecruitmentTarget.BoardStance} | Director {CurrentRecruitmentTarget.DirectorStance} | Outcome {CurrentRecruitmentTarget.OutcomeState} | {CurrentRecruitmentTarget.Status}\nDirector of Football\n{DirectorInfluenceSummary}\nShortlist\n{RecruitmentShortlistSummary}\nContracts\n{ContractFoundationSummary}\nTransfer history\n{TransferHistorySummary}";
-    public string TrainingScoutingSummary => $"{TrainingFocusName} ({TrainingIntensityName}): {TrainingStatusSummary}\nScouting depth: {ScoutingReportDepthName}\nScouting: {BuildScoutingSummary()}\nStaff effects\n{StaffImpactSummary}";
+    public string TrainingScoutingSummary => $"{TrainingFocusName} ({TrainingIntensityName}): {TrainingStatusSummary}\nScouting depth: {ScoutingReportDepthName}\nScouting: {BuildScoutingSummary()}\nDevelopment\n{PlayerDevelopmentSummary}\nDevelopment history\n{PlayerDevelopmentHistorySummary}\nStaff effects\n{StaffImpactSummary}";
     public string CareerMarketSummary => $"Job security: {JobSecurityName}\n{TrustSummary}\n{ReputationSummary}\n{PressureCategorySummary}\nLicense: {LicenseOpportunitySummary}\nJob market: {BuildJobOfferSummary()}";
     public string TacticsFoundationSummary => $"{TeamStyleName} | {TeamInstructionsSummary}\n{SetPieceSummary}\n{OpponentPreparationSummary}\n{PlayerRolesSummary}\n{PlayerInstructionsSummary}\n{TacticalRoleFitSummary}\n{PlayerFamiliaritySummary}\n{TacticalFitNotes}\n{TacticalRiskNotes}";
 
@@ -448,6 +453,7 @@ public partial class GameState
     {
         TickDecisionEventCooldowns(7);
         ApplyTrainingEffects();
+        ApplyPlayerDevelopmentProgress();
         ApplyScoutingProgress(7);
         ReviewPromiseLifecycle("Weekly review", 7);
         EvaluateCareerFoundationState();
@@ -908,7 +914,9 @@ public partial class GameState
             YouthBoardExpectation = YouthBoardExpectation,
             YouthFanExpectation = YouthFanExpectation,
             YouthProspects = Array.ConvertAll(_youthProspects.ToArray(), BuildYouthProspectSaveData),
-            YouthHistory = _youthHistory.ToArray()
+            YouthHistory = _youthHistory.ToArray(),
+            PlayerDevelopmentSummary = PlayerDevelopmentSummary,
+            PlayerDevelopmentHistory = _playerDevelopmentHistory.ToArray()
         };
     }
 
@@ -1125,6 +1133,13 @@ public partial class GameState
             _youthHistory.AddRange(data.YouthHistory);
         }
 
+        PlayerDevelopmentSummary = string.IsNullOrWhiteSpace(data.PlayerDevelopmentSummary) ? "Player development cadence restored; weekly history pending." : data.PlayerDevelopmentSummary;
+        _playerDevelopmentHistory.Clear();
+        if (data.PlayerDevelopmentHistory != null)
+        {
+            _playerDevelopmentHistory.AddRange(data.PlayerDevelopmentHistory);
+        }
+
         EnsureRecruitmentTarget();
         EnsureJobMarketFoundation();
         RefreshPressureCategories();
@@ -1190,6 +1205,7 @@ public partial class GameState
         YouthIntakeDateSummary = "Youth intake pending.";
         YouthBoardExpectation = "Youth board expectation pending.";
         YouthFanExpectation = "Youth fan expectation pending.";
+        PlayerDevelopmentSummary = "Player development cadence pending.";
         _foundationNewsEvents.Clear();
         _activeDecisionEvents.Clear();
         _resolvedDecisionEvents.Clear();
@@ -1203,6 +1219,7 @@ public partial class GameState
         _staffHistory.Clear();
         _youthProspects.Clear();
         _youthHistory.Clear();
+        _playerDevelopmentHistory.Clear();
     }
 
     public void InitializeStageFoundationsForClub()
@@ -1221,6 +1238,7 @@ public partial class GameState
         EnsureDirectorConflictState();
         EnsureStaffImpactState();
         EnsureYouthAcademyState();
+        EnsurePlayerDevelopmentState();
         if (CurrentScoutingAssignment == null)
         {
             StartBasicScoutingAssignment("Position need: versatile midfielder");
@@ -2674,6 +2692,101 @@ public partial class GameState
         if (YouthAcademyQuality <= 0 || YouthRecruitmentReach <= 0 || YouthCoachingQuality <= 0)
         {
             return "Saved youth academy quality, reach, or coaching state is invalid.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
+    public string ValidatePhase14PlayerDevelopmentContract()
+    {
+        InitializeStageFoundationsForClub();
+        EnsurePlayerDevelopmentState();
+        if (SquadPlayers.Length == 0)
+        {
+            return "No squad players available for player development validation.";
+        }
+
+        var before = SquadPlayers;
+        var beforeFirstAge = before[0].Age;
+        SetTrainingPlanByName("Youth integration", "Demanding");
+        ApplyWeeklyFoundationProgress();
+        if (!PlayerDevelopmentSummary.Contains("Development cadence", StringComparison.Ordinal) ||
+            !PlayerDevelopmentSummary.Contains("staff score", StringComparison.OrdinalIgnoreCase) ||
+            !PlayerDevelopmentSummary.Contains("Ability changes", StringComparison.Ordinal))
+        {
+            return "Weekly development summary does not explain focus, staff, and ability/condition changes.";
+        }
+
+        var changed = false;
+        for (var index = 0; index < before.Length; index++)
+        {
+            var previous = before[index];
+            var current = SquadPlayers[index];
+            if (current.TrueAbility != previous.TrueAbility ||
+                current.Form != previous.Form ||
+                current.Morale != previous.Morale ||
+                current.Fitness != previous.Fitness ||
+                current.Fatigue != previous.Fatigue ||
+                current.InjuryRisk != previous.InjuryRisk ||
+                current.DevelopmentCurve != previous.DevelopmentCurve)
+            {
+                changed = true;
+                break;
+            }
+        }
+
+        if (!changed)
+        {
+            return "Weekly development did not change any player state or development notes.";
+        }
+
+        if (_playerDevelopmentHistory.Count == 0 ||
+            !PlayerDevelopmentHistorySummary.Contains("Weekly development", StringComparison.Ordinal) ||
+            !TrainingScoutingSummary.Contains("Development history", StringComparison.Ordinal))
+        {
+            return "Player development history was not recorded or surfaced.";
+        }
+
+        var rolloverMessage = CompleteCurrentSeason();
+        if (rolloverMessage != MatchPlaybackContractValidator.PassMessage)
+        {
+            return rolloverMessage;
+        }
+
+        if (SquadPlayers.Length == 0 || SquadPlayers[0].Age <= beforeFirstAge)
+        {
+            return "Season development did not age the squad.";
+        }
+
+        if (!PlayerDevelopmentSummary.Contains("Season development review", StringComparison.Ordinal) ||
+            !_playerDevelopmentHistory.Exists(entry => entry.Contains("Season development review", StringComparison.Ordinal)))
+        {
+            return "Season development review was not recorded.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
+    public string ValidatePhase14StoredPlayerDevelopmentContract()
+    {
+        EnsurePlayerDevelopmentState();
+        if (string.IsNullOrWhiteSpace(PlayerDevelopmentSummary) ||
+            _playerDevelopmentHistory.Count == 0 ||
+            !TrainingScoutingSummary.Contains("Development", StringComparison.Ordinal))
+        {
+            return "Saved player development summary/history did not restore.";
+        }
+
+        var hasDevelopmentCurve = false;
+        foreach (var player in SquadPlayers)
+        {
+            hasDevelopmentCurve = hasDevelopmentCurve ||
+                player.DevelopmentCurve.Contains("development", StringComparison.OrdinalIgnoreCase);
+        }
+
+        if (!hasDevelopmentCurve)
+        {
+            return "Saved squad did not retain development curve notes.";
         }
 
         return MatchPlaybackContractValidator.PassMessage;
@@ -4793,6 +4906,132 @@ public partial class GameState
         if (_youthHistory.Count > 12)
         {
             _youthHistory.RemoveAt(_youthHistory.Count - 1);
+        }
+    }
+
+    private void EnsurePlayerDevelopmentState()
+    {
+        if (string.IsNullOrWhiteSpace(PlayerDevelopmentSummary) || PlayerDevelopmentSummary.Contains("pending", StringComparison.OrdinalIgnoreCase))
+        {
+            PlayerDevelopmentSummary = BuildInitialPlayerDevelopmentSummary();
+        }
+    }
+
+    private void ApplyPlayerDevelopmentProgress()
+    {
+        EnsurePlayerDevelopmentState();
+        if (SquadPlayers.Length == 0)
+        {
+            PlayerDevelopmentSummary = "Development cadence unavailable: no squad players.";
+            return;
+        }
+
+        var staffScore = BuildDevelopmentStaffScore();
+        var update = DevelopmentSystem.ApplyWeeklyDevelopment(
+            SquadPlayers,
+            SelectedClubName ?? string.Empty,
+            WorldSeed,
+            CurrentDate,
+            TrainingFocusName,
+            TrainingIntensityName,
+            staffScore,
+            YouthAcademyQuality,
+            YouthCoachingQuality);
+        SquadPlayers = update.SquadPlayers;
+        PlayerDevelopmentSummary = update.Summary;
+        SquadStatusSummary = BuildSquadStatusSummary();
+        foreach (var entry in update.HistoryEntries)
+        {
+            RecordPlayerDevelopmentHistory($"Weekly development: {entry}");
+        }
+
+        AddNews(
+            "Player development update",
+            NewsCategory.Training,
+            "Staff report",
+            update.Summary,
+            3,
+            sourceType: "Coaching staff",
+            relatedEntity: SelectedClubName ?? "squad",
+            effectSummary: "Training, minutes, age, staff quality, morale, fatigue, injury risk, and loan pathway cues applied.",
+            cooldownKey: "player-development-weekly");
+    }
+
+    private void RecordSeasonDevelopmentSnapshot()
+    {
+        EnsurePlayerDevelopmentState();
+        var youngCount = 0;
+        var seniorCount = 0;
+        var riskCount = 0;
+        foreach (var player in SquadPlayers)
+        {
+            if (player.Age <= 22)
+            {
+                youngCount++;
+            }
+
+            if (player.Age >= 30)
+            {
+                seniorCount++;
+            }
+
+            if (player.InjuryRisk >= 30 || player.Fatigue >= 35)
+            {
+                riskCount++;
+            }
+        }
+
+        PlayerDevelopmentSummary = $"Season development review | young players {youngCount}, senior decline watch {seniorCount}, condition risks {riskCount}. Ages, ability movement, condition, and development notes updated during rollover.";
+        RecordPlayerDevelopmentHistory(PlayerDevelopmentSummary);
+        AddNews(
+            "Season development review",
+            NewsCategory.Training,
+            "Staff report",
+            PlayerDevelopmentSummary,
+            4,
+            sourceType: "Coaching staff",
+            relatedEntity: SelectedClubName ?? "squad",
+            effectSummary: "Age, development curve, condition, and senior decline watch updated.",
+            cooldownKey: "player-development-season");
+    }
+
+    private string BuildInitialPlayerDevelopmentSummary()
+    {
+        var youngCount = 0;
+        var seniorCount = 0;
+        foreach (var player in SquadPlayers)
+        {
+            if (player.Age <= 21)
+            {
+                youngCount++;
+            }
+
+            if (player.Age >= 30)
+            {
+                seniorCount++;
+            }
+        }
+
+        return $"Development cadence | squad {SquadPlayers.Length}, young pathway players {youngCount}, senior decline watch {seniorCount}, staff score {BuildDevelopmentStaffScore()}. Weekly updates use training focus, minutes, morale, fatigue, injury risk, loan cues, and staff quality.";
+    }
+
+    private int BuildDevelopmentStaffScore()
+    {
+        return Math.Clamp(
+            (GetStaffQuality(StaffRole.FirstTeamCoach) +
+            GetStaffQuality(StaffRole.YouthCoach) +
+            GetStaffQuality(StaffRole.FitnessCoach) +
+            GetStaffQuality(StaffRole.Physio)) / 4,
+            0,
+            100);
+    }
+
+    private void RecordPlayerDevelopmentHistory(string detail)
+    {
+        _playerDevelopmentHistory.Insert(0, $"{CurrentDateLabel}: {detail}");
+        if (_playerDevelopmentHistory.Count > 16)
+        {
+            _playerDevelopmentHistory.RemoveAt(_playerDevelopmentHistory.Count - 1);
         }
     }
 

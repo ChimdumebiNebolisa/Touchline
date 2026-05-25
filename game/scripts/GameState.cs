@@ -47,6 +47,11 @@ public partial class GameState : Node
         public required bool IsStarting { get; init; }
 
         public SquadPlayer With(
+            int? trueAbility = null,
+            int? technicalAttribute = null,
+            int? tacticalAttribute = null,
+            int? physicalAttribute = null,
+            int? mentalAttribute = null,
             int? age = null,
             int? form = null,
             int? morale = null,
@@ -55,6 +60,7 @@ public partial class GameState : Node
             int? injuryRisk = null,
             int? tacticalFitScore = null,
             bool? isStarting = null,
+            string? developmentCurve = null,
             string? relationship = null,
             string? promiseSummary = null,
             string? transferInterest = null,
@@ -68,11 +74,11 @@ public partial class GameState : Node
                 Position = Position,
                 Age = age ?? Age,
                 Nationality = Nationality,
-                TrueAbility = TrueAbility,
-                TechnicalAttribute = TechnicalAttribute,
-                TacticalAttribute = TacticalAttribute,
-                PhysicalAttribute = PhysicalAttribute,
-                MentalAttribute = MentalAttribute,
+                TrueAbility = trueAbility ?? TrueAbility,
+                TechnicalAttribute = technicalAttribute ?? TechnicalAttribute,
+                TacticalAttribute = tacticalAttribute ?? TacticalAttribute,
+                PhysicalAttribute = physicalAttribute ?? PhysicalAttribute,
+                MentalAttribute = mentalAttribute ?? MentalAttribute,
                 KnownAttributesSummary = KnownAttributesSummary,
                 EstimatedAttributesSummary = EstimatedAttributesSummary,
                 UnknownAttributesSummary = UnknownAttributesSummary,
@@ -81,7 +87,7 @@ public partial class GameState : Node
                 Traits = Traits,
                 Personality = Personality,
                 TacticalFit = TacticalFit,
-                DevelopmentCurve = DevelopmentCurve,
+                DevelopmentCurve = developmentCurve ?? DevelopmentCurve,
                 Form = form ?? Form,
                 Morale = morale ?? Morale,
                 Fitness = fitness ?? Fitness,
@@ -363,6 +369,10 @@ public partial class GameState : Node
         LastMatchReport = null;
         CurrentMatchResult = null;
         ApplyWeeklyFoundationProgress();
+        if (advance.ResetRecentResults)
+        {
+            RecordSeasonDevelopmentSnapshot();
+        }
     }
 
     public MatchPlaybackResult PrepareCurrentMatchResult(bool forceNew = false)

@@ -191,15 +191,15 @@ public partial class PlayerProfile : Control
 
         if (player.Age <= 21)
         {
-            return $"Trajectory | Early-career player. Minutes and morale will shape the next development step. {latestMatchLine}";
+            return $"Trajectory | Early-career player. Minutes and morale will shape the next development step. {latestMatchLine}\n{state.PlayerDevelopmentSummary}";
         }
 
         if (player.Age >= 29)
         {
-            return $"Trajectory | Senior squad piece. Short-term reliability matters as much as long-term planning. {latestMatchLine}";
+            return $"Trajectory | Senior squad piece. Short-term reliability matters as much as long-term planning. {latestMatchLine}\n{state.PlayerDevelopmentSummary}";
         }
 
-        return $"Trajectory | Prime-cycle squad player. Current-season usage should drive immediate output. {latestMatchLine}";
+        return $"Trajectory | Prime-cycle squad player. Current-season usage should drive immediate output. {latestMatchLine}\n{state.PlayerDevelopmentSummary}";
     }
 
     private static string BuildReadinessSummary(GameState.SquadPlayer player)
