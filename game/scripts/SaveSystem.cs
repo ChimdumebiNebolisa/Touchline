@@ -181,7 +181,7 @@ public partial class SaveSystem : Node
         WriteIndented = true,
         PropertyNameCaseInsensitive = true
     };
-    public const int CurrentSaveVersion = 5;
+    public const int CurrentSaveVersion = 6;
 
     public static SaveSystem? Instance { get; private set; }
     public string LastStatusMessage { get; private set; } = "Save system idle.";
@@ -898,9 +898,14 @@ public partial class SaveSystem : Node
                     {
                         PromiseType = promise.PromiseType,
                         Recipient = promise.Recipient,
+                        Source = promise.Source,
+                        IsPublic = promise.IsPublic,
                         ExpectedAction = promise.ExpectedAction,
                         DeadlineSummary = promise.DeadlineSummary,
+                        DaysRemaining = promise.DaysRemaining,
                         StatusName = promise.StatusName,
+                        CurrentEvidence = promise.CurrentEvidence,
+                        AgentMood = promise.AgentMood,
                         ConsequenceRisk = promise.ConsequenceRisk
                     }),
             JobSecurityName = source.JobSecurityName,

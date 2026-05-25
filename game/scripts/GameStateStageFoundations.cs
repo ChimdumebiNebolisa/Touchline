@@ -67,9 +67,14 @@ public sealed class SaveSlotPromiseRecordData
 {
     public string PromiseType { get; set; } = string.Empty;
     public string Recipient { get; set; } = string.Empty;
+    public string Source { get; set; } = string.Empty;
+    public bool IsPublic { get; set; }
     public string ExpectedAction { get; set; } = string.Empty;
     public string DeadlineSummary { get; set; } = string.Empty;
+    public int DaysRemaining { get; set; }
     public string StatusName { get; set; } = "Active";
+    public string CurrentEvidence { get; set; } = string.Empty;
+    public string AgentMood { get; set; } = string.Empty;
     public string ConsequenceRisk { get; set; } = string.Empty;
 }
 
@@ -236,6 +241,7 @@ public partial class GameState
     {
         ApplyTrainingEffects();
         ApplyScoutingProgress(7);
+        ReviewPromiseLifecycle("Weekly review", 7);
         EvaluateCareerFoundationState();
         AddNews(
             "Weekly football report",
@@ -309,9 +315,14 @@ public partial class GameState
             {
                 PromiseType = "Squad role",
                 Recipient = target.PlayerName,
+                Source = "Recruitment approach",
+                IsPublic = false,
                 ExpectedAction = "Offer a clear rotation pathway before any agreement.",
                 DeadlineSummary = "Before contract completion",
+                DaysRemaining = 21,
                 Status = PromiseStatus.Active,
+                CurrentEvidence = "Promise created from recruitment action; no review yet.",
+                AgentMood = "Watching role pathway",
                 ConsequenceRisk = "Agent concern if the promised role is ignored."
             });
         }
@@ -424,9 +435,14 @@ public partial class GameState
                 {
                     PromiseType = promise.PromiseType,
                     Recipient = promise.Recipient,
+                    Source = promise.Source,
+                    IsPublic = promise.IsPublic,
                     ExpectedAction = promise.ExpectedAction,
                     DeadlineSummary = promise.DeadlineSummary,
+                    DaysRemaining = promise.DaysRemaining,
                     StatusName = StageFoundationText.GetDisplayName(promise.Status),
+                    CurrentEvidence = promise.CurrentEvidence,
+                    AgentMood = promise.AgentMood,
                     ConsequenceRisk = promise.ConsequenceRisk
                 }),
             JobSecurityName = JobSecurityName,
@@ -524,12 +540,17 @@ public partial class GameState
             {
                 _promiseRecords.Add(new PromiseRecord
                 {
-                    PromiseType = promise.PromiseType,
-                    Recipient = promise.Recipient,
-                    ExpectedAction = promise.ExpectedAction,
-                    DeadlineSummary = promise.DeadlineSummary,
+                    PromiseType = string.IsNullOrWhiteSpace(promise.PromiseType) ? "Squad role" : promise.PromiseType,
+                    Recipient = string.IsNullOrWhiteSpace(promise.Recipient) ? "Unknown player" : promise.Recipient,
+                    Source = string.IsNullOrWhiteSpace(promise.Source) ? "Saved career" : promise.Source,
+                    IsPublic = promise.IsPublic,
+                    ExpectedAction = string.IsNullOrWhiteSpace(promise.ExpectedAction) ? "Keep the promised pathway credible." : promise.ExpectedAction,
+                    DeadlineSummary = string.IsNullOrWhiteSpace(promise.DeadlineSummary) ? "Next promise review" : promise.DeadlineSummary,
+                    DaysRemaining = promise.DaysRemaining <= 0 ? 14 : promise.DaysRemaining,
                     Status = StageFoundationText.ParsePromiseStatus(promise.StatusName),
-                    ConsequenceRisk = promise.ConsequenceRisk
+                    CurrentEvidence = string.IsNullOrWhiteSpace(promise.CurrentEvidence) ? "Saved promise awaits next review." : promise.CurrentEvidence,
+                    AgentMood = string.IsNullOrWhiteSpace(promise.AgentMood) ? "Neutral" : promise.AgentMood,
+                    ConsequenceRisk = string.IsNullOrWhiteSpace(promise.ConsequenceRisk) ? "Trust and morale may move at review." : promise.ConsequenceRisk
                 });
             }
         }
@@ -644,6 +665,7 @@ public partial class GameState
             "Confirmed",
             $"{result.FinalResultSummary}: board, fan, squad, trust, reputation, and job security states were updated.",
             5);
+        ReviewPromiseLifecycle("Post-match review", 0);
     }
 
     public string BuildPlayerDossier(GameState.SquadPlayer player)
@@ -1075,6 +1097,99 @@ public partial class GameState
         return MatchPlaybackContractValidator.PassMessage;
     }
 
+    public string ValidatePhase3PromiseLifecycleContract()
+    {
+        InitializeStageFoundationsForClub();
+        if (SquadPlayers.Length == 0)
+        {
+            return "No squad player available for promise lifecycle validation.";
+        }
+
+        _promiseRecords.Clear();
+        var startingTrust = CareerProfile.PlayerTrust;
+        var startingNewsCount = CurrentClub?.NewsFeed.Length ?? 0;
+        _promiseRecords.Add(new PromiseRecord
+        {
+            PromiseType = "Playing time",
+            Recipient = SquadPlayers[0].Name,
+            Source = "Player meeting",
+            IsPublic = false,
+            ExpectedAction = "Keep the player involved this week.",
+            DeadlineSummary = "Next weekly review",
+            DaysRemaining = 7,
+            Status = PromiseStatus.Active,
+            CurrentEvidence = "Promise created for validation.",
+            AgentMood = "Neutral",
+            ConsequenceRisk = "Player trust moves if this is ignored."
+        });
+        ApplyWeeklyFoundationProgress();
+        if (_promiseRecords.Count == 0 ||
+            _promiseRecords[0].Status != PromiseStatus.Fulfilled ||
+            CareerProfile.PlayerTrust <= startingTrust)
+        {
+            return "Promise lifecycle did not fulfill a credible short promise or improve player trust.";
+        }
+
+        _promiseRecords.Add(new PromiseRecord
+        {
+            PromiseType = "Contract renewal",
+            Recipient = SquadPlayers[0].Name,
+            Source = "Agent call",
+            IsPublic = true,
+            ExpectedAction = "Open renewal talks before pressure spills into the dressing room.",
+            DeadlineSummary = "Next weekly review",
+            DaysRemaining = 7,
+            Status = PromiseStatus.Active,
+            CurrentEvidence = "Agent has gone public with the expectation.",
+            AgentMood = "Concerned",
+            ConsequenceRisk = "Public failure affects player trust, squad trust, media pressure, and job pressure."
+        });
+        TransferPressure = 92;
+        DressingRoomPressure = 80;
+        var trustBeforeBrokenPromise = CareerProfile.PlayerTrust;
+        ApplyWeeklyFoundationProgress();
+        if (_promiseRecords.Count < 2 ||
+            _promiseRecords[1].Status != PromiseStatus.Broken ||
+            CareerProfile.PlayerTrust >= trustBeforeBrokenPromise ||
+            TransferPressure <= 92)
+        {
+            return "Promise lifecycle did not break a public high-pressure promise with trust and pressure consequences.";
+        }
+
+        if ((CurrentClub?.NewsFeed.Length ?? 0) <= startingNewsCount ||
+            !PromiseSummary.Contains("agent", StringComparison.OrdinalIgnoreCase) ||
+            !PromiseSummary.Contains("Broken", StringComparison.Ordinal))
+        {
+            return "Promise lifecycle did not update news or expose status, evidence, and agent mood.";
+        }
+
+        if (SaveSystem.Instance == null)
+        {
+            return "Save system unavailable for promise lifecycle validation.";
+        }
+
+        var expectedSummary = PromiseSummary;
+        if (!SaveSystem.Instance.SaveGame(out var saveStatus))
+        {
+            return saveStatus;
+        }
+
+        if (!SaveSystem.Instance.LoadGame(out var loadStatus))
+        {
+            return loadStatus;
+        }
+
+        if (!PromiseSummary.Contains("Broken", StringComparison.Ordinal) ||
+            !PromiseSummary.Contains("Fulfilled", StringComparison.Ordinal) ||
+            PromiseSummary == "No active promises." ||
+            PromiseSummary.Length < Math.Min(40, expectedSummary.Length))
+        {
+            return "Save/load did not preserve promise lifecycle state.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
     public string ValidateStage8CareerJobMarketContract()
     {
         InitializeStageFoundationsForClub();
@@ -1412,6 +1527,144 @@ public partial class GameState
         CurrentClub.NewsFeed = feed.ToArray();
     }
 
+    private void ReviewPromiseLifecycle(string trigger, int elapsedDays)
+    {
+        if (_promiseRecords.Count == 0)
+        {
+            return;
+        }
+
+        for (var index = 0; index < _promiseRecords.Count; index++)
+        {
+            var promise = _promiseRecords[index];
+            if (promise.Status is PromiseStatus.Broken or PromiseStatus.Fulfilled)
+            {
+                continue;
+            }
+
+            var reviewed = BuildReviewedPromise(promise, trigger, elapsedDays);
+            _promiseRecords[index] = reviewed;
+            if (reviewed.Status != promise.Status)
+            {
+                ApplyPromiseStatusConsequences(reviewed, promise.Status);
+            }
+        }
+    }
+
+    private PromiseRecord BuildReviewedPromise(PromiseRecord promise, string trigger, int elapsedDays)
+    {
+        var daysRemaining = Math.Max(0, promise.DaysRemaining - elapsedDays);
+        var pressureLoad = TransferPressure + DressingRoomPressure / 2 + (promise.IsPublic ? CareerProfile.MediaPressure / 2 : 0);
+        var newStatus = promise.Status;
+        if (promise.Status == PromiseStatus.Active)
+        {
+            newStatus = pressureLoad >= 65 ? PromiseStatus.AtRisk : PromiseStatus.OnTrack;
+        }
+        else if (promise.Status == PromiseStatus.OnTrack && pressureLoad >= 78)
+        {
+            newStatus = PromiseStatus.AtRisk;
+        }
+        else if (promise.Status == PromiseStatus.AtRisk && pressureLoad >= 88)
+        {
+            newStatus = PromiseStatus.Broken;
+        }
+        else if (promise.Status == PromiseStatus.AtRisk && pressureLoad < 55)
+        {
+            newStatus = PromiseStatus.Renegotiated;
+        }
+
+        if (daysRemaining == 0)
+        {
+            newStatus = newStatus == PromiseStatus.AtRisk ? PromiseStatus.Broken : PromiseStatus.Fulfilled;
+        }
+
+        var evidence = newStatus switch
+        {
+            PromiseStatus.OnTrack => $"{trigger}: evidence is credible; pressure load {pressureLoad}.",
+            PromiseStatus.AtRisk => $"{trigger}: promise is drifting; pressure load {pressureLoad} needs action.",
+            PromiseStatus.Broken => $"{trigger}: deadline or pressure broke the promise.",
+            PromiseStatus.Fulfilled => $"{trigger}: promise requirements satisfied before the deadline.",
+            PromiseStatus.Renegotiated => $"{trigger}: staff/player side accepted a narrower path.",
+            _ => $"{trigger}: promise active and awaiting clearer evidence."
+        };
+        var agentMood = newStatus switch
+        {
+            PromiseStatus.OnTrack => "Satisfied",
+            PromiseStatus.AtRisk => "Concerned",
+            PromiseStatus.Broken => "Angry",
+            PromiseStatus.Fulfilled => "Pleased",
+            PromiseStatus.Renegotiated => "Cautiously settled",
+            _ => promise.AgentMood
+        };
+        var risk = newStatus switch
+        {
+            PromiseStatus.AtRisk => "Player trust and agent mood may drop if no corrective action follows.",
+            PromiseStatus.Broken => "Player trust, squad trust, media pressure, and job pressure can all worsen.",
+            PromiseStatus.Fulfilled => "Trust improves because the promise had a visible outcome.",
+            PromiseStatus.Renegotiated => "Trust hit is contained, but repeated renegotiation will still create pressure.",
+            _ => promise.ConsequenceRisk
+        };
+
+        return new PromiseRecord
+        {
+            PromiseType = promise.PromiseType,
+            Recipient = promise.Recipient,
+            Source = promise.Source,
+            IsPublic = promise.IsPublic,
+            ExpectedAction = promise.ExpectedAction,
+            DeadlineSummary = promise.DeadlineSummary,
+            DaysRemaining = daysRemaining,
+            Status = newStatus,
+            CurrentEvidence = evidence,
+            AgentMood = agentMood,
+            ConsequenceRisk = risk
+        };
+    }
+
+    private void ApplyPromiseStatusConsequences(PromiseRecord promise, PromiseStatus previousStatus)
+    {
+        var playerTrustDelta = promise.Status switch
+        {
+            PromiseStatus.OnTrack => 1,
+            PromiseStatus.AtRisk => -1,
+            PromiseStatus.Broken => -5,
+            PromiseStatus.Fulfilled => 3,
+            PromiseStatus.Renegotiated => -1,
+            _ => 0
+        };
+        var squadDelta = promise.Status switch
+        {
+            PromiseStatus.Broken when promise.IsPublic => -3,
+            PromiseStatus.Broken => -1,
+            PromiseStatus.Fulfilled => 1,
+            _ => 0
+        };
+        var pressureDelta = promise.Status switch
+        {
+            PromiseStatus.AtRisk => 2,
+            PromiseStatus.Broken => promise.IsPublic ? 8 : 5,
+            PromiseStatus.Fulfilled => -3,
+            PromiseStatus.Renegotiated => 1,
+            _ => 0
+        };
+
+        CareerProfile.PlayerTrust = Math.Clamp(CareerProfile.PlayerTrust + playerTrustDelta, 0, 100);
+        TeamMorale = Math.Clamp(TeamMorale + squadDelta, 0, 100);
+        TransferPressure = Math.Clamp(TransferPressure + pressureDelta, 0, 100);
+        if (promise.IsPublic)
+        {
+            CareerProfile.MediaPressure = Math.Clamp(CareerProfile.MediaPressure + Math.Max(0, pressureDelta / 2), 0, 100);
+        }
+
+        SyncCurrentClubMoraleFromRuntime();
+        AddNews(
+            "Promise review",
+            promise.IsPublic ? NewsCategory.Pressure : NewsCategory.Contract,
+            promise.IsPublic ? "Club sources" : "Internal",
+            $"{promise.PromiseType} promise to {promise.Recipient} moved from {StageFoundationText.GetDisplayName(previousStatus)} to {StageFoundationText.GetDisplayName(promise.Status)}. {promise.CurrentEvidence}",
+            promise.Status is PromiseStatus.Broken or PromiseStatus.AtRisk ? 5 : 3);
+    }
+
     private string BuildScoutingSummary()
     {
         if (CurrentScoutingAssignment == null)
@@ -1437,7 +1690,8 @@ public partial class GameState
         var lines = new List<string>();
         foreach (var promise in _promiseRecords)
         {
-            lines.Add($"{promise.PromiseType} to {promise.Recipient}: {StageFoundationText.GetDisplayName(promise.Status)} | {promise.ExpectedAction}");
+            var visibility = promise.IsPublic ? "public" : "private";
+            lines.Add($"{promise.PromiseType} to {promise.Recipient}: {StageFoundationText.GetDisplayName(promise.Status)} | {visibility} | {promise.DaysRemaining} days | agent {promise.AgentMood} | {promise.CurrentEvidence} | {promise.ExpectedAction}");
         }
 
         return string.Join("\n", lines);

@@ -133,9 +133,14 @@ public sealed class PromiseRecord
 {
     public required string PromiseType { get; init; }
     public required string Recipient { get; init; }
+    public required string Source { get; init; }
+    public required bool IsPublic { get; init; }
     public required string ExpectedAction { get; init; }
     public required string DeadlineSummary { get; init; }
+    public required int DaysRemaining { get; init; }
     public required PromiseStatus Status { get; init; }
+    public required string CurrentEvidence { get; init; }
+    public required string AgentMood { get; init; }
     public required string ConsequenceRisk { get; init; }
 }
 
