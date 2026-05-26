@@ -2,9 +2,9 @@
 
 ## 1. Current Foundation Summary
 
-Touchline has a playable Stage 1-8 foundation. It can start or load a career, choose a role/background/license/club, show club identity, inspect a squad, adjust tactics within role authority, advance basic time, run a shared instant/live match timeline, apply post-match consequences, perform a basic recruitment/contract interaction, generate a job-market event, and persist that state.
+Touchline has completed the 28-phase master-design implementation pass. It can start or load a career, choose role/background/license/difficulty/club, show club identity, inspect squad and player information, adjust tactics within role authority, advance the calendar, run training/scouting, process transfers/contracts/loans/promises, generate youth prospects, track finance, play shared instant/live match timelines, apply post-match consequences, run job-market movement, persist career memory, and verify an end-to-end season loop.
 
-This roadmap covers the remaining work needed to move from that foundation to the full design in `docs/touchline_master_design_decisions.md`. It is not a request to implement all features at once. Future runs should execute one phase at a time.
+This roadmap now records what was implemented in the pass and the remaining depth gaps. It is not a request to add new major systems during stabilization; future work should be audit-driven fixes, balance tuning, content expansion, or a new approved roadmap.
 
 ### Real gameplay systems
 
@@ -13,37 +13,36 @@ This roadmap covers the remaining work needed to move from that foundation to th
 - Instant Result and Live Match consume one simulated match object and timeline.
 - Training and scouting progress over time and affect state.
 - Post-match consequences update morale, trust, reputation, pressure, tactical familiarity, player condition, and news.
-- Save/load persists the Stage 1-8 foundation, including player identity, tactics, training/scouting, recruitment, promises, job security, job offers, and career history seed.
+- Save/load persists save version 26, including player identity, tactics, training/scouting, recruitment, promises, staff, youth, finance, competitions, media/events, job security, job offers, generated content, difficulty settings, and career memory.
 
 ### UI-visible foundations
 
 - Career setup, club selection, dashboard, squad/profile, tactics, fixtures, standings, matchday, live match, post-match, and save/load screens exist.
-- Recruitment/contracts, promises, job market, staff, board/fan/Director context, news, and license progression are visible but shallow.
+- Recruitment/contracts, promises, job market, staff, board/fan/Director context, news, youth, finance, generated content, difficulty settings, and license progression are visible and state-backed, with foundation-level depth.
 - Calendar, training, scouting, career market, and recruitment actions are currently surfaced through compact dashboard/context flows rather than full dedicated screens.
 
 ### Data-model-only foundations
 
-- Career history exists as a lightweight text timeline, not a full historical model.
-- Promises exist as records, but lifecycle resolution is minimal.
+- Career history exists as structured career memory plus readable summaries, but it is not yet a deep encyclopedia.
+- Promises exist as records with lifecycle resolution and consequences, but not a dialogue-heavy negotiation system.
 - License progression exists as opportunity text, not course scheduling or eligibility gates.
 - Recruitment/contract state stores interest, fit, fee/wage ranges, board response, Director response, and promise status, but not full negotiation history.
 - Reputation, pressure, and trust are separate values, but not yet deeply segmented across the full design.
 
 ### Simplified placeholders
 
-- Finance is mostly budget/wage summary, not a financial simulator.
-- Youth academy is represented by academy quality/context only.
-- League structure is a small seeded competition, not the full multi-division pyramid.
-- Promotion/relegation, cup competitions, squad registration, staff market, full media, job applications/interviews, and deep decision events are not implemented.
-- Match simulation is a compact stat-and-event engine, not the full tactical depth described in the master design.
+- Finance is readable and gameplay-affecting, but not a deep accounting simulator.
+- Youth academy has intake, prospects, promotion, and loan suitability, but not playable youth leagues.
+- League structure includes compact tiers, cups, promotion/relegation summaries, and shadow simulation context, not a fully deep multi-country pyramid.
+- Staff market, job applications/interviews, media/events, and decision events exist as playable foundations, not deep standalone simulations.
+- Match simulation is a shared stat-and-event tactical engine, not a physics or broadcast-depth match engine.
 
 ### Known risks
 
-- Information visibility is not yet deeply driven by license, staff, scouting confidence, or hidden-info difficulty.
-- Transfers/contracts can look more complete than they are because UI shows ranges and approval text before a full market exists.
-- Long-term save history is shallow; future phases must migrate carefully.
-- Match explanations are readable but not yet rich enough to fully justify all tactical, staff, player-fit, fatigue, and morale causes.
-- Role authority must remain protected as new screens and actions are added.
+- Transfers/contracts/loans remain foundation-depth and should not be described as complete negotiation systems.
+- Youth, finance, media/events, job market, generated content, and career memory are coherent foundations with room for content and depth expansion.
+- Save version 26 is the current supported shape; future persistent changes must migrate carefully.
+- Role authority, shared match timeline, partial information, and separated morale/trust/reputation/pressure remain the highest-risk invariants.
 
 ## 2. Full Remaining Work Map
 
@@ -2079,31 +2078,31 @@ Release or new roadmap planning beyond the current master design.
 
 | Phase | Status | Last commit | Verification | Notes |
 |---|---|---|---|---|
-| Phase 1: Information visibility deepening | Not Started | N/A | Not run | Starts from Stage 1-8 foundation |
-| Phase 2: Training and scouting controls | Not Started | N/A | Not run | Depends on Phase 1 |
-| Phase 3: Promise lifecycle | Not Started | N/A | Not run | Depends on Phase 2 and current promises |
-| Phase 4: Tactical depth and role fit | Not Started | N/A | Not run | Depends on Phase 1 and Phase 2 |
-| Phase 5: Match engine depth | Not Started | N/A | Not run | Depends on Phase 4 |
-| Phase 6: Post-match report depth | Not Started | N/A | Not run | Depends on Phase 5 |
-| Phase 7: Morale, trust, reputation, pressure depth | Not Started | N/A | Not run | Depends on Phase 6 |
-| Phase 8: News/media/world events | Not Started | N/A | Not run | Depends on Phase 7 |
-| Phase 9: Transfer market expansion | Not Started | N/A | Not run | Depends on Phases 2 and 8 |
-| Phase 10: Contract negotiation depth | Not Started | N/A | Not run | Depends on Phases 3 and 9 |
-| Phase 11: Director of Football conflict depth | Not Started | N/A | Not run | Depends on Phase 10 |
-| Phase 12: Staff impact and staff market | Not Started | N/A | Not run | Depends on training/scouting/finance hooks |
-| Phase 13: Youth academy | Not Started | N/A | Not run | Depends on staff, scouting, generated players |
-| Phase 14: Player development and aging depth | Not Started | N/A | Not run | Depends on Phase 13 |
-| Phase 15: Finance system | Not Started | N/A | Not run | Depends on transfers/contracts and league hooks |
-| Phase 16: League structure and promotion/relegation | Not Started | N/A | Not run | Depends on finance and season systems |
-| Phase 17: Cup competitions | Not Started | N/A | Not run | Depends on Phase 16 |
-| Phase 18: Squad registration rules | Not Started | N/A | Not run | Depends on transfers, youth, league/cups |
-| Phase 19: Rivalries and derbies | Not Started | N/A | Not run | Depends on fixtures and news |
-| Phase 20: Objectives, job security, sackings depth | Not Started | N/A | Not run | Depends on pressure, finance, league/cups |
-| Phase 21: Career job market and interviews | Not Started | N/A | Not run | Depends on Phase 20 |
-| Phase 22: Generated content and narrative variety | Not Started | N/A | Not run | Depends on events, youth, league, jobs |
-| Phase 23: Difficulty and realism settings | Not Started | N/A | Not run | Depends on mature systems to tune |
-| Phase 24: Save history and long-term career memory | Not Started | N/A | Not run | Depends on stable state shapes |
-| Phase 25: Balance pass | Not Started | N/A | Not run | Depends on major gameplay systems |
-| Phase 26: UI polish and readability pass | Not Started | N/A | Not run | Depends on final UI surface |
-| Phase 27: End-to-end season simulation pass | Not Started | N/A | Not run | Depends on Phases 1-26 |
-| Phase 28: Regression/stability pass | Not Started | N/A | Not run | Final audit pass |
+| Phase 1: Information visibility deepening | Complete | See git history | phase1_information_visibility_check.gd | Implemented in the 28-phase pass |
+| Phase 2: Training and scouting controls | Complete | See git history | phase2_training_scouting_controls_check.gd | Implemented in the 28-phase pass |
+| Phase 3: Promise lifecycle | Complete | See git history | phase3_promise_lifecycle_check.gd | Implemented in the 28-phase pass |
+| Phase 4: Tactical depth and role fit | Complete | See git history | phase4_tactical_depth_check.gd | Implemented in the 28-phase pass |
+| Phase 5: Match engine depth | Complete | See git history | phase5_match_engine_depth_check.gd | Implemented in the 28-phase pass |
+| Phase 6: Post-match report depth | Complete | See git history | phase6_post_match_report_depth_check.gd | Implemented in the 28-phase pass |
+| Phase 7: Morale, trust, reputation, pressure depth | Complete | See git history | phase7_perception_depth_check.gd | Implemented in the 28-phase pass |
+| Phase 8: News/media/world events | Complete | See git history | phase8_news_decision_events_check.gd | Implemented in the 28-phase pass |
+| Phase 9: Transfer market expansion | Complete | See git history | phase9_transfer_market_check.gd | Implemented in the 28-phase pass |
+| Phase 10: Contract negotiation depth | Complete | See git history | phase10_contract_negotiation_check.gd | Implemented in the 28-phase pass |
+| Phase 11: Director of Football conflict depth | Complete | See git history | phase11_director_conflict_check.gd | Implemented in the 28-phase pass |
+| Phase 12: Staff impact and staff market | Complete | See git history | phase12_staff_market_check.gd | Implemented in the 28-phase pass |
+| Phase 13: Youth academy | Complete | See git history | phase13_youth_academy_check.gd | Implemented in the 28-phase pass |
+| Phase 14: Player development and aging depth | Complete | See git history | phase14_player_development_check.gd | Implemented in the 28-phase pass |
+| Phase 15: Finance system | Complete | See git history | phase15_finance_check.gd | Implemented in the 28-phase pass |
+| Phase 16: League structure and promotion/relegation | Complete | See git history | phase16_league_structure_check.gd | Implemented in the 28-phase pass |
+| Phase 17: Cup competitions | Complete | See git history | phase17_cup_competition_check.gd | Implemented in the 28-phase pass |
+| Phase 18: Squad registration rules | Complete | See git history | phase18_squad_registration_check.gd | Implemented in the 28-phase pass |
+| Phase 19: Rivalries and derbies | Complete | See git history | phase19_rivalry_derby_check.gd | Implemented in the 28-phase pass |
+| Phase 20: Objectives, job security, sackings depth | Complete | See git history | phase20_objectives_sacking_check.gd | Implemented in the 28-phase pass |
+| Phase 21: Career job market and interviews | Complete | ed83668 | phase21_career_job_market_check.gd | Implemented in the 28-phase pass |
+| Phase 22: Generated content and narrative variety | Complete | a2a5dfe | phase22_generated_content_check.gd | Implemented in the 28-phase pass |
+| Phase 23: Difficulty and realism settings | Complete | 879e581 | phase23_difficulty_settings_check.gd | Implemented in the 28-phase pass |
+| Phase 24: Save history and long-term career memory | Complete | 879e581 | phase24_career_memory_check.gd | Implemented in the 28-phase pass |
+| Phase 25: Balance pass | Complete | 879e581 | phase25_balance_pass_check.gd | Implemented in the 28-phase pass |
+| Phase 26: UI polish and readability pass | Complete | 879e581 | phase26_ui_readability_check.gd | Implemented in the 28-phase pass |
+| Phase 27: End-to-end season simulation pass | Complete | 879e581 | phase27_end_to_end_season_check.gd | Implemented in the 28-phase pass |
+| Phase 28: Regression/stability pass | Complete | 879e581 | phase28_final_stability_audit_check.gd | Final audit pass complete before acceptance audit |

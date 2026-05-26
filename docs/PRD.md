@@ -87,11 +87,11 @@ Each implementation slice must:
 
 ## 9. Current Implementation Baseline
 
-The current playable baseline is the Stage 1 through Stage 8 foundation pass.
+The current playable baseline is the completed 28-phase master-design implementation pass. It is a broad playable foundation, not a claim that every master-design system has full simulation depth.
 
-The app should now provide a coherent local career loop with role, starting license, manager background, selected club, club archetype, board philosophy, fan culture, Director of Football style, staff, squad identity, tactics, weekly calendar/training/scouting foundations, shared match simulation/live playback, post-match consequences, recruitment/contracts foundation, job security, job-market events, and save/load coverage.
+The app should now provide a coherent local career loop with role, starting license, manager background, selected club, club archetype, board philosophy, fan culture, Director of Football style, staff, squad identity, partial information, tactics, tactical familiarity, weekly calendar/training/scouting, shared match simulation/live playback, post-match consequences, transfers/contracts/loans foundations, promises, youth academy, finance, media/events, job security, job-market movement, career memory, generated content, difficulty settings, and save/load coverage.
 
-This baseline is not the full master design. It should not claim full transfer negotiation, complete job-market simulation, deep youth development, full finance, deep scouting regions, multi-year media systems, or a complete four-tier pyramid. Those remain future deeper systems unless later plan stages explicitly add them.
+The completed pass should be honest about depth. Transfers/contracts, loans, youth, finance, scouting, media/events, job market, license progression, generated content, and career history are implemented as playable foundations with persistent effects, not as fully deep standalone simulations. UI and docs must not describe simplified foundations as complete negotiation, full global scouting, deep finance ledger, playable youth leagues, dialogue-heavy media, or a fully simulated global manager carousel.
 
 ## 10. Acceptance Criteria For The Reconciled Direction
 

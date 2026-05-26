@@ -60,9 +60,20 @@ public partial class TouchlineTheme : Node
         RenderingServer.SetDefaultClearColor(BackgroundBase);
     }
 
+    public override void _ExitTree()
+    {
+        if (GetTree().Root != null && GetTree().Root.Theme == _cachedTheme)
+        {
+            GetTree().Root.Theme = null;
+        }
+
+        _cachedTheme?.Dispose();
+        _cachedTheme = null;
+    }
+
     public static void ApplyPanelVariant(Control control, TouchlineSurfaceVariant variant, int radius = 20)
     {
-        control.AddThemeStyleboxOverride("panel", CreatePanelStyle(variant, radius));
+        AddStyleboxOverride(control, "panel", CreatePanelStyle(variant, radius));
     }
 
     public static void ApplyButtonVariant(Button button, TouchlineButtonVariant variant)
@@ -73,11 +84,11 @@ public partial class TouchlineTheme : Node
         button.AddThemeColorOverride("font_pressed_color", TextPrimary);
         button.AddThemeColorOverride("font_disabled_color", TextQuiet);
         button.AddThemeFontSizeOverride("font_size", 17);
-        button.AddThemeStyleboxOverride("normal", CreateButtonStyle(palette.normalBackground, palette.normalBorder));
-        button.AddThemeStyleboxOverride("hover", CreateButtonStyle(palette.hoverBackground, palette.hoverBorder));
-        button.AddThemeStyleboxOverride("pressed", CreateButtonStyle(palette.pressedBackground, palette.pressedBorder));
-        button.AddThemeStyleboxOverride("focus", CreateButtonStyle(palette.hoverBackground, BorderAccent));
-        button.AddThemeStyleboxOverride("disabled", CreateButtonStyle(SurfaceMuted, BorderSoft));
+        AddStyleboxOverride(button, "normal", CreateButtonStyle(palette.normalBackground, palette.normalBorder));
+        AddStyleboxOverride(button, "hover", CreateButtonStyle(palette.hoverBackground, palette.hoverBorder));
+        AddStyleboxOverride(button, "pressed", CreateButtonStyle(palette.pressedBackground, palette.pressedBorder));
+        AddStyleboxOverride(button, "focus", CreateButtonStyle(palette.hoverBackground, BorderAccent));
+        AddStyleboxOverride(button, "disabled", CreateButtonStyle(SurfaceMuted, BorderSoft));
     }
 
     public static void ApplyNavigationButton(Button button, bool selected)
@@ -96,7 +107,7 @@ public partial class TouchlineTheme : Node
     {
         var background = away ? AwayToken : HomeToken;
         var border = active ? BallColor : PitchLine;
-        control.AddThemeStyleboxOverride("panel", CreateTokenStyle(background, border, active));
+        AddStyleboxOverride(control, "panel", CreateTokenStyle(background, border, active));
     }
 
     public static void ApplyEyebrowStyle(Label label)
@@ -177,18 +188,18 @@ public partial class TouchlineTheme : Node
         theme.SetColor("font_pressed_color", "Button", TextPrimary);
         theme.SetColor("font_disabled_color", "Button", TextQuiet);
         theme.SetFontSize("font_size", "Button", 17);
-        theme.SetStylebox("normal", "Button", CreateButtonStyle(SurfaceRaised, BorderSoft));
-        theme.SetStylebox("hover", "Button", CreateButtonStyle(new Color(0.136f, 0.186f, 0.247f), BorderAccent));
-        theme.SetStylebox("pressed", "Button", CreateButtonStyle(SurfaceMuted, BorderSoft));
-        theme.SetStylebox("focus", "Button", CreateButtonStyle(SurfaceRaised, BorderAccent));
-        theme.SetStylebox("disabled", "Button", CreateButtonStyle(SurfaceMuted, BorderSoft));
+        SetThemeStylebox(theme, "normal", "Button", CreateButtonStyle(SurfaceRaised, BorderSoft));
+        SetThemeStylebox(theme, "hover", "Button", CreateButtonStyle(new Color(0.136f, 0.186f, 0.247f), BorderAccent));
+        SetThemeStylebox(theme, "pressed", "Button", CreateButtonStyle(SurfaceMuted, BorderSoft));
+        SetThemeStylebox(theme, "focus", "Button", CreateButtonStyle(SurfaceRaised, BorderAccent));
+        SetThemeStylebox(theme, "disabled", "Button", CreateButtonStyle(SurfaceMuted, BorderSoft));
 
         theme.SetColor("font_color", "LineEdit", TextPrimary);
         theme.SetColor("font_placeholder_color", "LineEdit", TextQuiet);
         theme.SetFontSize("font_size", "LineEdit", 17);
-        theme.SetStylebox("normal", "LineEdit", CreateInputStyle(SurfaceBase, BorderSoft));
-        theme.SetStylebox("focus", "LineEdit", CreateInputStyle(SurfaceBase, BorderAccent));
-        theme.SetStylebox("read_only", "LineEdit", CreateInputStyle(SurfaceMuted, BorderSoft));
+        SetThemeStylebox(theme, "normal", "LineEdit", CreateInputStyle(SurfaceBase, BorderSoft));
+        SetThemeStylebox(theme, "focus", "LineEdit", CreateInputStyle(SurfaceBase, BorderAccent));
+        SetThemeStylebox(theme, "read_only", "LineEdit", CreateInputStyle(SurfaceMuted, BorderSoft));
 
         theme.SetColor("font_color", "OptionButton", TextPrimary);
         theme.SetFontSize("font_size", "OptionButton", 17);
@@ -197,17 +208,29 @@ public partial class TouchlineTheme : Node
         theme.SetColor("font_selected_color", "ItemList", TextPrimary);
         theme.SetColor("guide_color", "ItemList", BorderSoft);
         theme.SetFontSize("font_size", "ItemList", 16);
-        theme.SetStylebox("panel", "ItemList", CreatePanelStyle(TouchlineSurfaceVariant.Card, 16));
-        theme.SetStylebox("selected", "ItemList", CreateSelectionStyle(PositiveGreen));
-        theme.SetStylebox("cursor", "ItemList", CreateSelectionStyle(AccentBlue));
+        SetThemeStylebox(theme, "panel", "ItemList", CreatePanelStyle(TouchlineSurfaceVariant.Card, 16));
+        SetThemeStylebox(theme, "selected", "ItemList", CreateSelectionStyle(PositiveGreen));
+        SetThemeStylebox(theme, "cursor", "ItemList", CreateSelectionStyle(AccentBlue));
 
-        theme.SetStylebox("panel", "PanelContainer", CreatePanelStyle(TouchlineSurfaceVariant.Card));
+        SetThemeStylebox(theme, "panel", "PanelContainer", CreatePanelStyle(TouchlineSurfaceVariant.Card));
 
         theme.SetConstant("h_separation", "HBoxContainer", 16);
         theme.SetConstant("v_separation", "VBoxContainer", 12);
 
         _cachedTheme = theme;
         return theme;
+    }
+
+    private static void AddStyleboxOverride(Control control, string name, StyleBoxFlat style)
+    {
+        control.AddThemeStyleboxOverride(name, style);
+        style.Dispose();
+    }
+
+    private static void SetThemeStylebox(Theme theme, string name, string themeType, StyleBoxFlat style)
+    {
+        theme.SetStylebox(name, themeType, style);
+        style.Dispose();
     }
 
     private static StyleBoxFlat CreateButtonStyle(Color background, Color border)

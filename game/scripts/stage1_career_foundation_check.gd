@@ -136,7 +136,7 @@ func _validate_dashboard() -> void:
         return
     if not _assert_label_contains(
         "RootMargin/Shell/MainColumn/ContentRow/MainStack/LowerRow/PressureCard/PressurePadding/PressureContent/PressureValueLabel",
-        "Job pressure",
+        "Pressure | job",
         "dashboard pressure"):
         return
     if not _assert_label_contains(

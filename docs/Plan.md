@@ -4,7 +4,7 @@
 
 ### Active
 
-- Stabilization and truth-audit pass after Stage 2-8 foundation implementation
+- Full acceptance audit and verification pass after the completed 28-phase master-design implementation.
 
 ### Done
 
@@ -17,6 +17,34 @@
 - Stage 6: Consequences and pressure foundation
 - Stage 7: Transfers/contracts foundation
 - Stage 8: Career/job market foundation
+- Phase 1: Information visibility deepening
+- Phase 2: Training and scouting controls
+- Phase 3: Promise lifecycle
+- Phase 4: Tactical depth and role fit
+- Phase 5: Match engine depth
+- Phase 6: Post-match report depth
+- Phase 7: Morale, trust, reputation, pressure depth
+- Phase 8: News/media/world events
+- Phase 9: Transfer market expansion
+- Phase 10: Contract negotiation depth
+- Phase 11: Director of Football conflict depth
+- Phase 12: Staff impact and staff market
+- Phase 13: Youth academy
+- Phase 14: Player development and aging depth
+- Phase 15: Finance system
+- Phase 16: League structure and promotion/relegation
+- Phase 17: Cup competitions
+- Phase 18: Squad registration rules
+- Phase 19: Rivalries and derbies
+- Phase 20: Objectives, job security, sackings depth
+- Phase 21: Career job market and interviews
+- Phase 22: Generated content and narrative variety
+- Phase 23: Difficulty and realism settings
+- Phase 24: Save history and long-term career memory
+- Phase 25: Balance pass
+- Phase 26: UI polish and readability pass
+- Phase 27: End-to-end season simulation pass
+- Phase 28: Regression/stability pass
 
 ### Blocked
 

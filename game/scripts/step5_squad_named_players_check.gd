@@ -70,8 +70,9 @@ func _process(_delta: float) -> bool:
         var player_rows := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/SelectionCard/SelectionPadding/SelectionContent/PlayerScroll/PlayerRows") as VBoxContainer
         var name_label := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/DetailCard/DetailPadding/DetailContent/PlayerNameLabel") as Label
         var detail_label := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/DetailCard/DetailPadding/DetailContent/DetailMetaLabel") as Label
+        var role_chip_label := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/DetailCard/DetailPadding/DetailContent/ChipRow/RoleChip/RoleChipPadding/RoleChipLabel") as Label
 
-        if filter == null or player_rows == null or name_label == null or detail_label == null:
+        if filter == null or player_rows == null or name_label == null or detail_label == null or role_chip_label == null:
             _fail("SquadScreen controls are missing")
             return false
 
@@ -79,7 +80,7 @@ func _process(_delta: float) -> bool:
             _fail("Expected named players list to be populated")
             return false
 
-        var first_row := player_rows.get_child(0) as PanelContainer
+        var first_row := _first_player_row(player_rows)
         if first_row == null:
             _fail("Expected a structured player row")
             return false
@@ -103,7 +104,7 @@ func _process(_delta: float) -> bool:
             _fail("Expected seeded named player not found")
             return false
 
-        if name_label.text.find("Mateo Silva") == -1 or detail_label.text.find("Age") == -1 or detail_label.text.find("XI") == -1:
+        if name_label.text.find("Mateo Silva") == -1 or detail_label.text.find("Age") == -1 or role_chip_label.text.find("XI") == -1:
             _fail("Player detail label missing expected stats")
             return false
 
@@ -114,7 +115,7 @@ func _process(_delta: float) -> bool:
             _fail("Goalkeeper filter did not return expected entries")
             return false
 
-        var filtered_row := player_rows.get_child(0) as PanelContainer
+        var filtered_row := _first_player_row(player_rows)
         var filtered_meta := filtered_row.get_node("RowPadding/RowContent/Body/MetaLabel") as Label
         if filtered_meta == null or filtered_meta.text.find("GK") == -1:
             _fail("Goalkeeper filter did not narrow by position")
@@ -129,3 +130,10 @@ func _fail(message: String) -> void:
     push_error(message)
     print("STEP5_SUBTASK_FAIL: " + message)
     quit(1)
+
+func _first_player_row(player_rows: VBoxContainer) -> PanelContainer:
+    for index in range(player_rows.get_child_count()):
+        var row := player_rows.get_child(index) as PanelContainer
+        if row != null and row.has_node("RowPadding/RowContent/Body/NameLabel"):
+            return row
+    return null

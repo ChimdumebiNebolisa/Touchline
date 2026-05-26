@@ -17,7 +17,7 @@ func _process(_delta: float) -> bool:
             _fail("MainMenu scene did not load")
             return false
 
-        var new_career_button := menu.get_node("Center/Menu/NewCareerButton") as Button
+        var new_career_button := menu.get_node("Center/MenuCard/Padding/Menu/NewCareerButton") as Button
         if new_career_button == null:
             _fail("NewCareerButton not found")
             return false
@@ -31,7 +31,7 @@ func _process(_delta: float) -> bool:
             _fail("New Career navigation did not open CareerSetup")
             return false
 
-        var back_button := current_scene.get_node("Center/Panel/BackButton") as Button
+        var back_button := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/ActionsRow/BackButton") as Button
         if back_button == null:
             _fail("CareerSetup back button not found")
             return false
@@ -45,7 +45,7 @@ func _process(_delta: float) -> bool:
             _fail("Back navigation did not return to MainMenu")
             return false
 
-        var load_game_button := current_scene.get_node("Center/Menu/LoadGameButton") as Button
+        var load_game_button := current_scene.get_node("Center/MenuCard/Padding/Menu/LoadGameButton") as Button
         if load_game_button == null:
             _fail("LoadGameButton not found")
             return false
