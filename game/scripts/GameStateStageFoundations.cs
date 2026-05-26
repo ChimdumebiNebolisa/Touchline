@@ -59,6 +59,14 @@ public sealed class SaveSlotStageFoundationData
     public bool JobOfferMade { get; set; }
     public bool JobOfferAccepted { get; set; }
     public string[]? JobMarketHistory { get; set; }
+    public string GeneratedContentSummary { get; set; } = string.Empty;
+    public string GeneratedNewsTemplateSummary { get; set; } = string.Empty;
+    public string GeneratedScoutTemplateSummary { get; set; } = string.Empty;
+    public string GeneratedMediaQuestionSummary { get; set; } = string.Empty;
+    public string GeneratedNamePoolSummary { get; set; } = string.Empty;
+    public string GeneratedClubTemplateSummary { get; set; } = string.Empty;
+    public string GeneratedConsistencySummary { get; set; } = string.Empty;
+    public string[]? GeneratedContentHistory { get; set; }
     public int FanTrust { get; set; } = 55;
     public int MediaTrust { get; set; } = 52;
     public int WorldReputation { get; set; } = 45;
@@ -311,6 +319,7 @@ public partial class GameState
     private readonly List<string> _objectiveReviewHistory = new();
     private readonly List<string> _sackingHistory = new();
     private readonly List<string> _jobMarketHistory = new();
+    private readonly List<string> _generatedContentHistory = new();
     private readonly List<string> _perceptionHistory = new();
     private readonly List<string> _transferHistory = new();
     private readonly List<string> _contractHistory = new();
@@ -381,6 +390,14 @@ public partial class GameState
     public bool JobOfferMade { get; private set; }
     public bool JobOfferAccepted { get; private set; }
     public string JobMarketHistorySummary => _jobMarketHistory.Count == 0 ? "Job market history starts after an application, interview, offer, or career move." : string.Join("\n", _jobMarketHistory);
+    public string GeneratedContentSummary { get; private set; } = "Generated content templates pending.";
+    public string GeneratedNewsTemplateSummary { get; private set; } = "Generated news template pending.";
+    public string GeneratedScoutTemplateSummary { get; private set; } = "Generated scout template pending.";
+    public string GeneratedMediaQuestionSummary { get; private set; } = "Generated media question pending.";
+    public string GeneratedNamePoolSummary { get; private set; } = "Generated name pool pending.";
+    public string GeneratedClubTemplateSummary { get; private set; } = "Generated club template pending.";
+    public string GeneratedConsistencySummary { get; private set; } = "Generated content consistency pending.";
+    public string GeneratedContentHistorySummary => _generatedContentHistory.Count == 0 ? "Generated content history starts after template output is created." : string.Join("\n", _generatedContentHistory);
     public int FanTrust { get; private set; } = 55;
     public int MediaTrust { get; private set; } = 52;
     public int WorldReputation { get; private set; } = 45;
@@ -490,7 +507,7 @@ public partial class GameState
         ? "Recruitment foundation pending scouting target."
         : $"{CurrentRecruitmentTarget.PlayerName} ({CurrentRecruitmentTarget.Position}) | {CurrentRecruitmentTarget.InformationSummary} | {CurrentRecruitmentTarget.InterestSummary} | {CurrentRecruitmentTarget.TacticalFitSummary} | Fee {CurrentRecruitmentTarget.EstimatedFeeRange} | Wage {CurrentRecruitmentTarget.EstimatedWageRange} | Status {CurrentRecruitmentTarget.TargetStatus} | Valuation {CurrentRecruitmentTarget.ClubValuation} | Agent {CurrentRecruitmentTarget.AgentMood} | Rival {CurrentRecruitmentTarget.RivalInterest} | Board {CurrentRecruitmentTarget.BoardStance} | Director {CurrentRecruitmentTarget.DirectorStance} | Outcome {CurrentRecruitmentTarget.OutcomeState} | {CurrentRecruitmentTarget.Status}\nDirector of Football\n{DirectorInfluenceSummary}\nShortlist\n{RecruitmentShortlistSummary}\nContracts\n{ContractFoundationSummary}\nTransfer history\n{TransferHistorySummary}";
     public string TrainingScoutingSummary => $"{TrainingFocusName} ({TrainingIntensityName}): {TrainingStatusSummary}\nScouting depth: {ScoutingReportDepthName}\nScouting: {BuildScoutingSummary()}\nDevelopment\n{PlayerDevelopmentSummary}\nDevelopment history\n{PlayerDevelopmentHistorySummary}\nRegistration\n{RegistrationStatusSummary}\n{RegistrationIssuesSummary}\nStaff effects\n{StaffImpactSummary}";
-    public string CareerMarketSummary => $"Job security: {JobSecurityName}\nObjective reviews\n{ObjectiveReviewSummary}\n{ObjectiveWarningSummary}\n{UltimatumSummary}\n{SackingSummary}\nObjective history\n{ObjectiveReviewHistorySummary}\nSacking history\n{SackingHistorySummary}\n{TrustSummary}\n{ReputationSummary}\n{PressureCategorySummary}\nLeague system\n{LeaguePyramidSummary}\n{PromotionRelegationSummary}\n{ShadowLeagueSummary}\nLeague history\n{LeagueHistorySummary}\nCup competitions\n{CupStatusSummary}\n{CupDrawSummary}\n{CupObjectiveSummary}\nCup history\n{CupHistorySummary}\nRivalries\n{RivalryStatusSummary}\n{RivalryPressureSummary}\nRivalry history\n{RivalryHistorySummary}\nFinance\n{FinanceSummary}\nFinance history\n{FinanceHistorySummary}\nLicense: {LicenseOpportunitySummary}\n{LicenseCourseStatusSummary}\nJob market\n{JobMarketStateSummary}\n{JobApplicationSummary}\n{JobInterviewSummary}\n{JobMovementSummary}\n{BuildJobOfferSummary()}\nJob market history\n{JobMarketHistorySummary}";
+    public string CareerMarketSummary => $"Job security: {JobSecurityName}\nObjective reviews\n{ObjectiveReviewSummary}\n{ObjectiveWarningSummary}\n{UltimatumSummary}\n{SackingSummary}\nObjective history\n{ObjectiveReviewHistorySummary}\nSacking history\n{SackingHistorySummary}\n{TrustSummary}\n{ReputationSummary}\n{PressureCategorySummary}\nLeague system\n{LeaguePyramidSummary}\n{PromotionRelegationSummary}\n{ShadowLeagueSummary}\nLeague history\n{LeagueHistorySummary}\nCup competitions\n{CupStatusSummary}\n{CupDrawSummary}\n{CupObjectiveSummary}\nCup history\n{CupHistorySummary}\nRivalries\n{RivalryStatusSummary}\n{RivalryPressureSummary}\nRivalry history\n{RivalryHistorySummary}\nFinance\n{FinanceSummary}\nFinance history\n{FinanceHistorySummary}\nLicense: {LicenseOpportunitySummary}\n{LicenseCourseStatusSummary}\nJob market\n{JobMarketStateSummary}\n{JobApplicationSummary}\n{JobInterviewSummary}\n{JobMovementSummary}\n{BuildJobOfferSummary()}\nJob market history\n{JobMarketHistorySummary}\nGenerated content\n{GeneratedContentSummary}\n{GeneratedNewsTemplateSummary}\n{GeneratedScoutTemplateSummary}\n{GeneratedMediaQuestionSummary}\n{GeneratedNamePoolSummary}\n{GeneratedClubTemplateSummary}\n{GeneratedConsistencySummary}\nGenerated content history\n{GeneratedContentHistorySummary}";
     public string TacticsFoundationSummary => $"{TeamStyleName} | {TeamInstructionsSummary}\n{SetPieceSummary}\n{OpponentPreparationSummary}\n{PlayerRolesSummary}\n{PlayerInstructionsSummary}\n{TacticalRoleFitSummary}\n{PlayerFamiliaritySummary}\n{TacticalFitNotes}\n{TacticalRiskNotes}";
 
     public void UpdateTactics(string formation, string teamStyle, int pressIntensity, int tempo, int width, int risk)
@@ -612,6 +629,7 @@ public partial class GameState
         EvaluateCareerFoundationState();
         ReviewObjectivesAndJobSecurity("Weekly board review", 0);
         GenerateContextDecisionEvent("Weekly review");
+        GenerateNarrativeVarietyEvent("Weekly review");
         AddNews(
             "Weekly football report",
             NewsCategory.Training,
@@ -1275,6 +1293,14 @@ public partial class GameState
             JobOfferMade = JobOfferMade,
             JobOfferAccepted = JobOfferAccepted,
             JobMarketHistory = _jobMarketHistory.ToArray(),
+            GeneratedContentSummary = GeneratedContentSummary,
+            GeneratedNewsTemplateSummary = GeneratedNewsTemplateSummary,
+            GeneratedScoutTemplateSummary = GeneratedScoutTemplateSummary,
+            GeneratedMediaQuestionSummary = GeneratedMediaQuestionSummary,
+            GeneratedNamePoolSummary = GeneratedNamePoolSummary,
+            GeneratedClubTemplateSummary = GeneratedClubTemplateSummary,
+            GeneratedConsistencySummary = GeneratedConsistencySummary,
+            GeneratedContentHistory = _generatedContentHistory.ToArray(),
             FanTrust = FanTrust,
             MediaTrust = MediaTrust,
             WorldReputation = WorldReputation,
@@ -1548,6 +1574,19 @@ public partial class GameState
             _jobMarketHistory.AddRange(data.JobMarketHistory);
         }
 
+        GeneratedContentSummary = string.IsNullOrWhiteSpace(data.GeneratedContentSummary) ? "Generated content templates restored." : data.GeneratedContentSummary;
+        GeneratedNewsTemplateSummary = string.IsNullOrWhiteSpace(data.GeneratedNewsTemplateSummary) ? "Generated news template pending." : data.GeneratedNewsTemplateSummary;
+        GeneratedScoutTemplateSummary = string.IsNullOrWhiteSpace(data.GeneratedScoutTemplateSummary) ? "Generated scout template pending." : data.GeneratedScoutTemplateSummary;
+        GeneratedMediaQuestionSummary = string.IsNullOrWhiteSpace(data.GeneratedMediaQuestionSummary) ? "Generated media question pending." : data.GeneratedMediaQuestionSummary;
+        GeneratedNamePoolSummary = string.IsNullOrWhiteSpace(data.GeneratedNamePoolSummary) ? "Generated name pool pending." : data.GeneratedNamePoolSummary;
+        GeneratedClubTemplateSummary = string.IsNullOrWhiteSpace(data.GeneratedClubTemplateSummary) ? "Generated club template pending." : data.GeneratedClubTemplateSummary;
+        GeneratedConsistencySummary = string.IsNullOrWhiteSpace(data.GeneratedConsistencySummary) ? "Generated content consistency pending." : data.GeneratedConsistencySummary;
+        _generatedContentHistory.Clear();
+        if (data.GeneratedContentHistory != null)
+        {
+            _generatedContentHistory.AddRange(data.GeneratedContentHistory);
+        }
+
         FanTrust = Math.Clamp(data.FanTrust <= 0 ? 55 : data.FanTrust, 0, 100);
         MediaTrust = Math.Clamp(data.MediaTrust <= 0 ? 52 : data.MediaTrust, 0, 100);
         WorldReputation = Math.Clamp(data.WorldReputation <= 0 ? CareerProfile.Reputation : data.WorldReputation, 0, 100);
@@ -1757,6 +1796,13 @@ public partial class GameState
         JobInterviewOffered = false;
         JobOfferMade = false;
         JobOfferAccepted = false;
+        GeneratedContentSummary = "Generated content templates pending.";
+        GeneratedNewsTemplateSummary = "Generated news template pending.";
+        GeneratedScoutTemplateSummary = "Generated scout template pending.";
+        GeneratedMediaQuestionSummary = "Generated media question pending.";
+        GeneratedNamePoolSummary = "Generated name pool pending.";
+        GeneratedClubTemplateSummary = "Generated club template pending.";
+        GeneratedConsistencySummary = "Generated content consistency pending.";
         FanTrust = 55;
         MediaTrust = 52;
         WorldReputation = CareerProfile.Reputation;
@@ -1841,6 +1887,7 @@ public partial class GameState
         _objectiveReviewHistory.Clear();
         _sackingHistory.Clear();
         _jobMarketHistory.Clear();
+        _generatedContentHistory.Clear();
         _perceptionHistory.Clear();
         _transferHistory.Clear();
         _contractHistory.Clear();
@@ -1879,6 +1926,7 @@ public partial class GameState
         EnsureCupCompetitionState();
         EnsureSquadRegistrationState();
         EnsureRivalryState();
+        EnsureGeneratedContentState();
         if (CurrentScoutingAssignment == null)
         {
             StartBasicScoutingAssignment("Position need: versatile midfielder");
@@ -4023,6 +4071,63 @@ public partial class GameState
         return MatchPlaybackContractValidator.PassMessage;
     }
 
+    public string ValidatePhase22GeneratedContentContract()
+    {
+        InitializeStageFoundationsForClub();
+        StartScoutingAssignment("Validation target: two-way midfielder", "Full report");
+        AdvanceYouthAcademyAction();
+        var firstOutput = GenerateNarrativeVarietyEvent("Validation narrative pass");
+        var secondOutput = GenerateNarrativeVarietyEvent("Validation pressure follow-up");
+        if (string.IsNullOrWhiteSpace(firstOutput) ||
+            string.IsNullOrWhiteSpace(secondOutput) ||
+            _generatedContentHistory.Count < 2)
+        {
+            return "Generated content did not create repeatable template history.";
+        }
+
+        if (!GeneratedContentSummary.Contains("Template output", StringComparison.OrdinalIgnoreCase) ||
+            !GeneratedNewsTemplateSummary.Contains(SelectedClubName ?? "club", StringComparison.OrdinalIgnoreCase) ||
+            !GeneratedScoutTemplateSummary.Contains("Validation target", StringComparison.OrdinalIgnoreCase) ||
+            !GeneratedMediaQuestionSummary.Contains("Media question", StringComparison.OrdinalIgnoreCase) ||
+            !GeneratedNamePoolSummary.Contains("no placeholder", StringComparison.OrdinalIgnoreCase) ||
+            !GeneratedClubTemplateSummary.Contains("Club template", StringComparison.OrdinalIgnoreCase) ||
+            !GeneratedConsistencySummary.Contains("passed", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Generated content summaries are incomplete or not tied to state.";
+        }
+
+        var combined = $"{GeneratedNewsTemplateSummary}\n{GeneratedScoutTemplateSummary}\n{GeneratedMediaQuestionSummary}\n{GeneratedNamePoolSummary}\n{GeneratedClubTemplateSummary}";
+        if (combined.Contains("{", StringComparison.Ordinal) ||
+            combined.Contains("Player 12", StringComparison.OrdinalIgnoreCase) ||
+            combined.Contains("real club", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Generated content contains unresolved placeholders or unsupported claims.";
+        }
+
+        if (!NewsFeedSummary.Contains("Template desk", StringComparison.Ordinal) ||
+            !CareerMarketSummary.Contains("Generated content", StringComparison.Ordinal) ||
+            !CareerMarketSummary.Contains("Generated content history", StringComparison.Ordinal))
+        {
+            return "Generated content is not visible through news and dashboard summaries.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
+    public string ValidatePhase22StoredGeneratedContentContract()
+    {
+        if (_generatedContentHistory.Count == 0 ||
+            string.IsNullOrWhiteSpace(GeneratedContentSummary) ||
+            !GeneratedConsistencySummary.Contains("passed", StringComparison.OrdinalIgnoreCase) ||
+            !GeneratedContentHistorySummary.Contains("Validation", StringComparison.OrdinalIgnoreCase) ||
+            !CareerMarketSummary.Contains("Generated content", StringComparison.Ordinal))
+        {
+            return "Saved generated content state did not restore.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
     public string ValidatePhase3PromiseLifecycleContract()
     {
         InitializeStageFoundationsForClub();
@@ -4556,6 +4661,174 @@ public partial class GameState
         }
     }
 
+    private void EnsureGeneratedContentState()
+    {
+        if (GeneratedContentSummary.Contains("pending", StringComparison.OrdinalIgnoreCase) ||
+            GeneratedContentSummary.Contains("restored", StringComparison.OrdinalIgnoreCase))
+        {
+            GeneratedNamePoolSummary = BuildGeneratedNamePoolSummary();
+            GeneratedClubTemplateSummary = BuildGeneratedClubTemplateSummary();
+            GeneratedNewsTemplateSummary = BuildGeneratedNewsTemplateSummary("career setup");
+            GeneratedScoutTemplateSummary = BuildGeneratedScoutTemplateSummary();
+            GeneratedMediaQuestionSummary = BuildGeneratedMediaQuestionSummary("career setup");
+            GeneratedConsistencySummary = BuildGeneratedConsistencySummary();
+            GeneratedContentSummary = $"Template library active: news, scout report, media question, job-market, youth, and club identity text are seeded from world {WorldSeed}.";
+        }
+    }
+
+    public string GenerateNarrativeVarietyEvent(string trigger = "Manual narrative refresh")
+    {
+        EnsureGeneratedContentState();
+        var categoryIndex = Math.Abs(WorldSeed + CurrentDate.DayOfYear + _generatedContentHistory.Count + ObjectiveReviewCount) % 5;
+        var category = categoryIndex switch
+        {
+            0 => NewsCategory.Career,
+            1 => NewsCategory.Scouting,
+            2 => NewsCategory.Pressure,
+            3 => NewsCategory.Training,
+            _ => NewsCategory.Club
+        };
+        GeneratedNewsTemplateSummary = BuildGeneratedNewsTemplateSummary(trigger);
+        GeneratedScoutTemplateSummary = BuildGeneratedScoutTemplateSummary();
+        GeneratedMediaQuestionSummary = BuildGeneratedMediaQuestionSummary(trigger);
+        GeneratedNamePoolSummary = BuildGeneratedNamePoolSummary();
+        GeneratedClubTemplateSummary = BuildGeneratedClubTemplateSummary();
+        GeneratedConsistencySummary = BuildGeneratedConsistencySummary();
+        GeneratedContentSummary = $"Template output refreshed for {trigger}: category {StageFoundationText.GetDisplayName(category)}, no external AI dependency, no real club/player claims.";
+        RecordGeneratedContentHistory($"{trigger}: {GeneratedNewsTemplateSummary} | {GeneratedConsistencySummary}");
+        AddNews(
+            PickGeneratedHeadline(trigger),
+            category,
+            ResolveGeneratedReliability(category),
+            GeneratedNewsTemplateSummary,
+            4,
+            "Template desk",
+            SelectedClubName ?? "club",
+            "Narrative variety only; consequences remain tied to explicit state changes.",
+            $"generated-{category}-{CurrentDate.DayOfYear}");
+        return GeneratedContentSummary;
+    }
+
+    private string PickGeneratedHeadline(string trigger)
+    {
+        var templates = new[]
+        {
+            "{club} context sharpens around {trigger}",
+            "{club} staff brief updates the week",
+            "{club} pressure story stays tied to the numbers",
+            "{club} report highlights {identity}",
+            "{club} analysts add another evidence-led note"
+        };
+        var template = templates[Math.Abs(WorldSeed + trigger.Length + _generatedContentHistory.Count) % templates.Length];
+        return template
+            .Replace("{club}", SelectedClubName ?? "Club")
+            .Replace("{trigger}", trigger)
+            .Replace("{identity}", BoardPhilosophyName);
+    }
+
+    private string BuildGeneratedNewsTemplateSummary(string trigger)
+    {
+        var templates = new[]
+        {
+            "{club} board read {trigger} through {board}; fans remain shaped by {fans}.",
+            "{club} dressing-room note links {trigger} to morale {morale}/100 and pressure {pressure}/100.",
+            "{club} football department frames {trigger} around {style}, {formation}, and {familiarity}.",
+            "{club} market story stays cautious: reputation {reputation}/100, license {license}, job security {security}.",
+            "{club} academy line remains measured: youth reputation {youth}/100 and intake status '{intake}'."
+        };
+        var template = templates[Math.Abs(WorldSeed + CurrentDate.DayOfYear + trigger.Length) % templates.Length];
+        return template
+            .Replace("{club}", SelectedClubName ?? "club")
+            .Replace("{trigger}", trigger)
+            .Replace("{board}", BoardPhilosophyName)
+            .Replace("{fans}", FanCultureName)
+            .Replace("{morale}", TeamMorale.ToString())
+            .Replace("{pressure}", JobPressure.ToString())
+            .Replace("{style}", TeamStyleName)
+            .Replace("{formation}", TacticalFormation)
+            .Replace("{familiarity}", TacticalFamiliarityName)
+            .Replace("{reputation}", WorldReputation.ToString())
+            .Replace("{license}", LicenseName)
+            .Replace("{security}", JobSecurityName)
+            .Replace("{youth}", YouthReputation.ToString())
+            .Replace("{intake}", YouthIntakeDateSummary);
+    }
+
+    private string BuildGeneratedScoutTemplateSummary()
+    {
+        var target = CurrentScoutingAssignment?.Target ?? CurrentRecruitmentTarget?.PlayerName ?? "next shortlist target";
+        var confidence = CurrentScoutingAssignment?.ReportQuality ?? CurrentRecruitmentTarget?.InformationSummary.Length % 55 + 35 ?? 42;
+        var templates = new[]
+        {
+            "Scout report on {target}: confidence {confidence}/100; keep exact attributes limited until the report is ready.",
+            "Analyst note on {target}: tactical fit should reference {style}, not a naked rating.",
+            "Recruitment brief on {target}: personality clues stay partial and agent/interest claims must match the target state."
+        };
+        return templates[Math.Abs(WorldSeed + confidence + target.Length) % templates.Length]
+            .Replace("{target}", target)
+            .Replace("{confidence}", confidence.ToString())
+            .Replace("{style}", TeamStyleName);
+    }
+
+    private string BuildGeneratedMediaQuestionSummary(string trigger)
+    {
+        var templates = new[]
+        {
+            "Media question: with job pressure at {jobPressure}/100, how do you explain {trigger} without blaming the squad?",
+            "Media question: does {board} patience still match supporter mood under {fans} culture?",
+            "Media question: after {trigger}, should {club} prioritize results, player development, or wage discipline?"
+        };
+        return templates[Math.Abs(WorldSeed + CareerProfile.MediaPressure + trigger.Length) % templates.Length]
+            .Replace("{jobPressure}", JobPressure.ToString())
+            .Replace("{trigger}", trigger)
+            .Replace("{board}", BoardPhilosophyName)
+            .Replace("{fans}", FanCultureName)
+            .Replace("{club}", SelectedClubName ?? "club");
+    }
+
+    private string BuildGeneratedNamePoolSummary()
+    {
+        var firstNames = new[] { "Tavian", "Milo", "Rafa", "Niko", "Luca", "Soren", "Ari", "Bastien" };
+        var lastNames = new[] { "Venn", "Sorell", "Calder", "Este", "Kade", "Roux", "Marek", "Vale" };
+        var offset = Math.Abs(WorldSeed + (SelectedClubName?.Length ?? 0)) % firstNames.Length;
+        var names = new List<string>();
+        for (var index = 0; index < 4; index++)
+        {
+            names.Add($"{firstNames[(offset + index) % firstNames.Length]} {lastNames[(offset + index * 2) % lastNames.Length]}");
+        }
+
+        return $"Regional name pool: {string.Join(", ", names)}; no placeholder player labels.";
+    }
+
+    private string BuildGeneratedClubTemplateSummary()
+    {
+        var colors = new[] { "red and slate", "green and white", "navy and gold", "black and amber", "sky and claret" };
+        var color = colors[Math.Abs(WorldSeed + (SelectedClubName?.Length ?? 0)) % colors.Length];
+        return $"Club template: {SelectedClubName ?? "club"} colors {color}; archetype {ClubArchetypeName}; board {BoardPhilosophyName}; fans {FanCultureName}; Director {DirectorOfFootballStyleName}; rival {PrimaryRivalName}; budget {BudgetSummary}; academy {YouthAcademyQuality}/100.";
+    }
+
+    private string BuildGeneratedConsistencySummary()
+    {
+        var hasPlaceholder = GeneratedNamePoolSummary.Contains("Player ", StringComparison.Ordinal) ||
+            GeneratedNewsTemplateSummary.Contains("{", StringComparison.Ordinal) ||
+            GeneratedScoutTemplateSummary.Contains("{", StringComparison.Ordinal) ||
+            GeneratedMediaQuestionSummary.Contains("{", StringComparison.Ordinal);
+        return hasPlaceholder
+            ? "Consistency check failed: generated text contains unresolved placeholders."
+            : "Consistency check passed: generated text is seeded, template-based, fictional, and tied to visible career facts.";
+    }
+
+    private static string ResolveGeneratedReliability(NewsCategory category)
+    {
+        return category switch
+        {
+            NewsCategory.Scouting => "Staff report",
+            NewsCategory.Pressure => "Media Speculation",
+            NewsCategory.Career => "Agent briefing",
+            _ => "Confirmed"
+        };
+    }
+
     private void EvaluateCareerFoundationState()
     {
         RefreshPressureCategories();
@@ -4842,6 +5115,15 @@ public partial class GameState
         if (_jobMarketHistory.Count > 14)
         {
             _jobMarketHistory.RemoveAt(_jobMarketHistory.Count - 1);
+        }
+    }
+
+    private void RecordGeneratedContentHistory(string detail)
+    {
+        _generatedContentHistory.Insert(0, $"{CurrentDateLabel}: {detail}");
+        if (_generatedContentHistory.Count > 16)
+        {
+            _generatedContentHistory.RemoveAt(_generatedContentHistory.Count - 1);
         }
     }
 
