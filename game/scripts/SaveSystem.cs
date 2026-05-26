@@ -53,6 +53,14 @@ public sealed class SaveSlotCareerProfileData
     public int StaffTrust { get; set; }
     public int DirectorTrust { get; set; }
     public int MediaPressure { get; set; }
+    public string StrictRealismName { get; set; } = "Balanced";
+    public string DramaFrequencyName { get; set; } = "Balanced";
+    public string ScoutingDifficultyName { get; set; } = "Balanced";
+    public string SackingStrictnessName { get; set; } = "Balanced";
+    public string TransferDifficultyName { get; set; } = "Balanced";
+    public string HiddenInfoName { get; set; } = "Balanced uncertainty";
+    public string MatchRandomnessName { get; set; } = "Balanced";
+    public string FinanceDifficultyName { get; set; } = "Balanced";
 }
 
 public sealed class SaveSlotClubFoundationData
@@ -200,7 +208,7 @@ public partial class SaveSystem : Node
         WriteIndented = true,
         PropertyNameCaseInsensitive = true
     };
-    public const int CurrentSaveVersion = 24;
+    public const int CurrentSaveVersion = 26;
 
     public static SaveSystem? Instance { get; private set; }
     public string LastStatusMessage { get; private set; } = "Save system idle.";
@@ -753,7 +761,15 @@ public partial class SaveSystem : Node
             PlayerTrust = profile.PlayerTrust,
             StaffTrust = profile.StaffTrust,
             DirectorTrust = profile.DirectorTrust,
-            MediaPressure = profile.MediaPressure
+            MediaPressure = profile.MediaPressure,
+            StrictRealismName = CareerDifficultyProfile.GetDisplayName(profile.Difficulty.StrictRealism),
+            DramaFrequencyName = CareerDifficultyProfile.GetDisplayName(profile.Difficulty.DramaFrequency),
+            ScoutingDifficultyName = CareerDifficultyProfile.GetDisplayName(profile.Difficulty.ScoutingDifficulty),
+            SackingStrictnessName = CareerDifficultyProfile.GetDisplayName(profile.Difficulty.SackingStrictness),
+            TransferDifficultyName = CareerDifficultyProfile.GetDisplayName(profile.Difficulty.TransferDifficulty),
+            HiddenInfoName = CareerDifficultyProfile.GetDisplayName(profile.Difficulty.HiddenInfo),
+            MatchRandomnessName = CareerDifficultyProfile.GetDisplayName(profile.Difficulty.MatchRandomness),
+            FinanceDifficultyName = CareerDifficultyProfile.GetDisplayName(profile.Difficulty.FinanceDifficulty)
         };
     }
 
@@ -828,7 +844,15 @@ public partial class SaveSystem : Node
             PlayerTrust = source.PlayerTrust,
             StaffTrust = source.StaffTrust,
             DirectorTrust = source.DirectorTrust,
-            MediaPressure = source.MediaPressure
+            MediaPressure = source.MediaPressure,
+            StrictRealismName = source.StrictRealismName,
+            DramaFrequencyName = source.DramaFrequencyName,
+            ScoutingDifficultyName = source.ScoutingDifficultyName,
+            SackingStrictnessName = source.SackingStrictnessName,
+            TransferDifficultyName = source.TransferDifficultyName,
+            HiddenInfoName = source.HiddenInfoName,
+            MatchRandomnessName = source.MatchRandomnessName,
+            FinanceDifficultyName = source.FinanceDifficultyName
         };
     }
 
@@ -1070,6 +1094,17 @@ public partial class SaveSystem : Node
             GeneratedClubTemplateSummary = source.GeneratedClubTemplateSummary,
             GeneratedConsistencySummary = source.GeneratedConsistencySummary,
             GeneratedContentHistory = source.GeneratedContentHistory == null ? null : (string[])source.GeneratedContentHistory.Clone(),
+            StructuredCareerMemory = source.StructuredCareerMemory == null
+                ? null
+                : Array.ConvertAll(
+                    source.StructuredCareerMemory,
+                    entry => new SaveSlotCareerMemoryEntryData
+                    {
+                        DateLabel = entry.DateLabel,
+                        Category = entry.Category,
+                        Summary = entry.Summary,
+                        RelatedEntities = entry.RelatedEntities == null ? null : (string[])entry.RelatedEntities.Clone()
+                    }),
             FanTrust = source.FanTrust,
             MediaTrust = source.MediaTrust,
             WorldReputation = source.WorldReputation,

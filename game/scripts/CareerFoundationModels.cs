@@ -134,6 +134,7 @@ public sealed class CareerProfile
     public required int StaffTrust { get; set; }
     public required int DirectorTrust { get; set; }
     public required int MediaPressure { get; set; }
+    public CareerDifficultyProfile Difficulty { get; set; } = CareerDifficultyProfile.BalancedDefaults();
 }
 
 public sealed class Club
@@ -213,7 +214,8 @@ public static class CareerFoundation
         int careerSeed,
         ManagerRole role,
         ManagerBackground background,
-        ManagerLicense license)
+        ManagerLicense license,
+        CareerDifficultyProfile? difficulty = null)
     {
         var backgroundEffect = GetBackgroundEffect(background);
         var licenseTrustModifier = GetLicenseTrustModifier(license);
@@ -224,6 +226,7 @@ public static class CareerFoundation
             Role = role,
             Background = background,
             License = license,
+            Difficulty = difficulty ?? CareerDifficultyProfile.BalancedDefaults(),
             Reputation = Math.Clamp(backgroundEffect.reputation + GetLicenseReputationModifier(license), 0, 100),
             BoardTrust = Math.Clamp(backgroundEffect.boardTrust + licenseTrustModifier, 0, 100),
             PlayerTrust = Math.Clamp(backgroundEffect.playerTrust + licenseTrustModifier, 0, 100),

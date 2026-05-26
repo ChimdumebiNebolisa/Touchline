@@ -25,7 +25,8 @@ public static class MatchSimulator
 
     public static MatchPlaybackResult Simulate(GameState state)
     {
-        var rng = new Random(state.WorldSeed * 31 + state.CurrentMatchday * 17 + state.PressIntensity + state.Risk);
+        var randomSpread = state.CareerProfile.Difficulty.MatchRandomnessSpread();
+        var rng = new Random(state.WorldSeed * 31 + state.CurrentMatchday * 17 + state.PressIntensity + state.Risk + randomSpread * 7);
         var homeClubName = state.SelectedClubName ?? "Home";
         var awayClubName = state.CurrentOpponentName;
         var tacticalShape = BuildTacticalShape(state.TacticalFormation, state.Width);
@@ -47,11 +48,11 @@ public static class MatchSimulator
         var setPieceEffect = ResolveSetPieceEffect(state);
         var opponentPrepEffect = ResolveOpponentPreparationEffect(state);
         var plannedHomeGoals = Math.Clamp(
-            (homeAttackQuality - awayDefensiveQuality + state.PressIntensity / 3 + state.Tempo / 2 + state.Risk / 2 + staffPreparation + moraleEffect + familiarityEffect + roleFitEffect + setPieceEffect + opponentPrepEffect - 78) / 24 + rng.Next(0, 2),
+            (homeAttackQuality - awayDefensiveQuality + state.PressIntensity / 3 + state.Tempo / 2 + state.Risk / 2 + staffPreparation + moraleEffect + familiarityEffect + roleFitEffect + setPieceEffect + opponentPrepEffect - 78) / 24 + rng.Next(0, randomSpread + 1),
             0,
             4);
         var plannedAwayGoals = Math.Clamp(
-            (awayAttackQuality - homeDefensiveQuality + state.Risk / 2 + (100 - state.PressIntensity) / 4 - moraleEffect - familiarityEffect - roleFitEffect / 2 - opponentPrepEffect - (state.SetPieceApproach == TacticalSetPieceApproach.DefensiveSecurity ? 1 : 0) - 45) / 28 + rng.Next(0, 2),
+            (awayAttackQuality - homeDefensiveQuality + state.Risk / 2 + (100 - state.PressIntensity) / 4 - moraleEffect - familiarityEffect - roleFitEffect / 2 - opponentPrepEffect - (state.SetPieceApproach == TacticalSetPieceApproach.DefensiveSecurity ? 1 : 0) - 45) / 28 + rng.Next(0, randomSpread + 1),
             0,
             3);
         if (plannedHomeGoals == 0 && plannedAwayGoals == 0)

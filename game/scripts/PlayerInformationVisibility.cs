@@ -32,7 +32,8 @@ public static class PlayerInformationVisibility
         int scoutQuality,
         int dataAnalystQuality,
         int staffQuality,
-        int reportQuality)
+        int reportQuality,
+        int difficultyKnowledgeModifier = 0)
     {
         var knowledgeScore = CalculateKnowledgeScore(
             context,
@@ -43,7 +44,8 @@ public static class PlayerInformationVisibility
             staffQuality,
             reportQuality,
             player.PlayerFamiliarity,
-            player.ScoutingConfidence);
+            player.ScoutingConfidence,
+            difficultyKnowledgeModifier);
 
         return BuildReportFromScore(player, context, knowledgeScore, license, scoutQuality, dataAnalystQuality, staffQuality);
     }
@@ -56,7 +58,8 @@ public static class PlayerInformationVisibility
         int scoutQuality,
         int dataAnalystQuality,
         int staffQuality,
-        int reportQuality)
+        int reportQuality,
+        int difficultyKnowledgeModifier = 0)
     {
         var squadPlayer = new GameState.SquadPlayer
         {
@@ -104,7 +107,8 @@ public static class PlayerInformationVisibility
             scoutQuality,
             dataAnalystQuality,
             staffQuality,
-            reportQuality);
+            reportQuality,
+            difficultyKnowledgeModifier);
     }
 
     private static PlayerInformationReport BuildReportFromScore(
@@ -190,7 +194,8 @@ public static class PlayerInformationVisibility
         int staffQuality,
         int reportQuality,
         int playerFamiliarity,
-        int scoutingConfidence)
+        int scoutingConfidence,
+        int difficultyKnowledgeModifier)
     {
         var score = context switch
         {
@@ -206,6 +211,7 @@ public static class PlayerInformationVisibility
         score += reportQuality / (context == PlayerKnowledgeContext.OwnSquad ? 8 : 4);
         score += playerFamiliarity / (context == PlayerKnowledgeContext.OwnSquad ? 3 : 5);
         score += scoutingConfidence / (context == PlayerKnowledgeContext.OwnSquad ? 5 : 3);
+        score += difficultyKnowledgeModifier;
         return Math.Clamp(score, 5, 96);
     }
 

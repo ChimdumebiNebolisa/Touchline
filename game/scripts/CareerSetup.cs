@@ -13,6 +13,14 @@ public partial class CareerSetup : Control
     private OptionButton _roleOption = default!;
     private OptionButton _backgroundOption = default!;
     private OptionButton _licenseOption = default!;
+    private OptionButton _strictRealismOption = default!;
+    private OptionButton _dramaFrequencyOption = default!;
+    private OptionButton _scoutingDifficultyOption = default!;
+    private OptionButton _sackingStrictnessOption = default!;
+    private OptionButton _transferDifficultyOption = default!;
+    private OptionButton _hiddenInfoOption = default!;
+    private OptionButton _matchRandomnessOption = default!;
+    private OptionButton _financeDifficultyOption = default!;
     private Label _statusLabel = default!;
     private Label _managerPreviewLabel = default!;
     private Label _seedPreviewLabel = default!;
@@ -24,6 +32,7 @@ public partial class CareerSetup : Control
     private Label _startDatePreviewLabel = default!;
     private Label _persistencePreviewLabel = default!;
     private Label _seedImpactPreviewLabel = default!;
+    private Label _difficultyPreviewLabel = default!;
     private Button _startCareerButton = default!;
     private Button _backButton = default!;
 
@@ -45,6 +54,14 @@ public partial class CareerSetup : Control
         _roleOption = GetNode<OptionButton>("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/RoleOption");
         _backgroundOption = GetNode<OptionButton>("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/BackgroundOption");
         _licenseOption = GetNode<OptionButton>("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/LicenseOption");
+        _strictRealismOption = GetNode<OptionButton>("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/StrictRealismOption");
+        _dramaFrequencyOption = GetNode<OptionButton>("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/DramaFrequencyOption");
+        _scoutingDifficultyOption = GetNode<OptionButton>("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/ScoutingDifficultyOption");
+        _sackingStrictnessOption = GetNode<OptionButton>("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/SackingStrictnessOption");
+        _transferDifficultyOption = GetNode<OptionButton>("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/TransferDifficultyOption");
+        _hiddenInfoOption = GetNode<OptionButton>("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/HiddenInfoOption");
+        _matchRandomnessOption = GetNode<OptionButton>("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/MatchRandomnessOption");
+        _financeDifficultyOption = GetNode<OptionButton>("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/FinanceDifficultyOption");
         _statusLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/StatusLabel");
         _managerPreviewLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent/ManagerPreviewLabel");
         _seedPreviewLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent/SeedPreviewLabel");
@@ -56,6 +73,7 @@ public partial class CareerSetup : Control
         _startDatePreviewLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent/StartDatePreviewLabel");
         _persistencePreviewLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent/PersistencePreviewLabel");
         _seedImpactPreviewLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent/SeedImpactPreviewLabel");
+        _difficultyPreviewLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent/DifficultyPreviewLabel");
         _startCareerButton = GetNode<Button>("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/ActionsRow/StartCareerButton");
         _backButton = GetNode<Button>("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/ActionsRow/BackButton");
     }
@@ -68,6 +86,14 @@ public partial class CareerSetup : Control
         EnsureSelectionField(formContent, ref insertIndex, "RoleLabel", "Role", "RoleOption", CareerFoundation.RoleDisplayNames, 2);
         EnsureSelectionField(formContent, ref insertIndex, "BackgroundLabel", "Manager background", "BackgroundOption", CareerFoundation.BackgroundDisplayNames, 1);
         EnsureSelectionField(formContent, ref insertIndex, "LicenseLabel", "Starting license", "LicenseOption", CareerFoundation.LicenseDisplayNames, 1);
+        EnsureSelectionField(formContent, ref insertIndex, "StrictRealismLabel", "Strict realism", "StrictRealismOption", CareerDifficultyOptions.StrictRealism, 1);
+        EnsureSelectionField(formContent, ref insertIndex, "DramaFrequencyLabel", "Drama frequency", "DramaFrequencyOption", CareerDifficultyOptions.DramaFrequency, 1);
+        EnsureSelectionField(formContent, ref insertIndex, "ScoutingDifficultyLabel", "Scouting difficulty", "ScoutingDifficultyOption", CareerDifficultyOptions.ScoutingDifficulty, 1);
+        EnsureSelectionField(formContent, ref insertIndex, "SackingStrictnessLabel", "Sacking strictness", "SackingStrictnessOption", CareerDifficultyOptions.SackingStrictness, 1);
+        EnsureSelectionField(formContent, ref insertIndex, "TransferDifficultyLabel", "Transfer difficulty", "TransferDifficultyOption", CareerDifficultyOptions.TransferDifficulty, 1);
+        EnsureSelectionField(formContent, ref insertIndex, "HiddenInfoLabel", "Hidden information", "HiddenInfoOption", CareerDifficultyOptions.HiddenInfo, 1);
+        EnsureSelectionField(formContent, ref insertIndex, "MatchRandomnessLabel", "Match randomness", "MatchRandomnessOption", CareerDifficultyOptions.MatchRandomness, 1);
+        EnsureSelectionField(formContent, ref insertIndex, "FinanceDifficultyLabel", "Finance difficulty", "FinanceDifficultyOption", CareerDifficultyOptions.FinanceDifficulty, 1);
 
         var previewContent = GetNode<VBoxContainer>("RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent");
         var worldPackNode = previewContent.GetNode("WorldPackPreviewLabel");
@@ -76,6 +102,7 @@ public partial class CareerSetup : Control
         EnsurePreviewLabel(previewContent, ref previewIndex, "BackgroundPreviewLabel");
         EnsurePreviewLabel(previewContent, ref previewIndex, "LicensePreviewLabel");
         EnsurePreviewLabel(previewContent, ref previewIndex, "AuthorityPreviewLabel");
+        EnsurePreviewLabel(previewContent, ref previewIndex, "DifficultyPreviewLabel");
     }
 
     private void EnsureSelectionField(
@@ -167,6 +194,7 @@ public partial class CareerSetup : Control
         TouchlineTheme.ApplyMutedStyle(_startDatePreviewLabel, 15);
         TouchlineTheme.ApplyMutedStyle(_persistencePreviewLabel, 15);
         TouchlineTheme.ApplyMutedStyle(_seedImpactPreviewLabel, 15);
+        TouchlineTheme.ApplyMutedStyle(_difficultyPreviewLabel, 15);
     }
 
     private void RefreshPreview()
@@ -196,6 +224,7 @@ public partial class CareerSetup : Control
             _startDatePreviewLabel.Text = "Start date unavailable.";
             _persistencePreviewLabel.Text = "Persistence preview unavailable.";
             _seedImpactPreviewLabel.Text = "Seed impact unavailable.";
+            _difficultyPreviewLabel.Text = "Difficulty | unavailable";
             return;
         }
 
@@ -211,6 +240,7 @@ public partial class CareerSetup : Control
         _startDatePreviewLabel.Text = $"Start date | {startDate:ddd d MMM yyyy}";
         _persistencePreviewLabel.Text = "Persistence | Career state, squad, fixtures, and season context save to Slot 1.";
         _seedImpactPreviewLabel.Text = "Seed impact | Clubs, competition start, tactical defaults, and future saves stay anchored to this world.";
+        _difficultyPreviewLabel.Text = BuildSelectedDifficultyProfile().Summary;
     }
 
     private void OnManagerNameChanged(string _newText)
@@ -249,7 +279,8 @@ public partial class CareerSetup : Control
             seed,
             GetSelectedText(_roleOption),
             GetSelectedText(_backgroundOption),
-            GetSelectedText(_licenseOption)))
+            GetSelectedText(_licenseOption),
+            BuildSelectedDifficultyProfile()))
         {
             _statusLabel.Text = TouchlineWorldGenerator.Instance.LastStatusMessage;
             return;
@@ -267,5 +298,20 @@ public partial class CareerSetup : Control
     private static string GetSelectedText(OptionButton option)
     {
         return option.GetItemText(option.Selected);
+    }
+
+    private CareerDifficultyProfile BuildSelectedDifficultyProfile()
+    {
+        return new CareerDifficultyProfile
+        {
+            StrictRealism = CareerDifficultyProfile.ParseStrictRealism(GetSelectedText(_strictRealismOption)),
+            DramaFrequency = CareerDifficultyProfile.ParseDramaFrequency(GetSelectedText(_dramaFrequencyOption)),
+            ScoutingDifficulty = CareerDifficultyProfile.ParseScoutingDifficulty(GetSelectedText(_scoutingDifficultyOption)),
+            SackingStrictness = CareerDifficultyProfile.ParseSackingStrictness(GetSelectedText(_sackingStrictnessOption)),
+            TransferDifficulty = CareerDifficultyProfile.ParseTransferDifficulty(GetSelectedText(_transferDifficultyOption)),
+            HiddenInfo = CareerDifficultyProfile.ParseHiddenInfo(GetSelectedText(_hiddenInfoOption)),
+            MatchRandomness = CareerDifficultyProfile.ParseMatchRandomness(GetSelectedText(_matchRandomnessOption)),
+            FinanceDifficulty = CareerDifficultyProfile.ParseFinanceDifficulty(GetSelectedText(_financeDifficultyOption))
+        };
     }
 }

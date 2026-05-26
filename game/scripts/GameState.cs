@@ -276,7 +276,8 @@ public partial class GameState : Node
             bootstrap.CareerSeed,
             bootstrap.Role,
             bootstrap.Background,
-            bootstrap.License);
+            bootstrap.License,
+            bootstrap.Difficulty);
         CurrentClub = null;
         CareerInitialized = true;
         WorldSeed = bootstrap.WorldSeed;
@@ -1578,7 +1579,23 @@ public partial class GameState : Node
         profile.StaffTrust = data.StaffTrust > 0 ? data.StaffTrust : profile.StaffTrust;
         profile.DirectorTrust = data.DirectorTrust > 0 ? data.DirectorTrust : profile.DirectorTrust;
         profile.MediaPressure = data.MediaPressure > 0 ? data.MediaPressure : profile.MediaPressure;
+        profile.Difficulty = RestoreDifficultyProfile(data);
         return profile;
+    }
+
+    private static CareerDifficultyProfile RestoreDifficultyProfile(SaveSlotCareerProfileData data)
+    {
+        return new CareerDifficultyProfile
+        {
+            StrictRealism = CareerDifficultyProfile.ParseStrictRealism(data.StrictRealismName),
+            DramaFrequency = CareerDifficultyProfile.ParseDramaFrequency(data.DramaFrequencyName),
+            ScoutingDifficulty = CareerDifficultyProfile.ParseScoutingDifficulty(data.ScoutingDifficultyName),
+            SackingStrictness = CareerDifficultyProfile.ParseSackingStrictness(data.SackingStrictnessName),
+            TransferDifficulty = CareerDifficultyProfile.ParseTransferDifficulty(data.TransferDifficultyName),
+            HiddenInfo = CareerDifficultyProfile.ParseHiddenInfo(data.HiddenInfoName),
+            MatchRandomness = CareerDifficultyProfile.ParseMatchRandomness(data.MatchRandomnessName),
+            FinanceDifficulty = CareerDifficultyProfile.ParseFinanceDifficulty(data.FinanceDifficultyName)
+        };
     }
 
     private Club? RestoreClubFoundation(SaveSlotClubFoundationData? data)

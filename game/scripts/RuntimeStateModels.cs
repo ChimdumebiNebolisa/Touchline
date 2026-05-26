@@ -22,6 +22,7 @@ public sealed class CareerBootstrapState
     public required int Width { get; init; }
     public required int Risk { get; init; }
     public required string FormSummary { get; init; }
+    public CareerDifficultyProfile Difficulty { get; init; } = CareerDifficultyProfile.BalancedDefaults();
 }
 
 public sealed class ClubSelectionState

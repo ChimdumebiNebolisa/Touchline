@@ -1,6 +1,14 @@
 using System;
 using System.Collections.Generic;
 
+public sealed class SaveSlotCareerMemoryEntryData
+{
+    public string DateLabel { get; set; } = string.Empty;
+    public string Category { get; set; } = string.Empty;
+    public string Summary { get; set; } = string.Empty;
+    public string[]? RelatedEntities { get; set; }
+}
+
 public sealed class SaveSlotStageFoundationData
 {
     public string TeamStyleName { get; set; } = "Balanced";
@@ -67,6 +75,7 @@ public sealed class SaveSlotStageFoundationData
     public string GeneratedClubTemplateSummary { get; set; } = string.Empty;
     public string GeneratedConsistencySummary { get; set; } = string.Empty;
     public string[]? GeneratedContentHistory { get; set; }
+    public SaveSlotCareerMemoryEntryData[]? StructuredCareerMemory { get; set; }
     public int FanTrust { get; set; } = 55;
     public int MediaTrust { get; set; } = 52;
     public int WorldReputation { get; set; } = 45;
@@ -320,6 +329,7 @@ public partial class GameState
     private readonly List<string> _sackingHistory = new();
     private readonly List<string> _jobMarketHistory = new();
     private readonly List<string> _generatedContentHistory = new();
+    private readonly List<SaveSlotCareerMemoryEntryData> _structuredCareerMemory = new();
     private readonly List<string> _perceptionHistory = new();
     private readonly List<string> _transferHistory = new();
     private readonly List<string> _contractHistory = new();
@@ -507,7 +517,11 @@ public partial class GameState
         ? "Recruitment foundation pending scouting target."
         : $"{CurrentRecruitmentTarget.PlayerName} ({CurrentRecruitmentTarget.Position}) | {CurrentRecruitmentTarget.InformationSummary} | {CurrentRecruitmentTarget.InterestSummary} | {CurrentRecruitmentTarget.TacticalFitSummary} | Fee {CurrentRecruitmentTarget.EstimatedFeeRange} | Wage {CurrentRecruitmentTarget.EstimatedWageRange} | Status {CurrentRecruitmentTarget.TargetStatus} | Valuation {CurrentRecruitmentTarget.ClubValuation} | Agent {CurrentRecruitmentTarget.AgentMood} | Rival {CurrentRecruitmentTarget.RivalInterest} | Board {CurrentRecruitmentTarget.BoardStance} | Director {CurrentRecruitmentTarget.DirectorStance} | Outcome {CurrentRecruitmentTarget.OutcomeState} | {CurrentRecruitmentTarget.Status}\nDirector of Football\n{DirectorInfluenceSummary}\nShortlist\n{RecruitmentShortlistSummary}\nContracts\n{ContractFoundationSummary}\nTransfer history\n{TransferHistorySummary}";
     public string TrainingScoutingSummary => $"{TrainingFocusName} ({TrainingIntensityName}): {TrainingStatusSummary}\nScouting depth: {ScoutingReportDepthName}\nScouting: {BuildScoutingSummary()}\nDevelopment\n{PlayerDevelopmentSummary}\nDevelopment history\n{PlayerDevelopmentHistorySummary}\nRegistration\n{RegistrationStatusSummary}\n{RegistrationIssuesSummary}\nStaff effects\n{StaffImpactSummary}";
-    public string CareerMarketSummary => $"Job security: {JobSecurityName}\nObjective reviews\n{ObjectiveReviewSummary}\n{ObjectiveWarningSummary}\n{UltimatumSummary}\n{SackingSummary}\nObjective history\n{ObjectiveReviewHistorySummary}\nSacking history\n{SackingHistorySummary}\n{TrustSummary}\n{ReputationSummary}\n{PressureCategorySummary}\nLeague system\n{LeaguePyramidSummary}\n{PromotionRelegationSummary}\n{ShadowLeagueSummary}\nLeague history\n{LeagueHistorySummary}\nCup competitions\n{CupStatusSummary}\n{CupDrawSummary}\n{CupObjectiveSummary}\nCup history\n{CupHistorySummary}\nRivalries\n{RivalryStatusSummary}\n{RivalryPressureSummary}\nRivalry history\n{RivalryHistorySummary}\nFinance\n{FinanceSummary}\nFinance history\n{FinanceHistorySummary}\nLicense: {LicenseOpportunitySummary}\n{LicenseCourseStatusSummary}\nJob market\n{JobMarketStateSummary}\n{JobApplicationSummary}\n{JobInterviewSummary}\n{JobMovementSummary}\n{BuildJobOfferSummary()}\nJob market history\n{JobMarketHistorySummary}\nGenerated content\n{GeneratedContentSummary}\n{GeneratedNewsTemplateSummary}\n{GeneratedScoutTemplateSummary}\n{GeneratedMediaQuestionSummary}\n{GeneratedNamePoolSummary}\n{GeneratedClubTemplateSummary}\n{GeneratedConsistencySummary}\nGenerated content history\n{GeneratedContentHistorySummary}";
+    public string DifficultySettingsSummary => CareerProfile?.Difficulty.Summary ?? CareerDifficultyProfile.BalancedDefaults().Summary;
+    public string StructuredCareerMemorySummary => _structuredCareerMemory.Count == 0
+        ? "Structured career memory starts after appointments, results, transfers, and job moves."
+        : string.Join("\n", _structuredCareerMemory.ConvertAll(entry => $"{entry.DateLabel} [{entry.Category}] {entry.Summary}"));
+    public string CareerMarketSummary => $"Job security: {JobSecurityName}\nObjective reviews\n{ObjectiveReviewSummary}\n{ObjectiveWarningSummary}\n{UltimatumSummary}\n{SackingSummary}\nObjective history\n{ObjectiveReviewHistorySummary}\nSacking history\n{SackingHistorySummary}\n{TrustSummary}\n{ReputationSummary}\n{PressureCategorySummary}\nDifficulty settings\n{DifficultySettingsSummary}\nLeague system\n{LeaguePyramidSummary}\n{PromotionRelegationSummary}\n{ShadowLeagueSummary}\nLeague history\n{LeagueHistorySummary}\nCup competitions\n{CupStatusSummary}\n{CupDrawSummary}\n{CupObjectiveSummary}\nCup history\n{CupHistorySummary}\nRivalries\n{RivalryStatusSummary}\n{RivalryPressureSummary}\nRivalry history\n{RivalryHistorySummary}\nFinance\n{FinanceSummary}\nFinance history\n{FinanceHistorySummary}\nLicense: {LicenseOpportunitySummary}\n{LicenseCourseStatusSummary}\nJob market\n{JobMarketStateSummary}\n{JobApplicationSummary}\n{JobInterviewSummary}\n{JobMovementSummary}\n{BuildJobOfferSummary()}\nJob market history\n{JobMarketHistorySummary}\nStructured career memory\n{StructuredCareerMemorySummary}\nGenerated content\n{GeneratedContentSummary}\n{GeneratedNewsTemplateSummary}\n{GeneratedScoutTemplateSummary}\n{GeneratedMediaQuestionSummary}\n{GeneratedNamePoolSummary}\n{GeneratedClubTemplateSummary}\n{GeneratedConsistencySummary}\nGenerated content history\n{GeneratedContentHistorySummary}";
     public string TacticsFoundationSummary => $"{TeamStyleName} | {TeamInstructionsSummary}\n{SetPieceSummary}\n{OpponentPreparationSummary}\n{PlayerRolesSummary}\n{PlayerInstructionsSummary}\n{TacticalRoleFitSummary}\n{PlayerFamiliaritySummary}\n{TacticalFitNotes}\n{TacticalRiskNotes}";
 
     public void UpdateTactics(string formation, string teamStyle, int pressIntensity, int tempo, int width, int risk)
@@ -1166,11 +1180,7 @@ public partial class GameState
         LicenseOpportunitySummary = BuildLicenseOpportunitySummary();
         LicenseCourseStatusSummary = BuildLicenseCourseStatusSummary();
         RecordJobMarketHistory($"Career move completed: {previousClub} -> {offer.ClubName} as {offer.RoleName}.");
-        _careerHistory.Insert(0, JobMovementSummary);
-        if (_careerHistory.Count > 18)
-        {
-            _careerHistory.RemoveAt(_careerHistory.Count - 1);
-        }
+        InsertCareerHistory(JobMovementSummary, "Career move", offer.ClubName, previousClub);
 
         AddNews(
             "Career move completed",
@@ -1301,6 +1311,7 @@ public partial class GameState
             GeneratedClubTemplateSummary = GeneratedClubTemplateSummary,
             GeneratedConsistencySummary = GeneratedConsistencySummary,
             GeneratedContentHistory = _generatedContentHistory.ToArray(),
+            StructuredCareerMemory = _structuredCareerMemory.ToArray(),
             FanTrust = FanTrust,
             MediaTrust = MediaTrust,
             WorldReputation = WorldReputation,
@@ -1536,6 +1547,16 @@ public partial class GameState
         if (data.CareerHistory != null)
         {
             _careerHistory.AddRange(data.CareerHistory);
+        }
+
+        _structuredCareerMemory.Clear();
+        if (data.StructuredCareerMemory != null && data.StructuredCareerMemory.Length > 0)
+        {
+            _structuredCareerMemory.AddRange(data.StructuredCareerMemory);
+        }
+        else
+        {
+            MigrateShallowCareerHistoryToStructured();
         }
 
         LicenseOpportunitySummary = string.IsNullOrWhiteSpace(data.LicenseOpportunitySummary) ? "License progression will be reviewed after sustained progress." : data.LicenseOpportunitySummary;
@@ -1888,6 +1909,7 @@ public partial class GameState
         _sackingHistory.Clear();
         _jobMarketHistory.Clear();
         _generatedContentHistory.Clear();
+        _structuredCareerMemory.Clear();
         _perceptionHistory.Clear();
         _transferHistory.Clear();
         _contractHistory.Clear();
@@ -2009,7 +2031,8 @@ public partial class GameState
             scoutQuality,
             analystQuality,
             staffQuality,
-            reportQuality);
+            reportQuality,
+            CareerProfile.Difficulty.KnowledgeScoreModifier());
     }
 
     public string BuildPlayerInformationSummary(GameState.SquadPlayer player)
@@ -4657,7 +4680,10 @@ public partial class GameState
 
         if (_careerHistory.Count == 0 && !string.IsNullOrWhiteSpace(SelectedClubName))
         {
-            _careerHistory.Add($"{CurrentDateLabel}: appointed {CurrentRoleName} of {SelectedClubName} with {LicenseName}.");
+            InsertCareerHistory(
+                $"{CurrentDateLabel}: appointed {CurrentRoleName} of {SelectedClubName} with {LicenseName}.",
+                "Appointment",
+                SelectedClubName);
         }
     }
 
@@ -4874,13 +4900,17 @@ public partial class GameState
             return;
         }
 
-        if (reviewScore >= 96 && UltimatumActive)
+        var warningThreshold = TouchlineBalanceConstants.ObjectiveWarningThreshold + CareerProfile.Difficulty.WarningThresholdModifier();
+        var ultimatumThreshold = TouchlineBalanceConstants.ObjectiveUltimatumThreshold + CareerProfile.Difficulty.UltimatumThresholdModifier();
+        var sackingThreshold = TouchlineBalanceConstants.ObjectiveSackingThreshold + CareerProfile.Difficulty.UltimatumThresholdModifier();
+
+        if (reviewScore >= sackingThreshold && UltimatumActive)
         {
             ApplySackingAftermath(trigger, reviewScore);
             return;
         }
 
-        if (reviewScore >= 84)
+        if (reviewScore >= ultimatumThreshold)
         {
             ObjectiveWarningIssued = true;
             UltimatumActive = true;
@@ -4902,7 +4932,7 @@ public partial class GameState
             return;
         }
 
-        if (reviewScore >= 68)
+        if (reviewScore >= warningThreshold)
         {
             ObjectiveWarningIssued = true;
             JobSecurity = JobSecurityState.UnderPressure;
@@ -4960,6 +4990,7 @@ public partial class GameState
         score += CurrentClub?.FanCulture == FanCulture.DerbyObsessed && RivalryLosses > RivalryWins ? 5 : 0;
         score += RegistrationValid ? 0 : 8;
         score += WageStructurePressure >= 70 ? 4 : 0;
+        score += CareerProfile.Difficulty.ObjectivePressureModifier();
 
         return Math.Clamp(score, 0, 100);
     }
@@ -4980,11 +5011,7 @@ public partial class GameState
         CareerProfile.BoardTrust = Math.Clamp(CareerProfile.BoardTrust - 8, 0, 100);
         CareerProfile.MediaPressure = Math.Clamp(CareerProfile.MediaPressure + 10, 0, 100);
         var detail = $"{CurrentDateLabel}: sacked by {SelectedClubName}; reason: failed objective review after ultimatum, score {reviewScore}/100.";
-        _careerHistory.Insert(0, detail);
-        if (_careerHistory.Count > 18)
-        {
-            _careerHistory.RemoveAt(_careerHistory.Count - 1);
-        }
+        InsertCareerHistory(detail, "Sacking", SelectedClubName ?? "club");
 
         RecordSackingHistory($"{trigger}: dismissal confirmed at objective score {reviewScore}; reputation now {WorldReputation}.");
         RecordPerceptionHistory("Sacking aftermath", $"world reputation {WorldReputation}, media reputation {MediaReputation}, board trust {CareerProfile.BoardTrust}");
@@ -5125,6 +5152,242 @@ public partial class GameState
         {
             _generatedContentHistory.RemoveAt(_generatedContentHistory.Count - 1);
         }
+    }
+
+    private void InsertCareerHistory(string detail, string category, params string[] relatedEntities)
+    {
+        _careerHistory.Insert(0, detail);
+        if (_careerHistory.Count > 18)
+        {
+            _careerHistory.RemoveAt(_careerHistory.Count - 1);
+        }
+
+        RecordStructuredCareerMemory(category, detail, relatedEntities);
+    }
+
+    private void RecordStructuredCareerMemory(string category, string summary, params string[] relatedEntities)
+    {
+        _structuredCareerMemory.Insert(0, new SaveSlotCareerMemoryEntryData
+        {
+            DateLabel = CurrentDateLabel,
+            Category = category,
+            Summary = summary,
+            RelatedEntities = relatedEntities.Length == 0 ? null : relatedEntities
+        });
+        if (_structuredCareerMemory.Count > 24)
+        {
+            _structuredCareerMemory.RemoveAt(_structuredCareerMemory.Count - 1);
+        }
+    }
+
+    private void MigrateShallowCareerHistoryToStructured()
+    {
+        if (_structuredCareerMemory.Count > 0 || _careerHistory.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var entry in _careerHistory)
+        {
+            var category = entry.Contains("sacked", StringComparison.OrdinalIgnoreCase)
+                ? "Sacking"
+                : entry.Contains("moved from", StringComparison.OrdinalIgnoreCase)
+                    ? "Career move"
+                    : entry.Contains("appointed", StringComparison.OrdinalIgnoreCase)
+                        ? "Appointment"
+                        : "Career note";
+            RecordStructuredCareerMemory(category, entry);
+        }
+    }
+
+    private int ApplyFinanceDifficultyBudget(int baseBudget)
+    {
+        var modifier = CareerProfile.Difficulty.FinanceBudgetModifierPercent();
+        return Math.Max(0, baseBudget + baseBudget * modifier / 100);
+    }
+
+    public string ValidatePhase23DifficultySettingsContract()
+    {
+        InitializeStageFoundationsForClub();
+        if (SquadPlayers.Length == 0)
+        {
+            return "No squad players available for difficulty validation.";
+        }
+
+        var relaxed = new CareerDifficultyProfile
+        {
+            StrictRealism = StrictRealismSetting.Relaxed,
+            HiddenInfo = HiddenInfoSetting.LowUncertainty,
+            ScoutingDifficulty = ScoutingDifficultySetting.Generous,
+            SackingStrictness = SackingStrictnessSetting.Forgiving,
+            FinanceDifficulty = FinanceDifficultySetting.Forgiving,
+            MatchRandomness = MatchRandomnessSetting.Low
+        };
+        var strict = new CareerDifficultyProfile
+        {
+            StrictRealism = StrictRealismSetting.Strict,
+            HiddenInfo = HiddenInfoSetting.HighUncertainty,
+            ScoutingDifficulty = ScoutingDifficultySetting.Strict,
+            SackingStrictness = SackingStrictnessSetting.Harsh,
+            MatchRandomness = MatchRandomnessSetting.High,
+            FinanceDifficulty = FinanceDifficultySetting.Strict,
+            TransferDifficulty = TransferDifficultySetting.Hard
+        };
+
+        var probePlayer = SquadPlayers[0].With(playerFamiliarity: 0, scoutingConfidence: 0);
+        var scoutQuality = GetStaffQuality(StaffRole.Scout);
+        var analystQuality = GetStaffQuality(StaffRole.DataAnalyst);
+        var staffQuality = GetStaffQuality(StaffRole.HeadOfRecruitment);
+        var relaxedReport = PlayerInformationVisibility.BuildReport(
+            probePlayer,
+            PlayerKnowledgeContext.UnknownTarget,
+            CareerProfile.Role,
+            CareerProfile.License,
+            scoutQuality,
+            analystQuality,
+            staffQuality,
+            0,
+            relaxed.KnowledgeScoreModifier());
+        var strictReport = PlayerInformationVisibility.BuildReport(
+            probePlayer,
+            PlayerKnowledgeContext.UnknownTarget,
+            CareerProfile.Role,
+            CareerProfile.License,
+            scoutQuality,
+            analystQuality,
+            staffQuality,
+            0,
+            strict.KnowledgeScoreModifier());
+
+        if (CurrentClub != null)
+        {
+            CurrentClub.JobPressure = 72;
+            BoardPressure = 68;
+            FanPressure = 64;
+            DressingRoomPressure = 60;
+            FinancialPressure = 58;
+            TransferPressure = 52;
+        }
+
+        CareerProfile.Difficulty = relaxed;
+        var relaxedScore = BuildObjectiveReviewScore(-1);
+        CareerProfile.Difficulty = strict;
+        var strictScore = BuildObjectiveReviewScore(-1);
+
+        if (relaxedReport.KnowledgeScore <= strictReport.KnowledgeScore ||
+            relaxedScore + 8 >= strictScore)
+        {
+            return $"Difficulty settings did not produce distinct relaxed vs strict outcomes (knowledge {relaxedReport.KnowledgeScore} vs {strictReport.KnowledgeScore}, pressure {relaxedScore} vs {strictScore}).";
+        }
+
+        if (!CareerMarketSummary.Contains("Difficulty settings", StringComparison.Ordinal) ||
+            !DifficultySettingsSummary.Contains("hidden info", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Difficulty settings are not visible in career summaries.";
+        }
+
+        CareerProfile.Difficulty = CareerDifficultyProfile.BalancedDefaults();
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
+    public string ValidatePhase23StoredDifficultySettingsContract()
+    {
+        if (!CareerMarketSummary.Contains("Difficulty settings", StringComparison.Ordinal) ||
+            string.IsNullOrWhiteSpace(CareerProfile.Difficulty.Summary))
+        {
+            return "Saved difficulty settings did not restore.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
+    public string ValidatePhase24CareerMemoryContract()
+    {
+        InitializeStageFoundationsForClub();
+        InsertCareerHistory("Validation memory entry for transfer interest.", "Transfer", "Validation target");
+        if (_structuredCareerMemory.Count == 0 ||
+            !StructuredCareerMemorySummary.Contains("Transfer", StringComparison.Ordinal) ||
+            !CareerMarketSummary.Contains("Structured career memory", StringComparison.Ordinal))
+        {
+            return "Structured career memory did not record or surface validation entries.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
+    public string ValidatePhase24StoredCareerMemoryContract()
+    {
+        if (_structuredCareerMemory.Count == 0 ||
+            !CareerMarketSummary.Contains("Structured career memory", StringComparison.Ordinal))
+        {
+            return "Saved structured career memory did not restore.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
+    public string ValidatePhase25BalanceContract()
+    {
+        InitializeStageFoundationsForClub();
+        var neutralScore = BuildObjectiveReviewScore(0);
+        if (neutralScore < 0 || neutralScore > 100)
+        {
+            return "Objective review score is outside the balance clamp.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
+    public string ValidatePhase26UiReadabilityContract()
+    {
+        EnsureGeneratedContentState();
+        if (string.IsNullOrWhiteSpace(DifficultySettingsSummary) ||
+            string.IsNullOrWhiteSpace(GeneratedConsistencySummary) ||
+            DifficultySettingsSummary.Contains("pending", StringComparison.OrdinalIgnoreCase) ||
+            GeneratedConsistencySummary.Contains("pending", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Dashboard-readable summaries still contain pending placeholders.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
+    public string ValidatePhase27SeasonIntegrationContract()
+    {
+        InitializeStageFoundationsForClub();
+        if (!AdvanceOneCareerWeek())
+        {
+            return "Weekly advancement failed during season integration validation.";
+        }
+
+        if (string.IsNullOrWhiteSpace(NextFixtureSummary) || CompetitionFixtures.Length == 0)
+        {
+            return "Season integration validation lost fixture context.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
+    }
+
+    public string ValidatePhase28StabilityAuditContract()
+    {
+        var phase1 = ValidatePhase1InformationVisibilityContract();
+        if (phase1 != MatchPlaybackContractValidator.PassMessage)
+        {
+            return $"Stability audit failed phase 1 visibility: {phase1}";
+        }
+
+        var phase22 = ValidatePhase22GeneratedContentContract();
+        if (phase22 != MatchPlaybackContractValidator.PassMessage)
+        {
+            return $"Stability audit failed phase 22 generated content: {phase22}";
+        }
+
+        if (!RegistrationValid && RegistrationIssuesSummary.Contains("pending", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Stability audit found registration summary still pending after club initialization.";
+        }
+
+        return MatchPlaybackContractValidator.PassMessage;
     }
 
     private void RecordTransferHistory(string detail)
@@ -6725,7 +6988,9 @@ public partial class GameState
     private void EnsureFinanceState()
     {
         FinanceWageBudget = FinanceWageBudget <= 0 ? CurrentClub?.WageBudget ?? 1 : FinanceWageBudget;
-        FinanceTransferBudgetRemaining = FinanceTransferBudgetRemaining <= 0 ? CurrentClub?.TransferBudget ?? 0 : FinanceTransferBudgetRemaining;
+        FinanceTransferBudgetRemaining = FinanceTransferBudgetRemaining <= 0
+            ? ApplyFinanceDifficultyBudget(CurrentClub?.TransferBudget ?? 0)
+            : FinanceTransferBudgetRemaining;
         FinanceDebt = FinanceDebt <= 0 ? BuildStartingDebt() : FinanceDebt;
         FinanceCurrentWageBill = CalculateCurrentWageBill();
         ProfitExpectationSummary = string.IsNullOrWhiteSpace(ProfitExpectationSummary) || ProfitExpectationSummary.Contains("pending", StringComparison.OrdinalIgnoreCase)
@@ -7571,6 +7836,18 @@ public partial class GameState
 
     private void GenerateContextDecisionEvent(string trigger)
     {
+        var dramaSkipGate = Math.Abs(WorldSeed + CurrentDate.DayOfYear + ObjectiveReviewCount + trigger.Length) % 10;
+        var dramaSkipThreshold = CareerProfile.Difficulty.DramaFrequency switch
+        {
+            DramaFrequencySetting.Low => 6,
+            DramaFrequencySetting.High => 2,
+            _ => 4
+        };
+        if (dramaSkipGate < dramaSkipThreshold)
+        {
+            return;
+        }
+
         var eventType = ResolveContextDecisionEventType();
         if (TryCreateDecisionEvent(eventType, trigger, out var decisionEvent))
         {

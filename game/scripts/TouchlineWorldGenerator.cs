@@ -34,6 +34,17 @@ public partial class TouchlineWorldGenerator : Node
 
     public bool BeginNewCareer(string managerName, int seed, string roleName, string backgroundName, string licenseName)
     {
+        return BeginNewCareer(managerName, seed, roleName, backgroundName, licenseName, CareerDifficultyProfile.BalancedDefaults());
+    }
+
+    public bool BeginNewCareer(
+        string managerName,
+        int seed,
+        string roleName,
+        string backgroundName,
+        string licenseName,
+        CareerDifficultyProfile difficulty)
+    {
         if (GameState.Instance == null)
         {
             LastStatusMessage = "GameState singleton is unavailable.";
@@ -72,7 +83,8 @@ public partial class TouchlineWorldGenerator : Node
             Tempo = seedData.Defaults.Tempo,
             Width = seedData.Defaults.Width,
             Risk = seedData.Defaults.Risk,
-            FormSummary = seedData.Defaults.FormSummary
+            FormSummary = seedData.Defaults.FormSummary,
+            Difficulty = difficulty
         };
 
         GameState.Instance.ApplyCareerBootstrap(bootstrap);
