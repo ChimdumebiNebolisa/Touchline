@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Active desktop playtest harness for Touchline.
 
-Launches the Godot game window, captures screenshots while driving the UI,
-runs the headless active_playtest_user_flow_check.gd validation, and writes logs.
+Launches the Godot game window, drives navigation screenshots, runs the
+headless active_playtest_user_flow_check.gd validation, parses its structured
+assertion log, and writes a timestamped JSON run summary.
 """
 
 from __future__ import annotations
@@ -53,9 +54,24 @@ class PlaytestObservation:
 
 
 @dataclass
+class AssertionRow:
+    """Parsed row from ACTIVE_PLAYTEST_ASSERT headless output."""
+
+    role: str
+    area: str
+    before: str
+    action: str
+    after: str
+    expected: str
+    passed: bool
+    evidence: str
+
+
+@dataclass
 class PlaytestRun:
     started_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     observations: list[PlaytestObservation] = field(default_factory=list)
+    assertions: list[AssertionRow] = field(default_factory=list)
     headless_pass: bool | None = None
     headless_log: str = ""
     errors: list[str] = field(default_factory=list)
@@ -75,7 +91,31 @@ def find_godot_console() -> Path:
     raise FileNotFoundError("Godot console executable not found. Set GODOT_CONSOLE.")
 
 
-def run_headless_check(godot_console: Path, log_path: Path) -> bool:
+def parse_assertion_rows(output: str) -> list[AssertionRow]:
+    """Extract ACTIVE_PLAYTEST_ASSERT rows from headless log output."""
+    rows: list[AssertionRow] = []
+    for line in output.splitlines():
+        if not line.startswith("ACTIVE_PLAYTEST_ASSERT|"):
+            continue
+        parts = line.split("|")
+        if len(parts) < 8:
+            continue
+        rows.append(
+            AssertionRow(
+                role=parts[1],
+                area=parts[2],
+                before=parts[3],
+                action=parts[4],
+                after=parts[5],
+                expected=parts[6],
+                passed=parts[7].strip() == "PASS",
+                evidence=parts[8] if len(parts) > 8 else "",
+            )
+        )
+    return rows
+
+
+def run_headless_check(godot_console: Path, log_path: Path) -> tuple[bool, list[AssertionRow]]:
     cmd = [
         str(godot_console),
         "--headless",
@@ -89,9 +129,14 @@ def run_headless_check(godot_console: Path, log_path: Path) -> bool:
     output = (result.stdout or "") + (result.stderr or "")
     log_path.write_text(output, encoding="utf-8")
     passed = "ACTIVE_PLAYTEST_USER_FLOW_PASS" in output
+    assertion_rows = parse_assertion_rows(output)
     if not passed:
         log(output[-4000:] if len(output) > 4000 else output)
-    return passed
+    else:
+        log(f"Headless check passed. Assertions parsed: {len(assertion_rows)}")
+        for row in assertion_rows:
+            log(f"  {'PASS' if row.passed else 'FAIL'} | {row.role} | {row.area}")
+    return passed, assertion_rows
 
 
 def focus_game_window(timeout_s: float = 45.0) -> gw.Win32Window:
@@ -131,8 +176,8 @@ def click_fraction(win: gw.Win32Window, fx: float, fy: float) -> None:
 
 
 def drive_role_flow(run: PlaytestRun, role_slug: str, role_index: int, win: gw.Win32Window) -> None:
-    """Drive a best-effort GUI path using relative window clicks."""
-    steps = [
+    """Drive navigation screenshots and action evidence per role."""
+    nav_steps = [
         ("main-menu", 0.50, 0.42, "Main menu before new career"),
         ("new-career-click", 0.50, 0.48, "Open career setup"),
         ("career-setup", 0.50, 0.35, "Career setup screen"),
@@ -155,7 +200,7 @@ def drive_role_flow(run: PlaytestRun, role_slug: str, role_index: int, win: gw.W
         click_fraction(win, 0.50, 0.48)
         time.sleep(1.5)
 
-    for step_name, fx, fy, note in steps:
+    for step_name, fx, fy, note in nav_steps:
         if step_name == "career-setup" and role_index >= 0:
             for _ in range(role_index):
                 pyautogui.press("tab")
@@ -168,7 +213,12 @@ def drive_role_flow(run: PlaytestRun, role_slug: str, role_index: int, win: gw.W
         path = SCREENSHOT_DIR / f"{role_slug}-{step_name}.png"
         screenshot_window(win, path)
         run.observations.append(
-            PlaytestObservation(role=role_slug, step=step_name, note=note, screenshot=str(path.relative_to(REPO_ROOT)))
+            PlaytestObservation(
+                role=role_slug,
+                step=step_name,
+                note=note,
+                screenshot=str(path.relative_to(REPO_ROOT)),
+            )
         )
 
 
@@ -193,13 +243,16 @@ def main() -> int:
 
     run = PlaytestRun()
     godot_console = find_godot_console()
-    headless_log = LOG_DIR / f"headless-active-playtest-{datetime.now().strftime('%Y%m%d-%H%M%S')}.log"
+    ts = datetime.now().strftime("%Y%m%d-%H%M%S")
+    headless_log = LOG_DIR / f"headless-active-playtest-{ts}.log"
 
     if not args.skip_headless:
         try:
-            run.headless_pass = run_headless_check(godot_console, headless_log)
+            passed, assertions = run_headless_check(godot_console, headless_log)
+            run.headless_pass = passed
+            run.assertions = assertions
             run.headless_log = str(headless_log.relative_to(REPO_ROOT))
-            if not run.headless_pass:
+            if not passed:
                 run.errors.append("Headless active_playtest_user_flow_check failed")
         except Exception as exc:
             run.headless_pass = False
@@ -223,7 +276,7 @@ def main() -> int:
                 except subprocess.TimeoutExpired:
                     proc.kill()
 
-    summary_path = LOG_DIR / f"active-playtest-run-{datetime.now().strftime('%Y%m%d-%H%M%S')}.json"
+    summary_path = LOG_DIR / f"active-playtest-run-{ts}.json"
     summary_path.write_text(
         json.dumps(
             {
@@ -231,6 +284,19 @@ def main() -> int:
                 "headless_pass": run.headless_pass,
                 "headless_log": run.headless_log,
                 "errors": run.errors,
+                "assertions": [
+                    {
+                        "role": a.role,
+                        "area": a.area,
+                        "before": a.before,
+                        "action": a.action,
+                        "after": a.after,
+                        "expected": a.expected,
+                        "passed": a.passed,
+                        "evidence": a.evidence,
+                    }
+                    for a in run.assertions
+                ],
                 "observations": [obs.__dict__ for obs in run.observations],
             },
             indent=2,

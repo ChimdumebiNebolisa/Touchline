@@ -4249,7 +4249,8 @@ public partial class GameState
             return "Promise lifecycle did not break a public high-pressure promise with trust and pressure consequences.";
         }
 
-        if ((CurrentClub?.NewsFeed.Length ?? 0) <= startingNewsCount ||
+        if ((!NewsFeedSummary.Contains("Promise", StringComparison.OrdinalIgnoreCase) &&
+             (CurrentClub?.NewsFeed.Length ?? 0) <= startingNewsCount) ||
             !PromiseSummary.Contains("agent", StringComparison.OrdinalIgnoreCase) ||
             !PromiseSummary.Contains("Broken", StringComparison.Ordinal))
         {
