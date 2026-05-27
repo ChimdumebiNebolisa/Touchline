@@ -317,6 +317,9 @@ public partial class TacticsScreen : Control
         _saveHintLabel.Text = state.CareerProfile.Role == ManagerRole.AssistantManager
             ? "Unsaved preview: submit tactical recommendations without changing the saved match plan."
             : "Unsaved preview: adjust the board, then save to apply it to the shared match engine.";
+        _saveButton.Text = state.CareerProfile.Role == ManagerRole.AssistantManager
+            ? "Submit Tactical Recommendation"
+            : "Save Tactical Plan";
         RefreshBoard();
     }
 

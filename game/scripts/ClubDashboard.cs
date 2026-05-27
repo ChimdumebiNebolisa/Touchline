@@ -433,6 +433,7 @@ public partial class ClubDashboard : Control
         PopulateTrainingScoutingControls(state);
         _youthAcademyLabel.Text = $"Youth academy\n{state.YouthAcademySummary}";
         _youthAcademyButton.Disabled = false;
+        ApplyRoleActionLabels(state);
         _recruitmentLabel.Text = $"Recruitment and contracts\n{state.RecruitmentFoundationSummary}\nPromises\n{state.PromiseSummary}";
         _careerMarketLabel.Text = $"Career and job market\n{state.CareerMarketSummary}\nCareer history\n{state.CareerHistorySummary}";
         _priorityLabel.Text = BuildPrioritySummary(state);
@@ -551,6 +552,38 @@ public partial class ClubDashboard : Control
         _startScoutingButton.Disabled = false;
         _advanceDayButton.Disabled = false;
         _advanceWeekButton.Disabled = false;
+    }
+
+    private void ApplyRoleActionLabels(GameState state)
+    {
+        if (state.CareerProfile.Role == ManagerRole.AssistantManager)
+        {
+            _applyTrainingButton.Text = "Recommend Training Focus";
+            _startScoutingButton.Text = "Recommend Scouting Priority";
+            _staffMarketButton.Text = "Recommend Staff Review";
+            _youthAcademyButton.Text = "Recommend Youth Review";
+            _recruitmentButton.Text = "Recommend Recruitment Target";
+            _contractButton.Text = "Recommend Contract Terms";
+            return;
+        }
+
+        if (state.CareerProfile.Role == ManagerRole.HeadCoach)
+        {
+            _applyTrainingButton.Text = "Apply Training Plan";
+            _startScoutingButton.Text = "Request Scouting Priority";
+            _staffMarketButton.Text = "Request Staff Review";
+            _youthAcademyButton.Text = "Request Youth Promotion Review";
+            _recruitmentButton.Text = "Request Recruitment Review";
+            _contractButton.Text = "Request Contract Review";
+            return;
+        }
+
+        _applyTrainingButton.Text = "Apply Training Plan";
+        _startScoutingButton.Text = "Start Scouting Assignment";
+        _staffMarketButton.Text = "Review Staff Market";
+        _youthAcademyButton.Text = "Review Youth Academy";
+        _recruitmentButton.Text = "Progress Recruitment Approach";
+        _contractButton.Text = "Review Contract Terms";
     }
 
     private static void PopulateOptionButton(OptionButton option, string selectedValue, params string[] values)
@@ -752,11 +785,11 @@ public partial class ClubDashboard : Control
             return;
         }
 
-        GameState.Instance.SetTrainingPlanByName(
+        var status = GameState.Instance.RequestTrainingPlanByName(
             GetSelectedOptionText(_trainingFocusOption),
             GetSelectedOptionText(_trainingIntensityOption));
-        _statusLabel.Text = "Training plan updated from dashboard controls.";
         RenderState();
+        _statusLabel.Text = status;
     }
 
     private void OnStartScoutingPressed()
@@ -766,11 +799,11 @@ public partial class ClubDashboard : Control
             return;
         }
 
-        GameState.Instance.StartScoutingAssignment(
+        var status = GameState.Instance.RequestScoutingAssignment(
             GetSelectedOptionText(_scoutingTargetOption),
             GetSelectedOptionText(_scoutingDepthOption));
-        _statusLabel.Text = "Scouting assignment updated from dashboard controls.";
         RenderState();
+        _statusLabel.Text = status;
     }
 
     private void OnAdvanceDayPressed()

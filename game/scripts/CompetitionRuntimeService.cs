@@ -151,20 +151,20 @@ public static class CompetitionRuntimeService
 
         if (previousPosition < 0 || currentPosition < 0)
         {
-            return $"{selectedClubName} now sit on {currentRow.Points} points with goal difference {FormatSigned(currentRow.GoalDifference)}.";
+            return $"{selectedClubName} now sit on {FormatPoints(currentRow.Points)} with goal difference {FormatSigned(currentRow.GoalDifference)}.";
         }
 
         if (currentPosition < previousPosition)
         {
-            return $"{selectedClubName} climb from {previousPosition} to {currentPosition} with {currentRow.Points} points.";
+            return $"{selectedClubName} climb from {previousPosition} to {currentPosition} with {FormatPoints(currentRow.Points)}.";
         }
 
         if (currentPosition > previousPosition)
         {
-            return $"{selectedClubName} slip from {previousPosition} to {currentPosition} despite reaching {currentRow.Points} points.";
+            return $"{selectedClubName} slip from {previousPosition} to {currentPosition} after moving to {FormatPoints(currentRow.Points)}.";
         }
 
-        return $"{selectedClubName} hold position {currentPosition} on {currentRow.Points} points and goal difference {FormatSigned(currentRow.GoalDifference)}.";
+        return $"{selectedClubName} hold position {currentPosition} on {FormatPoints(currentRow.Points)} and goal difference {FormatSigned(currentRow.GoalDifference)}.";
     }
 
     public static GameState.CompetitionFixture? GetCurrentClubFixture(
@@ -445,5 +445,10 @@ public static class CompetitionRuntimeService
     private static string FormatSigned(int value)
     {
         return value >= 0 ? $"+{value}" : value.ToString();
+    }
+
+    private static string FormatPoints(int points)
+    {
+        return points == 1 ? "1 point" : $"{points} points";
     }
 }

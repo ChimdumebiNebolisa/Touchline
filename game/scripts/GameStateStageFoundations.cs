@@ -559,6 +559,25 @@ public partial class GameState
         SetTrainingPlanByName(trainingFocusName, TrainingIntensityName);
     }
 
+    public string RequestTrainingPlanByName(string trainingFocusName, string trainingIntensityName)
+    {
+        if (CareerProfile.Role == ManagerRole.AssistantManager)
+        {
+            AddNews(
+                "Training recommendation filed",
+                NewsCategory.Training,
+                "Internal",
+                $"{ManagerName} recommended {trainingFocusName.ToLowerInvariant()} at {trainingIntensityName.ToLowerInvariant()} intensity, but Assistant Manager authority cannot finalize the weekly plan.",
+                2);
+            return "Assistant Manager training recommendation logged; final weekly plan authority sits with senior staff.";
+        }
+
+        SetTrainingPlanByName(trainingFocusName, trainingIntensityName);
+        return CareerProfile.Role == ManagerRole.HeadCoach
+            ? "Head Coach training plan applied to the next weekly block."
+            : "Manager training plan applied to the next weekly block.";
+    }
+
     public void SetTrainingPlanByName(string trainingFocusName, string trainingIntensityName)
     {
         CurrentTrainingFocus = StageFoundationText.ParseTrainingFocus(trainingFocusName);
@@ -575,6 +594,25 @@ public partial class GameState
     public void StartBasicScoutingAssignment(string target)
     {
         StartScoutingAssignment(target, ScoutingReportDepthName);
+    }
+
+    public string RequestScoutingAssignment(string target, string reportDepthName)
+    {
+        if (CareerProfile.Role == ManagerRole.AssistantManager)
+        {
+            AddNews(
+                "Scouting recommendation filed",
+                NewsCategory.Scouting,
+                "Internal",
+                $"{ManagerName} recommended a {reportDepthName.ToLowerInvariant()} on {target}, but Assistant Manager authority cannot direct recruitment scouting.",
+                2);
+            return "Assistant Manager scouting recommendation logged; recruitment staff must approve any assignment.";
+        }
+
+        StartScoutingAssignment(target, reportDepthName);
+        return CareerProfile.Role == ManagerRole.HeadCoach
+            ? "Head Coach scouting priority requested; recruitment staff opened a foundation report for review."
+            : "Manager scouting assignment opened for recruitment staff.";
     }
 
     public void StartScoutingAssignment(string target, string reportDepthName)
@@ -3347,12 +3385,13 @@ public partial class GameState
             return "Youth academy action did not return a result.";
         }
 
-        if (CareerProfile.Role == ManagerRole.AssistantManager)
+        if (CareerProfile.Role is ManagerRole.AssistantManager or ManagerRole.HeadCoach)
         {
             if (SquadPlayers.Length != beforeSquadCount ||
-                !_youthProspects[0].Status.Contains("recommended", StringComparison.OrdinalIgnoreCase))
+                (!_youthProspects[0].Status.Contains("recommended", StringComparison.OrdinalIgnoreCase) &&
+                    !_youthProspects[0].Status.Contains("requested", StringComparison.OrdinalIgnoreCase)))
             {
-                return "Assistant Manager youth authority was not respected.";
+                return $"{CurrentRoleName} youth authority was not respected.";
             }
         }
         else
@@ -4321,6 +4360,22 @@ public partial class GameState
                 return "Assistant tactical recommendation changed the saved match plan.";
             }
 
+            var originalTrainingFocus = TrainingFocusName;
+            var originalScoutingTarget = CurrentScoutingAssignment?.Target;
+            var trainingStatus = RequestTrainingPlanByName("Pressing", "Demanding");
+            if (!trainingStatus.Contains("Assistant Manager training recommendation", StringComparison.Ordinal) ||
+                TrainingFocusName != originalTrainingFocus)
+            {
+                return $"Assistant training action was not treated as a recommendation: {trainingStatus}";
+            }
+
+            var scoutingStatus = RequestScoutingAssignment("Specific player: pressing winger", "Full report");
+            if (!scoutingStatus.Contains("Assistant Manager scouting recommendation", StringComparison.Ordinal) ||
+                CurrentScoutingAssignment?.Target != originalScoutingTarget)
+            {
+                return $"Assistant scouting action was not treated as a recommendation: {scoutingStatus}";
+            }
+
             if (!NewsFeedSummary.Contains("recommendation", StringComparison.OrdinalIgnoreCase))
             {
                 return "Assistant recommendations did not leave a visible news trail.";
@@ -4337,6 +4392,22 @@ public partial class GameState
                 TeamStyleName != "High Press")
             {
                 return $"Head Coach tactic control did not update saved tactic state: {tacticStatus}";
+            }
+
+            var trainingStatus = RequestTrainingPlanByName("Pressing", "Demanding");
+            if (!trainingStatus.Contains("Head Coach training plan applied", StringComparison.Ordinal) ||
+                TrainingFocusName != "Pressing" ||
+                TrainingIntensityName != "Demanding")
+            {
+                return $"Head Coach training control did not update saved training state: {trainingStatus}";
+            }
+
+            var scoutingStatus = RequestScoutingAssignment("Specific player: pressing winger", "Full report");
+            if (!scoutingStatus.Contains("Head Coach scouting priority requested", StringComparison.Ordinal) ||
+                CurrentScoutingAssignment == null ||
+                CurrentScoutingAssignment.Target != "Specific player: pressing winger")
+            {
+                return $"Head Coach scouting request did not open a staff-reviewed report: {scoutingStatus}";
             }
 
             return MatchPlaybackContractValidator.PassMessage;
@@ -6702,6 +6773,19 @@ public partial class GameState
                     $"{ManagerName} recommended {prospect.Name} for senior review.",
                     2);
                 return "Assistant Manager youth recommendation logged; senior promotion not finalized.";
+            }
+
+            if (CareerProfile.Role == ManagerRole.HeadCoach)
+            {
+                _youthProspects[index] = CloneYouthProspect(prospect, false, "Promotion requested by Head Coach");
+                RecordYouthHistory($"{prospect.Name}: promotion requested; Head Coach authority needs board and Director approval before senior registration.");
+                AddNews(
+                    "Youth promotion requested",
+                    NewsCategory.Club,
+                    "Academy report",
+                    $"{ManagerName} requested senior review for {prospect.Name}; board and Director approval still apply.",
+                    3);
+                return "Head Coach youth promotion request logged; board and Director approval required before senior registration.";
             }
 
             PromoteProspectToSeniorSquad(prospect);
