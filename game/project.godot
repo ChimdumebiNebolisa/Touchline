@@ -14,6 +14,7 @@ GameState="*res://scripts/GameState.cs"
 SaveSystem="*res://scripts/SaveSystem.cs"
 CalendarSystem="*res://scripts/TouchlineCalendarSystem.cs"
 WorldGenerator="*res://scripts/TouchlineWorldGenerator.cs"
+AuditCommandBridge="*res://scripts/AuditCommandBridge.cs"
 
 [dotnet]
 project/assembly_name="Touchline"

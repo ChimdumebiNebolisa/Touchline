@@ -11,6 +11,7 @@ public partial class PostMatchScene : Control
     private PanelContainer _actionCard = default!;
     private Label _fixtureLabel = default!;
     private Label _resultLabel = default!;
+    private Label _statsLabel = default!;
     private Label _scoreLabel = default!;
     private Label _continueHintLabel = default!;
     private Label _deltaValueLabel = default!;
@@ -39,6 +40,7 @@ public partial class PostMatchScene : Control
         _headerCard = GetNode<PanelContainer>("RootMargin/MainColumn/HeaderCard");
         _fixtureLabel = GetNode<Label>("RootMargin/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderInfo/FixtureLabel");
         _resultLabel = GetNode<Label>("RootMargin/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderInfo/ResultLabel");
+        _statsLabel = GetNode<Label>("RootMargin/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderInfo/StatsLabel");
         _scoreCard = GetNode<PanelContainer>("RootMargin/MainColumn/HeaderCard/HeaderPadding/HeaderContent/ScoreCard");
         _scoreLabel = GetNode<Label>("RootMargin/MainColumn/HeaderCard/HeaderPadding/HeaderContent/ScoreCard/ScorePadding/ScoreContent/ScoreLabel");
         _continueHintLabel = GetNode<Label>("RootMargin/MainColumn/HeaderCard/HeaderPadding/HeaderContent/ScoreCard/ScorePadding/ScoreContent/ContinueHintLabel");
@@ -51,17 +53,17 @@ public partial class PostMatchScene : Control
         _pressureMetaLabel = GetNode<Label>("RootMargin/MainColumn/SummaryGrid/PressureCard/CardPadding/CardContent/CardMetaLabel");
 
         _consequencesCard = GetNode<PanelContainer>("RootMargin/MainColumn/ContentRow/ConsequencesCard");
-        _deltasLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/DeltasLabel");
-        _tableImpactLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/TableImpactLabel");
-        _tacticalLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/TacticalLabel");
-        _pressureLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/PressureLabel");
+        _deltasLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/ConsequencesScroll/ConsequencesStack/DeltasLabel");
+        _tableImpactLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/ConsequencesScroll/ConsequencesStack/TableImpactLabel");
+        _tacticalLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/ConsequencesScroll/ConsequencesStack/TacticalLabel");
+        _pressureLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/ConsequencesScroll/ConsequencesStack/PressureLabel");
 
         _eventsCard = GetNode<PanelContainer>("RootMargin/MainColumn/ContentRow/EventsCard");
-        _eventsLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/EventsCard/EventsPadding/EventsContent/EventsLabel");
+        _eventsLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/EventsCard/EventsPadding/EventsContent/EventsScroll/EventsLabel");
 
-        _actionCard = GetNode<PanelContainer>("RootMargin/MainColumn/ContentRow/ActionCard");
-        _nextStepLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/NextStepLabel");
-        _continueButton = GetNode<Button>("RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/ContinueButton");
+        _actionCard = GetNode<PanelContainer>("RootMargin/MainColumn/ActionCard");
+        _nextStepLabel = GetNode<Label>("RootMargin/MainColumn/ActionCard/ActionPadding/ActionContent/NextStepLabel");
+        _continueButton = GetNode<Button>("RootMargin/MainColumn/ActionCard/ActionPadding/ActionContent/ContinueButton");
     }
 
     private void ApplyShellStyles()
@@ -79,6 +81,7 @@ public partial class PostMatchScene : Control
         TouchlineTheme.ApplyTitleStyle(GetNode<Label>("RootMargin/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderInfo/PageTitleLabel"), 34);
         TouchlineTheme.ApplyMutedStyle(_fixtureLabel, 17);
         TouchlineTheme.ApplyMutedStyle(_resultLabel, 16);
+        TouchlineTheme.ApplyMutedStyle(_statsLabel, 15);
         TouchlineTheme.ApplyEyebrowStyle(GetNode<Label>("RootMargin/MainColumn/HeaderCard/HeaderPadding/HeaderContent/ScoreCard/ScorePadding/ScoreContent/ScoreEyebrow"));
         TouchlineTheme.ApplyValueStyle(_scoreLabel, 40);
         TouchlineTheme.ApplyMutedStyle(_continueHintLabel, 14);
@@ -95,7 +98,7 @@ public partial class PostMatchScene : Control
 
         TouchlineTheme.ApplyEyebrowStyle(GetNode<Label>("RootMargin/MainColumn/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/ConsequencesEyebrow"));
         TouchlineTheme.ApplyEyebrowStyle(GetNode<Label>("RootMargin/MainColumn/ContentRow/EventsCard/EventsPadding/EventsContent/EventsEyebrow"));
-        TouchlineTheme.ApplyEyebrowStyle(GetNode<Label>("RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/ActionEyebrow"));
+        TouchlineTheme.ApplyEyebrowStyle(GetNode<Label>("RootMargin/MainColumn/ActionCard/ActionPadding/ActionContent/ActionEyebrow"));
         TouchlineTheme.ApplyMutedStyle(_deltasLabel, 15);
         TouchlineTheme.ApplyMutedStyle(_tableImpactLabel, 15);
         TouchlineTheme.ApplyMutedStyle(_tacticalLabel, 15);
@@ -115,9 +118,10 @@ public partial class PostMatchScene : Control
 
         var report = GameState.Instance.LastMatchReport;
         _fixtureLabel.Text = report.FixtureLabel;
-        _resultLabel.Text = report.ResultLabel;
+        _resultLabel.Text = $"{report.ResultLabel} | {report.CauseSummary}";
+        _statsLabel.Text = BuildStatsLabel(report.StatsSummary);
         _scoreLabel.Text = report.Scoreline;
-        _continueHintLabel.Text = "Result recorded. Advance to roll the club week forward.";
+        _continueHintLabel.Text = "Result recorded. Review the aftermath below, then advance the club week.";
 
         _deltaValueLabel.Text = BuildDeltaScore(report.ConsequenceSummary);
         _deltaMetaLabel.Text = report.ConsequenceSummary;
@@ -126,18 +130,20 @@ public partial class PostMatchScene : Control
         _pressureValueLabel.Text = BuildPressureHeadline(report.PressureSummary);
         _pressureMetaLabel.Text = report.PressureSummary;
 
-        _deltasLabel.Text = $"{report.ConsequenceSummary}\nStats | {report.StatsSummary}\n{report.MoraleSection}";
-        _tableImpactLabel.Text = report.TableImpactSummary;
-        _tacticalLabel.Text = $"{report.TacticalSummary}\n{report.TacticalSection}\n{report.PlayerFitSection}\n{report.FatigueSection}\nTactical read | {report.TacticalExplanation}\nCause | {report.CauseSummary}";
-        _pressureLabel.Text = $"{report.PressureSummary}\n{report.BoardReactionSection}\n{report.FanReactionSection}";
-        _eventsLabel.Text = $"{report.MediaStorySection}\n{string.Join("\n", report.KeyEvents)}\n\nKey moments\n{report.KeyPlayerMoments}\n\n{report.StaffAnalysisSection}\n{report.DevelopmentNotesSection}";
-        _nextStepLabel.Text = "Advance to Manager Hub and carry this result into the next planning cycle.";
+        _deltasLabel.Text = $"Club reaction\n{BreakPipes(report.ConsequenceSummary)}\n{report.MoraleSection}";
+        _tableImpactLabel.Text = $"Table impact\n{BreakPipes(report.TableImpactSummary)}";
+        _tacticalLabel.Text = $"Tactical review\n{report.TacticalSummary}\nTactical read | {report.TacticalExplanation}\n{report.TacticalSection}\n{report.PlayerFitSection}\n{report.FatigueSection}";
+        _pressureLabel.Text = $"Pressure + reactions\n{BreakPipes(report.PressureSummary)}\nBoard | {report.BoardReactionSection}\nFans | {report.FanReactionSection}";
+        _eventsLabel.Text = $"Match timeline\n{BuildEventTimeline(report)}\n\nKey players\n{report.KeyPlayerMoments}\n\nMedia\n{report.MediaStorySection}\n\nStaff\n{report.StaffAnalysisSection}\n\nDevelopment\n{report.DevelopmentNotesSection}";
+        _nextStepLabel.Text = "Next action | Advance to Manager Hub, absorb the reactions, and set the next week.";
+        WriteAuditState();
     }
 
     private void RenderUnavailableState()
     {
         _fixtureLabel.Text = "Post-match context unavailable";
         _resultLabel.Text = "No completed result is ready to review.";
+        _statsLabel.Text = "Stats unavailable.";
         _scoreLabel.Text = "0 - 0";
         _continueHintLabel.Text = "Complete a match before reviewing the aftermath.";
         _deltaValueLabel.Text = "--";
@@ -152,6 +158,7 @@ public partial class PostMatchScene : Control
         _pressureLabel.Text = "Pressure summary unavailable.";
         _eventsLabel.Text = "No key events recorded.";
         _nextStepLabel.Text = "Advance to Manager Hub";
+        WriteAuditState();
     }
 
     private void OnContinuePressed()
@@ -159,12 +166,14 @@ public partial class PostMatchScene : Control
         if (TouchlineCalendarSystem.Instance == null)
         {
             _continueHintLabel.Text = "CalendarSystem singleton is unavailable.";
+            WriteAuditState();
             return;
         }
 
         if (!TouchlineCalendarSystem.Instance.AdvanceCareerDate())
         {
             _continueHintLabel.Text = TouchlineCalendarSystem.Instance.LastStatusMessage;
+            WriteAuditState();
             return;
         }
 
@@ -201,5 +210,43 @@ public partial class PostMatchScene : Control
 
         var pipeIndex = pressureSummary.IndexOf('|');
         return pipeIndex > 0 ? pressureSummary[..pipeIndex].Trim() : pressureSummary;
+    }
+
+    private static string BreakPipes(string text)
+    {
+        return string.IsNullOrWhiteSpace(text)
+            ? "Unavailable."
+            : text.Replace(" | ", "\n", System.StringComparison.Ordinal);
+    }
+
+    private static string BuildStatsLabel(string statsSummary)
+    {
+        return $"Key stats\n{BreakPipes(statsSummary)}";
+    }
+
+    private static string BuildEventTimeline(GameState.MatchReport report)
+    {
+        if (report.KeyEvents == null || report.KeyEvents.Length == 0)
+        {
+            return "No key events recorded.";
+        }
+
+        return string.Join("\n", report.KeyEvents);
+    }
+
+    private void WriteAuditState()
+    {
+        AuditUiStateWriter.Write(
+            nameof(PostMatchScene),
+            GameState.Instance?.CurrentRoleName ?? string.Empty,
+            TouchlineRailRoute.None,
+            _fixtureLabel.Text,
+            _resultLabel.Text,
+            _statsLabel.Text,
+            _scoreLabel.Text,
+            _deltasLabel.Text,
+            _tacticalLabel.Text,
+            _pressureLabel.Text,
+            _nextStepLabel.Text);
     }
 }

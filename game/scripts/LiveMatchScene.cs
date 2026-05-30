@@ -82,6 +82,7 @@ public partial class LiveMatchScene : Control
         CreateMarkers();
         RenderPlaybackSecond(0, null, 0.0f);
         SetProcess(true);
+        WriteAuditState();
     }
 
     public override void _Process(double delta)
@@ -104,7 +105,11 @@ public partial class LiveMatchScene : Control
 
     private void OnBackPressed()
     {
-        GetTree().ChangeSceneToFile(_matchComplete ? PostMatchScenePath : MatchdayScenePath);
+        var postMatchReady =
+            _matchComplete
+            || GameState.Instance?.LastMatchReport != null
+            || (_backButton?.Text?.Contains("Post-Match", StringComparison.OrdinalIgnoreCase) ?? false);
+        GetTree().ChangeSceneToFile(postMatchReady ? PostMatchScenePath : MatchdayScenePath);
     }
 
     private void RenderUnavailableState()
@@ -121,6 +126,7 @@ public partial class LiveMatchScene : Control
         _pitchStateLabel!.Text = "Unavailable";
         _awayTagLabel!.Text = "AWAY";
         _pitchNoteLabel!.Text = "Pitch presentation unavailable.";
+        WriteAuditState();
     }
 
     private void CreateMarkers()
@@ -236,6 +242,7 @@ public partial class LiveMatchScene : Control
         UpdateActionBanner(frameAction, currentFrame, hasEvent);
         UpdateReceiverTarget(frameAction, currentFrame, nextFrame, progress);
         UpdateActionTrail(currentFrame, nextFrame, progress, frameAction);
+        WriteAuditState();
     }
 
     private MatchAction? ResolveActionAtSecond(int simulatedSecond)
@@ -1014,6 +1021,24 @@ public partial class LiveMatchScene : Control
         }
 
         _matchComplete = true;
+        WriteAuditState();
+    }
+
+    private void WriteAuditState()
+    {
+        AuditUiStateWriter.Write(
+            nameof(LiveMatchScene),
+            GameState.Instance?.CurrentRoleName ?? string.Empty,
+            TouchlineRailRoute.None,
+            _fixtureLabel?.Text ?? string.Empty,
+            _scoreLabel?.Text ?? string.Empty,
+            _clockLabel?.Text ?? string.Empty,
+            _statusLabel?.Text ?? string.Empty,
+            _controlLabel?.Text ?? string.Empty,
+            _eventFeedLabel?.Text ?? string.Empty,
+            _pitchStateLabel?.Text ?? string.Empty,
+            _pitchNoteLabel?.Text ?? string.Empty,
+            _backButton?.Text ?? string.Empty);
     }
 
     private sealed class PlaybackSegment

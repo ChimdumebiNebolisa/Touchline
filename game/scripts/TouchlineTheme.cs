@@ -19,6 +19,17 @@ public enum TouchlineButtonVariant
     MatchdayCta
 }
 
+public enum TouchlineRailRoute
+{
+    None,
+    Dashboard,
+    Squad,
+    Tactics,
+    Fixtures,
+    Standings,
+    Matchday
+}
+
 public partial class TouchlineTheme : Node
 {
     private static Theme? _cachedTheme;
@@ -101,6 +112,32 @@ public partial class TouchlineTheme : Node
     {
         button.Text = "Go to Matchday";
         ApplyButtonVariant(button, TouchlineButtonVariant.MatchdayCta);
+    }
+
+    public static void ApplyRailNavigation(
+        Button dashboardButton,
+        Button squadButton,
+        Button tacticsButton,
+        Button fixturesButton,
+        Button standingsButton,
+        Button matchdayButton,
+        TouchlineRailRoute activeRoute)
+    {
+        ApplyNavigationButton(dashboardButton, activeRoute == TouchlineRailRoute.Dashboard);
+        ApplyNavigationButton(squadButton, activeRoute == TouchlineRailRoute.Squad);
+        ApplyNavigationButton(tacticsButton, activeRoute == TouchlineRailRoute.Tactics);
+        ApplyNavigationButton(fixturesButton, activeRoute == TouchlineRailRoute.Fixtures);
+        ApplyNavigationButton(standingsButton, activeRoute == TouchlineRailRoute.Standings);
+
+        if (activeRoute == TouchlineRailRoute.Matchday)
+        {
+            ApplyNavigationButton(matchdayButton, true);
+            matchdayButton.Text = "Matchday";
+            return;
+        }
+
+        ApplyMatchdayCta(matchdayButton);
+        matchdayButton.Disabled = false;
     }
 
     public static void ApplyTokenStyle(Control control, bool active = false, bool away = false)

@@ -128,12 +128,14 @@ public partial class FixturesScreen : Control
         TouchlineTheme.ApplyPanelVariant(GetNode<PanelContainer>("RootMargin/Shell/MainColumn/SummaryGrid/FormCard"), TouchlineSurfaceVariant.Positive, 20);
         TouchlineTheme.ApplyPanelVariant(GetNode<PanelContainer>("RootMargin/Shell/MainColumn/SummaryGrid/TableCard"), TouchlineSurfaceVariant.Card, 20);
 
-        TouchlineTheme.ApplyNavigationButton(_dashboardButton, false);
-        TouchlineTheme.ApplyNavigationButton(_squadButton, false);
-        TouchlineTheme.ApplyNavigationButton(_tacticsButton, false);
-        TouchlineTheme.ApplyNavigationButton(_fixturesButton, true);
-        TouchlineTheme.ApplyNavigationButton(_standingsButton, false);
-        TouchlineTheme.ApplyMatchdayCta(_matchdayButton);
+        TouchlineTheme.ApplyRailNavigation(
+            _dashboardButton,
+            _squadButton,
+            _tacticsButton,
+            _fixturesButton,
+            _standingsButton,
+            _matchdayButton,
+            TouchlineRailRoute.Fixtures);
         TouchlineTheme.ApplyButtonVariant(_backButton, TouchlineButtonVariant.Tertiary);
 
         TouchlineTheme.ApplyTitleStyle(_clubNameLabel, 28);
@@ -226,6 +228,7 @@ public partial class FixturesScreen : Control
 
         _matchdayButton.Disabled = false;
         PopulateFixtureSections();
+        WriteAuditState();
     }
 
     private void RenderUnavailableState()
@@ -259,6 +262,7 @@ public partial class FixturesScreen : Control
         ClearContainer(_clubFixtureRows);
         ClearContainer(_leagueFixtureRows);
         TouchlineTheme.ApplyPanelVariant(_stateChip, TouchlineSurfaceVariant.Muted, 999);
+        WriteAuditState();
     }
 
     private void PopulateFixtureSections()
@@ -587,6 +591,22 @@ public partial class FixturesScreen : Control
     private static string FormatSigned(int value)
     {
         return value >= 0 ? $"+{value}" : value.ToString();
+    }
+
+    private void WriteAuditState()
+    {
+        AuditUiStateWriter.Write(
+            nameof(FixturesScreen),
+            _managerLabel.Text,
+            TouchlineRailRoute.Fixtures,
+            _competitionLabel.Text,
+            _scheduleStatusLabel.Text,
+            _nextFixtureLabel.Text,
+            _formLabel.Text,
+            _statusLabel.Text,
+            _timelineNoteLabel.Text,
+            _railHintLabel.Text,
+            _nextMatchValueLabel.Text);
     }
 
     private void OnBackPressed()

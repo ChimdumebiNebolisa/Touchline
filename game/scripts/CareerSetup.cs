@@ -225,6 +225,7 @@ public partial class CareerSetup : Control
             _persistencePreviewLabel.Text = "Persistence preview unavailable.";
             _seedImpactPreviewLabel.Text = "Seed impact unavailable.";
             _difficultyPreviewLabel.Text = "Difficulty | unavailable";
+            WriteAuditState();
             return;
         }
 
@@ -241,6 +242,7 @@ public partial class CareerSetup : Control
         _persistencePreviewLabel.Text = "Persistence | Career state, squad, fixtures, and season context save to Slot 1.";
         _seedImpactPreviewLabel.Text = "Seed impact | Clubs, competition start, tactical defaults, and future saves stay anchored to this world.";
         _difficultyPreviewLabel.Text = BuildSelectedDifficultyProfile().Summary;
+        WriteAuditState();
     }
 
     private void OnManagerNameChanged(string _newText)
@@ -271,6 +273,7 @@ public partial class CareerSetup : Control
         if (TouchlineWorldGenerator.Instance == null)
         {
             _statusLabel.Text = "WorldGenerator singleton is unavailable.";
+            WriteAuditState();
             return;
         }
 
@@ -283,6 +286,7 @@ public partial class CareerSetup : Control
             BuildSelectedDifficultyProfile()))
         {
             _statusLabel.Text = TouchlineWorldGenerator.Instance.LastStatusMessage;
+            WriteAuditState();
             return;
         }
 
@@ -313,5 +317,21 @@ public partial class CareerSetup : Control
             MatchRandomness = CareerDifficultyProfile.ParseMatchRandomness(GetSelectedText(_matchRandomnessOption)),
             FinanceDifficulty = CareerDifficultyProfile.ParseFinanceDifficulty(GetSelectedText(_financeDifficultyOption))
         };
+    }
+
+    private void WriteAuditState()
+    {
+        AuditUiStateWriter.Write(
+            nameof(CareerSetup),
+            _rolePreviewLabel.Text,
+            TouchlineRailRoute.None,
+            _statusLabel.Text,
+            _managerPreviewLabel.Text,
+            _seedPreviewLabel.Text,
+            _rolePreviewLabel.Text,
+            _backgroundPreviewLabel.Text,
+            _licensePreviewLabel.Text,
+            _authorityPreviewLabel.Text,
+            _difficultyPreviewLabel.Text);
     }
 }

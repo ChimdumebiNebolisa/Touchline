@@ -54,10 +54,10 @@ func _process(_delta: float) -> bool:
             _fail("PostMatchScene did not load")
             return false
 
-        var table_impact := current_scene.get_node("RootMargin/MainColumn/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/TableImpactLabel") as Label
-        var tactical := current_scene.get_node("RootMargin/MainColumn/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/TacticalLabel") as Label
-        var pressure := current_scene.get_node("RootMargin/MainColumn/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/PressureLabel") as Label
-        var continue_button := current_scene.get_node("RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/ContinueButton") as Button
+        var table_impact := current_scene.get_node("RootMargin/MainColumn/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/ConsequencesScroll/ConsequencesStack/TableImpactLabel") as Label
+        var tactical := current_scene.get_node("RootMargin/MainColumn/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/ConsequencesScroll/ConsequencesStack/TacticalLabel") as Label
+        var pressure := current_scene.get_node("RootMargin/MainColumn/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/ConsequencesScroll/ConsequencesStack/PressureLabel") as Label
+        var continue_button := current_scene.get_node("RootMargin/MainColumn/ActionCard/ActionPadding/ActionContent/ContinueButton") as Button
 
         if table_impact == null or tactical == null or pressure == null or continue_button == null:
             _fail("Post-match consequence controls are missing")

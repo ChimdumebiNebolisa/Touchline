@@ -111,7 +111,7 @@ func _process(_delta: float) -> bool:
             _fail("PostMatchScene did not load")
             return false
 
-        var continue_button := current_scene.get_node("RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/ContinueButton") as Button
+        var continue_button := current_scene.get_node("RootMargin/MainColumn/ActionCard/ActionPadding/ActionContent/ContinueButton") as Button
         if continue_button == null:
             _fail("PostMatchScene continue button missing")
             return false

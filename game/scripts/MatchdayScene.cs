@@ -190,12 +190,15 @@ public partial class MatchdayScene : Control
             : $"Registration call | {state.RegistrationIssuesSummary}";
 
         _statusLabel.Text = fixtureComplete
-            ? "Fixture complete: this match is already in the season record. Return to the Manager Hub and advance instead of replaying it."
+            ? "Fixture complete: the live result is recorded. Open the post-match review or return to the Manager Hub."
             : registrationBlocked
                 ? "Match Controls | Registration or matchday XI validation blocks kickoff until the issue is fixed."
                 : "Match Controls | Watch Live Match uses the 2D replay; Instant Result resolves the same shared engine immediately.";
+        _instantResultButton.Text = fixtureComplete ? "Result Recorded" : "Instant Result";
+        _startMatchButton.Text = fixtureComplete ? "Open Post-Match Review" : "Watch Live Match";
         _instantResultButton.Disabled = fixtureComplete || registrationBlocked;
-        _startMatchButton.Disabled = fixtureComplete || registrationBlocked;
+        _startMatchButton.Disabled = registrationBlocked || (fixtureComplete && GameState.Instance?.LastMatchReport == null);
+        WriteAuditState();
     }
 
     private void RenderUnavailableState()
@@ -221,8 +224,11 @@ public partial class MatchdayScene : Control
         _readinessLabel.Text = "Readiness unavailable.";
         _statusLabel.Text = "Match Controls unavailable until a career and club are active.";
         SetMatchStateChip("OFFLINE", false);
+        _instantResultButton.Text = "Instant Result";
+        _startMatchButton.Text = "Watch Live Match";
         _instantResultButton.Disabled = true;
         _startMatchButton.Disabled = true;
+        WriteAuditState();
     }
 
     private void SetMatchStateChip(string text, bool positive)
@@ -233,6 +239,16 @@ public partial class MatchdayScene : Control
 
     private void OnStartMatchPressed()
     {
+        if (IsCurrentFixtureComplete())
+        {
+            if (GameState.Instance?.LastMatchReport != null)
+            {
+                GetTree().ChangeSceneToFile("res://scenes/PostMatchScene.tscn");
+            }
+
+            return;
+        }
+
         GameState.Instance?.PrepareCurrentMatchResult(true);
         GetTree().ChangeSceneToFile(LiveMatchScenePath);
     }
@@ -324,5 +340,22 @@ public partial class MatchdayScene : Control
     private static string FormatSigned(int value)
     {
         return value >= 0 ? $"+{value}" : value.ToString();
+    }
+
+    private void WriteAuditState()
+    {
+        AuditUiStateWriter.Write(
+            nameof(MatchdayScene),
+            GameState.Instance?.CurrentRoleName ?? string.Empty,
+            TouchlineRailRoute.None,
+            _competitionLabel.Text,
+            _fixtureLabel.Text,
+            _stakesLabel.Text,
+            _kickoffContextLabel.Text,
+            _pressureLabel.Text,
+            _tacticsLabel.Text,
+            _statusLabel.Text,
+            _instantResultButton.Text,
+            _startMatchButton.Text);
     }
 }

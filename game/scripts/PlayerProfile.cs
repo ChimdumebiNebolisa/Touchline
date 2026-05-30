@@ -127,32 +127,45 @@ public partial class PlayerProfile : Control
             _clubNameLabel.Text = GameState.Instance.SelectedClubName!;
             _clubContextLabel.Text = $"{GameState.Instance.SelectedClubName} | Player dossier context only";
             _badgeLabel.Text = BuildClubMonogram(GameState.Instance.SelectedClubName!);
+            WriteAuditState();
             return;
         }
 
         var lineupStatus = player.IsStarting ? "STARTING XI" : "BENCH/RESERVE";
+        var informationReport = GameState.Instance.BuildPlayerInformationReport(player, PlayerKnowledgeContext.OwnSquad);
         _badgeLabel.Text = BuildClubMonogram(GameState.Instance.SelectedClubName!);
         _clubNameLabel.Text = GameState.Instance.SelectedClubName!;
         _roleChipLabel.Text = lineupStatus;
         _clubContextLabel.Text = $"{GameState.Instance.SelectedClubName} | {player.Position} | Age {player.Age} | Squad status {lineupStatus}";
         _pageTitleLabel.Text = player.Name;
-        _statusLabel.Text = BuildStatusSummary(player);
+        _statusLabel.Text = BuildStatusSummary(player, informationReport);
 
         _positionValueLabel.Text = player.Position;
         _positionMetaLabel.Text = player.IsStarting ? "Current starter in the active shape." : "Bench/reserve option outside the XI.";
         _ageValueLabel.Text = player.Age.ToString();
         _ageMetaLabel.Text = DescribeAgeBand(player.Age);
-        var informationReport = GameState.Instance.BuildPlayerInformationReport(player, PlayerKnowledgeContext.OwnSquad);
         _formValueLabel.Text = player.Form.ToString();
-        _formMetaLabel.Text = $"{DescribeMetric(player.Form, "form")} {informationReport.TacticalFitSummary}";
+        _formMetaLabel.Text = $"{DescribeMetric(player.Form, "form")} {BuildProfileConfidenceText(informationReport)}";
         _fitnessValueLabel.Text = player.Fitness.ToString();
         _fitnessMetaLabel.Text = $"{DescribeFitness(player.Fitness)} Fatigue {player.Fatigue}, injury risk {player.InjuryRisk}.";
 
-        _identityLabel.Text = $"Player dossier | {player.Name} | {player.Position} | Age {player.Age}\n{GameState.Instance.BuildPlayerDossier(player)}";
-        _roleLabel.Text = $"Squad status | {lineupStatus} | {player.PlayingStyle} | {informationReport.PersonalitySummary}";
-        _conditionLabel.Text = $"Match sharpness | Form {player.Form} | Morale {player.Morale} | Fitness {player.Fitness} | Fatigue {player.Fatigue} | Injury risk {player.InjuryRisk}";
-        _pathwayLabel.Text = BuildTrajectorySummary(player, GameState.Instance);
-        _readinessLabel.Text = BuildReadinessSummary(player);
+        _identityLabel.Text =
+            $"Player dossier | {player.Name} | {player.Position} | Age {player.Age}\n" +
+            $"{BuildProfileConfidenceText(informationReport)}\n" +
+            $"{BuildVisibilityReason(informationReport)}\n" +
+            $"{informationReport.KnownAttributesSummary}\n" +
+            $"{informationReport.EstimatedAttributesSummary}\n" +
+            $"{informationReport.UnknownAttributesSummary}";
+        _roleLabel.Text =
+            $"Role view | {lineupStatus} | {player.PlayingStyle}\n" +
+            $"{informationReport.TacticalFitSummary}\n" +
+            $"{informationReport.PersonalitySummary}";
+        _conditionLabel.Text =
+            $"Match sharpness | Form {player.Form} | Morale {player.Morale} | Fitness {player.Fitness} | Fatigue {player.Fatigue} | Injury risk {player.InjuryRisk}\n" +
+            $"{informationReport.RiskSummary}";
+        _pathwayLabel.Text = $"{informationReport.DevelopmentSummary}\n{BuildTrajectorySummary(player, GameState.Instance)}";
+        _readinessLabel.Text = $"{BuildReadinessSummary(player)}\nScouting/staff note | {BuildVisibilityReason(informationReport).Replace("Visibility | ", string.Empty, System.StringComparison.Ordinal)}";
+        WriteAuditState();
     }
 
     private void RenderUnavailableState(string title, string status)
@@ -176,6 +189,7 @@ public partial class PlayerProfile : Control
         _conditionLabel.Text = "Condition unavailable.";
         _pathwayLabel.Text = "Trajectory unavailable.";
         _readinessLabel.Text = "Readiness unavailable.";
+        WriteAuditState();
     }
 
     private void OnBackPressed()
@@ -202,6 +216,22 @@ public partial class PlayerProfile : Control
         return $"Trajectory | Prime-cycle squad player. Current-season usage should drive immediate output. {latestMatchLine}\n{state.PlayerDevelopmentSummary}";
     }
 
+    private static string BuildProfileConfidenceText(PlayerInformationReport report)
+    {
+        return report.KnowledgeLabel.Replace("Knowledge:", "Profile Confidence:", System.StringComparison.Ordinal).Trim();
+    }
+
+    private static string BuildVisibilityReason(PlayerInformationReport report)
+    {
+        var parts = report.KnowledgeLabel.Split('|', System.StringSplitOptions.TrimEntries | System.StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length <= 1)
+        {
+            return "Visibility | Evidence is limited.";
+        }
+
+        return $"Visibility | {string.Join(" | ", parts[1..])}";
+    }
+
     private static string BuildReadinessSummary(GameState.SquadPlayer player)
     {
         var lineupStatus = player.IsStarting ? "Starting XI" : "Bench/reserve";
@@ -218,10 +248,10 @@ public partial class PlayerProfile : Control
         return $"Match readiness | Watch closely | {lineupStatus}. Fitness or confidence is suppressing selection certainty.";
     }
 
-    private static string BuildStatusSummary(GameState.SquadPlayer player)
+    private static string BuildStatusSummary(GameState.SquadPlayer player, PlayerInformationReport informationReport)
     {
         var role = player.IsStarting ? "Starting XI" : "Bench/reserve";
-        return $"{player.Position} | {role} | Age {player.Age} | Form {player.Form} | Morale {player.Morale} | Fitness {player.Fitness} | {player.PlayingStyle} | Known/estimated/unknown information active";
+        return $"{player.Position} | {role} | Age {player.Age} | Form {player.Form} | Morale {player.Morale} | Fitness {player.Fitness} | {BuildProfileConfidenceText(informationReport)} | {player.PlayingStyle}";
     }
 
     private static string DescribeMetric(int value, string metric)
@@ -293,6 +323,22 @@ public partial class PlayerProfile : Control
         }
 
         return $"{char.ToUpperInvariant(words[0][0])}{char.ToUpperInvariant(words[^1][0])}";
+    }
+
+    private void WriteAuditState()
+    {
+        AuditUiStateWriter.Write(
+            nameof(PlayerProfile),
+            _roleChipLabel.Text,
+            TouchlineRailRoute.None,
+            _clubContextLabel.Text,
+            _pageTitleLabel.Text,
+            _statusLabel.Text,
+            _identityLabel.Text,
+            _roleLabel.Text,
+            _conditionLabel.Text,
+            _pathwayLabel.Text,
+            _readinessLabel.Text);
     }
 }
 

@@ -82,6 +82,11 @@ layout_mode = 2
 text = "No completed result is ready to review."
 autowrap_mode = 3
 
+[node name="StatsLabel" type="Label" parent="RootMargin/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderInfo"]
+layout_mode = 2
+text = "Stats unavailable."
+autowrap_mode = 3
+
 [node name="ScoreCard" type="PanelContainer" parent="RootMargin/MainColumn/HeaderCard/HeaderPadding/HeaderContent"]
 custom_minimum_size = Vector2(260, 0)
 layout_mode = 2
@@ -218,28 +223,39 @@ theme_override_constants/margin_bottom = 20
 
 [node name="ConsequencesContent" type="VBoxContainer" parent="RootMargin/MainColumn/ContentRow/ConsequencesCard/ConsequencesPadding"]
 layout_mode = 2
+size_flags_vertical = 3
 theme_override_constants/separation = 12
 
 [node name="ConsequencesEyebrow" type="Label" parent="RootMargin/MainColumn/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent"]
 layout_mode = 2
 text = "WHY IT MATTERS"
 
-[node name="DeltasLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent"]
+[node name="ConsequencesScroll" type="ScrollContainer" parent="RootMargin/MainColumn/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent"]
+custom_minimum_size = Vector2(0, 300)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ConsequencesStack" type="VBoxContainer" parent="RootMargin/MainColumn/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/ConsequencesScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="DeltasLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/ConsequencesScroll/ConsequencesStack"]
 layout_mode = 2
 text = "Morale +0 | Fans +0 | Board +0"
 autowrap_mode = 3
 
-[node name="TableImpactLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent"]
+[node name="TableImpactLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/ConsequencesScroll/ConsequencesStack"]
 layout_mode = 2
 text = "Table impact unavailable."
 autowrap_mode = 3
 
-[node name="TacticalLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent"]
+[node name="TacticalLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/ConsequencesScroll/ConsequencesStack"]
 layout_mode = 2
 text = "Tactical summary unavailable."
 autowrap_mode = 3
 
-[node name="PressureLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent"]
+[node name="PressureLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/ConsequencesScroll/ConsequencesStack"]
 layout_mode = 2
 text = "Pressure summary unavailable."
 autowrap_mode = 3
@@ -258,47 +274,52 @@ theme_override_constants/margin_bottom = 20
 
 [node name="EventsContent" type="VBoxContainer" parent="RootMargin/MainColumn/ContentRow/EventsCard/EventsPadding"]
 layout_mode = 2
+size_flags_vertical = 3
 theme_override_constants/separation = 12
 
 [node name="EventsEyebrow" type="Label" parent="RootMargin/MainColumn/ContentRow/EventsCard/EventsPadding/EventsContent"]
 layout_mode = 2
 text = "KEY MOMENTS"
 
-[node name="EventsLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/EventsCard/EventsPadding/EventsContent"]
-custom_minimum_size = Vector2(300, 220)
+[node name="EventsScroll" type="ScrollContainer" parent="RootMargin/MainColumn/ContentRow/EventsCard/EventsPadding/EventsContent"]
+custom_minimum_size = Vector2(0, 300)
 layout_mode = 2
+size_flags_vertical = 3
+
+[node name="EventsLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/EventsCard/EventsPadding/EventsContent/EventsScroll"]
+custom_minimum_size = Vector2(300, 300)
+layout_mode = 2
+size_flags_horizontal = 3
 size_flags_vertical = 3
 text = "No key events recorded."
 autowrap_mode = 3
 vertical_alignment = 0
 
-[node name="ActionCard" type="PanelContainer" parent="RootMargin/MainColumn/ContentRow"]
-custom_minimum_size = Vector2(280, 0)
+[node name="ActionCard" type="PanelContainer" parent="RootMargin/MainColumn"]
 layout_mode = 2
-size_flags_vertical = 3
 
-[node name="ActionPadding" type="MarginContainer" parent="RootMargin/MainColumn/ContentRow/ActionCard"]
+[node name="ActionPadding" type="MarginContainer" parent="RootMargin/MainColumn/ActionCard"]
 layout_mode = 2
 theme_override_constants/margin_left = 22
 theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 22
 theme_override_constants/margin_bottom = 20
 
-[node name="ActionContent" type="VBoxContainer" parent="RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding"]
+[node name="ActionContent" type="VBoxContainer" parent="RootMargin/MainColumn/ActionCard/ActionPadding"]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="ActionEyebrow" type="Label" parent="RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent"]
+[node name="ActionEyebrow" type="Label" parent="RootMargin/MainColumn/ActionCard/ActionPadding/ActionContent"]
 layout_mode = 2
 text = "NEXT STEP"
 
-[node name="NextStepLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent"]
+[node name="NextStepLabel" type="Label" parent="RootMargin/MainColumn/ActionCard/ActionPadding/ActionContent"]
 layout_mode = 2
 text = "Advance to Manager Hub"
 autowrap_mode = 3
 
-[node name="ContinueButton" type="Button" parent="RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent"]
+[node name="ContinueButton" type="Button" parent="RootMargin/MainColumn/ActionCard/ActionPadding/ActionContent"]
 layout_mode = 2
 text = "Advance to Manager Hub"
 
-[connection signal="pressed" from="RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/ContinueButton" to="." method="OnContinuePressed"]
+[connection signal="pressed" from="RootMargin/MainColumn/ActionCard/ActionPadding/ActionContent/ContinueButton" to="." method="OnContinuePressed"]

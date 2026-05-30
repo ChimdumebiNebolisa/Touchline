@@ -97,8 +97,12 @@ func _validate_squad_screen() -> void:
         _fail("Selected player detail is missing role/form/morale/fitness")
         return
 
-    if readiness.find("squad status") == -1 or profile_hint.find("form-morale-fitness") == -1:
+    if readiness.find("reads as") == -1 or readiness.find("tactical fit") == -1 or readiness.find("squad status") == -1:
         _fail("Selected player detail does not explain readiness and profile purpose")
+        return
+
+    if profile_hint.find("Profile Confidence:") == -1 or profile_hint.find("Visibility |") == -1 or profile_hint.find("Known:") == -1 or profile_hint.find("Estimated:") == -1 or profile_hint.find("Unknown:") == -1:
+        _fail("Selected player detail does not expose explicit partial-information cues")
         return
 
     var action_button := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/LineupActionButton") as Button
@@ -152,7 +156,7 @@ func _validate_player_profile() -> void:
         _fail("PlayerProfile did not bind the selected player identity")
         return
 
-    if status.find("Age") == -1 or status.find("Form") == -1 or status.find("Morale") == -1 or status.find("Fitness") == -1:
+    if status.find("Age") == -1 or status.find("Form") == -1 or status.find("Morale") == -1 or status.find("Fitness") == -1 or status.find("Profile Confidence:") == -1:
         _fail("PlayerProfile status is missing age/form/morale/fitness: %s" % status)
         return
 
@@ -160,7 +164,7 @@ func _validate_player_profile() -> void:
         _fail("PlayerProfile does not expose squad status after lineup action")
         return
 
-    if identity.find(_selected_player) == -1 or role.find("Squad status") == -1:
+    if identity.find("Player dossier") == -1 or identity.find("Profile Confidence:") == -1 or role.find("Role view") == -1 or role.find("Tactical fit") == -1:
         _fail("PlayerProfile identity or role summary is incomplete")
         return
 

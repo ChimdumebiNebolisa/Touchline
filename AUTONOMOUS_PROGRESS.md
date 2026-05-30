@@ -1,24 +1,25 @@
 # Autonomous Progress
 
 ## Current active Plan step
-- Full acceptance audit and verification pass after the completed 28-phase master-design implementation.
+- Yellow audit UI/evidence repair pass complete and awaiting commit/push.
 
 ## Last completed verified task
-- Deepened active UI action assertions across Assistant Manager, Head Coach, and Manager.
-- 10 areas per role asserted with real before/after state deltas: training, scouting, tactics,
-  recruitment/contracts, post-match consequences, save/load persistence, promises, live-match consistency,
-  job market/career state, and role authority contract.
-- Fixed `ValidatePhase3PromiseLifecycleContract` false-failure when news feed is at capacity.
-- Updated desktop harness to parse and emit `ACTIVE_PLAYTEST_ASSERT` rows.
-- Added `active_playtest_report.md` Deep UI Action Assertions section (28 rows all PASS).
-- Added `docs/audit/active-playtest/scripts-used.md`.
+- Repaired the active screenshot pipeline with Godot-side UI-state export, verified screen assertions,
+  duplicate-hash review, archived prior screenshots, and validated capture metadata.
+- Fixed shared sidebar active-route highlighting across dashboard, squad, tactics, fixtures, and standings.
+- Rebuilt the post-match layout for full summary coverage and scroll-safe consequence text.
+- Reflowed main-menu and save/load slot cards, tightened dashboard copy, and surfaced explicit
+  partial-information cues on squad/player profile.
+- Added focused audit checks for sidebar route state, post-match layout, and partial-information visibility.
+- Recaptured role-specific dashboard, tactics, training/scouting, recruitment/contracts, job-market,
+  slot-card, live-match, and corrected post-match screenshots.
 
 ## Current subtask in progress
-- None. All deep assertion work complete and pushed.
+- Stage intended files, commit the verified Yellow-audit repair pass, and push `main`.
 
 ## Next queued subtasks
-- Review any follow-up UX polishing tickets raised by the deeper active tests.
-- Run another focused active audit after any product fix that touches role authority or match flow.
+- If push succeeds, monitor for any follow-up evidence work that requires deeper motion capture.
+- If push fails, record the exact remote/auth issue and stop.
 
 ## Known blockers
 - None.
@@ -27,17 +28,21 @@
 - `git diff --check` passed.
 - `git diff --cached --check` passed.
 - `dotnet build game/Touchline.sln` passed with 0 warnings and 0 errors.
-- Full Godot headless suite: 76 PASS tokens, 0 FAIL lines (out of 81 scripts; 5 require display
-  server and exit cleanly without a headless-mode pass token — pre-existing behaviour).
+- Full Godot headless suite rerun clean to `docs/audit/active-playtest/logs/full-godot-suite.log`:
+  `32` PASS tokens, `0` FAIL lines.
 - `ACTIVE_PLAYTEST_USER_FLOW_PASS` confirmed.
+- `AUDIT_SIDEBAR_ACTIVE_ROUTE_PASS` confirmed.
+- `AUDIT_POST_MATCH_LAYOUT_PASS` confirmed.
+- `AUDIT_PARTIAL_INFORMATION_PASS` confirmed.
+- `python docs/audit/active-playtest/scripts/active_desktop_playtest.py` passed and wrote
+  `docs/audit/active-playtest/logs/active-playtest-run-20260530-170551.json`
+  with `34` validated screenshots and `28` unique hashes.
 
 ## Last commit hash
-- `5006a52` — "test: deepen active UI action assertions"
+- `5006a52` - `test: deepen active UI action assertions`
 
 ## Resume instructions
-- Re-read `docs/touchline_master_design_decisions.md` before any new feature work.
-- The full 28-phase implementation pass is complete and pushed.
-- Future work should remain audit-driven fixes, balance tuning, and content expansion unless roadmap changes.
-- For active audits, reuse:
-  - `docs/audit/active-playtest/scripts/active_desktop_playtest.py`
-  - `game/scripts/active_playtest_user_flow_check.gd`
+- Stage only the intended product, audit, screenshot, archive, and log files from this pass.
+- Commit with `polish: fix evidence-backed ui ux issues`.
+- Push to `main`.
+- Keep the archive folder and validation JSON as part of the evidence trail.

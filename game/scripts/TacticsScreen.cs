@@ -192,12 +192,14 @@ public partial class TacticsScreen : Control
             };
             _pitchField.AddChild(_tacticalBoard);
         }
-        TouchlineTheme.ApplyNavigationButton(_dashboardButton, false);
-        TouchlineTheme.ApplyNavigationButton(_squadButton, false);
-        TouchlineTheme.ApplyNavigationButton(_tacticsButton, true);
-        TouchlineTheme.ApplyNavigationButton(_fixturesButton, false);
-        TouchlineTheme.ApplyNavigationButton(_standingsButton, false);
-        TouchlineTheme.ApplyMatchdayCta(_matchdayButton);
+        TouchlineTheme.ApplyRailNavigation(
+            _dashboardButton,
+            _squadButton,
+            _tacticsButton,
+            _fixturesButton,
+            _standingsButton,
+            _matchdayButton,
+            TouchlineRailRoute.Tactics);
         TouchlineTheme.ApplyButtonVariant(_saveButton, TouchlineButtonVariant.Primary);
         TouchlineTheme.ApplyButtonVariant(_resetButton, TouchlineButtonVariant.Secondary);
         TouchlineTheme.ApplyButtonVariant(_backButton, TouchlineButtonVariant.Tertiary);
@@ -321,6 +323,7 @@ public partial class TacticsScreen : Control
             ? "Submit Tactical Recommendation"
             : "Save Tactical Plan";
         RefreshBoard();
+        WriteAuditState();
     }
 
     private void RenderUnavailableState()
@@ -370,6 +373,7 @@ public partial class TacticsScreen : Control
         _saveButton.Disabled = true;
         _resetButton.Disabled = true;
         _matchdayButton.Disabled = true;
+        WriteAuditState();
     }
 
     private void RefreshBoard()
@@ -408,6 +412,7 @@ public partial class TacticsScreen : Control
         _tempoPreviewLabel.Text = $"Tempo: {DescribeTempo(tempo)}. {BuildTempoPreview(tempo)}";
         _widthPreviewLabel.Text = $"Pitch use: {DescribeWidth(width)}. {BuildWidthPreview(width)}";
         _riskPreviewLabel.Text = $"Mentality: {DescribeRisk(risk)}. {BuildRiskPreview(risk)}";
+        WriteAuditState();
     }
 
     private void ApplyFormationRows(string formation, int width)
@@ -738,6 +743,7 @@ public partial class TacticsScreen : Control
             _statusLabel.Text = "GameState singleton is unavailable.";
             _saveHintLabel.Text = "Save unavailable.";
             SetReadinessChip("SAVE OFFLINE", false);
+            WriteAuditState();
             return;
         }
 
@@ -756,11 +762,13 @@ public partial class TacticsScreen : Control
         {
             _saveHintLabel.Text = status;
             SetReadinessChip("SUGGESTED", true);
+            WriteAuditState();
             return;
         }
 
         _saveHintLabel.Text = "Saved plan is now the matchday tactical setup.";
         SetReadinessChip("PLAN SAVED", true);
+        WriteAuditState();
     }
 
     private void OnResetPressed()
@@ -781,6 +789,7 @@ public partial class TacticsScreen : Control
         RefreshBoard();
         _statusLabel.Text = "Preview reset to the currently saved tactical setup.";
         _saveHintLabel.Text = "Save is only needed after new tactical changes.";
+        WriteAuditState();
     }
 
     private void OnBackPressed()
@@ -845,6 +854,23 @@ public partial class TacticsScreen : Control
     {
         _readinessChipLabel.Text = text;
         TouchlineTheme.ApplyPanelVariant(_readinessChip, positive ? TouchlineSurfaceVariant.Positive : TouchlineSurfaceVariant.Muted, 999);
+    }
+
+    private void WriteAuditState()
+    {
+        AuditUiStateWriter.Write(
+            nameof(TacticsScreen),
+            _managerLabel.Text,
+            TouchlineRailRoute.Tactics,
+            _clubContextLabel.Text,
+            _matchPlanLabel.Text,
+            _controlSummaryLabel.Text,
+            _savedPlanLabel.Text,
+            _saveButton.Text,
+            _saveHintLabel.Text,
+            _statusLabel.Text,
+            _formationBadgeLabel.Text,
+            _previewSummaryLabel.Text);
     }
 
     private int FindFormationIndex(string formation)

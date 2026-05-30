@@ -99,52 +99,84 @@ layout_mode = 2
 text = "Load is unavailable."
 autowrap_mode = 3
 
-[node name="DetailGrid" type="GridContainer" parent="RootMargin/MainColumn/SlotCard/SlotPadding/SlotContent"]
+[node name="DetailRows" type="VBoxContainer" parent="RootMargin/MainColumn/SlotCard/SlotPadding/SlotContent"]
 layout_mode = 2
-columns = 2
-theme_override_constants/h_separation = 12
-theme_override_constants/v_separation = 8
+theme_override_constants/separation = 8
 
-[node name="ManagerLabel" type="Label" parent="RootMargin/MainColumn/SlotCard/SlotPadding/SlotContent/DetailGrid"]
+[node name="ManagerRow" type="HBoxContainer" parent="RootMargin/MainColumn/SlotCard/SlotPadding/SlotContent/DetailRows"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ManagerLabel" type="Label" parent="RootMargin/MainColumn/SlotCard/SlotPadding/SlotContent/DetailRows/ManagerRow"]
+custom_minimum_size = Vector2(140, 0)
 layout_mode = 2
 text = "MANAGER"
-horizontal_alignment = 1
 
-[node name="SeasonLabel" type="Label" parent="RootMargin/MainColumn/SlotCard/SlotPadding/SlotContent/DetailGrid"]
+[node name="ManagerValueLabel" type="Label" parent="RootMargin/MainColumn/SlotCard/SlotPadding/SlotContent/DetailRows/ManagerRow"]
 layout_mode = 2
-text = "SEASON / DATE"
-horizontal_alignment = 1
-
-[node name="FixtureLabel" type="Label" parent="RootMargin/MainColumn/SlotCard/SlotPadding/SlotContent/DetailGrid"]
-layout_mode = 2
-text = "NEXT FIXTURE"
-horizontal_alignment = 1
-
-[node name="TableLabel" type="Label" parent="RootMargin/MainColumn/SlotCard/SlotPadding/SlotContent/DetailGrid"]
-layout_mode = 2
-text = "TABLE"
-horizontal_alignment = 1
-
-[node name="ManagerValueLabel" type="Label" parent="RootMargin/MainColumn/SlotCard/SlotPadding/SlotContent/DetailGrid"]
-layout_mode = 2
+size_flags_horizontal = 3
 text = "--"
-horizontal_alignment = 1
-
-[node name="SeasonValueLabel" type="Label" parent="RootMargin/MainColumn/SlotCard/SlotPadding/SlotContent/DetailGrid"]
-layout_mode = 2
-text = "--"
-horizontal_alignment = 1
-
-[node name="FixtureValueLabel" type="Label" parent="RootMargin/MainColumn/SlotCard/SlotPadding/SlotContent/DetailGrid"]
-layout_mode = 2
-text = "No live fixture"
-horizontal_alignment = 1
 autowrap_mode = 3
 
-[node name="TableValueLabel" type="Label" parent="RootMargin/MainColumn/SlotCard/SlotPadding/SlotContent/DetailGrid"]
+[node name="RoleRow" type="HBoxContainer" parent="RootMargin/MainColumn/SlotCard/SlotPadding/SlotContent/DetailRows"]
 layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="RoleLabel" type="Label" parent="RootMargin/MainColumn/SlotCard/SlotPadding/SlotContent/DetailRows/RoleRow"]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "ROLE"
+
+[node name="RoleValueLabel" type="Label" parent="RootMargin/MainColumn/SlotCard/SlotPadding/SlotContent/DetailRows/RoleRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Role unavailable"
+autowrap_mode = 3
+
+[node name="SeasonRow" type="HBoxContainer" parent="RootMargin/MainColumn/SlotCard/SlotPadding/SlotContent/DetailRows"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="SeasonLabel" type="Label" parent="RootMargin/MainColumn/SlotCard/SlotPadding/SlotContent/DetailRows/SeasonRow"]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "SEASON / DATE"
+
+[node name="SeasonValueLabel" type="Label" parent="RootMargin/MainColumn/SlotCard/SlotPadding/SlotContent/DetailRows/SeasonRow"]
+layout_mode = 2
+size_flags_horizontal = 3
 text = "--"
-horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="FixtureRow" type="HBoxContainer" parent="RootMargin/MainColumn/SlotCard/SlotPadding/SlotContent/DetailRows"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="FixtureLabel" type="Label" parent="RootMargin/MainColumn/SlotCard/SlotPadding/SlotContent/DetailRows/FixtureRow"]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "NEXT FIXTURE"
+
+[node name="FixtureValueLabel" type="Label" parent="RootMargin/MainColumn/SlotCard/SlotPadding/SlotContent/DetailRows/FixtureRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "No live fixture"
+autowrap_mode = 3
+
+[node name="SaveRow" type="HBoxContainer" parent="RootMargin/MainColumn/SlotCard/SlotPadding/SlotContent/DetailRows"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="SaveLabel" type="Label" parent="RootMargin/MainColumn/SlotCard/SlotPadding/SlotContent/DetailRows/SaveRow"]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "SAVE / VERSION"
+
+[node name="SaveValueLabel" type="Label" parent="RootMargin/MainColumn/SlotCard/SlotPadding/SlotContent/DetailRows/SaveRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Slot 1 | No save"
+autowrap_mode = 3
 
 [node name="ActionsRow" type="HBoxContainer" parent="RootMargin/MainColumn"]
 layout_mode = 2

@@ -285,12 +285,14 @@ public partial class ClubDashboard : Control
         TouchlineTheme.ApplyPanelVariant(GetNode<PanelContainer>("RootMargin/Shell/RailCard/RailPadding/RailContent/IdentityCard"), TouchlineSurfaceVariant.Shell, 22);
         TouchlineTheme.ApplyPanelVariant(GetNode<PanelContainer>("RootMargin/Shell/RailCard/RailPadding/RailContent/IdentityCard/IdentityPadding/IdentityContent/IdentityTopRow/Badge"), TouchlineSurfaceVariant.Accent, 20);
 
-        TouchlineTheme.ApplyNavigationButton(_dashboardButton, true);
-        TouchlineTheme.ApplyNavigationButton(_squadButton, false);
-        TouchlineTheme.ApplyNavigationButton(_tacticsButton, false);
-        TouchlineTheme.ApplyNavigationButton(_fixturesButton, false);
-        TouchlineTheme.ApplyNavigationButton(_standingsButton, false);
-        TouchlineTheme.ApplyMatchdayCta(_matchdayButton);
+        TouchlineTheme.ApplyRailNavigation(
+            _dashboardButton,
+            _squadButton,
+            _tacticsButton,
+            _fixturesButton,
+            _standingsButton,
+            _matchdayButton,
+            TouchlineRailRoute.Dashboard);
         TouchlineTheme.ApplyButtonVariant(_saveButton, TouchlineButtonVariant.Secondary);
         TouchlineTheme.ApplyButtonVariant(_backButton, TouchlineButtonVariant.Tertiary);
 
@@ -403,14 +405,14 @@ public partial class ClubDashboard : Control
         _shapeValueLabel.Text = state.TacticalFormation;
         _shapeMetaLabel.Text = $"{state.TeamStyleName} | Press {state.PressIntensity} | Tempo {state.Tempo} | Risk {state.Risk}";
 
-        _fixturePreviewLabel.Text = $"{careerPhase}\n{state.NextFixtureSummary}";
+        _fixturePreviewLabel.Text = $"Next match\n{state.NextFixtureSummary}";
         _focusContextLabel.Text = state.CurrentFixtureIsCup
             ? $"{state.CurrentFixtureCompetitionName} | {state.CurrentFixtureRoundName} | {state.BuildLeaguePositionSummary()}"
-            : $"{state.CompetitionName} | {state.BuildLeaguePositionSummary()}";
-        _recommendedMoveLabel.Text = BuildPrioritySummary(state);
+            : $"{state.BuildLeaguePositionSummary()} | Board {state.BoardPhilosophyName}";
+        _recommendedMoveLabel.Text = $"Next best action | {BuildPrioritySummary(state)}";
         _actionHintLabel.Text = state.IsCurrentClubFixtureComplete()
-            ? "Next match: advance after the post-match review, not replay the completed fixture."
-            : "Next match: go to Matchday when squad and tactics feel set.";
+            ? "Post-match logged. Review it, then advance the week."
+            : "Check the XI, lock the plan, then go to Matchday.";
 
         _formValueLabel.Text = BuildCompactForm(state.FormSummary);
         _lastResultLabel.Text = hasMatchReport
@@ -426,16 +428,16 @@ public partial class ClubDashboard : Control
         _squadStatusLabel.Text = $"{state.BuildLineupReadinessSummary()}\n{state.SquadStatusSummary}";
         _tacticsSummaryLabel.Text = $"{state.BuildTacticalPlanSummary()}\n{state.TacticsFoundationSummary}";
         _roleAuthorityLabel.Text = $"Role authority | {state.RoleAuthoritySummary}";
-        _objectivesLabel.Text = $"Main objectives\n{state.MainObjectivesSummary}";
-        _staffLabel.Text = $"Starting staff\n{state.StaffSummary}\nStaff impact\n{state.StaffImpactSummary}";
-        _newsFeedLabel.Text = $"News feed\n{state.NewsFeedSummary}\nDecision events\n{state.DecisionEventSummary}";
-        _trainingScoutingLabel.Text = $"Training and scouting\n{state.TrainingScoutingSummary}";
+        _objectivesLabel.Text = $"Main objectives\n{TakeLines(state.MainObjectivesSummary, 3)}";
+        _staffLabel.Text = $"Staff\n{TakeLines(state.StaffSummary, 2)}\nImpact\n{TakeLines(state.StaffImpactSummary, 2)}";
+        _newsFeedLabel.Text = $"News\n{TakeLines(state.NewsFeedSummary, 2)}\nEvents\n{TakeLines(state.DecisionEventSummary, 2)}";
+        _trainingScoutingLabel.Text = $"Training/scouting\n{TakeLines(state.TrainingScoutingSummary, 4)}";
         PopulateTrainingScoutingControls(state);
-        _youthAcademyLabel.Text = $"Youth academy\n{state.YouthAcademySummary}";
+        _youthAcademyLabel.Text = $"Youth academy\n{TakeLines(state.YouthAcademySummary, 3)}";
         _youthAcademyButton.Disabled = false;
         ApplyRoleActionLabels(state);
-        _recruitmentLabel.Text = $"Recruitment and contracts\n{state.RecruitmentFoundationSummary}\nPromises\n{state.PromiseSummary}";
-        _careerMarketLabel.Text = $"Career and job market\n{state.CareerMarketSummary}\nCareer history\n{state.CareerHistorySummary}";
+        _recruitmentLabel.Text = $"Recruitment/contracts\n{TakeLines(state.RecruitmentFoundationSummary, 4)}\nPromises\n{TakeLines(state.PromiseSummary, 2)}";
+        _careerMarketLabel.Text = $"Career/job market\n{TakeLines(state.CareerMarketSummary, 4)}\nHistory\n{TakeLines(state.CareerHistorySummary, 2)}";
         _priorityLabel.Text = BuildPrioritySummary(state);
         _statusLabel.Text = hasMatchReport
             ? $"{state.LastMatchReport!.FixtureLabel}: {state.LastMatchReport.Scoreline} | Cause: {state.LastMatchReport.CauseSummary}"
@@ -443,6 +445,7 @@ public partial class ClubDashboard : Control
         _saveHintLabel.Text = SaveSystem.Instance == null
             ? "Save unavailable."
             : "Save the live career state before leaving the session.";
+        WriteAuditState();
     }
 
     private void RenderUnavailableState(string title, string status)
@@ -506,6 +509,7 @@ public partial class ClubDashboard : Control
         _contractButton.Disabled = true;
         _jobMarketButton.Disabled = true;
         _matchdayButton.Disabled = true;
+        WriteAuditState();
     }
 
     private void PopulateTrainingScoutingControls(GameState state)
@@ -618,20 +622,20 @@ public partial class ClubDashboard : Control
     {
         if (state.BoardConfidence < 50)
         {
-            return "Board pressure is tightening. Stabilize shape and protect the next result.";
+            return "Board pressure is rising; protect the next result.";
         }
 
         if (state.TeamMorale < 60)
         {
-            return "The dressing room needs help. Check the squad pulse before kickoff.";
+            return "Squad morale is fragile; check the dressing room pulse.";
         }
 
         if (state.LastMatchReport == null)
         {
-            return "Opening week: settle the XI, confirm the plan, and take control of matchday.";
+            return "Opening week: settle the XI and confirm the plan.";
         }
 
-        return "Keep the weekly rhythm moving. Track pressure, review the squad, then go again.";
+        return "Track pressure, review the squad, then go again.";
     }
 
     private static string BuildPriorityTag(GameState state)
@@ -652,6 +656,23 @@ public partial class ClubDashboard : Control
     private static string BuildCompactForm(string formSummary)
     {
         return formSummary.StartsWith("Form: ") ? formSummary["Form: ".Length..] : formSummary;
+    }
+
+    private static string TakeLines(string text, int maxLines)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return "Unavailable.";
+        }
+
+        var lines = text.Split('\n', System.StringSplitOptions.RemoveEmptyEntries);
+        if (lines.Length == 0)
+        {
+            return text.Trim();
+        }
+
+        var visibleCount = System.Math.Min(maxLines, lines.Length);
+        return string.Join("\n", lines[..visibleCount]).Trim();
     }
 
     private static string BuildClubMonogram(string clubName)
@@ -732,6 +753,28 @@ public partial class ClubDashboard : Control
         return value >= 0 ? $"+{value}" : value.ToString();
     }
 
+    private void WriteAuditState()
+    {
+        AuditUiStateWriter.Write(
+            nameof(ClubDashboard),
+            _managerLabel.Text,
+            TouchlineRailRoute.Dashboard,
+            _clubContextLabel.Text,
+            _fixturePreviewLabel.Text,
+            _recommendedMoveLabel.Text,
+            _actionHintLabel.Text,
+            _roleAuthorityLabel.Text,
+            _trainingScoutingLabel.Text,
+            _recruitmentLabel.Text,
+            _careerMarketLabel.Text,
+            _applyTrainingButton.Text,
+            _startScoutingButton.Text,
+            _recruitmentButton.Text,
+            _contractButton.Text,
+            _jobMarketButton.Text,
+            _statusLabel.Text);
+    }
+
     private void OnBackPressed()
     {
         GetTree().ChangeSceneToFile(MainMenuScenePath);
@@ -769,6 +812,7 @@ public partial class ClubDashboard : Control
             _statusLabel.Text = "Save system unavailable.";
             _saveHintLabel.Text = "Save system unavailable.";
             SetStateChip("SAVE OFFLINE", false);
+            WriteAuditState();
             return;
         }
 
@@ -776,6 +820,7 @@ public partial class ClubDashboard : Control
         _statusLabel.Text = statusMessage;
         _saveHintLabel.Text = statusMessage;
         SetStateChip("CAREER SAVED", true);
+        WriteAuditState();
     }
 
     private void OnApplyTrainingPressed()
@@ -790,6 +835,7 @@ public partial class ClubDashboard : Control
             GetSelectedOptionText(_trainingIntensityOption));
         RenderState();
         _statusLabel.Text = status;
+        WriteAuditState();
     }
 
     private void OnStartScoutingPressed()
@@ -804,6 +850,7 @@ public partial class ClubDashboard : Control
             GetSelectedOptionText(_scoutingDepthOption));
         RenderState();
         _statusLabel.Text = status;
+        WriteAuditState();
     }
 
     private void OnAdvanceDayPressed()
@@ -817,6 +864,7 @@ public partial class ClubDashboard : Control
             ? "Advanced one career day; training and scouting state progressed."
             : "Career day could not advance without an active club.";
         RenderState();
+        WriteAuditState();
     }
 
     private void OnAdvanceWeekPressed()
@@ -830,6 +878,7 @@ public partial class ClubDashboard : Control
             ? "Advanced one career week; training, scouting, pressure, and news updated."
             : "Career week could not advance without an active club.";
         RenderState();
+        WriteAuditState();
     }
 
     private void OnStaffMarketPressed()
@@ -841,6 +890,7 @@ public partial class ClubDashboard : Control
 
         _statusLabel.Text = GameState.Instance.AttemptStaffMarketAction();
         RenderState();
+        WriteAuditState();
     }
 
     private void OnYouthAcademyPressed()
@@ -852,6 +902,7 @@ public partial class ClubDashboard : Control
 
         _statusLabel.Text = GameState.Instance.AdvanceYouthAcademyAction();
         RenderState();
+        WriteAuditState();
     }
 
     private void OnRecruitmentPressed()
@@ -863,6 +914,7 @@ public partial class ClubDashboard : Control
 
         _statusLabel.Text = GameState.Instance.AttemptBasicRecruitmentAction();
         RenderState();
+        WriteAuditState();
     }
 
     private void OnContractPressed()
@@ -874,6 +926,7 @@ public partial class ClubDashboard : Control
 
         _statusLabel.Text = GameState.Instance.AttemptBasicContractNegotiation();
         RenderState();
+        WriteAuditState();
     }
 
     private void OnJobMarketPressed()
@@ -885,6 +938,7 @@ public partial class ClubDashboard : Control
 
         _statusLabel.Text = GameState.Instance.AdvanceCareerJobMarketAction();
         RenderState();
+        WriteAuditState();
     }
 
     private void OnResolveEventPressed()
@@ -896,5 +950,6 @@ public partial class ClubDashboard : Control
 
         _statusLabel.Text = GameState.Instance.ResolveActiveDecisionEvent();
         RenderState();
+        WriteAuditState();
     }
 }

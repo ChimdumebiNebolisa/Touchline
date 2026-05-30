@@ -123,12 +123,14 @@ public partial class StandingsScreen : Control
         TouchlineTheme.ApplyPanelVariant(GetNode<PanelContainer>("RootMargin/Shell/MainColumn/SummaryGrid/PaceCard"), TouchlineSurfaceVariant.Card, 20);
         TouchlineTheme.ApplyPanelVariant(GetNode<PanelContainer>("RootMargin/Shell/MainColumn/SummaryGrid/NextMatchCard"), TouchlineSurfaceVariant.Card, 20);
 
-        TouchlineTheme.ApplyNavigationButton(_dashboardButton, false);
-        TouchlineTheme.ApplyNavigationButton(_squadButton, false);
-        TouchlineTheme.ApplyNavigationButton(_tacticsButton, false);
-        TouchlineTheme.ApplyNavigationButton(_fixturesButton, false);
-        TouchlineTheme.ApplyNavigationButton(_standingsButton, true);
-        TouchlineTheme.ApplyMatchdayCta(_matchdayButton);
+        TouchlineTheme.ApplyRailNavigation(
+            _dashboardButton,
+            _squadButton,
+            _tacticsButton,
+            _fixturesButton,
+            _standingsButton,
+            _matchdayButton,
+            TouchlineRailRoute.Standings);
         TouchlineTheme.ApplyButtonVariant(_backButton, TouchlineButtonVariant.Tertiary);
 
         TouchlineTheme.ApplyTitleStyle(_clubNameLabel, 28);
@@ -237,6 +239,7 @@ public partial class StandingsScreen : Control
 
         _matchdayButton.Disabled = false;
         PopulateTable();
+        WriteAuditState();
     }
 
     private void RenderUnavailableState()
@@ -270,6 +273,7 @@ public partial class StandingsScreen : Control
         ClearContainer(_tableRows);
         TouchlineTheme.ApplyPanelVariant(_positionChip, TouchlineSurfaceVariant.Muted, 999);
         TouchlineTheme.ApplyPanelVariant(_stateChip, TouchlineSurfaceVariant.Muted, 999);
+        WriteAuditState();
     }
 
     private void PopulateTable()
@@ -516,6 +520,22 @@ public partial class StandingsScreen : Control
     private static string FormatSigned(int value)
     {
         return value >= 0 ? $"+{value}" : value.ToString();
+    }
+
+    private void WriteAuditState()
+    {
+        AuditUiStateWriter.Write(
+            nameof(StandingsScreen),
+            _managerLabel.Text,
+            TouchlineRailRoute.Standings,
+            _competitionLabel.Text,
+            _tableStatusLabel.Text,
+            _clubSummaryLabel.Text,
+            _formLabel.Text,
+            _nextFixtureLabel.Text,
+            _tableNoteLabel.Text,
+            _railHintLabel.Text,
+            _positionValueLabel.Text);
     }
 
     private void OnBackPressed()

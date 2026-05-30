@@ -166,12 +166,14 @@ public partial class SquadScreen : Control
         TouchlineTheme.ApplyPanelVariant(GetNode<PanelContainer>("RootMargin/Shell/MainColumn/SummaryGrid/NextMatchCard"), TouchlineSurfaceVariant.Card, 20);
         TouchlineTheme.ApplyPanelVariant(GetNode<PanelContainer>("RootMargin/Shell/MainColumn/ContentRow/DetailCard/DetailPadding/DetailContent/StatsCard"), TouchlineSurfaceVariant.Muted, 20);
 
-        TouchlineTheme.ApplyNavigationButton(_dashboardButton, false);
-        TouchlineTheme.ApplyNavigationButton(_squadButton, true);
-        TouchlineTheme.ApplyNavigationButton(_tacticsButton, false);
-        TouchlineTheme.ApplyNavigationButton(_fixturesButton, false);
-        TouchlineTheme.ApplyNavigationButton(_standingsButton, false);
-        TouchlineTheme.ApplyMatchdayCta(_matchdayButton);
+        TouchlineTheme.ApplyRailNavigation(
+            _dashboardButton,
+            _squadButton,
+            _tacticsButton,
+            _fixturesButton,
+            _standingsButton,
+            _matchdayButton,
+            TouchlineRailRoute.Squad);
         TouchlineTheme.ApplyButtonVariant(_lineupActionButton, TouchlineButtonVariant.Primary);
         TouchlineTheme.ApplyButtonVariant(_openProfileButton, TouchlineButtonVariant.Secondary);
         TouchlineTheme.ApplyButtonVariant(_backButton, TouchlineButtonVariant.Tertiary);
@@ -270,6 +272,7 @@ public partial class SquadScreen : Control
 
         _matchdayButton.Disabled = false;
         PopulatePlayerRows((int)_positionFilter.GetSelectedId(), _selectedPlayerName);
+        WriteAuditState();
     }
 
     private void RenderUnavailableState()
@@ -315,6 +318,7 @@ public partial class SquadScreen : Control
         TouchlineTheme.ApplyPanelVariant(_readinessChip, TouchlineSurfaceVariant.Muted, 999);
         TouchlineTheme.ApplyPanelVariant(_roleChip, TouchlineSurfaceVariant.Muted, 999);
         TouchlineTheme.ApplyPanelVariant(_statusChip, TouchlineSurfaceVariant.Muted, 999);
+        WriteAuditState();
     }
 
     private void OnFilterSelected(long index)
@@ -523,8 +527,8 @@ public partial class SquadScreen : Control
 
         var informationReport = GameState.Instance?.BuildPlayerInformationReport(player, PlayerKnowledgeContext.OwnSquad);
         var rowKnowledgeLabel = informationReport == null
-            ? "Information unavailable"
-            : informationReport.KnowledgeLabel.Split('|')[0].Trim();
+            ? "Profile confidence unavailable"
+            : BuildProfileConfidenceText(informationReport);
         var conditionLabel = new Label
         {
             Text = informationReport == null
@@ -574,6 +578,7 @@ public partial class SquadScreen : Control
             _detailMetaLabel.Text = "Player details unavailable.";
             _lineupActionButton.Disabled = true;
             _openProfileButton.Disabled = true;
+            WriteAuditState();
             return;
         }
 
@@ -581,9 +586,10 @@ public partial class SquadScreen : Control
         var index = _visiblePlayerIndexes[visibleIndex];
         var player = GameState.Instance.SquadPlayers[index];
         _selectedPlayerName = player.Name;
+        var informationReport = GameState.Instance.BuildPlayerInformationReport(player, PlayerKnowledgeContext.OwnSquad);
 
         _playerNameLabel.Text = player.Name;
-        _detailMetaLabel.Text = $"{player.Position} | Age {player.Age} | {PlayerIdentityFoundation.BuildProfileSummary(player)}";
+        _detailMetaLabel.Text = $"{player.Position} | Age {player.Age} | {BuildProfileConfidenceText(informationReport)}";
         _roleChipLabel.Text = player.IsStarting ? "STARTING XI" : "BENCH/RESERVE";
         _statusChipLabel.Text = BuildReadinessLabel(player).ToUpperInvariant();
         TouchlineTheme.ApplyPanelVariant(_roleChip, player.IsStarting ? TouchlineSurfaceVariant.Positive : TouchlineSurfaceVariant.Accent, 999);
@@ -593,7 +599,17 @@ public partial class SquadScreen : Control
         _moraleStatLabel.Text = $"Morale | {player.Morale} | {DescribePulse(player.Morale)}";
         _fitnessStatLabel.Text = $"Fitness | {player.Fitness} | {DescribeReadiness(player.Fitness)}";
         _readinessSummaryLabel.Text = BuildReadinessSummary(player);
-        _profileHintLabel.Text = $"Open the player profile for identity, lineup status, and the longer form-morale-fitness arc.\n{GameState.Instance.BuildPlayerInformationSummary(player)}\n{PlayerIdentityFoundation.BuildContractSummary(player)}";
+        _profileHintLabel.Text =
+            $"{BuildProfileConfidenceText(informationReport)}\n" +
+            $"{BuildVisibilityReason(informationReport)}\n" +
+            $"{informationReport.KnownAttributesSummary}\n" +
+            $"{informationReport.EstimatedAttributesSummary}\n" +
+            $"{informationReport.UnknownAttributesSummary}\n" +
+            $"{informationReport.TacticalFitSummary}\n" +
+            $"{informationReport.PersonalitySummary}\n" +
+            $"{informationReport.DevelopmentSummary}\n" +
+            $"{informationReport.RiskSummary}\n" +
+            $"{PlayerIdentityFoundation.BuildContractSummary(player)}";
         if (GameState.Instance.CareerProfile.Role == ManagerRole.AssistantManager)
         {
             _lineupStatusLabel.Text = player.IsStarting
@@ -613,6 +629,7 @@ public partial class SquadScreen : Control
         _openProfileButton.Disabled = false;
         _openProfileButton.Text = $"Open {player.Name} Profile";
         SetReadinessChip(BuildSquadReadinessChip(player), true);
+        WriteAuditState();
     }
 
     private void OnLineupActionPressed()
@@ -720,6 +737,22 @@ public partial class SquadScreen : Control
     private static string BuildPlayerStatusLine(GameState.SquadPlayer player)
     {
         return player.IsStarting ? $"Starting XI role | {player.ContractRole}" : $"Bench/reserve depth | {player.ContractRole}";
+    }
+
+    private static string BuildProfileConfidenceText(PlayerInformationReport report)
+    {
+        return report.KnowledgeLabel.Replace("Knowledge:", "Profile Confidence:", System.StringComparison.Ordinal).Trim();
+    }
+
+    private static string BuildVisibilityReason(PlayerInformationReport report)
+    {
+        var parts = report.KnowledgeLabel.Split('|', System.StringSplitOptions.TrimEntries | System.StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length <= 1)
+        {
+            return "Visibility | Evidence is limited.";
+        }
+
+        return $"Visibility | {string.Join(" | ", parts[1..])}";
     }
 
     private static string BuildReadinessLabel(GameState.SquadPlayer player)
@@ -860,6 +893,22 @@ public partial class SquadScreen : Control
         }
 
         return $"{char.ToUpperInvariant(words[0][0])}{char.ToUpperInvariant(words[^1][0])}";
+    }
+
+    private void WriteAuditState()
+    {
+        AuditUiStateWriter.Write(
+            nameof(SquadScreen),
+            _managerLabel.Text,
+            TouchlineRailRoute.Squad,
+            _clubContextLabel.Text,
+            _lineupSummaryLabel.Text,
+            _playerNameLabel.Text,
+            _detailMetaLabel.Text,
+            _profileHintLabel.Text,
+            _lineupStatusLabel.Text,
+            _actionHintLabel.Text,
+            _openProfileButton.Text);
     }
 
     private void OnBackPressed()

@@ -118,13 +118,13 @@ func _validate_main_menu_preview() -> void:
 
     var summary := _label_text("Center/MenuCard/Padding/Menu/ResumeCard/ResumePadding/ResumeContent/ResumeSummaryLabel")
     var status := _label_text("Center/MenuCard/Padding/Menu/ResumeCard/ResumePadding/ResumeContent/ResumeStatusLabel")
-    var season := _label_text("Center/MenuCard/Padding/Menu/ResumeCard/ResumePadding/ResumeContent/DetailGrid/SeasonValueLabel")
+    var season := _label_text("Center/MenuCard/Padding/Menu/ResumeCard/ResumePadding/ResumeContent/DetailRows/SeasonRow/SeasonValueLabel")
 
     if summary.find("Slot 1 ready") == -1 or status.find("Local career ready") == -1:
         _fail("MainMenu save preview does not clearly show a loadable slot")
         return
 
-    if season.find("MD") == -1:
+    if season.find("Matchday") == -1:
         _fail("MainMenu save preview does not include matchday context: %s" % season)
         return
 
@@ -143,15 +143,15 @@ func _validate_save_load_preview_and_load() -> void:
 
     var slot_summary := _label_text("RootMargin/MainColumn/SlotCard/SlotPadding/SlotContent/SlotSummaryLabel")
     var status := _label_text("RootMargin/MainColumn/SlotCard/SlotPadding/SlotContent/StatusLabel")
-    var season := _label_text("RootMargin/MainColumn/SlotCard/SlotPadding/SlotContent/DetailGrid/SeasonValueLabel")
-    var table := _label_text("RootMargin/MainColumn/SlotCard/SlotPadding/SlotContent/DetailGrid/TableValueLabel")
+    var season := _label_text("RootMargin/MainColumn/SlotCard/SlotPadding/SlotContent/DetailRows/SeasonRow/SeasonValueLabel")
+    var save_version := _label_text("RootMargin/MainColumn/SlotCard/SlotPadding/SlotContent/DetailRows/SaveRow/SaveValueLabel")
     var load_button := current_scene.get_node("RootMargin/MainColumn/ActionsRow/LoadButton") as Button
 
     if slot_summary.find("Slot 1 ready") == -1 or slot_summary.find(_selected_club) == -1:
         _fail("SaveLoad valid slot summary is unclear: %s" % slot_summary)
         return
 
-    if status.find("Ready to load") == -1 or season.find("MD") == -1 or table.find("pts") == -1:
+    if status.find("Career summary") == -1 or status.find("pts") == -1 or season.find("Matchday") == -1 or save_version.find("Save v") == -1:
         _fail("SaveLoad valid slot details are incomplete")
         return
 

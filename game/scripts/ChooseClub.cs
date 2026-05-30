@@ -93,6 +93,7 @@ public partial class ChooseClub : Control
             _selectionStatusLabel.Text = "Career setup is incomplete.";
             _confirmSelectionButton.Disabled = true;
             RenderFallbackPreview("Club context unavailable.");
+            WriteAuditState();
             return;
         }
 
@@ -101,6 +102,7 @@ public partial class ChooseClub : Control
         _selectionStatusLabel.Text = "Select a club to preview its identity and pressure before you confirm.";
         _confirmSelectionButton.Disabled = false;
         PopulateClubRows();
+        WriteAuditState();
     }
 
     public void SelectClubRow(int visibleIndex)
@@ -258,6 +260,7 @@ public partial class ChooseClub : Control
         _openingFixtureLabel.Text = preview.OpeningFixtureSummary;
         _selectionStatusLabel.Text = $"Selected | {preview.ClubName}";
         _confirmSelectionButton.Text = $"Take Charge of {preview.ClubName}";
+        WriteAuditState();
     }
 
     private void RenderFallbackPreview(string clubName)
@@ -270,6 +273,7 @@ public partial class ChooseClub : Control
         _expectationLabel.Text = "Board line unavailable.";
         _openingFixtureLabel.Text = "Opening fixture unavailable.";
         _confirmSelectionButton.Text = "Confirm Club Selection";
+        WriteAuditState();
     }
 
     private void OnConfirmSelectionPressed()
@@ -277,18 +281,21 @@ public partial class ChooseClub : Control
         if (TouchlineWorldGenerator.Instance == null)
         {
             _selectionStatusLabel.Text = "WorldGenerator singleton is unavailable.";
+            WriteAuditState();
             return;
         }
 
         if (string.IsNullOrWhiteSpace(_selectedClubName))
         {
             _selectionStatusLabel.Text = "Select a club before confirming.";
+            WriteAuditState();
             return;
         }
 
         if (!TouchlineWorldGenerator.Instance.SelectClub(_selectedClubName))
         {
             _selectionStatusLabel.Text = TouchlineWorldGenerator.Instance.LastStatusMessage;
+            WriteAuditState();
             return;
         }
 
@@ -432,5 +439,22 @@ public partial class ChooseClub : Control
     private void OnBackPressed()
     {
         GetTree().ChangeSceneToFile(CareerSetupScenePath);
+    }
+
+    private void WriteAuditState()
+    {
+        AuditUiStateWriter.Write(
+            nameof(ChooseClub),
+            GameState.Instance?.CurrentRoleName ?? string.Empty,
+            TouchlineRailRoute.None,
+            _careerSummaryLabel.Text,
+            _selectionStatusLabel.Text,
+            _previewClubNameLabel.Text,
+            _identityTagLabel.Text,
+            _pressureTagLabel.Text,
+            _identityLabel.Text,
+            _expectationLabel.Text,
+            _openingFixtureLabel.Text,
+            _confirmSelectionButton.Text);
     }
 }

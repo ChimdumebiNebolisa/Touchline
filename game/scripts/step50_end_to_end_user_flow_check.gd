@@ -96,7 +96,7 @@ func _process(_delta: float) -> bool:
             return false
 
         var score_label := current_scene.get_node("RootMargin/MainColumn/HeaderCard/HeaderPadding/HeaderContent/ScoreCard/ScorePadding/ScoreContent/ScoreLabel") as Label
-        var continue_button := current_scene.get_node("RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/ContinueButton") as Button
+        var continue_button := current_scene.get_node("RootMargin/MainColumn/ActionCard/ActionPadding/ActionContent/ContinueButton") as Button
         if score_label == null or continue_button == null:
             _fail("PostMatch controls missing")
             return false
