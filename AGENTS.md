@@ -169,3 +169,48 @@ After a work cycle, state:
 - commit hash
 - push result
 - next subtask
+
+## Cursor Cloud specific instructions
+
+Touchline is a **local Godot 4.6 Mono + C#** desktop game (`game/`). There is no backend or Docker stack. TypeScript workspaces (`packages/sim-core`, `packages/save`) support Vitest and manual step scripts; they are **not** the active product path.
+
+### One-time VM tools (not in the update script)
+
+Install once per Cloud Agent VM (paths below match a typical Linux setup):
+
+- **.NET 8 SDK** — `curl -fsSL https://dot.net/v1/dotnet-install.sh | bash -s -- --channel 8.0 --install-dir "$HOME/.dotnet"` then `export PATH="$HOME/.dotnet:$PATH"`.
+- **Godot 4.6.2 Mono (Linux x86_64)** — download [Godot_v4.6.2-stable_mono_linux_x86_64.zip](https://github.com/godotengine/godot/releases/download/4.6.2-stable/Godot_v4.6.2-stable_mono_linux_x86_64.zip), unzip under `$HOME/godot/`. On Linux there is a single binary (no separate `_console` exe); use it for both GUI and `--headless`.
+
+Set for every shell session (already in `~/.bashrc` on provisioned VMs):
+
+```bash
+export PATH="$HOME/.dotnet:$PATH"
+export GODOT_CONSOLE="$HOME/godot/Godot_v4.6.2-stable_mono_linux_x86_64/Godot_v4.6.2-stable_mono_linux.x86_64"
+export GODOT="$GODOT_CONSOLE"
+```
+
+### Services
+
+| Component | Required? | How to run |
+|-----------|-----------|------------|
+| Godot app (`game/`) | Yes (product) | GUI: `"$GODOT" --path game` |
+| .NET build | Yes (gate) | `dotnet build game/Touchline.sln` from repo root |
+| npm workspaces | Optional for product E2E | See root `package.json` scripts |
+
+### Commands (repo root)
+
+| Goal | Command |
+|------|---------|
+| TS lint / typecheck / build / test | `npm run lint`, `npm run typecheck`, `npm run build`, `npm test` |
+| C# build | `dotnet build game/Touchline.sln` |
+| Godot + C# warm build | `"$GODOT" --headless --path game --build-solutions --quit` |
+| Product E2E (headless) | `"$GODOT" --headless --path game -s res://scripts/step50_end_to_end_user_flow_check.gd` |
+| Full regression (headless) | `"$GODOT" --headless --path game -s res://scripts/step57_final_regression_check.gd` |
+
+More headless checks: `docs/QA.md`. Legacy Vite client is under `legacy/web-prototype/` (archived; not required for the Godot product).
+
+### Gotchas
+
+- README examples use Windows `.exe` names; on Linux use `$GODOT` as above.
+- Headless scripts exit with `STEP*_PASS` lines on success; non-zero exit means failure.
+- GUI playtests need `DISPLAY` (Desktop pane / X11). Python GUI harness in `docs/audit/active-playtest/` is Windows-oriented; prefer Godot headless checks on Linux.
