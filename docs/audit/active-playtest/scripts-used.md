@@ -46,4 +46,4 @@ What it does:
 3. Writes a timestamped JSON summary to `docs/audit/active-playtest/logs/active-playtest-run-<ts>.json`.
    The JSON includes `assertions` (from the headless check) and `observations` (GUI navigation steps).
 
-Required Python packages: `mss`, `pyautogui`, `pygetwindow`
+Required Python packages: `mss`, `pyautogui`, `pygetwindow` (Windows desktop focus). On Linux, also install `xdotool` for window activation; set `GODOT_CONSOLE` to the Godot 4.6.2 Mono binary.

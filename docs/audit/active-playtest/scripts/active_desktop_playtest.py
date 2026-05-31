@@ -13,17 +13,22 @@ import argparse
 import hashlib
 import json
 import os
+import platform
 import shutil
+import signal
 import subprocess
 import sys
 import time
 import uuid
-import ctypes
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterable
-from ctypes import wintypes
+
+IS_WINDOWS = platform.system() == "Windows"
+if IS_WINDOWS:
+    import ctypes
+    from ctypes import wintypes
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
 GAME_DIR = REPO_ROOT / "game"
@@ -154,9 +159,10 @@ class GameWindow:
         return self.bottom - self.top
 
 
-USER32 = ctypes.windll.user32
-SW_RESTORE = 9
-SW_MAXIMIZE = 3
+if IS_WINDOWS:
+    USER32 = ctypes.windll.user32
+    SW_RESTORE = 9
+    SW_MAXIMIZE = 3
 
 
 def log(message: str) -> None:
@@ -166,12 +172,12 @@ def log(message: str) -> None:
 def find_godot_console() -> Path:
     if DEFAULT_GODOT.is_file():
         return DEFAULT_GODOT
-    found = subprocess.run(
-        ["where", "Godot_v4.6.2-stable_mono_win64_console.exe"],
-        capture_output=True,
-        text=True,
-        check=False,
+    lookup_cmd = (
+        ["where", "Godot_v4.6.2-stable_mono_win64_console.exe"]
+        if IS_WINDOWS
+        else ["bash", "-lc", "command -v godot || command -v Godot"]
     )
+    found = subprocess.run(lookup_cmd, capture_output=True, text=True, check=False)
     if found.returncode == 0 and found.stdout.strip():
         return Path(found.stdout.strip().splitlines()[0])
     raise FileNotFoundError("Godot console executable not found. Set GODOT_CONSOLE.")
@@ -249,21 +255,30 @@ def launch_gui_game(godot_console: Path) -> subprocess.Popen[str]:
     gui = Path(str(godot_console).replace("_console", ""))
     if not gui.is_file():
         gui = godot_console
-    cmd = [str(gui), "--path", str(GAME_DIR)]
+    cmd = [str(gui), "--path", str(GAME_DIR), "--resolution", "1280x720"]
     log(f"Launching GUI game: {' '.join(cmd)}")
-    return subprocess.Popen(cmd, cwd=REPO_ROOT)
+    popen_kwargs: dict = {"cwd": REPO_ROOT}
+    if not IS_WINDOWS:
+        popen_kwargs["start_new_session"] = True
+    return subprocess.Popen(cmd, **popen_kwargs)
 
 
 def terminate_process_tree(process: subprocess.Popen[str]) -> None:
     if process.poll() is not None:
         return
-    subprocess.run(
-        ["taskkill", "/F", "/T", "/PID", str(process.pid)],
-        cwd=REPO_ROOT,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
+    if IS_WINDOWS:
+        subprocess.run(
+            ["taskkill", "/F", "/T", "/PID", str(process.pid)],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    else:
+        try:
+            os.killpg(os.getpgid(process.pid), signal.SIGTERM)
+        except ProcessLookupError:
+            process.terminate()
     try:
         process.wait(timeout=5)
     except subprocess.TimeoutExpired:
@@ -271,6 +286,8 @@ def terminate_process_tree(process: subprocess.Popen[str]) -> None:
 
 
 def _get_window_rect(hwnd: int) -> tuple[int, int, int, int]:
+    if not IS_WINDOWS:
+        raise OSError("Window rect lookup is only implemented on Windows.")
     rect = wintypes.RECT()
     if not USER32.GetWindowRect(hwnd, ctypes.byref(rect)):
         raise OSError(f"Could not read window rect for hwnd {hwnd}")
@@ -278,6 +295,8 @@ def _get_window_rect(hwnd: int) -> tuple[int, int, int, int]:
 
 
 def _enumerate_windows() -> list[tuple[int, int, str]]:
+    if not IS_WINDOWS:
+        return []
     windows: list[tuple[int, int, str]] = []
 
     @ctypes.WINFUNCTYPE(ctypes.c_bool, wintypes.HWND, wintypes.LPARAM)
@@ -300,7 +319,57 @@ def _enumerate_windows() -> list[tuple[int, int, str]]:
     return windows
 
 
+def _focus_game_window_linux(process: subprocess.Popen[str], timeout_s: float = 45.0) -> GameWindow:
+    deadline = time.time() + timeout_s
+    while time.time() < deadline:
+        search = subprocess.run(
+            ["xdotool", "search", "--pid", str(process.pid)],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if search.returncode == 0 and search.stdout.strip():
+            window_id = search.stdout.strip().splitlines()[0]
+            subprocess.run(
+                ["xdotool", "windowactivate", "--sync", window_id],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            time.sleep(0.75)
+            geometry = subprocess.run(
+                ["xdotool", "getwindowgeometry", "--shell", window_id],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            left = top = width = height = 0
+            if geometry.returncode == 0:
+                for line in geometry.stdout.splitlines():
+                    if line.startswith("X="):
+                        left = int(line.split("=", 1)[1])
+                    elif line.startswith("Y="):
+                        top = int(line.split("=", 1)[1])
+                    elif line.startswith("WIDTH="):
+                        width = int(line.split("=", 1)[1])
+                    elif line.startswith("HEIGHT="):
+                        height = int(line.split("=", 1)[1])
+            return GameWindow(
+                hwnd=int(window_id),
+                pid=process.pid,
+                title="Touchline",
+                left=left,
+                top=top,
+                right=left + width,
+                bottom=top + height,
+            )
+        time.sleep(0.5)
+    raise TimeoutError(f"Could not find Touchline window for process {process.pid}")
+
+
 def focus_game_window(process: subprocess.Popen[str], timeout_s: float = 45.0) -> GameWindow:
+    if not IS_WINDOWS:
+        return _focus_game_window_linux(process, timeout_s)
     deadline = time.time() + timeout_s
     while time.time() < deadline:
         matches = [
@@ -1131,8 +1200,7 @@ def write_run_summary(run: PlaytestRun, timestamp: str) -> None:
 
 
 def is_ffmpeg_available() -> bool:
-    found = subprocess.run(["where", "ffmpeg"], capture_output=True, text=True, check=False)
-    return found.returncode == 0 and bool(found.stdout.strip())
+    return shutil.which("ffmpeg") is not None
 
 
 def main() -> int:

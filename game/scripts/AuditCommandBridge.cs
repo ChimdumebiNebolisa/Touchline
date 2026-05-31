@@ -38,6 +38,7 @@ public partial class AuditCommandBridge : Node
     private string _lastCommandId = string.Empty;
     private double _elapsed;
     private AuditCommand? _pendingScreenshotCommand;
+    private int _screenshotWarmupFrames;
 
     public override void _Process(double delta)
     {
@@ -71,6 +72,7 @@ public partial class AuditCommandBridge : Node
             if (command.Action.Equals("capture_screenshot", StringComparison.Ordinal))
             {
                 _pendingScreenshotCommand = command;
+                _screenshotWarmupFrames = 3;
                 _lastCommandId = command.Id;
                 File.Delete(CommandPath);
                 return;
@@ -96,6 +98,12 @@ public partial class AuditCommandBridge : Node
     {
         if (_pendingScreenshotCommand == null)
         {
+            return;
+        }
+
+        if (_screenshotWarmupFrames > 0)
+        {
+            _screenshotWarmupFrames--;
             return;
         }
 

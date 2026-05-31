@@ -10,6 +10,8 @@ var _saw_event_alignment := false
 var _saw_action_banner := false
 
 func _initialize() -> void:
+    # Headless CI VMs often run below real-time; speed the live match for this renderer gate only.
+    Engine.time_scale = 12.0
     var game_state := root.get_node("GameState")
     if game_state == null:
         _fail("GameState singleton missing")
@@ -74,6 +76,7 @@ func _process(_delta: float) -> bool:
             _fail("LiveMatchScene did not hand off to PostMatchScene")
             return false
 
+        Engine.time_scale = 1.0
         print("STEP35_LIVE_RENDERER_PASS")
         quit()
 
@@ -169,6 +172,7 @@ func _find_label_by_name(node: Node, label_name: String):
     return null
 
 func _fail(message: String) -> void:
+    Engine.time_scale = 1.0
     push_error(message)
     print("STEP35_LIVE_RENDERER_FAIL: " + message)
     quit(1)
