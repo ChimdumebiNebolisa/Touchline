@@ -6,7 +6,7 @@ Touchline is a fictional club-football career and club management simulator. The
 
 The game is built around tactical identity, partial player knowledge, club politics, and consequences that persist across weeks and seasons. Players review the club situation, shape or recommend squad and tactical choices within their authority, prepare for matchday, and then watch outcomes through instant simulation or live tactical playback — never through arcade on-pitch controls.
 
-Touchline is a local-first, single-player desktop experience set in a fully fictional football world. The current build is a coherent playable foundation: a full career loop exists, but several management systems are simplified rather than fully deep simulations. The tone is mostly serious and realistic football, with believable club drama arising from football logic rather than random chaos.
+Touchline is a local-first, single-player desktop experience set in a fully fictional football world. The MVP targets a coherent playable foundation: a full career loop with several management systems at foundation depth rather than fully deep simulations. The tone is mostly serious and realistic football, with believable club drama arising from football logic rather than random chaos.
 
 ## 2. One-Sentence Pitch
 
@@ -49,9 +49,9 @@ Touchline is not aimed at players who want direct on-pitch control, quick arcade
 
 - Not a FIFA-style game with direct player control
 - Not an arcade football game
-- Not a full Football Manager clone yet
+- Not a full Football Manager clone at MVP
 - Not an accounting-heavy finance simulator
-- Not a complete transfer market, youth academy, media dialogue, or job-interview simulation yet
+- Not a complete transfer market, youth academy, media dialogue, or job-interview simulation at MVP
 - Not a multiplayer or online service
 - Not a licensed real-clubs or real-players product
 - Not a physics-based action football game
@@ -166,7 +166,7 @@ Players in Touchline are footballers with identity, not just rating numbers.
 
 **Morale, form, and fitness** are live context. A talented player in poor form, low morale, or heavy fatigue performs differently than their profile suggests.
 
-**Contract basics** cover wage, length, role promise, and happiness — enough to create squad tension without full negotiation depth in the current build.
+**Contract basics** cover wage, length, role promise, and happiness — enough to create squad tension without full negotiation depth at MVP.
 
 **Partial information** is central. Attributes may be Known (exact), Estimated (a range), or Unknown (?). Profile confidence — Low, Medium, High, or Fully Scouted — tells the player how much to trust what they see. Role, license, staff quality, and scouting effort all affect visibility.
 
@@ -174,7 +174,7 @@ Players in Touchline are footballers with identity, not just rating numbers.
 
 **Tactical fit** is expressed in scouting language — how naturally a player suits the current system — not just a single compatibility number.
 
-**Current foundation depth:** Squad and player profiles are one of the stronger systems in the current build. Injury and medical depth are limited or abstracted. Full promise lifecycle and deep development curves exist as design direction with partial implementation. The UI presents rich player context; some underlying simulation depth is still foundation-level.
+**Foundation depth at MVP:** Squad and player profiles should be one of the stronger systems in the first build. Injury and medical depth may be limited or abstracted. Full promise lifecycle and deep development curves are design direction for later. The UI should present rich player context even when underlying simulation depth is still foundation-level.
 
 ## 11. Tactics System
 
@@ -208,7 +208,7 @@ Role authority affects whether the player saves the match plan directly or files
 
 **Role authority:** A Head Coach or Manager sets training and scouting directly. An Assistant Manager recommends training plans and scouting priorities — the recommendation is logged, but final authority sits with senior staff. This difference should be felt in both UI feedback and whether the club actually changes course.
 
-**Current foundation depth:** Training is weekly focus and intensity, not a deep session planner. Scouting uses assignments and reports at standard depth, not a full global scouting network UI. Both systems affect state and match preparation, but dedicated full-screen depth is still ahead.
+**Foundation depth at MVP:** Training is weekly focus and intensity, not a deep session planner. Scouting uses assignments and reports at standard depth, not a full global scouting network UI. Both systems affect state and match preparation, but dedicated full-screen depth comes later.
 
 ## 13. Matchday and Simulation
 
@@ -252,45 +252,45 @@ Board approval and fan approval often disagree. A sale that satisfies a Financia
 
 ## 15. Recruitment, Contracts, Youth, Finance, and Job Market
 
-These systems exist in the current build primarily as **foundation systems** — they affect career state and dashboard context, but they are not yet full standalone gameplay loops.
+These systems are **foundation systems** at MVP — they affect career state and dashboard context, but they are not yet full standalone gameplay loops.
 
 ### Recruitment and contracts
 
-**What exists now:** Dashboard recruitment and contract actions; role-appropriate recommend vs offer behavior; a current recruitment target and contract offer context; persistent transfer and contract history; news when recommendations or approaches are filed.
+**MVP scope:** Dashboard recruitment and contract actions; role-appropriate recommend vs offer behavior; a current recruitment target and contract offer context; persistent transfer and contract history; news when recommendations or approaches are filed.
 
-**What is simplified:** No full transfer market UI with bidding wars, rival clubs, or deep negotiation trees. Transfers do not resolve on fee alone in the design intent, but the current player-facing depth is foundation-level.
+**Foundation depth:** No full transfer market UI with bidding wars, rival clubs, or deep negotiation trees. Transfers do not resolve on fee alone in the design intent; player-facing depth at MVP is foundation-level.
 
 **What should deepen later:** Interactive negotiation, richer market dynamics, adaptation after signing, and clearer cause-and-effect through the full transfer lifecycle.
 
 ### Youth
 
-**What exists now:** Youth quality and academy quality may appear in club identity and state; youth integration appears as a training focus; youth promotion is a design hook for Head Coach and Manager influence.
+**MVP scope:** Youth quality and academy quality may appear in club identity and state; youth integration appears as a training focus; youth promotion is a design hook for Head Coach and Manager influence.
 
-**What is simplified:** No playable youth academy loop, no youth league matches, and no full development pipeline the player manages week to week.
+**Foundation depth:** No playable youth academy loop, no youth league matches, and no full development pipeline the player manages week to week.
 
 **What should deepen later:** A meaningful but rare youth pipeline where academy products feel special, not routine.
 
 ### Finance
 
-**What exists now:** Budget pressure and wage summary context visible at club level; financial pressure as a consequence category; difficulty settings that touch finance strictness.
+**MVP scope:** Budget pressure and wage summary context visible at club level; financial pressure as a consequence category; difficulty settings that touch finance strictness.
 
-**What is simplified:** No full finance ledger, no wage negotiation UI, and no deep budget simulation the player manages line by line.
+**Foundation depth:** No full finance ledger, no wage negotiation UI, and no deep budget simulation the player manages line by line.
 
 **What should deepen later:** Readable financial trade-offs — sustainability vs ambition — without becoming an accounting simulator.
 
 ### Job market
 
-**What exists now:** Dashboard job-market section; career state for reputation, license, and job movement hooks; job pressure and sacking foundations.
+**MVP scope:** Dashboard job-market section; career state for reputation, license, and job movement hooks; job pressure and sacking foundations.
 
-**What is simplified:** No full job interview flow, no global manager carousel the player navigates screen by screen, and no deep hiring negotiation.
+**Foundation depth:** No full job interview flow, no global manager carousel the player navigates screen by screen, and no deep hiring negotiation.
 
 **What should deepen later:** Career progression that feels earned — interviews, club interest, interim opportunities, and the Assistant Manager caretaker path.
 
-## 16. Current Product State
+## 16. MVP Scope and Foundation Systems
 
-Touchline today is a **playable foundation**, not a finished commercial football management product.
+The MVP delivers a **coherent single-player career slice**, not a finished commercial football management product. The first playable build should prove the core fantasy end to end; many management systems ship at foundation depth with clear room to deepen later.
 
-**What works:**
+**MVP must include:**
 - New career and continue career from the main menu
 - Career setup with role, manager background, license, difficulty options, and world seed
 - Club selection with identity and pressure preview
@@ -300,20 +300,19 @@ Touchline today is a **playable foundation**, not a finished commercial football
 - Training and scouting dashboard actions
 - Recruitment, contracts, and job-market dashboard sections
 - Fixtures, standings, and matchday flow
-- Instant Sim and Live Match tactical playback from the same engine
+- Instant Sim and Live Match tactical playback from the same underlying match simulation
 - Post-match report with stats, causes, and consequences
 - Save/load and persistent career continuity
-- Season progression and rollover in a short seeded league loop
+- Season progression in a seeded fictional league
 - Role-specific authority differences across Assistant Manager, Head Coach, and Manager
 
-**What is still in progress or foundation-depth:**
-- UI has undergone substantial rebuild work (shared shell, card-based dashboard, scroll-safe layouts). Automated flow verification has passed; final visual acceptance at 1280×720 may still be in progress.
-- Private playtest documentation exists for human UX feedback.
-- The current demo world is a small seeded league (four fictional clubs), not a full multi-division pyramid.
-- Transfers, contracts, job market, training, scouting, finance, youth, media dialogue, and job interviews are foundation-depth rather than complete simulations.
-- Promotions, relegation, cups, and multi-competition calendars are not part of the current demo scope.
+**Foundation-depth at MVP (present but simplified):**
+- UI should be readable at 1280×720 with practical football-management layout — not decorative dashboard slop
+- Initial demo world may be a small seeded league rather than a full multi-division pyramid
+- Transfers, contracts, job market, training, scouting, finance, youth, media dialogue, and job interviews are foundation-depth rather than complete simulations
+- Promotions, relegation, cups, and multi-competition calendars are not required for the first MVP slice
 
-The honest product promise today: a coherent single-player career slice where role, tactics, partial information, match consequences, and save/load work end to end — with many management systems present as hooks for future depth.
+The honest MVP promise: a coherent single-player career where role, tactics, partial information, match consequences, and save/load work end to end — with many management systems present as hooks for future depth.
 
 ## 17. MVP Definition
 
@@ -323,7 +322,7 @@ The MVP is:
 
 If a player can complete that loop without confusion and feel that their role mattered, the MVP is doing its job.
 
-## 18. Out of Scope for Current MVP
+## 18. Out of Scope for MVP
 
 The following are explicitly out of scope for the current MVP:
 
@@ -381,12 +380,72 @@ You save your career and come back tomorrow. That is Touchline — a role-based 
 
 ## 22. Portfolio Summary
 
-**What the project is:** Touchline is a fictional club-football career and management simulator built as a portfolio-grade game project — a coherent playable slice of a larger design with honest foundation depth.
+**What the project is:** Touchline is a fictional club-football career and management simulator — a coherent playable slice of a larger design with honest foundation depth.
 
 **Core systems:** Role-based authority (Assistant Manager, Head Coach, Manager); club identity (archetype, board, fans, Director of Football); partial player information; tactics and tactical familiarity; shared match simulation with Instant Sim and Live Match playback; post-match consequences; morale, trust, reputation, and pressure as separate systems; save/load career persistence.
 
-**Tech stack:** Godot 4 with C# on desktop (.NET). Local-first, single-player, no backend required.
+**Platform:** Local-first, single-player desktop game. No backend, accounts, or online services required.
 
-**Why it is impressive:** Touchline combines a spec-driven product design with a working end-to-end career loop. Role authority is enforced in gameplay, not just UI labels. One match engine serves both instant and live viewing. Partial information, club identity, and consequence systems are designed as interconnected product logic — not isolated screens. The project demonstrates product thinking, systems design, and implemented gameplay in a focused fictional world.
+**Why it matters:** Touchline combines spec-driven product design with an end-to-end career loop. Role authority should be enforced in gameplay, not just UI labels. One match simulation should serve both instant and live viewing. Partial information, club identity, and consequence systems are designed as interconnected product logic — not isolated screens.
 
-**Current status:** Playable foundation with verified automated user flow and private playtest documentation. UI rebuild substantially complete in code; final visual polish at 1280×720 may still be in progress. Many management systems exist as foundations ready for depth. Suitable as a portfolio demo of product vision, systems thinking, and working game implementation — with honest scope about what is complete versus what is next.
+## 23. Research and Inspiration References
+
+Future Touchline work should learn from these repos and resources without copying code blindly. They are research inputs for product quality, architecture discipline, UI taste, and management-simulation feel — not shortcuts to paste into the codebase.
+
+### 1. Uncodixfy
+
+- **URL:** https://github.com/cyxzdev/Uncodixfy
+- **Use:** anti-AI-slop UI guardrails
+- **Lesson:** avoid generic GPT UI patterns, oversized cards, gradient-heavy dashboards, decorative labels, glass panels, and fake-polished layouts.
+- **Apply to Touchline:** future UI must be practical, readable, football-management focused, and not decorative AI dashboard slop.
+
+### 2. Godot Demo Projects
+
+- **URL:** https://github.com/godotengine/godot-demo-projects
+- **Use:** Godot project and UI implementation reference
+- **Lesson:** use real Godot scene/container patterns instead of dumping UI text into panels.
+- **Apply to Touchline:** future implementation should study Godot UI examples before building screens.
+
+### 3. Game Programming Patterns
+
+- **URL:** https://github.com/munificent/game-programming-patterns
+- **Use:** game architecture and system design reference
+- **Lesson:** game loops, state, event queues, update methods, observers, and component-style thinking help keep game logic clear.
+- **Apply to Touchline:** future implementation should separate product systems from UI presentation.
+
+### 4. OpenRCT2
+
+- **URL:** https://github.com/OpenRCT2/OpenRCT2
+- **Use:** management simulation inspiration
+- **Lesson:** management games need clear objectives, readable status, scenario/sandbox framing, reputation/guest/player feedback, and understandable consequences.
+- **Apply to Touchline:** club pressure, morale, board/fan reactions, and match consequences should be readable like a serious management sim.
+
+### 5. OpenTTD
+
+- **URL:** https://github.com/OpenTTD/OpenTTD
+- **Use:** simulation-game documentation and long-term project reference
+- **Lesson:** explain gameplay clearly, document manuals/help, protect save compatibility, and keep simulation systems understandable.
+- **Apply to Touchline:** future builds need strong player-facing help and persistent-career stability.
+
+### 6. FreeOrion
+
+- **URL:** https://github.com/freeorion/freeorion
+- **Use:** grand-campaign strategy simulation inspiration
+- **Lesson:** fictional worldbuilding, campaign progression, scripting/content separation, and strategy depth can create a living long-term game world.
+- **Apply to Touchline:** clubs, leagues, players, staff, and career reputation should feel like a living fictional football world.
+
+### 7. LinCity-NG
+
+- **URL:** https://github.com/lincity-ng/lincity-ng
+- **Use:** management simulation framing
+- **Lesson:** a sim can be complex while still having simple player goals and clear success/failure framing.
+- **Apply to Touchline:** the player should always understand what they are trying to achieve this week, this season, and in their career.
+
+### 8. Battle for Wesnoth
+
+- **URL:** https://github.com/wesnoth/wesnoth
+- **Use:** player-facing game documentation and long-running open-source game structure
+- **Lesson:** campaigns, traits, scenarios, manuals, and faction/player identity help players understand a fictional strategy world.
+- **Apply to Touchline:** roles, club archetypes, player traits, rivalries, and career stories need clear player-facing explanations.
+
+**Important note:** These references are for research and inspiration only. Do not vendor, copy, or import code/assets from them unless licensing is reviewed and explicitly approved.
