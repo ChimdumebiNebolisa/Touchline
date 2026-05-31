@@ -1,0 +1,835 @@
+{
+  "started_at": "2026-05-31T04:25:23.186862+00:00",
+  "headless_pass": true,
+  "headless_log": "docs\\audit\\active-playtest\\logs\\headless-active-playtest-20260530-232523.log",
+  "old_screenshot_count": 35,
+  "old_unique_hash_count": 29,
+  "new_screenshot_count": 35,
+  "new_unique_hash_count": 29,
+  "archive_path": "docs\\audit\\active-playtest\\archive\\screenshots-20260530-232523",
+  "video_capture_skipped_reason": "No local ffmpeg binary is available, so the harness captured a verified timed screenshot sequence for Live Match to Post-Match instead of a video.",
+  "duplicate_hash_groups": [
+    {
+      "hash": "b251379942b7c09ebae016c6ae14e70190496ccf11ceabbfcc2dcb50a043e201",
+      "count": 3,
+      "screens": [
+        "TacticsScreen"
+      ],
+      "labels": [
+        "tactics",
+        "tactics",
+        "tactics"
+      ],
+      "files": [
+        "docs\\audit\\active-playtest\\screenshots\\assistant-manager-tactics.png",
+        "docs\\audit\\active-playtest\\screenshots\\head-coach-tactics.png",
+        "docs\\audit\\active-playtest\\screenshots\\manager-tactics.png"
+      ]
+    },
+    {
+      "hash": "dee99d6bcaa649a329e78100f77f76a28a3fd01d5950df9897377553cedb7068",
+      "count": 2,
+      "screens": [
+        "MainMenu"
+      ],
+      "labels": [
+        "main-menu-slot-card",
+        "post-match-main-menu"
+      ],
+      "files": [
+        "docs\\audit\\active-playtest\\screenshots\\manager-main-menu-slot-card.png",
+        "docs\\audit\\active-playtest\\screenshots\\manager-post-match-main-menu.png"
+      ]
+    },
+    {
+      "hash": "78f1ed0f309ada52d8607236891f647f776f8752df3d1d1d5d71a2e972f5a1ae",
+      "count": 2,
+      "screens": [
+        "SaveLoadScene"
+      ],
+      "labels": [
+        "save-load-slot-card",
+        "post-match-save-load"
+      ],
+      "files": [
+        "docs\\audit\\active-playtest\\screenshots\\manager-save-load-slot-card.png",
+        "docs\\audit\\active-playtest\\screenshots\\manager-post-match-save-load.png"
+      ]
+    },
+    {
+      "hash": "76e4afe339df10d68b8c3c968c3b8563a09a6a90a15ff3e18e0073385b3a9244",
+      "count": 2,
+      "screens": [
+        "ClubDashboard"
+      ],
+      "labels": [
+        "recruitment-contracts",
+        "dashboard-job-market"
+      ],
+      "files": [
+        "docs\\audit\\active-playtest\\screenshots\\manager-recruitment-contracts.png",
+        "docs\\audit\\active-playtest\\screenshots\\manager-job-market.png"
+      ]
+    },
+    {
+      "hash": "f74233bf23627d38e1fbd218779275bdac9bb92f5f26ea4ca2c5c604f706ce76",
+      "count": 2,
+      "screens": [
+        "SquadScreen"
+      ],
+      "labels": [
+        "squad",
+        "squad-return"
+      ],
+      "files": [
+        "docs\\audit\\active-playtest\\screenshots\\manager-squad.png",
+        "docs\\audit\\active-playtest\\screenshots\\manager-squad-return.png"
+      ]
+    }
+  ],
+  "errors": [],
+  "assertions": [
+    {
+      "role": "Assistant Manager",
+      "area": "Training",
+      "before": "Team cohesion",
+      "action": "Request Pressing/Demanding",
+      "after": "Team cohesion",
+      "expected": "Recommend only; focus unchanged",
+      "passed": true,
+      "evidence": ""
+    },
+    {
+      "role": "Assistant Manager",
+      "area": "Training",
+      "before": "Team cohesion",
+      "action": "Recommend Pressing/Demanding + advance week",
+      "after": "unchanged; familiarity 59->64",
+      "expected": "Recommend only; weekly effects still run",
+      "passed": true,
+      "evidence": ""
+    },
+    {
+      "role": "Assistant Manager",
+      "area": "Scouting",
+      "before": "Position need: versatile midfielder ",
+      "action": " 3 days ",
+      "after": " quality 89 ",
+      "expected": " In progress: Position need: versatile midfielder; confidence strong; wider attribute ranges and tactical-fit language improving; personality still ?.",
+      "passed": false,
+      "evidence": "Position need: versatile midfielder "
+    },
+    {
+      "role": "Assistant Manager",
+      "area": "Tactics",
+      "before": "4-3-3 / Balanced",
+      "action": "TryApply 3-5-2 High Press",
+      "after": "4-3-3 / Balanced",
+      "expected": "Recommend only; plan unchanged",
+      "passed": true,
+      "evidence": ""
+    },
+    {
+      "role": "Assistant Manager",
+      "area": "Recruitment/contracts",
+      "before": "Tariq Balde (RW) ",
+      "action": " Knowledge: high confidence (96/100) ",
+      "after": " National C License ",
+      "expected": " scout 70 ",
+      "passed": false,
+      "evidence": " staff 55; Known: Technical 84, Tactical 82, Physical 84, Mental 80, form 77, fitness 89. Estimated: current ability band 78-82, potential/development 82-90. Unknown: exact future ceiling ?, exact agent loyalty ?, exact pressure response ?. "
+    },
+    {
+      "role": "Assistant Manager",
+      "area": "Post-match consequences",
+      "before": "board 62 fan 66 squad 74 pressure 29",
+      "action": "ResolveCurrentMatchInstantly",
+      "after": "board 56 fan 54 squad 71 pressure 36; Post-match review: 0 - 1 logged. Continue to advance the calendar.",
+      "expected": "Morale/pressure delta or stable with explanation; news updates",
+      "passed": true,
+      "evidence": ""
+    },
+    {
+      "role": "Assistant Manager",
+      "area": "Save/load persistence",
+      "before": "focus=Team cohesion formation=4-3-3",
+      "action": "Save, reload, advance week",
+      "after": "role=Assistant Manager focus=Team cohesion formation=4-3-3",
+      "expected": "Changed state survives reload; week continues",
+      "passed": true,
+      "evidence": ""
+    },
+    {
+      "role": "Assistant Manager",
+      "area": "Promises",
+      "before": "active promises",
+      "action": "Phase3 lifecycle contract",
+      "after": "Playing time to Mateo Silva: Fulfilled ",
+      "expected": " private ",
+      "passed": false,
+      "evidence": " agent Pleased "
+    },
+    {
+      "role": "Assistant Manager",
+      "area": "Live Match consistency",
+      "before": "instant result",
+      "action": "ValidateStage5 contract",
+      "after": "same match object",
+      "expected": "No split result or stale timeline",
+      "passed": true,
+      "evidence": ""
+    },
+    {
+      "role": "Head Coach",
+      "area": "Training",
+      "before": "Team cohesion",
+      "action": "Apply Pressing/Demanding + advance week",
+      "after": "Pressing; familiarity 59->67",
+      "expected": "Football-side control; state delta",
+      "passed": true,
+      "evidence": ""
+    },
+    {
+      "role": "Head Coach",
+      "area": "Scouting",
+      "before": "Position need: versatile midfielder ",
+      "action": " 3 days ",
+      "after": " quality 82 ",
+      "expected": " In progress: Position need: versatile midfielder; confidence strong; wider attribute ranges and tactical-fit language improving; personality still ?.",
+      "passed": false,
+      "evidence": "Specific player: pressing winger "
+    },
+    {
+      "role": "Head Coach",
+      "area": "Tactics",
+      "before": "4-3-3 / Balanced",
+      "action": "Apply 3-5-2 High Press",
+      "after": "3-5-2 / High Press",
+      "expected": "Football-side tactical control",
+      "passed": true,
+      "evidence": ""
+    },
+    {
+      "role": "Head Coach",
+      "area": "Recruitment/contracts",
+      "before": "Tariq Balde (RW) ",
+      "action": " Knowledge: high confidence (96/100) ",
+      "after": " National C License ",
+      "expected": " scout 62 ",
+      "passed": false,
+      "evidence": " staff 55; Known: Technical 89, Tactical 90, Physical 85, Mental 80, form 77, fitness 86. Estimated: current ability band 83-87, potential/development 87-95. Unknown: exact future ceiling ?, exact agent loyalty ?, exact pressure response ?. "
+    },
+    {
+      "role": "Head Coach",
+      "area": "Post-match consequences",
+      "before": "board 62 fan 66 squad 74 pressure 40",
+      "action": "ResolveCurrentMatchInstantly",
+      "after": "board 68 fan 77 squad 79 pressure 33; Post-match review: 1 - 0 logged. Continue to advance the calendar.",
+      "expected": "Morale/pressure delta or stable with explanation; news updates",
+      "passed": true,
+      "evidence": ""
+    },
+    {
+      "role": "Head Coach",
+      "area": "Save/load persistence",
+      "before": "focus=Pressing formation=3-5-2",
+      "action": "Save, reload, advance week",
+      "after": "role=Head Coach focus=Pressing formation=3-5-2",
+      "expected": "Changed state survives reload; week continues",
+      "passed": true,
+      "evidence": ""
+    },
+    {
+      "role": "Head Coach",
+      "area": "Promises",
+      "before": "active promises",
+      "action": "Phase3 lifecycle contract",
+      "after": "Playing time to Mateo Silva: Fulfilled ",
+      "expected": " private ",
+      "passed": false,
+      "evidence": " agent Pleased "
+    },
+    {
+      "role": "Head Coach",
+      "area": "Live Match consistency",
+      "before": "instant result",
+      "action": "ValidateStage5 contract",
+      "after": "same match object",
+      "expected": "No split result or stale timeline",
+      "passed": true,
+      "evidence": ""
+    },
+    {
+      "role": "Manager",
+      "area": "Training",
+      "before": "Team cohesion",
+      "action": "Apply Pressing/Demanding + advance week",
+      "after": "Pressing; familiarity 59->66",
+      "expected": "Football-side control; state delta",
+      "passed": true,
+      "evidence": ""
+    },
+    {
+      "role": "Manager",
+      "area": "Scouting",
+      "before": "Position need: versatile midfielder ",
+      "action": " 3 days ",
+      "after": " quality 90 ",
+      "expected": " In progress: Position need: versatile midfielder; confidence strong; wider attribute ranges and tactical-fit language improving; personality still ?.",
+      "passed": false,
+      "evidence": "Specific player: pressing winger "
+    },
+    {
+      "role": "Manager",
+      "area": "Tactics",
+      "before": "4-3-3 / Balanced",
+      "action": "Apply 3-5-2 High Press",
+      "after": "3-5-2 / High Press",
+      "expected": "Football-side tactical control",
+      "passed": true,
+      "evidence": ""
+    },
+    {
+      "role": "Manager",
+      "area": "Recruitment/contracts",
+      "before": "Tariq Balde (RW) ",
+      "action": " Knowledge: high confidence (96/100) ",
+      "after": " National C License ",
+      "expected": " scout 71 ",
+      "passed": false,
+      "evidence": " staff 55; Known: Technical 89, Tactical 87, Physical 85, Mental 80, form 78, fitness 86. Estimated: current ability band 83-87, potential/development 87-95. Unknown: exact future ceiling ?, exact agent loyalty ?, exact pressure response ?. "
+    },
+    {
+      "role": "Manager",
+      "area": "Post-match consequences",
+      "before": "board 62 fan 66 squad 74 pressure 45",
+      "action": "ResolveCurrentMatchInstantly",
+      "after": "board 69 fan 77 squad 80 pressure 38; Post-match review: 1 - 0 logged. Continue to advance the calendar.",
+      "expected": "Morale/pressure delta or stable with explanation; news updates",
+      "passed": true,
+      "evidence": ""
+    },
+    {
+      "role": "Manager",
+      "area": "Save/load persistence",
+      "before": "focus=Pressing formation=3-5-2",
+      "action": "Save, reload, advance week",
+      "after": "role=Manager focus=Pressing formation=3-5-2",
+      "expected": "Changed state survives reload; week continues",
+      "passed": true,
+      "evidence": ""
+    },
+    {
+      "role": "Manager",
+      "area": "Promises",
+      "before": "active promises",
+      "action": "Phase3 lifecycle contract",
+      "after": "Playing time to Mateo Silva: Fulfilled ",
+      "expected": " private ",
+      "passed": false,
+      "evidence": " agent Pleased "
+    },
+    {
+      "role": "Manager",
+      "area": "Live Match consistency",
+      "before": "instant result",
+      "action": "ValidateStage5 contract",
+      "after": "same match object",
+      "expected": "No split result or stale timeline",
+      "passed": true,
+      "evidence": ""
+    }
+  ],
+  "captures": [
+    {
+      "role": "assistant-manager",
+      "label": "main-menu-slot-card",
+      "expected_screen": "MainMenu",
+      "actual_detected_screen": "MainMenu",
+      "expected_nav": "",
+      "actual_nav": "",
+      "timestamp_utc": "2026-05-31T04:25:31.0202746Z",
+      "passed": true,
+      "visible_anchor_used": "Assistant Manager",
+      "screenshot": "docs\\audit\\active-playtest\\screenshots\\assistant-manager-main-menu-slot-card.png",
+      "image_hash": "2a5be4aa91a6c9ea4ad67dafa77a64518db5cd7b3f1cfc1774251865d10d315d",
+      "note": "Reflowed main-menu slot card"
+    },
+    {
+      "role": "assistant-manager",
+      "label": "save-load-slot-card",
+      "expected_screen": "SaveLoadScene",
+      "actual_detected_screen": "SaveLoadScene",
+      "expected_nav": "",
+      "actual_nav": "",
+      "timestamp_utc": "2026-05-31T04:25:33.1208635Z",
+      "passed": true,
+      "visible_anchor_used": "Assistant Manager",
+      "screenshot": "docs\\audit\\active-playtest\\screenshots\\assistant-manager-save-load-slot-card.png",
+      "image_hash": "08f245f072851797963be1b49ff341276885dab781344853f386fbe6303e78f6",
+      "note": "Reflowed save/load slot card"
+    },
+    {
+      "role": "assistant-manager",
+      "label": "dashboard",
+      "expected_screen": "ClubDashboard",
+      "actual_detected_screen": "ClubDashboard",
+      "expected_nav": "Dashboard",
+      "actual_nav": "Dashboard",
+      "timestamp_utc": "2026-05-31T04:25:34.7157506Z",
+      "passed": true,
+      "visible_anchor_used": "Assistant Manager",
+      "screenshot": "docs\\audit\\active-playtest\\screenshots\\assistant-manager-dashboard.png",
+      "image_hash": "ba861023d3f98aab7990e819418fa78a539e291b8da7dbb3d9ff319a264c4887",
+      "note": "Dashboard with corrected active route"
+    },
+    {
+      "role": "assistant-manager",
+      "label": "training-scouting",
+      "expected_screen": "ClubDashboard",
+      "actual_detected_screen": "ClubDashboard",
+      "expected_nav": "Dashboard",
+      "actual_nav": "Dashboard",
+      "timestamp_utc": "2026-05-31T04:25:36.0281442Z",
+      "passed": true,
+      "visible_anchor_used": "Recommend Scouting Priority",
+      "screenshot": "docs\\audit\\active-playtest\\screenshots\\assistant-manager-training-scouting.png",
+      "image_hash": "bffa50349a2453f017284f18839663f4e8dd8cceb16130997bae9e3748203b83",
+      "note": "Training/scouting evidence from the dashboard section"
+    },
+    {
+      "role": "assistant-manager",
+      "label": "recruitment-contracts",
+      "expected_screen": "ClubDashboard",
+      "actual_detected_screen": "ClubDashboard",
+      "expected_nav": "Dashboard",
+      "actual_nav": "Dashboard",
+      "timestamp_utc": "2026-05-31T04:25:37.3253075Z",
+      "passed": true,
+      "visible_anchor_used": "Recommend Contract Terms",
+      "screenshot": "docs\\audit\\active-playtest\\screenshots\\assistant-manager-recruitment-contracts.png",
+      "image_hash": "e469beccd1b4a5fb744b132ca2c8904bf9f74b5a7f041429bbeabb711701a20d",
+      "note": "Recruitment/contracts evidence from the dashboard section"
+    },
+    {
+      "role": "assistant-manager",
+      "label": "tactics",
+      "expected_screen": "TacticsScreen",
+      "actual_detected_screen": "TacticsScreen",
+      "expected_nav": "Tactics",
+      "actual_nav": "Tactics",
+      "timestamp_utc": "2026-05-31T04:25:38.8584911Z",
+      "passed": true,
+      "visible_anchor_used": "Submit Tactical Recommendation",
+      "screenshot": "docs\\audit\\active-playtest\\screenshots\\assistant-manager-tactics.png",
+      "image_hash": "b251379942b7c09ebae016c6ae14e70190496ccf11ceabbfcc2dcb50a043e201",
+      "note": "Role-specific tactics screen"
+    },
+    {
+      "role": "head-coach",
+      "label": "main-menu-slot-card",
+      "expected_screen": "MainMenu",
+      "actual_detected_screen": "MainMenu",
+      "expected_nav": "",
+      "actual_nav": "",
+      "timestamp_utc": "2026-05-31T04:25:46.5157989Z",
+      "passed": true,
+      "visible_anchor_used": "Head Coach",
+      "screenshot": "docs\\audit\\active-playtest\\screenshots\\head-coach-main-menu-slot-card.png",
+      "image_hash": "00f616f4c550396ef11212b64b83859853b49295d12871cadb4cb5c6106262fa",
+      "note": "Reflowed main-menu slot card"
+    },
+    {
+      "role": "head-coach",
+      "label": "save-load-slot-card",
+      "expected_screen": "SaveLoadScene",
+      "actual_detected_screen": "SaveLoadScene",
+      "expected_nav": "",
+      "actual_nav": "",
+      "timestamp_utc": "2026-05-31T04:25:48.5904397Z",
+      "passed": true,
+      "visible_anchor_used": "Head Coach",
+      "screenshot": "docs\\audit\\active-playtest\\screenshots\\head-coach-save-load-slot-card.png",
+      "image_hash": "d3e6d9f2c6a7d00e170b9d22ba630818f9f00db9e6b6a260a1c65f0f014de2a7",
+      "note": "Reflowed save/load slot card"
+    },
+    {
+      "role": "head-coach",
+      "label": "dashboard",
+      "expected_screen": "ClubDashboard",
+      "actual_detected_screen": "ClubDashboard",
+      "expected_nav": "Dashboard",
+      "actual_nav": "Dashboard",
+      "timestamp_utc": "2026-05-31T04:25:50.0683495Z",
+      "passed": true,
+      "visible_anchor_used": "Head Coach",
+      "screenshot": "docs\\audit\\active-playtest\\screenshots\\head-coach-dashboard.png",
+      "image_hash": "bb538dd2d139c05630db648e599b97d53313820dc616533dadc3b2b19637d835",
+      "note": "Dashboard with corrected active route"
+    },
+    {
+      "role": "head-coach",
+      "label": "training-scouting",
+      "expected_screen": "ClubDashboard",
+      "actual_detected_screen": "ClubDashboard",
+      "expected_nav": "Dashboard",
+      "actual_nav": "Dashboard",
+      "timestamp_utc": "2026-05-31T04:25:51.3104185Z",
+      "passed": true,
+      "visible_anchor_used": "Request Scouting Priority",
+      "screenshot": "docs\\audit\\active-playtest\\screenshots\\head-coach-training-scouting.png",
+      "image_hash": "5a9890f7876705e21a506dd35ae454d68caf315c28e13e9b743af39f066a6470",
+      "note": "Training/scouting evidence from the dashboard section"
+    },
+    {
+      "role": "head-coach",
+      "label": "recruitment-contracts",
+      "expected_screen": "ClubDashboard",
+      "actual_detected_screen": "ClubDashboard",
+      "expected_nav": "Dashboard",
+      "actual_nav": "Dashboard",
+      "timestamp_utc": "2026-05-31T04:25:52.6074560Z",
+      "passed": true,
+      "visible_anchor_used": "Request Contract Review",
+      "screenshot": "docs\\audit\\active-playtest\\screenshots\\head-coach-recruitment-contracts.png",
+      "image_hash": "73db76b88069ad1fb60e015f5dcc468958835548d4cd92c5fad8630286adb756",
+      "note": "Recruitment/contracts evidence from the dashboard section"
+    },
+    {
+      "role": "head-coach",
+      "label": "tactics",
+      "expected_screen": "TacticsScreen",
+      "actual_detected_screen": "TacticsScreen",
+      "expected_nav": "Tactics",
+      "actual_nav": "Tactics",
+      "timestamp_utc": "2026-05-31T04:25:54.0468334Z",
+      "passed": true,
+      "visible_anchor_used": "Save Tactical Plan",
+      "screenshot": "docs\\audit\\active-playtest\\screenshots\\head-coach-tactics.png",
+      "image_hash": "b251379942b7c09ebae016c6ae14e70190496ccf11ceabbfcc2dcb50a043e201",
+      "note": "Role-specific tactics screen"
+    },
+    {
+      "role": "manager",
+      "label": "club-selection",
+      "expected_screen": "ChooseClub",
+      "actual_detected_screen": "ChooseClub",
+      "expected_nav": "",
+      "actual_nav": "",
+      "timestamp_utc": "2026-05-31T04:26:01.9351919Z",
+      "passed": true,
+      "visible_anchor_used": "Riverton Athletic",
+      "screenshot": "docs\\audit\\active-playtest\\screenshots\\manager-club-selection.png",
+      "image_hash": "1c614679a77dbebd617cb3a6f62b379a9330bf518ca9c1112978c2a87dd969fa",
+      "note": "New-career club selection screen with seeded club list and preview"
+    },
+    {
+      "role": "manager",
+      "label": "main-menu-slot-card",
+      "expected_screen": "MainMenu",
+      "actual_detected_screen": "MainMenu",
+      "expected_nav": "",
+      "actual_nav": "",
+      "timestamp_utc": "2026-05-31T04:26:09.3736946Z",
+      "passed": true,
+      "visible_anchor_used": "Manager",
+      "screenshot": "docs\\audit\\active-playtest\\screenshots\\manager-main-menu-slot-card.png",
+      "image_hash": "dee99d6bcaa649a329e78100f77f76a28a3fd01d5950df9897377553cedb7068",
+      "note": "Reflowed main-menu slot card"
+    },
+    {
+      "role": "manager",
+      "label": "save-load-slot-card",
+      "expected_screen": "SaveLoadScene",
+      "actual_detected_screen": "SaveLoadScene",
+      "expected_nav": "",
+      "actual_nav": "",
+      "timestamp_utc": "2026-05-31T04:26:11.6570396Z",
+      "passed": true,
+      "visible_anchor_used": "Manager",
+      "screenshot": "docs\\audit\\active-playtest\\screenshots\\manager-save-load-slot-card.png",
+      "image_hash": "78f1ed0f309ada52d8607236891f647f776f8752df3d1d1d5d71a2e972f5a1ae",
+      "note": "Reflowed save/load slot card"
+    },
+    {
+      "role": "manager",
+      "label": "dashboard",
+      "expected_screen": "ClubDashboard",
+      "actual_detected_screen": "ClubDashboard",
+      "expected_nav": "Dashboard",
+      "actual_nav": "Dashboard",
+      "timestamp_utc": "2026-05-31T04:26:13.2234067Z",
+      "passed": true,
+      "visible_anchor_used": "Manager",
+      "screenshot": "docs\\audit\\active-playtest\\screenshots\\manager-dashboard.png",
+      "image_hash": "666784fb5531c92e6137153971ad78b3d226c23b83d9ff361350151762f0562c",
+      "note": "Dashboard with corrected active route"
+    },
+    {
+      "role": "manager",
+      "label": "training-scouting",
+      "expected_screen": "ClubDashboard",
+      "actual_detected_screen": "ClubDashboard",
+      "expected_nav": "Dashboard",
+      "actual_nav": "Dashboard",
+      "timestamp_utc": "2026-05-31T04:26:14.4435858Z",
+      "passed": true,
+      "visible_anchor_used": "Start Scouting Assignment",
+      "screenshot": "docs\\audit\\active-playtest\\screenshots\\manager-training-scouting.png",
+      "image_hash": "c221887c3b02333223c65bbce1a24dcddbb589e6a7eb880487436cb5e857804f",
+      "note": "Training/scouting evidence from the dashboard section"
+    },
+    {
+      "role": "manager",
+      "label": "recruitment-contracts",
+      "expected_screen": "ClubDashboard",
+      "actual_detected_screen": "ClubDashboard",
+      "expected_nav": "Dashboard",
+      "actual_nav": "Dashboard",
+      "timestamp_utc": "2026-05-31T04:26:15.7649332Z",
+      "passed": true,
+      "visible_anchor_used": "Review Contract Terms",
+      "screenshot": "docs\\audit\\active-playtest\\screenshots\\manager-recruitment-contracts.png",
+      "image_hash": "76e4afe339df10d68b8c3c968c3b8563a09a6a90a15ff3e18e0073385b3a9244",
+      "note": "Recruitment/contracts evidence from the dashboard section"
+    },
+    {
+      "role": "manager",
+      "label": "tactics",
+      "expected_screen": "TacticsScreen",
+      "actual_detected_screen": "TacticsScreen",
+      "expected_nav": "Tactics",
+      "actual_nav": "Tactics",
+      "timestamp_utc": "2026-05-31T04:26:17.3062320Z",
+      "passed": true,
+      "visible_anchor_used": "Save Tactical Plan",
+      "screenshot": "docs\\audit\\active-playtest\\screenshots\\manager-tactics.png",
+      "image_hash": "b251379942b7c09ebae016c6ae14e70190496ccf11ceabbfcc2dcb50a043e201",
+      "note": "Role-specific tactics screen"
+    },
+    {
+      "role": "manager",
+      "label": "dashboard-job-market",
+      "expected_screen": "ClubDashboard",
+      "actual_detected_screen": "ClubDashboard",
+      "expected_nav": "Dashboard",
+      "actual_nav": "Dashboard",
+      "timestamp_utc": "2026-05-31T04:26:18.6824377Z",
+      "passed": true,
+      "visible_anchor_used": "Career/job market",
+      "screenshot": "docs\\audit\\active-playtest\\screenshots\\manager-job-market.png",
+      "image_hash": "76e4afe339df10d68b8c3c968c3b8563a09a6a90a15ff3e18e0073385b3a9244",
+      "note": "Returned dashboard before job-market action"
+    },
+    {
+      "role": "manager",
+      "label": "career-job-market",
+      "expected_screen": "ClubDashboard",
+      "actual_detected_screen": "ClubDashboard",
+      "expected_nav": "Dashboard",
+      "actual_nav": "Dashboard",
+      "timestamp_utc": "2026-05-31T04:26:20.0096159Z",
+      "passed": true,
+      "visible_anchor_used": "Career/job market",
+      "screenshot": "docs\\audit\\active-playtest\\screenshots\\manager-career-job-market.png",
+      "image_hash": "9b288016e70c03cf0727eb9a274791f884b12984cfb399a4f73d5748e1afe91c",
+      "note": "Career/job-market dashboard evidence"
+    },
+    {
+      "role": "manager",
+      "label": "squad",
+      "expected_screen": "SquadScreen",
+      "actual_detected_screen": "SquadScreen",
+      "expected_nav": "Squad",
+      "actual_nav": "Squad",
+      "timestamp_utc": "2026-05-31T04:26:21.4499674Z",
+      "passed": true,
+      "visible_anchor_used": "Profile Confidence:",
+      "screenshot": "docs\\audit\\active-playtest\\screenshots\\manager-squad.png",
+      "image_hash": "f74233bf23627d38e1fbd218779275bdac9bb92f5f26ea4ca2c5c604f706ce76",
+      "note": "Squad screen with explicit partial-information cues"
+    },
+    {
+      "role": "manager",
+      "label": "player-profile",
+      "expected_screen": "PlayerProfile",
+      "actual_detected_screen": "PlayerProfile",
+      "expected_nav": "",
+      "actual_nav": "",
+      "timestamp_utc": "2026-05-31T04:26:22.7627109Z",
+      "passed": true,
+      "visible_anchor_used": "Profile Confidence:",
+      "screenshot": "docs\\audit\\active-playtest\\screenshots\\manager-player-profile.png",
+      "image_hash": "6caaf697e15da85a2e7f5acf6a16df3c92e53257fc6cc794e1487f6684c75ee8",
+      "note": "Partial-information player profile"
+    },
+    {
+      "role": "manager",
+      "label": "squad-return",
+      "expected_screen": "SquadScreen",
+      "actual_detected_screen": "SquadScreen",
+      "expected_nav": "Squad",
+      "actual_nav": "Squad",
+      "timestamp_utc": "2026-05-31T04:26:24.1084777Z",
+      "passed": true,
+      "visible_anchor_used": "Profile Confidence:",
+      "screenshot": "docs\\audit\\active-playtest\\screenshots\\manager-squad-return.png",
+      "image_hash": "f74233bf23627d38e1fbd218779275bdac9bb92f5f26ea4ca2c5c604f706ce76",
+      "note": "Return from player profile to squad"
+    },
+    {
+      "role": "manager",
+      "label": "fixtures",
+      "expected_screen": "FixturesScreen",
+      "actual_detected_screen": "FixturesScreen",
+      "expected_nav": "Fixtures",
+      "actual_nav": "Fixtures",
+      "timestamp_utc": "2026-05-31T04:26:25.5732973Z",
+      "passed": true,
+      "visible_anchor_used": "Fixture List",
+      "screenshot": "docs\\audit\\active-playtest\\screenshots\\manager-fixtures.png",
+      "image_hash": "559d6adcd83e100b06810acda4ff48a623771d27403517be7cf1ba4e8a468ae5",
+      "note": "Fixtures screen with corrected active route"
+    },
+    {
+      "role": "manager",
+      "label": "standings",
+      "expected_screen": "StandingsScreen",
+      "actual_detected_screen": "StandingsScreen",
+      "expected_nav": "Standings",
+      "actual_nav": "Standings",
+      "timestamp_utc": "2026-05-31T04:26:26.8869868Z",
+      "passed": true,
+      "visible_anchor_used": "League Table",
+      "screenshot": "docs\\audit\\active-playtest\\screenshots\\manager-standings.png",
+      "image_hash": "0a094a96c63fdcf51b7b846b0bb8c476ac90a112f64e784e67a826dbdfbafa31",
+      "note": "Standings screen with corrected active route"
+    },
+    {
+      "role": "manager",
+      "label": "matchday",
+      "expected_screen": "MatchdayScene",
+      "actual_detected_screen": "MatchdayScene",
+      "expected_nav": "",
+      "actual_nav": "",
+      "timestamp_utc": "2026-05-31T04:26:28.1573355Z",
+      "passed": true,
+      "visible_anchor_used": "Watch Live Match",
+      "screenshot": "docs\\audit\\active-playtest\\screenshots\\manager-matchday.png",
+      "image_hash": "4565a8212783ae03e0e9fc127fe2d0fe6ef5d344ed6e32cfe268dabbf4367273",
+      "note": "Matchday handoff before live playback"
+    },
+    {
+      "role": "manager",
+      "label": "live-match-kickoff",
+      "expected_screen": "LiveMatchScene",
+      "actual_detected_screen": "LiveMatchScene",
+      "expected_nav": "",
+      "actual_nav": "",
+      "timestamp_utc": "2026-05-31T04:26:29.6459785Z",
+      "passed": true,
+      "visible_anchor_used": "01'",
+      "screenshot": "docs\\audit\\active-playtest\\screenshots\\manager-live-match-kickoff.png",
+      "image_hash": "79ac749a324e2d074e01d796952225e407f9932d222647cddb8ed04943f2937b",
+      "note": "Timed screenshot sequence: kickoff"
+    },
+    {
+      "role": "manager",
+      "label": "live-match-mid",
+      "expected_screen": "LiveMatchScene",
+      "actual_detected_screen": "LiveMatchScene",
+      "expected_nav": "",
+      "actual_nav": "",
+      "timestamp_utc": "2026-05-31T04:26:30.7412702Z",
+      "passed": true,
+      "visible_anchor_used": "Riverton Athletic vs Northbridge City",
+      "screenshot": "docs\\audit\\active-playtest\\screenshots\\manager-live-match-mid.png",
+      "image_hash": "bfbb0ea1cfc810de8746875c2e2d08477d21698aae17dba729090253a7bf79c5",
+      "note": "Timed screenshot sequence: live-match pacing sample"
+    },
+    {
+      "role": "manager",
+      "label": "live-match-full-time",
+      "expected_screen": "LiveMatchScene",
+      "actual_detected_screen": "LiveMatchScene",
+      "expected_nav": "",
+      "actual_nav": "",
+      "timestamp_utc": "2026-05-31T04:26:45.4215921Z",
+      "passed": true,
+      "visible_anchor_used": "FT",
+      "screenshot": "docs\\audit\\active-playtest\\screenshots\\manager-live-match-full-time.png",
+      "image_hash": "c6c276796c10babf700426e9a26e82c3b20108c3080832b14989af2f39560d41",
+      "note": "Timed screenshot sequence: full-time state"
+    },
+    {
+      "role": "manager",
+      "label": "post-match-main-menu",
+      "expected_screen": "MainMenu",
+      "actual_detected_screen": "MainMenu",
+      "expected_nav": "",
+      "actual_nav": "",
+      "timestamp_utc": "2026-05-31T04:26:52.9737160Z",
+      "passed": true,
+      "visible_anchor_used": "Manager",
+      "screenshot": "docs\\audit\\active-playtest\\screenshots\\manager-post-match-main-menu.png",
+      "image_hash": "dee99d6bcaa649a329e78100f77f76a28a3fd01d5950df9897377553cedb7068",
+      "note": "Manager slot before deterministic post-match capture"
+    },
+    {
+      "role": "manager",
+      "label": "post-match-save-load",
+      "expected_screen": "SaveLoadScene",
+      "actual_detected_screen": "SaveLoadScene",
+      "expected_nav": "",
+      "actual_nav": "",
+      "timestamp_utc": "2026-05-31T04:26:55.1070211Z",
+      "passed": true,
+      "visible_anchor_used": "Manager",
+      "screenshot": "docs\\audit\\active-playtest\\screenshots\\manager-post-match-save-load.png",
+      "image_hash": "78f1ed0f309ada52d8607236891f647f776f8752df3d1d1d5d71a2e972f5a1ae",
+      "note": "Save/load before deterministic post-match capture"
+    },
+    {
+      "role": "manager",
+      "label": "post-match-dashboard",
+      "expected_screen": "ClubDashboard",
+      "actual_detected_screen": "ClubDashboard",
+      "expected_nav": "Dashboard",
+      "actual_nav": "Dashboard",
+      "timestamp_utc": "2026-05-31T04:26:56.7697214Z",
+      "passed": true,
+      "visible_anchor_used": "Manager",
+      "screenshot": "docs\\audit\\active-playtest\\screenshots\\manager-post-match-dashboard.png",
+      "image_hash": "28904fe64f0a1b5174aa90ccf28be1a2768e58e22c904e109d28eb6260424d0e",
+      "note": "Dashboard before direct post-match capture"
+    },
+    {
+      "role": "manager",
+      "label": "post-match-matchday",
+      "expected_screen": "MatchdayScene",
+      "actual_detected_screen": "MatchdayScene",
+      "expected_nav": "",
+      "actual_nav": "",
+      "timestamp_utc": "2026-05-31T04:26:58.1454462Z",
+      "passed": true,
+      "visible_anchor_used": "Watch Live Match",
+      "screenshot": "docs\\audit\\active-playtest\\screenshots\\manager-post-match-matchday.png",
+      "image_hash": "d2d8770d325b4d8df1b41d501921d3ac7a37dbac2ed27a96cfbaf24e5b85e39f",
+      "note": "Matchday before deterministic post-match capture"
+    },
+    {
+      "role": "manager",
+      "label": "post-match",
+      "expected_screen": "PostMatchScene",
+      "actual_detected_screen": "PostMatchScene",
+      "expected_nav": "",
+      "actual_nav": "",
+      "timestamp_utc": "2026-05-31T04:26:59.6151167Z",
+      "passed": true,
+      "visible_anchor_used": "Key stats",
+      "screenshot": "docs\\audit\\active-playtest\\screenshots\\manager-post-match.png",
+      "image_hash": "8523495be638d7f7b673f4c0dd879923bfcba58eb863fb429a48d88e663baa42",
+      "note": "Corrected post-match screen from the shared instant-result path"
+    }
+  ]
+}

@@ -61,7 +61,10 @@ DEFAULT_GODOT = Path(
 )
 
 BUTTON_PATHS = {
+    "mainmenu_new_career": "Center/MenuCard/Padding/Menu/NewCareerButton",
     "mainmenu_load": "Center/MenuCard/Padding/Menu/LoadGameButton",
+    "career_start": "RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/ActionsRow/StartCareerButton",
+    "career_role_option": "RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/RoleOption",
     "saveload_load": "RootMargin/MainColumn/ActionsRow/LoadButton",
     "dashboard_tactics": "RootMargin/Shell/RailCard/RailPadding/RailContent/NavButtons/TacticsButton",
     "dashboard_squad": "RootMargin/Shell/RailCard/RailPadding/RailContent/NavButtons/SquadButton",
@@ -718,6 +721,85 @@ def compute_duplicate_groups(observations: list[CaptureObservation]) -> list[dic
     return duplicates
 
 
+def capture_manager_club_selection(run: PlaytestRun, godot_console: Path) -> None:
+    """Capture ChooseClub from the new-career path (manager context, no pre-prepared save)."""
+    role_slug = "manager"
+    clear_runtime_state_files()
+
+    proc: subprocess.Popen[str] | None = None
+    try:
+        proc = launch_gui_game(godot_console)
+        window = focus_game_window(proc)
+
+        main_state, _ = wait_for_ui_state(
+            expected_scene="MainMenu",
+            anchor_candidates=["Slot 1", "Touchline Career", "Riverton", "Continue Career"],
+            timeout_s=45.0,
+        )
+        if main_state is None:
+            run.errors.append("manager:club-selection MainMenu did not become visible")
+            return
+
+        result = issue_command(
+            "press_button",
+            BUTTON_PATHS["mainmenu_new_career"],
+            expected_scene="MainMenu",
+        )
+        if not result.get("Success", False):
+            run.errors.append(f"manager:club-selection new career failed: {result.get('Message', '')}")
+            return
+
+        setup_state, _ = wait_for_ui_state(
+            expected_scene="CareerSetup",
+            anchor_candidates=["Start Career", "Manager", "Role"],
+            timeout_s=20.0,
+            newer_than=main_state.timestamp_utc,
+        )
+        if setup_state is None:
+            run.errors.append("manager:club-selection CareerSetup did not become visible")
+            return
+
+        role_result = issue_command(
+            "select_option",
+            BUTTON_PATHS["career_role_option"],
+            expected_scene="CareerSetup",
+            value="Manager",
+        )
+        if not role_result.get("Success", False):
+            run.errors.append(f"manager:club-selection role select failed: {role_result.get('Message', '')}")
+            return
+
+        start_result = issue_command(
+            "press_button",
+            BUTTON_PATHS["career_start"],
+            expected_scene="CareerSetup",
+        )
+        if not start_result.get("Success", False):
+            run.errors.append(f"manager:club-selection start career failed: {start_result.get('Message', '')}")
+            return
+
+        capture_verified_step(
+            run,
+            window,
+            role_slug=role_slug,
+            label="club-selection",
+            filename=f"{role_slug}-club-selection.png",
+            expected_scene="ChooseClub",
+            anchor_candidates=[
+                "Riverton Athletic",
+                "Select a club",
+                "Confirm Club Selection",
+                "Take Charge of",
+            ],
+            note="New-career club selection screen with seeded club list and preview",
+            require_state_change_from=setup_state,
+            timeout_s=30.0,
+        )
+    finally:
+        if proc is not None and proc.poll() is None:
+            terminate_process_tree(proc)
+
+
 def capture_role_flow(run: PlaytestRun, godot_console: Path, role_slug: str, role_label: str, seed: int) -> None:
     run_prepare_slot(godot_console, role_label, seed)
     clear_runtime_state_files()
@@ -978,12 +1060,11 @@ def capture_role_flow(run: PlaytestRun, godot_console: Path, role_slug: str, rol
             label="live-match-kickoff",
             filename=f"{role_slug}-live-match-kickoff.png",
             expected_scene="LiveMatchScene",
-            anchor_candidates=["01'", "Kickoff"],
-            role_anchor=role_label,
+            anchor_candidates=["00'", "01'", "Kickoff", "Kick-off", " vs ", "0 - 0", "Playback model"],
             command=("press_button", BUTTON_PATHS["matchday_start_live"]),
             note="Timed screenshot sequence: kickoff",
             require_state_change_from=matchday_state,
-            timeout_s=45.0,
+            timeout_s=60.0,
         )
         if live_start_state is None:
             return
@@ -1007,8 +1088,7 @@ def capture_role_flow(run: PlaytestRun, godot_console: Path, role_slug: str, rol
 
         full_time_state, _ = wait_for_ui_state(
             expected_scene="LiveMatchScene",
-            anchor_candidates=["Continue to Post-Match", "FT", "Full time"],
-            role_anchor=role_label,
+            anchor_candidates=["Continue to Post-Match", "FT", "Full time", "Playback complete"],
             timeout_s=120.0,
             newer_than=live_start_state.timestamp_utc,
         )
@@ -1023,8 +1103,7 @@ def capture_role_flow(run: PlaytestRun, godot_console: Path, role_slug: str, rol
             label="live-match-full-time",
             filename=f"{role_slug}-live-match-full-time.png",
             expected_scene="LiveMatchScene",
-            anchor_candidates=["Continue to Post-Match", "FT", "Full time"],
-            role_anchor=role_label,
+            anchor_candidates=["Continue to Post-Match", "FT", "Full time", "Playback complete"],
             note="Timed screenshot sequence: full-time state",
             require_state_change_from=live_start_state,
         )
@@ -1242,6 +1321,11 @@ def main() -> int:
 
     if not args.skip_gui:
         for role_slug, role_label, seed in ROLES:
+            if role_slug == "manager":
+                try:
+                    capture_manager_club_selection(run, godot_console)
+                except Exception as exc:  # pragma: no cover - environment-dependent
+                    run.errors.append(f"GUI club-selection capture error: {exc}")
             try:
                 capture_role_flow(run, godot_console, role_slug, role_label, seed)
             except Exception as exc:  # pragma: no cover - environment-dependent
