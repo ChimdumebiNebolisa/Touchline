@@ -54,9 +54,9 @@ func _validate_matchday_context() -> void:
     var pressure_reasons := current_scene.get_node("RootMargin/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent/PressureReasonsLabel") as Label
     var tactics_label := current_scene.get_node("RootMargin/MainColumn/ContentRow/PlanCard/PlanPadding/PlanContent/TacticsLabel") as Label
     var opponent_focus := current_scene.get_node("RootMargin/MainColumn/ContentRow/PlanCard/PlanPadding/PlanContent/OpponentFocusLabel") as Label
-    var status_label := current_scene.get_node("RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/StatusLabel") as Label
-    var live_button := current_scene.get_node("RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/StartMatchButton") as Button
-    var instant_button := current_scene.get_node("RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/InstantResultButton") as Button
+    var status_label := current_scene.get_node("RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ActionCard/ActionPadding/ActionContent/StatusLabel") as Label
+    var live_button := current_scene.get_node("RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ActionCard/ActionPadding/ActionContent/StartMatchButton") as Button
+    var instant_button := current_scene.get_node("RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ActionCard/ActionPadding/ActionContent/InstantResultButton") as Button
 
     if competition_label == null or fixture_label == null or kickoff_context == null or lineup_label == null or pressure_reasons == null or tactics_label == null or opponent_focus == null or status_label == null or live_button == null or instant_button == null:
         _fail("Matchday preparation labels are missing")

@@ -47,7 +47,7 @@ func _validate_fixtures_after_result() -> void:
     var matchday_value := _label_text("RootMargin/Shell/MainColumn/SummaryGrid/MatchdayCard/CardPadding/CardContent/CardValueLabel")
     var matchday_meta := _label_text("RootMargin/Shell/MainColumn/SummaryGrid/MatchdayCard/CardPadding/CardContent/CardMetaLabel")
     var season_meta := _label_text("RootMargin/Shell/MainColumn/SummaryGrid/SeasonCard/CardPadding/CardContent/CardMetaLabel")
-    var timeline_note := _label_text("RootMargin/Shell/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent/TimelineNoteLabel")
+    var timeline_note := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ContextCard/ContextPadding/ContextContent/TimelineNoteLabel")
 
     if schedule_status.find("Season") == -1 or schedule_status.find("Matchday") == -1:
         _fail("Fixtures header does not show season and matchday: %s" % schedule_status)
@@ -65,8 +65,8 @@ func _validate_fixtures_after_result() -> void:
         _fail("Fixtures context does not name the selected club: %s" % timeline_note)
         return
 
-    var club_rows := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/MainStack/ClubTimelineCard/TimelinePadding/TimelineContent/TimelineScroll/ClubFixtureRows")
-    var league_rows := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/MainStack/LeagueTimelineCard/TimelinePadding/TimelineContent/TimelineScroll/LeagueFixtureRows")
+    var club_rows := current_scene.get_node("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/ClubTimelineCard/TimelinePadding/TimelineContent/TimelineScroll/ClubFixtureRows")
+    var league_rows := current_scene.get_node("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/LeagueTimelineCard/TimelinePadding/TimelineContent/TimelineScroll/LeagueFixtureRows")
     if club_rows == null or league_rows == null:
         _fail("Fixture row containers are missing")
         return
@@ -104,9 +104,9 @@ func _validate_standings_context() -> void:
 
     var table_status := _label_text("RootMargin/Shell/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderInfo/TableStatusLabel")
     var header_status := _label_text("RootMargin/Shell/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderStatus/HeaderStatusLabel")
-    var club_summary := _label_text("RootMargin/Shell/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent/ClubSummaryLabel")
-    var table_note := _label_text("RootMargin/Shell/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent/TableNoteLabel")
-    var table_rows := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/TableCard/TablePadding/TableContent/TableScroll/TableRows")
+    var club_summary := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ContextCard/ContextPadding/ContextContent/ClubSummaryLabel")
+    var table_note := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ContextCard/ContextPadding/ContextContent/TableNoteLabel")
+    var table_rows := current_scene.get_node("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/TableCard/TablePadding/TableContent/TableScroll/TableRows")
 
     if table_status.find("Season") == -1 or table_status.find("Matchday") == -1:
         _fail("Standings header does not show season and matchday: %s" % table_status)
@@ -131,16 +131,16 @@ func _validate_standings_context() -> void:
         return
 
     for path in [
-        "RootMargin/Shell/MainColumn/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow/PosHeader",
-        "RootMargin/Shell/MainColumn/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow/ClubHeader",
-        "RootMargin/Shell/MainColumn/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow/PHeader",
-        "RootMargin/Shell/MainColumn/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow/WHeader",
-        "RootMargin/Shell/MainColumn/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow/DHeader",
-        "RootMargin/Shell/MainColumn/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow/LHeader",
-        "RootMargin/Shell/MainColumn/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow/GFHeader",
-        "RootMargin/Shell/MainColumn/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow/GAHeader",
-        "RootMargin/Shell/MainColumn/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow/GDHeader",
-        "RootMargin/Shell/MainColumn/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow/PtsHeader"
+        "RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow/PosHeader",
+        "RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow/ClubHeader",
+        "RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow/PHeader",
+        "RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow/WHeader",
+        "RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow/DHeader",
+        "RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow/LHeader",
+        "RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow/GFHeader",
+        "RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow/GAHeader",
+        "RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow/GDHeader",
+        "RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow/PtsHeader"
     ]:
         if _label_text(path).strip_edges() == "":
             _fail("Standings table header column is blank: %s" % path)

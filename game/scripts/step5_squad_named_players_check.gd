@@ -16,9 +16,9 @@ func _process(_delta: float) -> bool:
             _fail("CareerSetup scene did not load")
             return false
 
-        var name_input := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/ManagerNameInput") as LineEdit
-        var seed_input := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/SeedInput") as SpinBox
-        var start_button := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/ActionsRow/StartCareerButton") as Button
+        var name_input := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormLayout/FormScroll/FormContent/ManagerNameInput") as LineEdit
+        var seed_input := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormLayout/FormScroll/FormContent/SeedInput") as SpinBox
+        var start_button := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormLayout/FormScroll/FormContent/ActionsRow/StartCareerButton") as Button
 
         if name_input == null or seed_input == null or start_button == null:
             _fail("CareerSetup controls are missing")
@@ -66,11 +66,11 @@ func _process(_delta: float) -> bool:
             _fail("SquadScreen did not load")
             return false
 
-        var filter := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/SelectionCard/SelectionPadding/SelectionContent/FilterRow/PositionFilter") as OptionButton
-        var player_rows := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/SelectionCard/SelectionPadding/SelectionContent/PlayerScroll/PlayerRows") as VBoxContainer
-        var name_label := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/DetailCard/DetailPadding/DetailContent/PlayerNameLabel") as Label
-        var detail_label := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/DetailCard/DetailPadding/DetailContent/DetailMetaLabel") as Label
-        var role_chip_label := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/DetailCard/DetailPadding/DetailContent/ChipRow/RoleChip/RoleChipPadding/RoleChipLabel") as Label
+        var filter := current_scene.get_node("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/SelectionCard/SelectionPadding/SelectionContent/FilterRow/PositionFilter") as OptionButton
+        var player_rows := current_scene.get_node("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/SelectionCard/SelectionPadding/SelectionContent/PlayerScroll/PlayerRows") as VBoxContainer
+        var name_label := current_scene.get_node("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/DetailCard/DetailPadding/DetailContent/PlayerNameLabel") as Label
+        var detail_label := current_scene.get_node("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/DetailCard/DetailPadding/DetailContent/DetailMetaLabel") as Label
+        var role_chip_label := current_scene.get_node("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/DetailCard/DetailPadding/DetailContent/ChipRow/RoleChip/RoleChipPadding/RoleChipLabel") as Label
 
         if filter == null or player_rows == null or name_label == null or detail_label == null or role_chip_label == null:
             _fail("SquadScreen controls are missing")

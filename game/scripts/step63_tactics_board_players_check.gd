@@ -25,7 +25,7 @@ func _start_flow() -> void:
     _ticks = 0
 
 func _validate_tactics_board() -> void:
-    var board := current_scene.get_node_or_null("RootMargin/Shell/MainColumn/ContentRow/PitchCard/PitchPadding/PitchContent/PitchPanel/PitchPanelPadding/PitchField/TacticalBoard")
+    var board := current_scene.get_node_or_null("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/PitchCard/PitchPadding/PitchContent/PitchPanel/PitchPanelPadding/PitchField/TacticalBoard")
     if board == null:
         _fail("TacticalBoard drawing control is missing")
         return
@@ -61,7 +61,7 @@ func _validate_tactics_board() -> void:
         _fail("Tactics board markers do not expose subtle role labels: %s" % " | ".join(marker_texts))
         return
 
-    var status := _label_text("RootMargin/Shell/MainColumn/ContentRow/PitchCard/PitchPadding/PitchContent/StatusLabel")
+    var status := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/PitchCard/PitchPadding/PitchContent/StatusLabel")
     var first_marker: Node = null
     for child in board.get_children():
         if child.has_meta("player_name"):
@@ -74,7 +74,7 @@ func _validate_tactics_board() -> void:
 
     first_marker.emit_signal("gui_input", _make_click())
     await process_frame
-    status = _label_text("RootMargin/Shell/MainColumn/ContentRow/PitchCard/PitchPadding/PitchContent/StatusLabel")
+    status = _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/PitchCard/PitchPadding/PitchContent/StatusLabel")
     if status.find("Selected marker") == -1 or status.find("Fitness") == -1:
         _fail("Clicking a tactic marker does not inspect player details: %s" % status)
         return

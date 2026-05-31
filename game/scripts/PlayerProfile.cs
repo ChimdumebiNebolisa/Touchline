@@ -18,8 +18,12 @@ public partial class PlayerProfile : Control
     private Label _formMetaLabel = default!;
     private Label _fitnessValueLabel = default!;
     private Label _fitnessMetaLabel = default!;
-    private Label _identityLabel = default!;
+    private Label _profileConfidenceLabel = default!;
+    private Label _knownLabel = default!;
+    private Label _estimatedLabel = default!;
+    private Label _unknownLabel = default!;
     private Label _roleLabel = default!;
+    private Label _traitChipsLabel = default!;
     private Label _conditionLabel = default!;
     private Label _pathwayLabel = default!;
     private Label _readinessLabel = default!;
@@ -60,14 +64,18 @@ public partial class PlayerProfile : Control
         _fitnessValueLabel = GetNode<Label>("RootMargin/Shell/MainColumn/SummaryGrid/FitnessCard/CardPadding/CardContent/CardValueLabel");
         _fitnessMetaLabel = GetNode<Label>("RootMargin/Shell/MainColumn/SummaryGrid/FitnessCard/CardPadding/CardContent/CardMetaLabel");
 
-        _profileCard = GetNode<PanelContainer>("RootMargin/Shell/MainColumn/ContentRow/ProfileCard");
-        _identityLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/ProfileCard/ProfilePadding/ProfileContent/IdentityLabel");
-        _roleLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/ProfileCard/ProfilePadding/ProfileContent/RoleLabel");
-        _conditionLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/ProfileCard/ProfilePadding/ProfileContent/ConditionLabel");
+        _profileCard = GetNode<PanelContainer>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ProfileCard");
+        _profileConfidenceLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ProfileCard/ProfilePadding/ProfileContent/ProfileConfidenceLabel");
+        _knownLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ProfileCard/ProfilePadding/ProfileContent/KnownLabel");
+        _estimatedLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ProfileCard/ProfilePadding/ProfileContent/EstimatedLabel");
+        _unknownLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ProfileCard/ProfilePadding/ProfileContent/UnknownLabel");
+        _roleLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ProfileCard/ProfilePadding/ProfileContent/RoleLabel");
+        _traitChipsLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ProfileCard/ProfilePadding/ProfileContent/TraitChipsLabel");
+        _conditionLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ProfileCard/ProfilePadding/ProfileContent/ConditionLabel");
 
-        _insightCard = GetNode<PanelContainer>("RootMargin/Shell/MainColumn/ContentRow/InsightCard");
-        _pathwayLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/PathwayLabel");
-        _readinessLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/ReadinessLabel");
+        _insightCard = GetNode<PanelContainer>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard");
+        _pathwayLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightContent/PathwayLabel");
+        _readinessLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightContent/ReadinessLabel");
     }
 
     private void ApplyShellStyles()
@@ -102,11 +110,15 @@ public partial class PlayerProfile : Control
         TouchlineTheme.ApplyMutedStyle(_ageMetaLabel, 14);
         TouchlineTheme.ApplyMutedStyle(_formMetaLabel, 14);
         TouchlineTheme.ApplyMutedStyle(_fitnessMetaLabel, 14);
-        TouchlineTheme.ApplyEyebrowStyle(GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/ProfileCard/ProfilePadding/ProfileContent/ProfileEyebrow"));
-        TouchlineTheme.ApplyEyebrowStyle(GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/InsightEyebrow"));
-        TouchlineTheme.ApplyMutedStyle(_identityLabel, 16);
-        TouchlineTheme.ApplyMutedStyle(_roleLabel, 16);
-        TouchlineTheme.ApplyMutedStyle(_conditionLabel, 16);
+        TouchlineTheme.ApplyEyebrowStyle(GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ProfileCard/ProfilePadding/ProfileContent/ProfileEyebrow"));
+        TouchlineTheme.ApplyEyebrowStyle(GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightContent/InsightEyebrow"));
+        TouchlineTheme.ApplyMutedStyle(_profileConfidenceLabel, 15);
+        TouchlineTheme.ApplyMutedStyle(_knownLabel, 14);
+        TouchlineTheme.ApplyMutedStyle(_estimatedLabel, 14);
+        TouchlineTheme.ApplyMutedStyle(_unknownLabel, 14);
+        TouchlineTheme.ApplyMutedStyle(_roleLabel, 15);
+        TouchlineTheme.ApplyMutedStyle(_traitChipsLabel, 14);
+        TouchlineTheme.ApplyMutedStyle(_conditionLabel, 14);
         TouchlineTheme.ApplyMutedStyle(_pathwayLabel, 15);
         TouchlineTheme.ApplyMutedStyle(_readinessLabel, 15);
         TouchlineTheme.ApplyButtonVariant(_backButton, TouchlineButtonVariant.Secondary);
@@ -149,20 +161,14 @@ public partial class PlayerProfile : Control
         _fitnessValueLabel.Text = player.Fitness.ToString();
         _fitnessMetaLabel.Text = $"{DescribeFitness(player.Fitness)} Fatigue {player.Fatigue}, injury risk {player.InjuryRisk}.";
 
-        _identityLabel.Text =
-            $"Player dossier | {player.Name} | {player.Position} | Age {player.Age}\n" +
-            $"{BuildProfileConfidenceText(informationReport)}\n" +
-            $"{BuildVisibilityReason(informationReport)}\n" +
-            $"{informationReport.KnownAttributesSummary}\n" +
-            $"{informationReport.EstimatedAttributesSummary}\n" +
-            $"{informationReport.UnknownAttributesSummary}";
-        _roleLabel.Text =
-            $"Role view | {lineupStatus} | {player.PlayingStyle}\n" +
-            $"{informationReport.TacticalFitSummary}\n" +
-            $"{informationReport.PersonalitySummary}";
+        _profileConfidenceLabel.Text = BuildProfileConfidenceText(informationReport);
+        _knownLabel.Text = informationReport.KnownAttributesSummary;
+        _estimatedLabel.Text = informationReport.EstimatedAttributesSummary;
+        _unknownLabel.Text = informationReport.UnknownAttributesSummary;
+        _roleLabel.Text = $"Role | {lineupStatus} | {player.PlayingStyle}";
+        _traitChipsLabel.Text = $"{informationReport.TacticalFitSummary} | {informationReport.PersonalitySummary}";
         _conditionLabel.Text =
-            $"Match sharpness | Form {player.Form} | Morale {player.Morale} | Fitness {player.Fitness} | Fatigue {player.Fatigue} | Injury risk {player.InjuryRisk}\n" +
-            $"{informationReport.RiskSummary}";
+            $"Form {player.Form} | Morale {player.Morale} | Fitness {player.Fitness} | {informationReport.RiskSummary}";
         _pathwayLabel.Text = $"{informationReport.DevelopmentSummary}\n{BuildTrajectorySummary(player, GameState.Instance)}";
         _readinessLabel.Text = $"{BuildReadinessSummary(player)}\nScouting/staff note | {BuildVisibilityReason(informationReport).Replace("Visibility | ", string.Empty, System.StringComparison.Ordinal)}";
         WriteAuditState();
@@ -184,8 +190,12 @@ public partial class PlayerProfile : Control
         _formMetaLabel.Text = "Form trend unavailable.";
         _fitnessValueLabel.Text = "--";
         _fitnessMetaLabel.Text = "Availability unavailable.";
-        _identityLabel.Text = "Identity unavailable.";
+        _profileConfidenceLabel.Text = "Profile Confidence: unavailable";
+        _knownLabel.Text = "Known: unavailable";
+        _estimatedLabel.Text = "Estimated: unavailable";
+        _unknownLabel.Text = "Unknown: unavailable";
         _roleLabel.Text = "Role unavailable.";
+        _traitChipsLabel.Text = "Traits unavailable.";
         _conditionLabel.Text = "Condition unavailable.";
         _pathwayLabel.Text = "Trajectory unavailable.";
         _readinessLabel.Text = "Readiness unavailable.";
@@ -334,7 +344,7 @@ public partial class PlayerProfile : Control
             _clubContextLabel.Text,
             _pageTitleLabel.Text,
             _statusLabel.Text,
-            _identityLabel.Text,
+            $"{_profileConfidenceLabel.Text} | {_knownLabel.Text}",
             _roleLabel.Text,
             _conditionLabel.Text,
             _pathwayLabel.Text,

@@ -47,13 +47,13 @@ func _validate_initial_tactics_context() -> void:
     var tempo_value := _label_text("RootMargin/Shell/MainColumn/SummaryGrid/TempoCard/CardPadding/CardContent/CardValueLabel")
     var width_value := _label_text("RootMargin/Shell/MainColumn/SummaryGrid/WidthCard/CardPadding/CardContent/CardValueLabel")
     var risk_value := _label_text("RootMargin/Shell/MainColumn/SummaryGrid/RiskCard/CardPadding/CardContent/CardValueLabel")
-    var preview_summary := _label_text("RootMargin/Shell/MainColumn/ContentRow/PitchCard/PitchPadding/PitchContent/PreviewSummaryLabel")
-    var control_summary := _label_text("RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/ControlSummaryLabel")
-    var press_note := _label_text("RootMargin/Shell/MainColumn/ContentRow/SideStack/NotesCard/NotesPadding/NotesContent/PressPreviewLabel")
-    var tempo_note := _label_text("RootMargin/Shell/MainColumn/ContentRow/SideStack/NotesCard/NotesPadding/NotesContent/TempoPreviewLabel")
-    var width_note := _label_text("RootMargin/Shell/MainColumn/ContentRow/SideStack/NotesCard/NotesPadding/NotesContent/WidthPreviewLabel")
-    var risk_note := _label_text("RootMargin/Shell/MainColumn/ContentRow/SideStack/NotesCard/NotesPadding/NotesContent/RiskPreviewLabel")
-    var saved_plan := _label_text("RootMargin/Shell/MainColumn/ContentRow/SideStack/NotesCard/NotesPadding/NotesContent/SavedPlanLabel")
+    var preview_summary := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/PitchCard/PitchPadding/PitchContent/PreviewSummaryLabel")
+    var control_summary := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/ControlSummaryLabel")
+    var press_note := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/SideStack/NotesCard/NotesPadding/NotesContent/PressPreviewLabel")
+    var tempo_note := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/SideStack/NotesCard/NotesPadding/NotesContent/TempoPreviewLabel")
+    var width_note := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/SideStack/NotesCard/NotesPadding/NotesContent/WidthPreviewLabel")
+    var risk_note := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/SideStack/NotesCard/NotesPadding/NotesContent/RiskPreviewLabel")
+    var saved_plan := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/SideStack/NotesCard/NotesPadding/NotesContent/SavedPlanLabel")
     var save_hint := _label_text("RootMargin/Shell/RailCard/RailPadding/RailContent/FooterActions/SaveHintLabel")
 
     if formation_value == "--" or press_value == "--" or tempo_value == "--" or width_value == "--" or risk_value == "--":
@@ -81,11 +81,11 @@ func _validate_initial_tactics_context() -> void:
         _fail("Save hint does not explain preview/apply state: %s" % save_hint)
         return
 
-    var formation := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/FormationOption") as OptionButton
-    var press_spin := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/PressSpin") as SpinBox
-    var tempo_spin := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/TempoSpin") as SpinBox
-    var width_spin := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/WidthSpin") as SpinBox
-    var risk_spin := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/RiskSpin") as SpinBox
+    var formation := current_scene.get_node("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/FormationOption") as OptionButton
+    var press_spin := current_scene.get_node("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/PressSpin") as SpinBox
+    var tempo_spin := current_scene.get_node("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/TempoSpin") as SpinBox
+    var width_spin := current_scene.get_node("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/WidthSpin") as SpinBox
+    var risk_spin := current_scene.get_node("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/RiskSpin") as SpinBox
     var save_button := current_scene.get_node("RootMargin/Shell/RailCard/RailPadding/RailContent/FooterActions/SaveButton") as Button
 
     if formation == null or press_spin == null or tempo_spin == null or width_spin == null or risk_spin == null or save_button == null:
@@ -121,10 +121,10 @@ func _validate_saved_tactics_context() -> void:
         _fail("Saved tactical values did not persist into GameState")
         return
 
-    var saved_plan := _label_text("RootMargin/Shell/MainColumn/ContentRow/SideStack/NotesCard/NotesPadding/NotesContent/SavedPlanLabel")
-    var status := _label_text("RootMargin/Shell/MainColumn/ContentRow/PitchCard/PitchPadding/PitchContent/StatusLabel")
+    var saved_plan := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/SideStack/NotesCard/NotesPadding/NotesContent/SavedPlanLabel")
+    var status := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/PitchCard/PitchPadding/PitchContent/StatusLabel")
     var save_hint := _label_text("RootMargin/Shell/RailCard/RailPadding/RailContent/FooterActions/SaveHintLabel")
-    var control_summary := _label_text("RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/ControlSummaryLabel")
+    var control_summary := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/ControlSummaryLabel")
 
     if saved_plan.find("Formation 3-5-2") == -1 or saved_plan.find("Pressing 82") == -1 or saved_plan.find("Tempo 77") == -1 or saved_plan.find("Width 68") == -1 or saved_plan.find("Mentality 73") == -1:
         _fail("Saved plan label does not show all persisted tactical values: %s" % saved_plan)

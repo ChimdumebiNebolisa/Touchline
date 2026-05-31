@@ -32,7 +32,7 @@ func _start_flow() -> void:
     _ticks = 0
 
 func _open_live_match() -> void:
-    var live_button := current_scene.get_node("RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/StartMatchButton") as Button
+    var live_button := current_scene.get_node("RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ActionCard/ActionPadding/ActionContent/StartMatchButton") as Button
     live_button.emit_signal("pressed")
     _stage = 2
     _ticks = 0

@@ -48,21 +48,22 @@ public partial class CareerSetup : Control
         _heroCard = GetNode<PanelContainer>("RootMargin/MainColumn/HeroCard");
         _formCard = GetNode<PanelContainer>("RootMargin/MainColumn/ContentRow/FormCard");
         _previewCard = GetNode<PanelContainer>("RootMargin/MainColumn/ContentRow/PreviewCard");
-        _managerNameInput = GetNode<LineEdit>("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/ManagerNameInput");
-        _seedInput = GetNode<SpinBox>("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/SeedInput");
+        const string formRoot = "RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormLayout/FormScroll/FormContent";
+        _managerNameInput = GetNode<LineEdit>($"{formRoot}/ManagerNameInput");
+        _seedInput = GetNode<SpinBox>($"{formRoot}/SeedInput");
         EnsureCareerFoundationControls();
-        _roleOption = GetNode<OptionButton>("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/RoleOption");
-        _backgroundOption = GetNode<OptionButton>("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/BackgroundOption");
-        _licenseOption = GetNode<OptionButton>("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/LicenseOption");
-        _strictRealismOption = GetNode<OptionButton>("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/StrictRealismOption");
-        _dramaFrequencyOption = GetNode<OptionButton>("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/DramaFrequencyOption");
-        _scoutingDifficultyOption = GetNode<OptionButton>("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/ScoutingDifficultyOption");
-        _sackingStrictnessOption = GetNode<OptionButton>("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/SackingStrictnessOption");
-        _transferDifficultyOption = GetNode<OptionButton>("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/TransferDifficultyOption");
-        _hiddenInfoOption = GetNode<OptionButton>("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/HiddenInfoOption");
-        _matchRandomnessOption = GetNode<OptionButton>("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/MatchRandomnessOption");
-        _financeDifficultyOption = GetNode<OptionButton>("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/FinanceDifficultyOption");
-        _statusLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/StatusLabel");
+        _roleOption = GetNode<OptionButton>($"{formRoot}/RoleOption");
+        _backgroundOption = GetNode<OptionButton>($"{formRoot}/BackgroundOption");
+        _licenseOption = GetNode<OptionButton>($"{formRoot}/LicenseOption");
+        _strictRealismOption = GetNode<OptionButton>($"{formRoot}/StrictRealismOption");
+        _dramaFrequencyOption = GetNode<OptionButton>($"{formRoot}/DramaFrequencyOption");
+        _scoutingDifficultyOption = GetNode<OptionButton>($"{formRoot}/ScoutingDifficultyOption");
+        _sackingStrictnessOption = GetNode<OptionButton>($"{formRoot}/SackingStrictnessOption");
+        _transferDifficultyOption = GetNode<OptionButton>($"{formRoot}/TransferDifficultyOption");
+        _hiddenInfoOption = GetNode<OptionButton>($"{formRoot}/HiddenInfoOption");
+        _matchRandomnessOption = GetNode<OptionButton>($"{formRoot}/MatchRandomnessOption");
+        _financeDifficultyOption = GetNode<OptionButton>($"{formRoot}/FinanceDifficultyOption");
+        _statusLabel = GetNode<Label>($"{formRoot}/StatusLabel");
         _managerPreviewLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent/ManagerPreviewLabel");
         _seedPreviewLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent/SeedPreviewLabel");
         _rolePreviewLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent/RolePreviewLabel");
@@ -74,13 +75,13 @@ public partial class CareerSetup : Control
         _persistencePreviewLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent/PersistencePreviewLabel");
         _seedImpactPreviewLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent/SeedImpactPreviewLabel");
         _difficultyPreviewLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/PreviewCard/PreviewPadding/PreviewContent/DifficultyPreviewLabel");
-        _startCareerButton = GetNode<Button>("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/ActionsRow/StartCareerButton");
-        _backButton = GetNode<Button>("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/ActionsRow/BackButton");
+        _startCareerButton = GetNode<Button>("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormLayout/ActionsRow/StartCareerButton");
+        _backButton = GetNode<Button>("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormLayout/ActionsRow/BackButton");
     }
 
     private void EnsureCareerFoundationControls()
     {
-        var formContent = GetNode<VBoxContainer>("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent");
+        var formContent = GetNode<VBoxContainer>("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormLayout/FormScroll/FormContent");
         var statusNode = formContent.GetNode("StatusLabel");
         var insertIndex = statusNode.GetIndex();
         EnsureSelectionField(formContent, ref insertIndex, "RoleLabel", "Role", "RoleOption", CareerFoundation.RoleDisplayNames, 2);

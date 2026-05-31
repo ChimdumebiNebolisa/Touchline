@@ -29,10 +29,10 @@ func _start_flow() -> void:
     _change_scene("res://scenes/MainMenu.tscn", 1)
 
 func _validate_main_menu() -> void:
-    var detail_grid := current_scene.get_node_or_null("Center/MenuCard/Padding/Menu/ResumeCard/ResumePadding/ResumeContent/DetailGrid") as GridContainer
-    var new_career := current_scene.get_node_or_null("Center/MenuCard/Padding/Menu/NewCareerButton") as Button
-    if detail_grid == null or detail_grid.columns > 3 or new_career == null:
-        _fail("Main menu layout controls are missing or too narrow")
+	var detail_rows := current_scene.get_node_or_null("Center/MenuCard/Padding/Menu/ResumeCard/ResumePadding/ResumeContent/DetailRows") as VBoxContainer
+	var new_career := current_scene.get_node_or_null("Center/MenuCard/Padding/Menu/NewCareerButton") as Button
+	if detail_rows == null or new_career == null:
+		_fail("Main menu layout controls are missing")
         return
 
     _change_scene("res://scenes/SaveLoadScene.tscn", 2)
@@ -47,8 +47,8 @@ func _validate_save_load() -> void:
     _change_scene("res://scenes/SquadScreen.tscn", 3)
 
 func _validate_squad() -> void:
-    var heading := _label_text("RootMargin/Shell/MainColumn/ContentRow/SelectionCard/SelectionPadding/SelectionContent/SelectionHeading")
-    var rows := current_scene.get_node_or_null("RootMargin/Shell/MainColumn/ContentRow/SelectionCard/SelectionPadding/SelectionContent/PlayerScroll/PlayerRows")
+    var heading := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/SelectionCard/SelectionPadding/SelectionContent/SelectionHeading")
+    var rows := current_scene.get_node_or_null("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/SelectionCard/SelectionPadding/SelectionContent/PlayerScroll/PlayerRows")
     if heading.find("Bench") == -1 or heading.find("Reserves") == -1 or rows == null:
         _fail("Squad team-sheet layout is missing expected sections")
         return

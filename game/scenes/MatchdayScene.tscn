@@ -20,24 +20,6 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.0313726, 0.0509804, 0.0666667, 1)
 
-[node name="TopBand" type="ColorRect" parent="."]
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-anchor_bottom = 0.26
-grow_horizontal = 2
-color = Color(0.0509804, 0.0862745, 0.117647, 1)
-
-[node name="LeftWash" type="ColorRect" parent="."]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.0
-anchor_top = 0.0
-anchor_right = 0.34
-anchor_bottom = 1.0
-grow_vertical = 2
-color = Color(0.0235294, 0.0627451, 0.0901961, 0.24)
-
 [node name="RootMargin" type="MarginContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
@@ -232,128 +214,138 @@ layout_mode = 2
 text = "Selection state unavailable."
 autowrap_mode = 3
 
-[node name="ContentRow" type="HBoxContainer" parent="RootMargin/MainColumn"]
+[node name="MainScroll" type="ScrollContainer" parent="RootMargin/MainColumn"]
 layout_mode = 2
 size_flags_vertical = 3
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 2
+
+[node name="ScrollContent" type="VBoxContainer" parent="RootMargin/MainColumn/MainScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 14
+
+[node name="ContentRow" type="HBoxContainer" parent="RootMargin/MainColumn/MainScroll/ScrollContent"]
+layout_mode = 2
 theme_override_constants/separation = 18
 
-[node name="ContextCard" type="PanelContainer" parent="RootMargin/MainColumn/ContentRow"]
+[node name="ContextCard" type="PanelContainer" parent="RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="ContextPadding" type="MarginContainer" parent="RootMargin/MainColumn/ContentRow/ContextCard"]
+[node name="ContextPadding" type="MarginContainer" parent="RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ContextCard"]
 layout_mode = 2
 theme_override_constants/margin_left = 22
 theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 22
 theme_override_constants/margin_bottom = 20
 
-[node name="ContextContent" type="VBoxContainer" parent="RootMargin/MainColumn/ContentRow/ContextCard/ContextPadding"]
+[node name="ContextContent" type="VBoxContainer" parent="RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ContextCard/ContextPadding"]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="ContextEyebrow" type="Label" parent="RootMargin/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent"]
+[node name="ContextEyebrow" type="Label" parent="RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ContextCard/ContextPadding/ContextContent"]
 layout_mode = 2
 text = "DRESSING ROOM BRIEF"
 
-[node name="KickoffContextLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent"]
+[node name="KickoffContextLabel" type="Label" parent="RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ContextCard/ContextPadding/ContextContent"]
 layout_mode = 2
 text = "Kickoff context unavailable."
 autowrap_mode = 3
 
-[node name="LineupLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent"]
+[node name="LineupLabel" type="Label" parent="RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ContextCard/ContextPadding/ContextContent"]
 layout_mode = 2
 text = "Lineup readiness unavailable."
 autowrap_mode = 3
 
-[node name="BenchLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent"]
+[node name="BenchLabel" type="Label" parent="RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ContextCard/ContextPadding/ContextContent"]
 layout_mode = 2
 text = "Bench context unavailable."
 autowrap_mode = 3
 
-[node name="PressureReasonsLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent"]
+[node name="PressureReasonsLabel" type="Label" parent="RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ContextCard/ContextPadding/ContextContent"]
 layout_mode = 2
 text = "Pressure reasons unavailable."
 autowrap_mode = 3
 
-[node name="PlanCard" type="PanelContainer" parent="RootMargin/MainColumn/ContentRow"]
+[node name="PlanCard" type="PanelContainer" parent="RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="PlanPadding" type="MarginContainer" parent="RootMargin/MainColumn/ContentRow/PlanCard"]
+[node name="PlanPadding" type="MarginContainer" parent="RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/PlanCard"]
 layout_mode = 2
 theme_override_constants/margin_left = 22
 theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 22
 theme_override_constants/margin_bottom = 20
 
-[node name="PlanContent" type="VBoxContainer" parent="RootMargin/MainColumn/ContentRow/PlanCard/PlanPadding"]
+[node name="PlanContent" type="VBoxContainer" parent="RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/PlanCard/PlanPadding"]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="PlanEyebrow" type="Label" parent="RootMargin/MainColumn/ContentRow/PlanCard/PlanPadding/PlanContent"]
+[node name="PlanEyebrow" type="Label" parent="RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/PlanCard/PlanPadding/PlanContent"]
 layout_mode = 2
 text = "MATCH PLAN"
 
-[node name="PressureLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/PlanCard/PlanPadding/PlanContent"]
+[node name="PressureLabel" type="Label" parent="RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/PlanCard/PlanPadding/PlanContent"]
 layout_mode = 2
 text = "Pressure context unavailable."
 autowrap_mode = 3
 
-[node name="TacticsLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/PlanCard/PlanPadding/PlanContent"]
+[node name="TacticsLabel" type="Label" parent="RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/PlanCard/PlanPadding/PlanContent"]
 layout_mode = 2
 text = "Tactics unavailable."
 autowrap_mode = 3
 
-[node name="OpponentFocusLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/PlanCard/PlanPadding/PlanContent"]
+[node name="OpponentFocusLabel" type="Label" parent="RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/PlanCard/PlanPadding/PlanContent"]
 layout_mode = 2
 text = "Opponent focus unavailable."
 autowrap_mode = 3
 
-[node name="ReadinessLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/PlanCard/PlanPadding/PlanContent"]
+[node name="ReadinessLabel" type="Label" parent="RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/PlanCard/PlanPadding/PlanContent"]
 layout_mode = 2
 text = "Readiness unavailable."
 autowrap_mode = 3
 
-[node name="ActionCard" type="PanelContainer" parent="RootMargin/MainColumn/ContentRow"]
+[node name="ActionCard" type="PanelContainer" parent="RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow"]
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="ActionPadding" type="MarginContainer" parent="RootMargin/MainColumn/ContentRow/ActionCard"]
+[node name="ActionPadding" type="MarginContainer" parent="RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ActionCard"]
 layout_mode = 2
 theme_override_constants/margin_left = 22
 theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 22
 theme_override_constants/margin_bottom = 20
 
-[node name="ActionContent" type="VBoxContainer" parent="RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding"]
+[node name="ActionContent" type="VBoxContainer" parent="RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ActionCard/ActionPadding"]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="ActionEyebrow" type="Label" parent="RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent"]
+[node name="ActionEyebrow" type="Label" parent="RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ActionCard/ActionPadding/ActionContent"]
 layout_mode = 2
 text = "MATCH CONTROLS"
 
-[node name="StatusLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent"]
+[node name="StatusLabel" type="Label" parent="RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ActionCard/ActionPadding/ActionContent"]
 layout_mode = 2
 text = "Set up a career and club before entering matchday."
 autowrap_mode = 3
 
-[node name="BackButton" type="Button" parent="RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent"]
+[node name="BackButton" type="Button" parent="RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ActionCard/ActionPadding/ActionContent"]
 layout_mode = 2
 text = "Back to Manager Hub"
 
-[node name="InstantResultButton" type="Button" parent="RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent"]
+[node name="InstantResultButton" type="Button" parent="RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ActionCard/ActionPadding/ActionContent"]
 layout_mode = 2
 text = "Instant Result"
 
-[node name="StartMatchButton" type="Button" parent="RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent"]
+[node name="StartMatchButton" type="Button" parent="RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ActionCard/ActionPadding/ActionContent"]
 layout_mode = 2
 text = "Watch Live Match"
 
-[connection signal="pressed" from="RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/BackButton" to="." method="OnBackPressed"]
-[connection signal="pressed" from="RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/InstantResultButton" to="." method="OnInstantResultPressed"]
-[connection signal="pressed" from="RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/StartMatchButton" to="." method="OnStartMatchPressed"]
+[connection signal="pressed" from="RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ActionCard/ActionPadding/ActionContent/BackButton" to="." method="OnBackPressed"]
+[connection signal="pressed" from="RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ActionCard/ActionPadding/ActionContent/InstantResultButton" to="." method="OnInstantResultPressed"]
+[connection signal="pressed" from="RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ActionCard/ActionPadding/ActionContent/StartMatchButton" to="." method="OnStartMatchPressed"]

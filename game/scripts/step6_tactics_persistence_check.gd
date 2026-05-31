@@ -16,9 +16,9 @@ func _process(_delta: float) -> bool:
             _fail("CareerSetup scene did not load")
             return false
 
-        var name_input := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/ManagerNameInput") as LineEdit
-        var seed_input := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/SeedInput") as SpinBox
-        var start_button := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/ActionsRow/StartCareerButton") as Button
+        var name_input := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormLayout/FormScroll/FormContent/ManagerNameInput") as LineEdit
+        var seed_input := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormLayout/FormScroll/FormContent/SeedInput") as SpinBox
+        var start_button := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormLayout/FormScroll/FormContent/ActionsRow/StartCareerButton") as Button
 
         if name_input == null or seed_input == null or start_button == null:
             _fail("CareerSetup controls are missing")
@@ -70,11 +70,11 @@ func _process(_delta: float) -> bool:
             _fail("TacticsScreen did not load")
             return false
 
-        var formation := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/FormationOption") as OptionButton
-        var press_spin := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/PressSpin") as SpinBox
-        var tempo_spin := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/TempoSpin") as SpinBox
-        var width_spin := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/WidthSpin") as SpinBox
-        var risk_spin := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/RiskSpin") as SpinBox
+        var formation := current_scene.get_node("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/FormationOption") as OptionButton
+        var press_spin := current_scene.get_node("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/PressSpin") as SpinBox
+        var tempo_spin := current_scene.get_node("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/TempoSpin") as SpinBox
+        var width_spin := current_scene.get_node("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/WidthSpin") as SpinBox
+        var risk_spin := current_scene.get_node("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/RiskSpin") as SpinBox
         var save_button := current_scene.get_node("RootMargin/Shell/RailCard/RailPadding/RailContent/FooterActions/SaveButton") as Button
         var back_button := current_scene.get_node("RootMargin/Shell/RailCard/RailPadding/RailContent/FooterActions/BackButton") as Button
 
@@ -125,11 +125,11 @@ func _process(_delta: float) -> bool:
             _fail("TacticsScreen did not reload")
             return false
 
-        var formation := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/FormationOption") as OptionButton
-        var press_spin := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/PressSpin") as SpinBox
-        var tempo_spin := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/TempoSpin") as SpinBox
-        var width_spin := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/WidthSpin") as SpinBox
-        var risk_spin := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/RiskSpin") as SpinBox
+        var formation := current_scene.get_node("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/FormationOption") as OptionButton
+        var press_spin := current_scene.get_node("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/PressSpin") as SpinBox
+        var tempo_spin := current_scene.get_node("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/TempoSpin") as SpinBox
+        var width_spin := current_scene.get_node("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/WidthSpin") as SpinBox
+        var risk_spin := current_scene.get_node("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/SideStack/ControlsCard/ControlsPadding/ControlsContent/RiskSpin") as SpinBox
 
         if formation == null or press_spin == null or tempo_spin == null or width_spin == null or risk_spin == null:
             _fail("TacticsScreen controls missing on reload")

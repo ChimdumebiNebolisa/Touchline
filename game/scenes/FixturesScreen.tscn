@@ -20,24 +20,6 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.0313726, 0.0509804, 0.0666667, 1)
 
-[node name="TopBand" type="ColorRect" parent="."]
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-anchor_bottom = 0.24
-grow_horizontal = 2
-color = Color(0.0509804, 0.0862745, 0.117647, 1)
-
-[node name="RightWash" type="ColorRect" parent="."]
-layout_mode = 1
-anchors_preset = 9
-anchor_left = 0.72
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0.0392157, 0.0666667, 0.0901961, 0.45)
-
 [node name="RootMargin" type="MarginContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
@@ -55,7 +37,7 @@ layout_mode = 2
 theme_override_constants/separation = 18
 
 [node name="RailCard" type="PanelContainer" parent="RootMargin/Shell"]
-custom_minimum_size = Vector2(272, 0)
+custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
 
 [node name="RailPadding" type="MarginContainer" parent="RootMargin/Shell/RailCard"]
@@ -419,126 +401,135 @@ layout_mode = 2
 text = "Table unavailable."
 autowrap_mode = 3
 
-[node name="ContentRow" type="HBoxContainer" parent="RootMargin/Shell/MainColumn"]
+[node name="MainScroll" type="ScrollContainer" parent="RootMargin/Shell/MainColumn"]
 layout_mode = 2
 size_flags_vertical = 3
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 2
+
+[node name="ScrollContent" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/MainScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 14
+[node name="ContentRow" type="HBoxContainer" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent"]
+layout_mode = 2
 theme_override_constants/separation = 18
 
-[node name="MainStack" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/ContentRow"]
+[node name="MainStack" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 18
 
-[node name="ClubTimelineCard" type="PanelContainer" parent="RootMargin/Shell/MainColumn/ContentRow/MainStack"]
+[node name="ClubTimelineCard" type="PanelContainer" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="TimelinePadding" type="MarginContainer" parent="RootMargin/Shell/MainColumn/ContentRow/MainStack/ClubTimelineCard"]
+[node name="TimelinePadding" type="MarginContainer" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/ClubTimelineCard"]
 layout_mode = 2
 theme_override_constants/margin_left = 20
 theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 20
 theme_override_constants/margin_bottom = 20
 
-[node name="TimelineContent" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/ContentRow/MainStack/ClubTimelineCard/TimelinePadding"]
+[node name="TimelineContent" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/ClubTimelineCard/TimelinePadding"]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="TimelineHeading" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/MainStack/ClubTimelineCard/TimelinePadding/TimelineContent"]
+[node name="TimelineHeading" type="Label" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/ClubTimelineCard/TimelinePadding/TimelineContent"]
 layout_mode = 2
 text = "Club Fixtures"
 
-[node name="TimelineHintLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/MainStack/ClubTimelineCard/TimelinePadding/TimelineContent"]
+[node name="TimelineHintLabel" type="Label" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/ClubTimelineCard/TimelinePadding/TimelineContent"]
 layout_mode = 2
 text = "Only your club's season path. Home and away context stays explicit."
 autowrap_mode = 3
 
-[node name="TimelineScroll" type="ScrollContainer" parent="RootMargin/Shell/MainColumn/ContentRow/MainStack/ClubTimelineCard/TimelinePadding/TimelineContent"]
+[node name="TimelineScroll" type="ScrollContainer" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/ClubTimelineCard/TimelinePadding/TimelineContent"]
 layout_mode = 2
 size_flags_vertical = 3
 follow_focus = true
 horizontal_scroll_mode = 0
 
-[node name="ClubFixtureRows" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/ContentRow/MainStack/ClubTimelineCard/TimelinePadding/TimelineContent/TimelineScroll"]
+[node name="ClubFixtureRows" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/ClubTimelineCard/TimelinePadding/TimelineContent/TimelineScroll"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 8
 
-[node name="LeagueTimelineCard" type="PanelContainer" parent="RootMargin/Shell/MainColumn/ContentRow/MainStack"]
+[node name="LeagueTimelineCard" type="PanelContainer" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="TimelinePadding" type="MarginContainer" parent="RootMargin/Shell/MainColumn/ContentRow/MainStack/LeagueTimelineCard"]
+[node name="TimelinePadding" type="MarginContainer" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/LeagueTimelineCard"]
 layout_mode = 2
 theme_override_constants/margin_left = 20
 theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 20
 theme_override_constants/margin_bottom = 20
 
-[node name="TimelineContent" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/ContentRow/MainStack/LeagueTimelineCard/TimelinePadding"]
+[node name="TimelineContent" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/LeagueTimelineCard/TimelinePadding"]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="TimelineHeading" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/MainStack/LeagueTimelineCard/TimelinePadding/TimelineContent"]
+[node name="TimelineHeading" type="Label" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/LeagueTimelineCard/TimelinePadding/TimelineContent"]
 layout_mode = 2
 text = "Other League Fixtures"
 
-[node name="TimelineHintLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/MainStack/LeagueTimelineCard/TimelinePadding/TimelineContent"]
+[node name="TimelineHintLabel" type="Label" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/LeagueTimelineCard/TimelinePadding/TimelineContent"]
 layout_mode = 2
 text = "The rest of the round, separated from the club schedule."
 autowrap_mode = 3
 
-[node name="TimelineScroll" type="ScrollContainer" parent="RootMargin/Shell/MainColumn/ContentRow/MainStack/LeagueTimelineCard/TimelinePadding/TimelineContent"]
+[node name="TimelineScroll" type="ScrollContainer" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/LeagueTimelineCard/TimelinePadding/TimelineContent"]
 layout_mode = 2
 size_flags_vertical = 3
 follow_focus = true
 horizontal_scroll_mode = 0
 
-[node name="LeagueFixtureRows" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/ContentRow/MainStack/LeagueTimelineCard/TimelinePadding/TimelineContent/TimelineScroll"]
+[node name="LeagueFixtureRows" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/LeagueTimelineCard/TimelinePadding/TimelineContent/TimelineScroll"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 8
 
-[node name="ContextCard" type="PanelContainer" parent="RootMargin/Shell/MainColumn/ContentRow"]
+[node name="ContextCard" type="PanelContainer" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow"]
 custom_minimum_size = Vector2(332, 0)
 layout_mode = 2
 
-[node name="ContextPadding" type="MarginContainer" parent="RootMargin/Shell/MainColumn/ContentRow/ContextCard"]
+[node name="ContextPadding" type="MarginContainer" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ContextCard"]
 layout_mode = 2
 theme_override_constants/margin_left = 20
 theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 20
 theme_override_constants/margin_bottom = 20
 
-[node name="ContextContent" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/ContentRow/ContextCard/ContextPadding"]
+[node name="ContextContent" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ContextCard/ContextPadding"]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="ContextHeading" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent"]
+[node name="ContextHeading" type="Label" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ContextCard/ContextPadding/ContextContent"]
 layout_mode = 2
 text = "Next Fixture Brief"
 
-[node name="ContextHintLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent"]
+[node name="ContextHintLabel" type="Label" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ContextCard/ContextPadding/ContextContent"]
 layout_mode = 2
 text = "Quick context for the next decision."
 autowrap_mode = 3
 
-[node name="NextFixtureLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent"]
+[node name="NextFixtureLabel" type="Label" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ContextCard/ContextPadding/ContextContent"]
 layout_mode = 2
 text = "Next fixture unavailable."
 autowrap_mode = 3
 
-[node name="FormLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent"]
+[node name="FormLabel" type="Label" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ContextCard/ContextPadding/ContextContent"]
 layout_mode = 2
 text = "Form unavailable."
 autowrap_mode = 3
 
-[node name="StatusLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent"]
+[node name="StatusLabel" type="Label" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ContextCard/ContextPadding/ContextContent"]
 layout_mode = 2
 text = "Status unavailable."
 autowrap_mode = 3
 
-[node name="TimelineNoteLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent"]
+[node name="TimelineNoteLabel" type="Label" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ContextCard/ContextPadding/ContextContent"]
 layout_mode = 2
 text = "Fixture note unavailable."
 autowrap_mode = 3

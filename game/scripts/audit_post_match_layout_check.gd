@@ -33,8 +33,8 @@ func _start_flow() -> void:
 func _validate_post_match() -> void:
 	var score := _label_text("RootMargin/MainColumn/HeaderCard/HeaderPadding/HeaderContent/ScoreCard/ScorePadding/ScoreContent/ScoreLabel")
 	var stats := _label_text("RootMargin/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderInfo/StatsLabel")
-	var tactical := _label_text("RootMargin/MainColumn/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/ConsequencesScroll/ConsequencesStack/TacticalLabel")
-	var pressure := _label_text("RootMargin/MainColumn/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/ConsequencesScroll/ConsequencesStack/PressureLabel")
+	var tactical := _label_text("RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/ConsequencesScroll/ConsequencesStack/TacticalLabel")
+	var pressure := _label_text("RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/ConsequencesScroll/ConsequencesStack/PressureLabel")
 	var next_step := _label_text("RootMargin/MainColumn/ActionCard/ActionPadding/ActionContent/NextStepLabel")
 	var continue_hint := _label_text("RootMargin/MainColumn/HeaderCard/HeaderPadding/HeaderContent/ScoreCard/ScorePadding/ScoreContent/ContinueHintLabel")
 
@@ -64,8 +64,8 @@ func _validate_post_match() -> void:
 		_fail("Post-match continue hint was not updated")
 		return
 
-	var consequences_scroll := current_scene.get_node_or_null("RootMargin/MainColumn/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/ConsequencesScroll") as ScrollContainer
-	var events_scroll := current_scene.get_node_or_null("RootMargin/MainColumn/ContentRow/EventsCard/EventsPadding/EventsContent/EventsScroll") as ScrollContainer
+	var consequences_scroll := current_scene.get_node_or_null("RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/ConsequencesScroll") as ScrollContainer
+	var events_scroll := current_scene.get_node_or_null("RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/EventsCard/EventsPadding/EventsContent/EventsScroll") as ScrollContainer
 	if consequences_scroll == null or events_scroll == null:
 		_fail("Scrollable post-match containers are missing")
 		return

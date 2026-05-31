@@ -20,14 +20,6 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.0313726, 0.0470588, 0.0666667, 1)
 
-[node name="TopBand" type="ColorRect" parent="."]
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-anchor_bottom = 0.24
-grow_horizontal = 2
-color = Color(0.0784314, 0.12549, 0.164706, 1)
-
 [node name="RootMargin" type="MarginContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
@@ -204,89 +196,99 @@ layout_mode = 2
 text = "Pressure summary unavailable."
 autowrap_mode = 3
 
-[node name="ContentRow" type="HBoxContainer" parent="RootMargin/MainColumn"]
+[node name="MainScroll" type="ScrollContainer" parent="RootMargin/MainColumn"]
 layout_mode = 2
 size_flags_vertical = 3
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 2
+
+[node name="ScrollContent" type="VBoxContainer" parent="RootMargin/MainColumn/MainScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 14
+
+[node name="ContentRow" type="HBoxContainer" parent="RootMargin/MainColumn/MainScroll/ScrollContent"]
+layout_mode = 2
 theme_override_constants/separation = 18
 
-[node name="ConsequencesCard" type="PanelContainer" parent="RootMargin/MainColumn/ContentRow"]
+[node name="ConsequencesCard" type="PanelContainer" parent="RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="ConsequencesPadding" type="MarginContainer" parent="RootMargin/MainColumn/ContentRow/ConsequencesCard"]
+[node name="ConsequencesPadding" type="MarginContainer" parent="RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ConsequencesCard"]
 layout_mode = 2
 theme_override_constants/margin_left = 22
 theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 22
 theme_override_constants/margin_bottom = 20
 
-[node name="ConsequencesContent" type="VBoxContainer" parent="RootMargin/MainColumn/ContentRow/ConsequencesCard/ConsequencesPadding"]
+[node name="ConsequencesContent" type="VBoxContainer" parent="RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ConsequencesCard/ConsequencesPadding"]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 12
 
-[node name="ConsequencesEyebrow" type="Label" parent="RootMargin/MainColumn/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent"]
+[node name="ConsequencesEyebrow" type="Label" parent="RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent"]
 layout_mode = 2
 text = "WHY IT MATTERS"
 
-[node name="ConsequencesScroll" type="ScrollContainer" parent="RootMargin/MainColumn/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent"]
+[node name="ConsequencesScroll" type="ScrollContainer" parent="RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent"]
 custom_minimum_size = Vector2(0, 300)
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="ConsequencesStack" type="VBoxContainer" parent="RootMargin/MainColumn/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/ConsequencesScroll"]
+[node name="ConsequencesStack" type="VBoxContainer" parent="RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/ConsequencesScroll"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 12
 
-[node name="DeltasLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/ConsequencesScroll/ConsequencesStack"]
+[node name="DeltasLabel" type="Label" parent="RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/ConsequencesScroll/ConsequencesStack"]
 layout_mode = 2
 text = "Morale +0 | Fans +0 | Board +0"
 autowrap_mode = 3
 
-[node name="TableImpactLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/ConsequencesScroll/ConsequencesStack"]
+[node name="TableImpactLabel" type="Label" parent="RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/ConsequencesScroll/ConsequencesStack"]
 layout_mode = 2
 text = "Table impact unavailable."
 autowrap_mode = 3
 
-[node name="TacticalLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/ConsequencesScroll/ConsequencesStack"]
+[node name="TacticalLabel" type="Label" parent="RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/ConsequencesScroll/ConsequencesStack"]
 layout_mode = 2
 text = "Tactical summary unavailable."
 autowrap_mode = 3
 
-[node name="PressureLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/ConsequencesScroll/ConsequencesStack"]
+[node name="PressureLabel" type="Label" parent="RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/ConsequencesScroll/ConsequencesStack"]
 layout_mode = 2
 text = "Pressure summary unavailable."
 autowrap_mode = 3
 
-[node name="EventsCard" type="PanelContainer" parent="RootMargin/MainColumn/ContentRow"]
+[node name="EventsCard" type="PanelContainer" parent="RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow"]
 custom_minimum_size = Vector2(340, 0)
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="EventsPadding" type="MarginContainer" parent="RootMargin/MainColumn/ContentRow/EventsCard"]
+[node name="EventsPadding" type="MarginContainer" parent="RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/EventsCard"]
 layout_mode = 2
 theme_override_constants/margin_left = 22
 theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 22
 theme_override_constants/margin_bottom = 20
 
-[node name="EventsContent" type="VBoxContainer" parent="RootMargin/MainColumn/ContentRow/EventsCard/EventsPadding"]
+[node name="EventsContent" type="VBoxContainer" parent="RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/EventsCard/EventsPadding"]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 12
 
-[node name="EventsEyebrow" type="Label" parent="RootMargin/MainColumn/ContentRow/EventsCard/EventsPadding/EventsContent"]
+[node name="EventsEyebrow" type="Label" parent="RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/EventsCard/EventsPadding/EventsContent"]
 layout_mode = 2
 text = "KEY MOMENTS"
 
-[node name="EventsScroll" type="ScrollContainer" parent="RootMargin/MainColumn/ContentRow/EventsCard/EventsPadding/EventsContent"]
+[node name="EventsScroll" type="ScrollContainer" parent="RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/EventsCard/EventsPadding/EventsContent"]
 custom_minimum_size = Vector2(0, 300)
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="EventsLabel" type="Label" parent="RootMargin/MainColumn/ContentRow/EventsCard/EventsPadding/EventsContent/EventsScroll"]
+[node name="EventsLabel" type="Label" parent="RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/EventsCard/EventsPadding/EventsContent/EventsScroll"]
 custom_minimum_size = Vector2(300, 300)
 layout_mode = 2
 size_flags_horizontal = 3

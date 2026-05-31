@@ -38,7 +38,7 @@ func _process(_delta: float) -> bool:
             _fail("MatchdayScene did not load")
             return false
 
-        var live_button := current_scene.get_node_or_null("RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/StartMatchButton") as Button
+        var live_button := current_scene.get_node_or_null("RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ActionCard/ActionPadding/ActionContent/StartMatchButton") as Button
         if live_button == null:
             _fail("StartMatchButton missing on MatchdayScene")
             return false

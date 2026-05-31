@@ -10,7 +10,7 @@ func _process(_delta: float) -> bool:
 		_start_flow()
 	elif _stage == 1 and _ticks > 2:
 		_validate_squad()
-	elif _stage == 2 and _ticks > 2:
+	elif _stage == 2 and _ticks > 8:
 		_validate_profile()
 
 	return false
@@ -33,8 +33,8 @@ func _start_flow() -> void:
 	_ticks = 0
 
 func _validate_squad() -> void:
-	var detail_meta := _label_text("RootMargin/Shell/MainColumn/ContentRow/DetailCard/DetailPadding/DetailContent/DetailMetaLabel")
-	var profile_hint := _label_text("RootMargin/Shell/MainColumn/ContentRow/DetailCard/DetailPadding/DetailContent/ProfileHintLabel")
+	var detail_meta := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/DetailCard/DetailPadding/DetailContent/DetailMetaLabel")
+	var profile_hint := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/DetailCard/DetailPadding/DetailContent/ProfileHintLabel")
 	for token in ["Profile Confidence:", "Visibility |", "Known:", "Estimated:", "Unknown:", "Tactical fit", "Personality", "Risk:"]:
 		if detail_meta.find("Profile Confidence:") == -1 and token == "Profile Confidence:":
 			_fail("Squad detail meta is missing profile confidence")
@@ -43,7 +43,7 @@ func _validate_squad() -> void:
 			_fail("Squad profile hint missing token %s" % token)
 			return
 
-	var profile_button := current_scene.get_node_or_null("RootMargin/Shell/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/OpenProfileButton") as Button
+	var profile_button := current_scene.get_node_or_null("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ActionCard/ActionPadding/ActionContent/OpenProfileButton") as Button
 	if profile_button == null or profile_button.disabled:
 		_fail("Open profile button unavailable")
 		return
@@ -58,20 +58,32 @@ func _validate_profile() -> void:
 		return
 
 	var status := _label_text("RootMargin/Shell/MainColumn/HeaderCard/HeaderPadding/HeaderContent/StatusLabel")
-	var identity := _label_text("RootMargin/Shell/MainColumn/ContentRow/ProfileCard/ProfilePadding/ProfileContent/IdentityLabel")
-	var role := _label_text("RootMargin/Shell/MainColumn/ContentRow/ProfileCard/ProfilePadding/ProfileContent/RoleLabel")
-	var condition := _label_text("RootMargin/Shell/MainColumn/ContentRow/ProfileCard/ProfilePadding/ProfileContent/ConditionLabel")
-	var pathway := _label_text("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/PathwayLabel")
-	var readiness := _label_text("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/ReadinessLabel")
+	var confidence := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ProfileCard/ProfilePadding/ProfileContent/ProfileConfidenceLabel")
+	var known := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ProfileCard/ProfilePadding/ProfileContent/KnownLabel")
+	var estimated := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ProfileCard/ProfilePadding/ProfileContent/EstimatedLabel")
+	var unknown := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ProfileCard/ProfilePadding/ProfileContent/UnknownLabel")
+	var traits := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ProfileCard/ProfilePadding/ProfileContent/TraitChipsLabel")
+	var role := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ProfileCard/ProfilePadding/ProfileContent/RoleLabel")
+	var condition := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ProfileCard/ProfilePadding/ProfileContent/ConditionLabel")
+	var pathway := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightContent/PathwayLabel")
+	var readiness := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightContent/ReadinessLabel")
 
-	for token in ["Profile Confidence:", "Known:", "Estimated:", "Unknown:", "Visibility |"]:
-		if identity.find(token) == -1:
-			_fail("Player profile identity block missing token %s" % token)
-			return
+	if confidence.find("Profile Confidence:") == -1:
+		_fail("Player profile confidence label missing")
+		return
+	if known.find("Known:") == -1:
+		_fail("Player profile known label missing")
+		return
+	if estimated.find("Estimated:") == -1:
+		_fail("Player profile estimated label missing")
+		return
+	if unknown.find("Unknown:") == -1:
+		_fail("Player profile unknown label missing")
+		return
 
 	for token in ["Tactical fit", "Personality"]:
-		if role.find(token) == -1:
-			_fail("Player profile role block missing token %s" % token)
+		if traits.find(token) == -1:
+			_fail("Player profile trait block missing token %s" % token)
 			return
 
 	if condition.find("Risk:") == -1:

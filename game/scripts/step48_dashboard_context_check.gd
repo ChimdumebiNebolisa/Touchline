@@ -51,10 +51,10 @@ func _validate_dashboard_context() -> void:
     var header_status := current_scene.get_node("RootMargin/Shell/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderStatus/HeaderStatusLabel") as Label
     var next_match_meta := current_scene.get_node("RootMargin/Shell/MainColumn/SummaryGrid/NextMatchCard/CardPadding/CardContent/CardMetaLabel") as Label
     var table_meta := current_scene.get_node("RootMargin/Shell/MainColumn/SummaryGrid/TableCard/CardPadding/CardContent/CardMetaLabel") as Label
-    var pressure_reasons := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/MainStack/LowerRow/PressureCard/PressurePadding/PressureContent/PressureReasonsLabel") as Label
-    var squad_status := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/SquadStatusLabel") as Label
-    var tactics_summary := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/TacticsSummaryLabel") as Label
-    var status_label := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/StatusLabel") as Label
+    var pressure_reasons := current_scene.get_node("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/LowerRow/PressureCard/PressurePadding/PressureContent/PressureReasonsLabel") as Label
+    var squad_status := current_scene.get_node("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent/SquadStatusLabel") as Label
+    var tactics_summary := current_scene.get_node("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent/TacticsSummaryLabel") as Label
+    var status_label := current_scene.get_node("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent/StatusLabel") as Label
 
     if date_label == null or header_status == null or next_match_meta == null or table_meta == null or pressure_reasons == null or squad_status == null or tactics_summary == null or status_label == null:
         _fail("Dashboard context labels are missing")

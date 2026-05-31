@@ -119,30 +119,30 @@ public partial class SquadScreen : Control
         _nextMatchValueLabel = GetNode<Label>("RootMargin/Shell/MainColumn/SummaryGrid/NextMatchCard/CardPadding/CardContent/CardValueLabel");
         _nextMatchMetaLabel = GetNode<Label>("RootMargin/Shell/MainColumn/SummaryGrid/NextMatchCard/CardPadding/CardContent/CardMetaLabel");
 
-        _selectionCard = GetNode<PanelContainer>("RootMargin/Shell/MainColumn/ContentRow/SelectionCard");
-        _positionFilter = GetNode<OptionButton>("RootMargin/Shell/MainColumn/ContentRow/SelectionCard/SelectionPadding/SelectionContent/FilterRow/PositionFilter");
-        _playerRows = GetNode<VBoxContainer>("RootMargin/Shell/MainColumn/ContentRow/SelectionCard/SelectionPadding/SelectionContent/PlayerScroll/PlayerRows");
+        _selectionCard = GetNode<PanelContainer>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/SelectionCard");
+        _positionFilter = GetNode<OptionButton>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/SelectionCard/SelectionPadding/SelectionContent/FilterRow/PositionFilter");
+        _playerRows = GetNode<VBoxContainer>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/SelectionCard/SelectionPadding/SelectionContent/PlayerScroll/PlayerRows");
 
-        _detailCard = GetNode<PanelContainer>("RootMargin/Shell/MainColumn/ContentRow/DetailCard");
-        _playerNameLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/DetailCard/DetailPadding/DetailContent/PlayerNameLabel");
-        _detailMetaLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/DetailCard/DetailPadding/DetailContent/DetailMetaLabel");
-        _roleChip = GetNode<PanelContainer>("RootMargin/Shell/MainColumn/ContentRow/DetailCard/DetailPadding/DetailContent/ChipRow/RoleChip");
-        _roleChipLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/DetailCard/DetailPadding/DetailContent/ChipRow/RoleChip/RoleChipPadding/RoleChipLabel");
-        _statusChip = GetNode<PanelContainer>("RootMargin/Shell/MainColumn/ContentRow/DetailCard/DetailPadding/DetailContent/ChipRow/StatusChip");
-        _statusChipLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/DetailCard/DetailPadding/DetailContent/ChipRow/StatusChip/StatusChipPadding/StatusChipLabel");
-        _formStatLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/DetailCard/DetailPadding/DetailContent/StatsCard/StatsPadding/StatsContent/FormStatLabel");
-        _moraleStatLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/DetailCard/DetailPadding/DetailContent/StatsCard/StatsPadding/StatsContent/MoraleStatLabel");
-        _fitnessStatLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/DetailCard/DetailPadding/DetailContent/StatsCard/StatsPadding/StatsContent/FitnessStatLabel");
-        _readinessSummaryLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/DetailCard/DetailPadding/DetailContent/ReadinessSummaryLabel");
-        _profileHintLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/DetailCard/DetailPadding/DetailContent/ProfileHintLabel");
+        _detailCard = GetNode<PanelContainer>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/DetailCard");
+        _playerNameLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/DetailCard/DetailPadding/DetailContent/PlayerNameLabel");
+        _detailMetaLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/DetailCard/DetailPadding/DetailContent/DetailMetaLabel");
+        _roleChip = GetNode<PanelContainer>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/DetailCard/DetailPadding/DetailContent/ChipRow/RoleChip");
+        _roleChipLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/DetailCard/DetailPadding/DetailContent/ChipRow/RoleChip/RoleChipPadding/RoleChipLabel");
+        _statusChip = GetNode<PanelContainer>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/DetailCard/DetailPadding/DetailContent/ChipRow/StatusChip");
+        _statusChipLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/DetailCard/DetailPadding/DetailContent/ChipRow/StatusChip/StatusChipPadding/StatusChipLabel");
+        _formStatLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/DetailCard/DetailPadding/DetailContent/StatsCard/StatsPadding/StatsContent/FormStatLabel");
+        _moraleStatLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/DetailCard/DetailPadding/DetailContent/StatsCard/StatsPadding/StatsContent/MoraleStatLabel");
+        _fitnessStatLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/DetailCard/DetailPadding/DetailContent/StatsCard/StatsPadding/StatsContent/FitnessStatLabel");
+        _readinessSummaryLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/DetailCard/DetailPadding/DetailContent/ReadinessSummaryLabel");
+        _profileHintLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/DetailCard/DetailPadding/DetailContent/ProfileHintLabel");
 
-        _actionCard = GetNode<PanelContainer>("RootMargin/Shell/MainColumn/ContentRow/ActionCard");
-        _lineupStatusLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/LineupStatusLabel");
-        _squadStatusLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/SquadStatusLabel");
-        _filterStatusLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/FilterStatusLabel");
-        _actionHintLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/ActionHintLabel");
-        _lineupActionButton = GetNode<Button>("RootMargin/Shell/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/LineupActionButton");
-        _openProfileButton = GetNode<Button>("RootMargin/Shell/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/OpenProfileButton");
+        _actionCard = GetNode<PanelContainer>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ActionCard");
+        _lineupStatusLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ActionCard/ActionPadding/ActionContent/LineupStatusLabel");
+        _squadStatusLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ActionCard/ActionPadding/ActionContent/SquadStatusLabel");
+        _filterStatusLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ActionCard/ActionPadding/ActionContent/FilterStatusLabel");
+        _actionHintLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ActionCard/ActionPadding/ActionContent/ActionHintLabel");
+        _lineupActionButton = GetNode<Button>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ActionCard/ActionPadding/ActionContent/LineupActionButton");
+        _openProfileButton = GetNode<Button>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ActionCard/ActionPadding/ActionContent/OpenProfileButton");
     }
 
     private void ApplyShellStyles()
@@ -164,7 +164,7 @@ public partial class SquadScreen : Control
         TouchlineTheme.ApplyPanelVariant(GetNode<PanelContainer>("RootMargin/Shell/MainColumn/SummaryGrid/MoraleCard"), TouchlineSurfaceVariant.Card, 20);
         TouchlineTheme.ApplyPanelVariant(GetNode<PanelContainer>("RootMargin/Shell/MainColumn/SummaryGrid/FitnessCard"), TouchlineSurfaceVariant.Card, 20);
         TouchlineTheme.ApplyPanelVariant(GetNode<PanelContainer>("RootMargin/Shell/MainColumn/SummaryGrid/NextMatchCard"), TouchlineSurfaceVariant.Card, 20);
-        TouchlineTheme.ApplyPanelVariant(GetNode<PanelContainer>("RootMargin/Shell/MainColumn/ContentRow/DetailCard/DetailPadding/DetailContent/StatsCard"), TouchlineSurfaceVariant.Muted, 20);
+        TouchlineTheme.ApplyPanelVariant(GetNode<PanelContainer>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/DetailCard/DetailPadding/DetailContent/StatsCard"), TouchlineSurfaceVariant.Muted, 20);
 
         TouchlineTheme.ApplyRailNavigation(
             _dashboardButton,
@@ -221,11 +221,11 @@ public partial class SquadScreen : Control
         TouchlineTheme.ApplyEyebrowStyle(GetNode<Label>("RootMargin/Shell/MainColumn/SummaryGrid/MoraleCard/CardPadding/CardContent/CardEyebrow"));
         TouchlineTheme.ApplyEyebrowStyle(GetNode<Label>("RootMargin/Shell/MainColumn/SummaryGrid/FitnessCard/CardPadding/CardContent/CardEyebrow"));
         TouchlineTheme.ApplyEyebrowStyle(GetNode<Label>("RootMargin/Shell/MainColumn/SummaryGrid/NextMatchCard/CardPadding/CardContent/CardEyebrow"));
-        TouchlineTheme.ApplyTitleStyle(GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/SelectionCard/SelectionPadding/SelectionContent/SelectionHeading"), 24);
-        TouchlineTheme.ApplyMutedStyle(GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/SelectionCard/SelectionPadding/SelectionContent/SelectionHintLabel"), 14);
-        TouchlineTheme.ApplyMutedStyle(GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/SelectionCard/SelectionPadding/SelectionContent/FilterRow/FilterLabel"), 14);
-        TouchlineTheme.ApplyTitleStyle(GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/DetailCard/DetailPadding/DetailContent/DetailHeading"), 20);
-        TouchlineTheme.ApplyMutedStyle(GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/ActionHeading"), 18);
+        TouchlineTheme.ApplyTitleStyle(GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/SelectionCard/SelectionPadding/SelectionContent/SelectionHeading"), 24);
+        TouchlineTheme.ApplyMutedStyle(GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/SelectionCard/SelectionPadding/SelectionContent/SelectionHintLabel"), 14);
+        TouchlineTheme.ApplyMutedStyle(GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/SelectionCard/SelectionPadding/SelectionContent/FilterRow/FilterLabel"), 14);
+        TouchlineTheme.ApplyTitleStyle(GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/DetailCard/DetailPadding/DetailContent/DetailHeading"), 20);
+        TouchlineTheme.ApplyMutedStyle(GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ActionCard/ActionPadding/ActionContent/ActionHeading"), 18);
     }
 
     private void RenderState()

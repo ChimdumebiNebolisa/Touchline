@@ -97,13 +97,13 @@ public partial class StandingsScreen : Control
         _nextMatchValueLabel = GetNode<Label>("RootMargin/Shell/MainColumn/SummaryGrid/NextMatchCard/CardPadding/CardContent/CardValueLabel");
         _nextMatchMetaLabel = GetNode<Label>("RootMargin/Shell/MainColumn/SummaryGrid/NextMatchCard/CardPadding/CardContent/CardMetaLabel");
 
-        _tableCard = GetNode<PanelContainer>("RootMargin/Shell/MainColumn/ContentRow/TableCard");
-        _tableRows = GetNode<VBoxContainer>("RootMargin/Shell/MainColumn/ContentRow/TableCard/TablePadding/TableContent/TableScroll/TableRows");
-        _contextCard = GetNode<PanelContainer>("RootMargin/Shell/MainColumn/ContentRow/ContextCard");
-        _clubSummaryLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent/ClubSummaryLabel");
-        _formLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent/FormLabel");
-        _nextFixtureLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent/NextFixtureLabel");
-        _tableNoteLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent/TableNoteLabel");
+        _tableCard = GetNode<PanelContainer>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/TableCard");
+        _tableRows = GetNode<VBoxContainer>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/TableCard/TablePadding/TableContent/TableScroll/TableRows");
+        _contextCard = GetNode<PanelContainer>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ContextCard");
+        _clubSummaryLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ContextCard/ContextPadding/ContextContent/ClubSummaryLabel");
+        _formLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ContextCard/ContextPadding/ContextContent/FormLabel");
+        _nextFixtureLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ContextCard/ContextPadding/ContextContent/NextFixtureLabel");
+        _tableNoteLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ContextCard/ContextPadding/ContextContent/TableNoteLabel");
     }
 
     private void ApplyShellStyles()
@@ -167,23 +167,23 @@ public partial class StandingsScreen : Control
         TouchlineTheme.ApplyEyebrowStyle(GetNode<Label>("RootMargin/Shell/MainColumn/SummaryGrid/GoalDifferenceCard/CardPadding/CardContent/CardEyebrow"));
         TouchlineTheme.ApplyEyebrowStyle(GetNode<Label>("RootMargin/Shell/MainColumn/SummaryGrid/PaceCard/CardPadding/CardContent/CardEyebrow"));
         TouchlineTheme.ApplyEyebrowStyle(GetNode<Label>("RootMargin/Shell/MainColumn/SummaryGrid/NextMatchCard/CardPadding/CardContent/CardEyebrow"));
-        TouchlineTheme.ApplyTitleStyle(GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/TableCard/TablePadding/TableContent/TableHeading"), 24);
-        TouchlineTheme.ApplyMutedStyle(GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/TableCard/TablePadding/TableContent/TableHintLabel"), 14);
-        TouchlineTheme.ApplyMutedStyle(GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent/ContextHeading"), 18);
-        TouchlineTheme.ApplyMutedStyle(GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent/ContextHintLabel"), 14);
+        TouchlineTheme.ApplyTitleStyle(GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/TableCard/TablePadding/TableContent/TableHeading"), 24);
+        TouchlineTheme.ApplyMutedStyle(GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/TableCard/TablePadding/TableContent/TableHintLabel"), 14);
+        TouchlineTheme.ApplyMutedStyle(GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ContextCard/ContextPadding/ContextContent/ContextHeading"), 18);
+        TouchlineTheme.ApplyMutedStyle(GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ContextCard/ContextPadding/ContextContent/ContextHintLabel"), 14);
 
         var headerCells = new[]
         {
-            "RootMargin/Shell/MainColumn/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow/PosHeader",
-            "RootMargin/Shell/MainColumn/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow/ClubHeader",
-            "RootMargin/Shell/MainColumn/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow/PHeader",
-            "RootMargin/Shell/MainColumn/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow/WHeader",
-            "RootMargin/Shell/MainColumn/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow/DHeader",
-            "RootMargin/Shell/MainColumn/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow/LHeader",
-            "RootMargin/Shell/MainColumn/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow/GFHeader",
-            "RootMargin/Shell/MainColumn/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow/GAHeader",
-            "RootMargin/Shell/MainColumn/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow/GDHeader",
-            "RootMargin/Shell/MainColumn/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow/PtsHeader"
+            "RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow/PosHeader",
+            "RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow/ClubHeader",
+            "RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow/PHeader",
+            "RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow/WHeader",
+            "RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow/DHeader",
+            "RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow/LHeader",
+            "RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow/GFHeader",
+            "RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow/GAHeader",
+            "RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow/GDHeader",
+            "RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow/PtsHeader"
         };
 
         foreach (var path in headerCells)

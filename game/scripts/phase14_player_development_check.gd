@@ -59,7 +59,7 @@ func _process(_delta: float) -> bool:
         _fail("PlayerProfile did not load")
         return false
 
-    var pathway_label := current_scene.get_node_or_null("RootMargin/Shell/MainColumn/ContentRow/DetailCard/DetailPadding/DetailContent/PathwayLabel")
+    var pathway_label := current_scene.get_node_or_null("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/DetailCard/DetailPadding/DetailContent/PathwayLabel")
     if pathway_label == null:
         _fail("PlayerProfile pathway label is missing")
         return false

@@ -2,45 +2,50 @@
 
 ## Bottom line
 
-**Green.**
+**Yellow — layout rebuild landed; refresh desktop PNGs to claim Green.**
 
-Windows native desktop capture confirms the UI/UX polish pass on real hardware. All 35 verified screenshots pass scene/nav/anchor gates with 29 unique hashes and zero mislabeled cross-screen duplicates. The Cloud Agent's Yellow verdict was driven by Linux llvmpipe instability and missing local proof — not by open P1 UI defects.
+The prior **Green** verdict reflected passing headless/token checks and old screenshots, not viewport-bounded card layout at 1280×720. This pass rebuilt the presentation layer (scroll regions, dashboard sections, player partial-info rows). Headless gates pass; **visual Green requires a new `active_desktop_playtest.py` capture** showing card hierarchy instead of debug-style label dumps.
 
-## What Windows local capture proved
+## What changed in the UI rebuild
 
-- Native Windows Godot GUI runs the full active-playtest matrix without llvmpipe SIGSEGV.
-- Viewport PNG capture via `AuditCommandBridge` produces distinct, correctly labeled evidence per role and screen.
-- Club selection is now visually evidenced (`manager-club-selection.png`) via New Career → CareerSetup → ChooseClub.
-- Live-match pacing is evidenced by a timed screenshot sequence (kickoff, mid-match, full-time) plus post-match follow-through.
-- Sidebar active-route, post-match layout, slot cards, dashboard copy, and partial player information all look correct on Windows PNGs.
+- Shared UI kit under `game/scripts/ui/` and reference shell `game/scenes/ui/TouchlineManagementShell.tscn`
+- `MainScroll` on management screens; `FormScroll` on career setup; `InsightScroll` on dashboard notes
+- Dashboard summary grid (3 columns) fixed above scrollable detail
+- Player profile: dedicated Profile Confidence / Known / Estimated / Unknown labels
+- Post-match: scrollable consequences + pinned Continue action card
+- Narrower nav rail (220px); removed decorative full-screen bands on main menu / dashboard / post-match
 
-## Screenshot reliability
+## Headless verification (post-rebuild)
 
-| Metric | Cloud after polish | Windows local |
-|---|---:|---:|
-| Screenshot count | 34 | 35 |
-| Unique hashes | 28 | 29 |
-| Mislabeled screenshots | 0 | 0 |
-| Role-specific captures | Yes | Yes |
-| Training/scouting captures | Yes | Yes |
-| Recruitment/job-market captures | Yes | Yes |
-| Video captured | No | No |
+| Check | Result |
+|-------|--------|
+| `dotnet build game/Touchline.sln` | Pass |
+| `audit_ui_rebuild_layout_check.gd` | Pass |
+| `audit_post_match_layout_check.gd` | Pass |
+| `audit_partial_information_check.gd` | Pass |
+| `audit_sidebar_active_route_check.gd` | Pass |
+| `active_playtest_user_flow_check.gd` | Pass |
+| `step2_career_setup_check.gd` | Pass |
+| `step48_dashboard_context_check.gd` | Pass |
 
-Timed sequence: `docs/audit/active-playtest/screenshots/live_to_post_match_sequence/` (video skipped — no ffmpeg).
+## Screenshot refresh required
+
+Re-run:
+
+```powershell
+python docs/audit/active-playtest/scripts/active_desktop_playtest.py
+```
+
+Validate against `docs/audit/ui-rebuild/screenshot_validation.md`.
 
 ## Remaining UI issues
 
-| Issue | Evidence path | Severity | Fix needed? |
-|---|---|---|---|
-| No true video for live-match pacing | `live_to_post_match_sequence/README.txt` | P3 | No (timed sequence sufficient for now) |
-| Live→post-match not one continuous clip | Same sequence folder | P2 | No for private playtest; add ffmpeg later |
-| Training/recruitment remain dashboard sections | `manager-training-scouting.png`, `manager-recruitment-contracts.png` | P3 | No (foundation depth per PRD) |
-| Minor FORM card text density on player profile | `manager-player-profile.png` | P3 | Optional polish later |
-
-## Final verdict
-
-Touchline is **Green: ready for private human playtest** on Windows. Logic gates pass headlessly; visual evidence is now trustworthy on the target platform. Remaining gaps are motion capture tooling and foundation-depth management screens — not blockers for a focused human UX pass.
+| Issue | Severity | Notes |
+|-------|----------|-------|
+| Desktop PNGs predate layout rebuild | P1 | Re-capture before human playtest sign-off |
+| Training/recruitment remain dashboard sections | P3 | Per PRD foundation scope |
+| No ffmpeg live-match video | P3 | Timed sequence still acceptable |
 
 ## Paste-back summary
 
-Touchline moved from Yellow (Cloud) to Green on Windows. A full native desktop capture run produced 35 verified screenshots (29 unique hashes, zero mislabels) including new club-selection proof and a live-to-post-match timed sequence. All Yellow-audit UI fixes hold: sidebar routing, post-match density, slot cards, dashboard copy, and partial player information. Video was skipped (no ffmpeg); motion is covered by numbered sequence frames. No product code changes were needed beyond small Windows harness anchor fixes. Ready for private human playtest.
+Touchline UI layout was rebuilt from research rules: scroll-safe 1280×720 shells, card-first dashboard, career form scroll, and explicit partial-information rows on player profile. Headless audits pass. Prior Windows Green is revoked until new screenshots prove the layout is designed—not merely documented. See `docs/audit/ui-rebuild/` for plan, report, and validation checklist.

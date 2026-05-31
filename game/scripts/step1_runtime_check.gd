@@ -31,7 +31,7 @@ func _process(_delta: float) -> bool:
             _fail("New Career navigation did not open CareerSetup")
             return false
 
-        var back_button := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/ActionsRow/BackButton") as Button
+        var back_button := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormLayout/FormScroll/FormContent/ActionsRow/BackButton") as Button
         if back_button == null:
             _fail("CareerSetup back button not found")
             return false

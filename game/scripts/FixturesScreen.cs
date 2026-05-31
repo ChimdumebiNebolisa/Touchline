@@ -99,15 +99,15 @@ public partial class FixturesScreen : Control
         _tableValueLabel = GetNode<Label>("RootMargin/Shell/MainColumn/SummaryGrid/TableCard/CardPadding/CardContent/CardValueLabel");
         _tableMetaLabel = GetNode<Label>("RootMargin/Shell/MainColumn/SummaryGrid/TableCard/CardPadding/CardContent/CardMetaLabel");
 
-        _clubTimelineCard = GetNode<PanelContainer>("RootMargin/Shell/MainColumn/ContentRow/MainStack/ClubTimelineCard");
-        _clubFixtureRows = GetNode<VBoxContainer>("RootMargin/Shell/MainColumn/ContentRow/MainStack/ClubTimelineCard/TimelinePadding/TimelineContent/TimelineScroll/ClubFixtureRows");
-        _leagueTimelineCard = GetNode<PanelContainer>("RootMargin/Shell/MainColumn/ContentRow/MainStack/LeagueTimelineCard");
-        _leagueFixtureRows = GetNode<VBoxContainer>("RootMargin/Shell/MainColumn/ContentRow/MainStack/LeagueTimelineCard/TimelinePadding/TimelineContent/TimelineScroll/LeagueFixtureRows");
-        _contextCard = GetNode<PanelContainer>("RootMargin/Shell/MainColumn/ContentRow/ContextCard");
-        _nextFixtureLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent/NextFixtureLabel");
-        _formLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent/FormLabel");
-        _statusLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent/StatusLabel");
-        _timelineNoteLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent/TimelineNoteLabel");
+        _clubTimelineCard = GetNode<PanelContainer>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/ClubTimelineCard");
+        _clubFixtureRows = GetNode<VBoxContainer>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/ClubTimelineCard/TimelinePadding/TimelineContent/TimelineScroll/ClubFixtureRows");
+        _leagueTimelineCard = GetNode<PanelContainer>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/LeagueTimelineCard");
+        _leagueFixtureRows = GetNode<VBoxContainer>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/LeagueTimelineCard/TimelinePadding/TimelineContent/TimelineScroll/LeagueFixtureRows");
+        _contextCard = GetNode<PanelContainer>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ContextCard");
+        _nextFixtureLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ContextCard/ContextPadding/ContextContent/NextFixtureLabel");
+        _formLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ContextCard/ContextPadding/ContextContent/FormLabel");
+        _statusLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ContextCard/ContextPadding/ContextContent/StatusLabel");
+        _timelineNoteLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ContextCard/ContextPadding/ContextContent/TimelineNoteLabel");
     }
 
     private void ApplyShellStyles()
@@ -172,12 +172,12 @@ public partial class FixturesScreen : Control
         TouchlineTheme.ApplyEyebrowStyle(GetNode<Label>("RootMargin/Shell/MainColumn/SummaryGrid/SeasonCard/CardPadding/CardContent/CardEyebrow"));
         TouchlineTheme.ApplyEyebrowStyle(GetNode<Label>("RootMargin/Shell/MainColumn/SummaryGrid/FormCard/CardPadding/CardContent/CardEyebrow"));
         TouchlineTheme.ApplyEyebrowStyle(GetNode<Label>("RootMargin/Shell/MainColumn/SummaryGrid/TableCard/CardPadding/CardContent/CardEyebrow"));
-        TouchlineTheme.ApplyTitleStyle(GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/MainStack/ClubTimelineCard/TimelinePadding/TimelineContent/TimelineHeading"), 24);
-        TouchlineTheme.ApplyMutedStyle(GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/MainStack/ClubTimelineCard/TimelinePadding/TimelineContent/TimelineHintLabel"), 14);
-        TouchlineTheme.ApplyTitleStyle(GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/MainStack/LeagueTimelineCard/TimelinePadding/TimelineContent/TimelineHeading"), 22);
-        TouchlineTheme.ApplyMutedStyle(GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/MainStack/LeagueTimelineCard/TimelinePadding/TimelineContent/TimelineHintLabel"), 14);
-        TouchlineTheme.ApplyMutedStyle(GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent/ContextHeading"), 18);
-        TouchlineTheme.ApplyMutedStyle(GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent/ContextHintLabel"), 14);
+        TouchlineTheme.ApplyTitleStyle(GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/ClubTimelineCard/TimelinePadding/TimelineContent/TimelineHeading"), 24);
+        TouchlineTheme.ApplyMutedStyle(GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/ClubTimelineCard/TimelinePadding/TimelineContent/TimelineHintLabel"), 14);
+        TouchlineTheme.ApplyTitleStyle(GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/LeagueTimelineCard/TimelinePadding/TimelineContent/TimelineHeading"), 22);
+        TouchlineTheme.ApplyMutedStyle(GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/LeagueTimelineCard/TimelinePadding/TimelineContent/TimelineHintLabel"), 14);
+        TouchlineTheme.ApplyMutedStyle(GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ContextCard/ContextPadding/ContextContent/ContextHeading"), 18);
+        TouchlineTheme.ApplyMutedStyle(GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ContextCard/ContextPadding/ContextContent/ContextHintLabel"), 14);
     }
 
     private void RenderState()

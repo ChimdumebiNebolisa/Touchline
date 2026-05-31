@@ -28,20 +28,20 @@ func _start_flow() -> void:
     _ticks = 0
 
 func _validate_squad() -> void:
-    var heading := _label_text("RootMargin/Shell/MainColumn/ContentRow/SelectionCard/SelectionPadding/SelectionContent/SelectionHeading")
+    var heading := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/SelectionCard/SelectionPadding/SelectionContent/SelectionHeading")
     if heading.find("Starting XI") == -1 or heading.find("Bench") == -1 or heading.find("Reserves") == -1:
         _fail("Team sheet heading does not separate XI, bench, reserves")
         return
 
-    var rows := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/SelectionCard/SelectionPadding/SelectionContent/PlayerScroll/PlayerRows")
+    var rows := current_scene.get_node("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/SelectionCard/SelectionPadding/SelectionContent/PlayerScroll/PlayerRows")
     var row_text := _collect_text(rows)
     for token in ["Starting XI", "Bench", "Reserves", "STARTING XI", "BENCH/RESERVE", "Form", "Morale", "Fitness"]:
         if row_text.find(token) == -1:
             _fail("Team sheet rows missing token %s" % token)
             return
 
-    _selected_player = _label_text("RootMargin/Shell/MainColumn/ContentRow/DetailCard/DetailPadding/DetailContent/PlayerNameLabel")
-    var profile_button := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/OpenProfileButton") as Button
+    _selected_player = _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/DetailCard/DetailPadding/DetailContent/PlayerNameLabel")
+    var profile_button := current_scene.get_node("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ActionCard/ActionPadding/ActionContent/OpenProfileButton") as Button
     if profile_button == null or profile_button.disabled:
         _fail("Open profile button unavailable")
         return
@@ -58,9 +58,10 @@ func _validate_profile() -> void:
     var title := _label_text("RootMargin/Shell/MainColumn/HeaderCard/HeaderPadding/HeaderContent/PageTitleLabel")
     var status := _label_text("RootMargin/Shell/MainColumn/HeaderCard/HeaderPadding/HeaderContent/StatusLabel")
     var club_context := _label_text("RootMargin/Shell/ContextColumn/ContextCard/ContextPadding/ContextContent/ClubContextLabel")
-    var identity := _label_text("RootMargin/Shell/MainColumn/ContentRow/ProfileCard/ProfilePadding/ProfileContent/IdentityLabel")
-    var role := _label_text("RootMargin/Shell/MainColumn/ContentRow/ProfileCard/ProfilePadding/ProfileContent/RoleLabel")
-    var condition := _label_text("RootMargin/Shell/MainColumn/ContentRow/ProfileCard/ProfilePadding/ProfileContent/ConditionLabel")
+    var confidence := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ProfileCard/ProfilePadding/ProfileContent/ProfileConfidenceLabel")
+    var known := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ProfileCard/ProfilePadding/ProfileContent/KnownLabel")
+    var role := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ProfileCard/ProfilePadding/ProfileContent/RoleLabel")
+    var condition := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ProfileCard/ProfilePadding/ProfileContent/ConditionLabel")
 
     if title != _selected_player:
         _fail("Player dossier title did not bind selected player")
@@ -71,12 +72,12 @@ func _validate_profile() -> void:
             _fail("Player dossier status missing %s" % token)
             return
 
-    if club_context.find("Squad status") == -1 or identity.find("Player dossier") == -1 or role.find("Squad status") == -1:
-        _fail("Player dossier identity/status copy missing")
+    if club_context.find("Squad status") == -1 or confidence.find("Profile Confidence:") == -1 or known.find("Known:") == -1:
+        _fail("Player dossier partial-information copy missing")
         return
 
-    if condition.find("Match sharpness") == -1:
-        _fail("Player dossier condition row is not football-framed")
+    if role.find("Role |") == -1 or condition.find("Fitness") == -1:
+        _fail("Player dossier role/condition row is incomplete")
         return
 
     print("STEP62_SQUAD_PROFILE_LAYOUT_PASS")

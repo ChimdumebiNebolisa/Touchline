@@ -18,7 +18,7 @@ func _process(_delta: float) -> bool:
 
 	if _stage == 0 and _ticks > 2:
 		_start_flow()
-	elif _stage == 1 and _ticks > 2:
+	elif _stage == 1 and _ticks > 8:
 		_validate_scene()
 
 	return false

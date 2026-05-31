@@ -58,8 +58,8 @@ func _process(_delta: float) -> bool:
         _fail("ClubDashboard did not load")
         return false
 
-    var youth_label := current_scene.get_node_or_null("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/YouthAcademyLabel")
-    var youth_button := current_scene.get_node_or_null("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/YouthAcademyButton")
+    var youth_label := current_scene.get_node_or_null("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent/YouthAcademyLabel")
+    var youth_button := current_scene.get_node_or_null("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent/YouthAcademyButton")
     if youth_label == null or youth_button == null:
         _fail("Dashboard youth academy controls are missing")
         return false

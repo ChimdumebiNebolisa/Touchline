@@ -47,19 +47,19 @@ func _validate_squad_screen() -> void:
         _fail("SquadScreen did not load")
         return
 
-    var heading := _label_text("RootMargin/Shell/MainColumn/ContentRow/SelectionCard/SelectionPadding/SelectionContent/SelectionHeading")
-    var hint := _label_text("RootMargin/Shell/MainColumn/ContentRow/SelectionCard/SelectionPadding/SelectionContent/SelectionHintLabel")
+    var heading := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/SelectionCard/SelectionPadding/SelectionContent/SelectionHeading")
+    var hint := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/SelectionCard/SelectionPadding/SelectionContent/SelectionHintLabel")
     var header_status := _label_text("RootMargin/Shell/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderStatus/HeaderStatusLabel")
     var starters_meta := _label_text("RootMargin/Shell/MainColumn/SummaryGrid/StartersCard/CardPadding/CardContent/CardMetaLabel")
     var bench_meta := _label_text("RootMargin/Shell/MainColumn/SummaryGrid/BenchCard/CardPadding/CardContent/CardMetaLabel")
-    var role_chip := _label_text("RootMargin/Shell/MainColumn/ContentRow/DetailCard/DetailPadding/DetailContent/ChipRow/RoleChip/RoleChipPadding/RoleChipLabel")
-    var form_stat := _label_text("RootMargin/Shell/MainColumn/ContentRow/DetailCard/DetailPadding/DetailContent/StatsCard/StatsPadding/StatsContent/FormStatLabel")
-    var morale_stat := _label_text("RootMargin/Shell/MainColumn/ContentRow/DetailCard/DetailPadding/DetailContent/StatsCard/StatsPadding/StatsContent/MoraleStatLabel")
-    var fitness_stat := _label_text("RootMargin/Shell/MainColumn/ContentRow/DetailCard/DetailPadding/DetailContent/StatsCard/StatsPadding/StatsContent/FitnessStatLabel")
-    var readiness := _label_text("RootMargin/Shell/MainColumn/ContentRow/DetailCard/DetailPadding/DetailContent/ReadinessSummaryLabel")
-    var profile_hint := _label_text("RootMargin/Shell/MainColumn/ContentRow/DetailCard/DetailPadding/DetailContent/ProfileHintLabel")
-    var squad_status := _label_text("RootMargin/Shell/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/SquadStatusLabel")
-    var player_name := _label_text("RootMargin/Shell/MainColumn/ContentRow/DetailCard/DetailPadding/DetailContent/PlayerNameLabel")
+    var role_chip := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/DetailCard/DetailPadding/DetailContent/ChipRow/RoleChip/RoleChipPadding/RoleChipLabel")
+    var form_stat := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/DetailCard/DetailPadding/DetailContent/StatsCard/StatsPadding/StatsContent/FormStatLabel")
+    var morale_stat := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/DetailCard/DetailPadding/DetailContent/StatsCard/StatsPadding/StatsContent/MoraleStatLabel")
+    var fitness_stat := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/DetailCard/DetailPadding/DetailContent/StatsCard/StatsPadding/StatsContent/FitnessStatLabel")
+    var readiness := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/DetailCard/DetailPadding/DetailContent/ReadinessSummaryLabel")
+    var profile_hint := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/DetailCard/DetailPadding/DetailContent/ProfileHintLabel")
+    var squad_status := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ActionCard/ActionPadding/ActionContent/SquadStatusLabel")
+    var player_name := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/DetailCard/DetailPadding/DetailContent/PlayerNameLabel")
     var starters_value := _label_text("RootMargin/Shell/MainColumn/SummaryGrid/StartersCard/CardPadding/CardContent/CardValueLabel")
 
     if heading.find("Starting XI") == -1 or heading.find("Bench") == -1 or heading.find("Reserves") == -1:
@@ -83,7 +83,7 @@ func _validate_squad_screen() -> void:
         _fail("Squad summary cards do not label starters and bench/reserves")
         return
 
-    var rows := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/SelectionCard/SelectionPadding/SelectionContent/PlayerScroll/PlayerRows")
+    var rows := current_scene.get_node("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/SelectionCard/SelectionPadding/SelectionContent/PlayerScroll/PlayerRows")
     var row_text := _collect_text(rows)
     if row_text.find("STARTING XI") == -1 or row_text.find("BENCH/RESERVE") == -1 or row_text.find("Reserves") == -1:
         _fail("Player rows do not show Starting XI, bench/reserve labels, and reserve section")
@@ -105,7 +105,7 @@ func _validate_squad_screen() -> void:
         _fail("Selected player detail does not expose explicit partial-information cues")
         return
 
-    var action_button := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/LineupActionButton") as Button
+    var action_button := current_scene.get_node("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ActionCard/ActionPadding/ActionContent/LineupActionButton") as Button
     if action_button == null or action_button.disabled:
         _fail("Lineup action button is not available")
         return
@@ -123,12 +123,12 @@ func _validate_squad_screen() -> void:
         _fail("Lineup action changed the total starting count")
         return
 
-    var role_after := _label_text("RootMargin/Shell/MainColumn/ContentRow/DetailCard/DetailPadding/DetailContent/ChipRow/RoleChip/RoleChipPadding/RoleChipLabel")
+    var role_after := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/DetailCard/DetailPadding/DetailContent/ChipRow/RoleChip/RoleChipPadding/RoleChipLabel")
     if role_after.find("BENCH/RESERVE") == -1:
         _fail("Lineup action did not move the selected starter into bench/reserve status: %s" % role_after)
         return
 
-    var profile_button := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/OpenProfileButton") as Button
+    var profile_button := current_scene.get_node("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ActionCard/ActionPadding/ActionContent/OpenProfileButton") as Button
     if profile_button == null or profile_button.disabled:
         _fail("Profile handoff button is unavailable after lineup action")
         return
@@ -146,11 +146,14 @@ func _validate_player_profile() -> void:
     var status := _label_text("RootMargin/Shell/MainColumn/HeaderCard/HeaderPadding/HeaderContent/StatusLabel")
     var role_chip := _label_text("RootMargin/Shell/ContextColumn/ContextCard/ContextPadding/ContextContent/RoleChip/RoleChipPadding/RoleChipLabel")
     var club_context := _label_text("RootMargin/Shell/ContextColumn/ContextCard/ContextPadding/ContextContent/ClubContextLabel")
-    var identity := _label_text("RootMargin/Shell/MainColumn/ContentRow/ProfileCard/ProfilePadding/ProfileContent/IdentityLabel")
-    var role := _label_text("RootMargin/Shell/MainColumn/ContentRow/ProfileCard/ProfilePadding/ProfileContent/RoleLabel")
-    var condition := _label_text("RootMargin/Shell/MainColumn/ContentRow/ProfileCard/ProfilePadding/ProfileContent/ConditionLabel")
-    var pathway := _label_text("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/PathwayLabel")
-    var readiness := _label_text("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/ReadinessLabel")
+    var confidence := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ProfileCard/ProfilePadding/ProfileContent/ProfileConfidenceLabel")
+    var known := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ProfileCard/ProfilePadding/ProfileContent/KnownLabel")
+    var estimated := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ProfileCard/ProfilePadding/ProfileContent/EstimatedLabel")
+    var unknown := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ProfileCard/ProfilePadding/ProfileContent/UnknownLabel")
+    var role := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ProfileCard/ProfilePadding/ProfileContent/RoleLabel")
+    var condition := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ProfileCard/ProfilePadding/ProfileContent/ConditionLabel")
+    var pathway := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightContent/PathwayLabel")
+    var readiness := _label_text("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightContent/ReadinessLabel")
 
     if title != _selected_player:
         _fail("PlayerProfile did not bind the selected player identity")
@@ -164,8 +167,12 @@ func _validate_player_profile() -> void:
         _fail("PlayerProfile does not expose squad status after lineup action")
         return
 
-    if identity.find("Player dossier") == -1 or identity.find("Profile Confidence:") == -1 or role.find("Role view") == -1 or role.find("Tactical fit") == -1:
-        _fail("PlayerProfile identity or role summary is incomplete")
+    if confidence.find("Profile Confidence:") == -1 or known.find("Known:") == -1 or estimated.find("Estimated:") == -1 or unknown.find("Unknown:") == -1:
+        _fail("PlayerProfile partial-information blocks are incomplete")
+        return
+
+    if role.find("Role |") == -1:
+        _fail("PlayerProfile role summary is incomplete")
         return
 
     if condition.find("Fitness") == -1 or condition.find("Morale") == -1 or condition.find("Form") == -1:

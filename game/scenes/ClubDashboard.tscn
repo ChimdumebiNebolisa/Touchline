@@ -20,25 +20,6 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.0313726, 0.0509804, 0.0666667, 1)
 
-[node name="TopBand" type="ColorRect" parent="."]
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-anchor_bottom = 0.26
-grow_horizontal = 2
-color = Color(0.0509804, 0.0862745, 0.117647, 1)
-
-[node name="RightWash" type="ColorRect" parent="."]
-layout_mode = 1
-anchors_preset = 9
-anchor_left = 0.7
-anchor_top = 0.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0.0392157, 0.0666667, 0.0901961, 0.55)
-
 [node name="RootMargin" type="MarginContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
@@ -56,7 +37,7 @@ layout_mode = 2
 theme_override_constants/separation = 18
 
 [node name="RailCard" type="PanelContainer" parent="RootMargin/Shell"]
-custom_minimum_size = Vector2(272, 0)
+custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
 
 [node name="RailPadding" type="MarginContainer" parent="RootMargin/Shell/RailCard"]
@@ -285,7 +266,7 @@ autowrap_mode = 3
 
 [node name="SummaryGrid" type="GridContainer" parent="RootMargin/Shell/MainColumn"]
 layout_mode = 2
-columns = 5
+columns = 3
 theme_override_constants/h_separation = 14
 theme_override_constants/v_separation = 14
 
@@ -424,157 +405,174 @@ layout_mode = 2
 text = "Tactics unavailable."
 autowrap_mode = 3
 
-[node name="ContentRow" type="HBoxContainer" parent="RootMargin/Shell/MainColumn"]
+[node name="MainScroll" type="ScrollContainer" parent="RootMargin/Shell/MainColumn"]
 layout_mode = 2
 size_flags_vertical = 3
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 2
+
+[node name="ScrollContent" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/MainScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 14
+
+[node name="ContentRow" type="HBoxContainer" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent"]
+layout_mode = 2
 theme_override_constants/separation = 18
 
-[node name="MainStack" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/ContentRow"]
+[node name="MainStack" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 18
 
-[node name="FocusCard" type="PanelContainer" parent="RootMargin/Shell/MainColumn/ContentRow/MainStack"]
+[node name="FocusCard" type="PanelContainer" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="FocusPadding" type="MarginContainer" parent="RootMargin/Shell/MainColumn/ContentRow/MainStack/FocusCard"]
+[node name="FocusPadding" type="MarginContainer" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/FocusCard"]
 layout_mode = 2
 theme_override_constants/margin_left = 22
 theme_override_constants/margin_top = 22
 theme_override_constants/margin_right = 22
 theme_override_constants/margin_bottom = 22
 
-[node name="FocusContent" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/ContentRow/MainStack/FocusCard/FocusPadding"]
+[node name="FocusContent" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/FocusCard/FocusPadding"]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="FocusEyebrow" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/MainStack/FocusCard/FocusPadding/FocusContent"]
+[node name="FocusEyebrow" type="Label" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/FocusCard/FocusPadding/FocusContent"]
 layout_mode = 2
 text = "MANAGER BRIEF"
 
-[node name="FixturePreviewLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/MainStack/FocusCard/FocusPadding/FocusContent"]
+[node name="FixturePreviewLabel" type="Label" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/FocusCard/FocusPadding/FocusContent"]
 layout_mode = 2
 text = "Fixture unavailable."
 theme_override_font_sizes/font_size = 28
 autowrap_mode = 3
 
-[node name="FocusContextLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/MainStack/FocusCard/FocusPadding/FocusContent"]
+[node name="FocusContextLabel" type="Label" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/FocusCard/FocusPadding/FocusContent"]
 layout_mode = 2
 text = "Context unavailable."
 autowrap_mode = 3
 
-[node name="RecommendedMoveLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/MainStack/FocusCard/FocusPadding/FocusContent"]
+[node name="RecommendedMoveLabel" type="Label" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/FocusCard/FocusPadding/FocusContent"]
 layout_mode = 2
 text = "Recommendation unavailable."
 autowrap_mode = 3
 
-[node name="ActionHintLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/MainStack/FocusCard/FocusPadding/FocusContent"]
+[node name="ActionHintLabel" type="Label" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/FocusCard/FocusPadding/FocusContent"]
 layout_mode = 2
 text = "Action hint unavailable."
 autowrap_mode = 3
 
-[node name="LowerRow" type="HBoxContainer" parent="RootMargin/Shell/MainColumn/ContentRow/MainStack"]
+[node name="LowerRow" type="HBoxContainer" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack"]
 layout_mode = 2
 theme_override_constants/separation = 18
 
-[node name="MomentumCard" type="PanelContainer" parent="RootMargin/Shell/MainColumn/ContentRow/MainStack/LowerRow"]
+[node name="MomentumCard" type="PanelContainer" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/LowerRow"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="MomentumPadding" type="MarginContainer" parent="RootMargin/Shell/MainColumn/ContentRow/MainStack/LowerRow/MomentumCard"]
+[node name="MomentumPadding" type="MarginContainer" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/LowerRow/MomentumCard"]
 layout_mode = 2
 theme_override_constants/margin_left = 18
 theme_override_constants/margin_top = 18
 theme_override_constants/margin_right = 18
 theme_override_constants/margin_bottom = 18
 
-[node name="MomentumContent" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/ContentRow/MainStack/LowerRow/MomentumCard/MomentumPadding"]
+[node name="MomentumContent" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/LowerRow/MomentumCard/MomentumPadding"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="MomentumEyebrow" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/MainStack/LowerRow/MomentumCard/MomentumPadding/MomentumContent"]
+[node name="MomentumEyebrow" type="Label" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/LowerRow/MomentumCard/MomentumPadding/MomentumContent"]
 layout_mode = 2
 text = "MOMENTUM"
 
-[node name="FormValueLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/MainStack/LowerRow/MomentumCard/MomentumPadding/MomentumContent"]
+[node name="FormValueLabel" type="Label" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/LowerRow/MomentumCard/MomentumPadding/MomentumContent"]
 layout_mode = 2
 text = "--"
 
-[node name="LastResultLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/MainStack/LowerRow/MomentumCard/MomentumPadding/MomentumContent"]
+[node name="LastResultLabel" type="Label" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/LowerRow/MomentumCard/MomentumPadding/MomentumContent"]
 layout_mode = 2
 text = "Result unavailable."
 autowrap_mode = 3
 
-[node name="TableImpactLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/MainStack/LowerRow/MomentumCard/MomentumPadding/MomentumContent"]
+[node name="TableImpactLabel" type="Label" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/LowerRow/MomentumCard/MomentumPadding/MomentumContent"]
 layout_mode = 2
 text = "Table impact unavailable."
 autowrap_mode = 3
 
-[node name="PressureCard" type="PanelContainer" parent="RootMargin/Shell/MainColumn/ContentRow/MainStack/LowerRow"]
+[node name="PressureCard" type="PanelContainer" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/LowerRow"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="PressurePadding" type="MarginContainer" parent="RootMargin/Shell/MainColumn/ContentRow/MainStack/LowerRow/PressureCard"]
+[node name="PressurePadding" type="MarginContainer" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/LowerRow/PressureCard"]
 layout_mode = 2
 theme_override_constants/margin_left = 18
 theme_override_constants/margin_top = 18
 theme_override_constants/margin_right = 18
 theme_override_constants/margin_bottom = 18
 
-[node name="PressureContent" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/ContentRow/MainStack/LowerRow/PressureCard/PressurePadding"]
+[node name="PressureContent" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/LowerRow/PressureCard/PressurePadding"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="PressureEyebrow" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/MainStack/LowerRow/PressureCard/PressurePadding/PressureContent"]
+[node name="PressureEyebrow" type="Label" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/LowerRow/PressureCard/PressurePadding/PressureContent"]
 layout_mode = 2
 text = "CLUB PULSE"
 
-[node name="PressureValueLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/MainStack/LowerRow/PressureCard/PressurePadding/PressureContent"]
+[node name="PressureValueLabel" type="Label" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/LowerRow/PressureCard/PressurePadding/PressureContent"]
 layout_mode = 2
 text = "Pressure unavailable."
 autowrap_mode = 3
 
-[node name="PressureReasonsLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/MainStack/LowerRow/PressureCard/PressurePadding/PressureContent"]
+[node name="PressureReasonsLabel" type="Label" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/LowerRow/PressureCard/PressurePadding/PressureContent"]
 layout_mode = 2
 text = "Pressure reasons unavailable."
 autowrap_mode = 3
 
-[node name="InsightCard" type="PanelContainer" parent="RootMargin/Shell/MainColumn/ContentRow"]
+[node name="InsightCard" type="PanelContainer" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow"]
 custom_minimum_size = Vector2(312, 0)
 layout_mode = 2
 
-[node name="InsightPadding" type="MarginContainer" parent="RootMargin/Shell/MainColumn/ContentRow/InsightCard"]
+[node name="InsightPadding" type="MarginContainer" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard"]
 layout_mode = 2
+size_flags_vertical = 3
 theme_override_constants/margin_left = 20
 theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 20
 theme_override_constants/margin_bottom = 20
 
-[node name="InsightContent" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding"]
+[node name="InsightScroll" type="ScrollContainer" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 2
+
+[node name="InsightContent" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll"]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="InsightEyebrow" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent"]
+[node name="InsightEyebrow" type="Label" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent"]
 layout_mode = 2
 text = "DUGOUT NOTES"
 
-[node name="SquadStatusLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent"]
+[node name="SquadStatusLabel" type="Label" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent"]
 layout_mode = 2
 text = "Squad status unavailable."
 autowrap_mode = 3
 
-[node name="TacticsSummaryLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent"]
+[node name="TacticsSummaryLabel" type="Label" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent"]
 layout_mode = 2
 text = "Tactical summary unavailable."
 autowrap_mode = 3
 
-[node name="PriorityLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent"]
+[node name="PriorityLabel" type="Label" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent"]
 layout_mode = 2
 text = "Priority unavailable."
 autowrap_mode = 3
 
-[node name="StatusLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent"]
+[node name="StatusLabel" type="Label" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent"]
 layout_mode = 2
 text = "Status unavailable."
 autowrap_mode = 3

@@ -27,12 +27,12 @@ func _submit_career_setup() -> void:
         _fail("CareerSetup scene did not load")
         return
 
-    var name_input := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/ManagerNameInput") as LineEdit
-    var seed_input := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/SeedInput") as SpinBox
-    var role_option := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/RoleOption") as OptionButton
-    var background_option := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/BackgroundOption") as OptionButton
-    var license_option := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/LicenseOption") as OptionButton
-    var start_button := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/ActionsRow/StartCareerButton") as Button
+    var name_input := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormLayout/FormScroll/FormContent/ManagerNameInput") as LineEdit
+    var seed_input := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormLayout/FormScroll/FormContent/SeedInput") as SpinBox
+    var role_option := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormLayout/FormScroll/FormContent/RoleOption") as OptionButton
+    var background_option := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormLayout/FormScroll/FormContent/BackgroundOption") as OptionButton
+    var license_option := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormLayout/FormScroll/FormContent/LicenseOption") as OptionButton
+    var start_button := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormLayout/FormScroll/FormContent/ActionsRow/StartCareerButton") as Button
 
     if name_input == null or seed_input == null or role_option == null or background_option == null or license_option == null or start_button == null:
         _fail("CareerSetup Stage 1 controls are missing")
@@ -135,22 +135,22 @@ func _validate_dashboard() -> void:
         "dashboard club foundation"):
         return
     if not _assert_label_contains(
-        "RootMargin/Shell/MainColumn/ContentRow/MainStack/LowerRow/PressureCard/PressurePadding/PressureContent/PressureValueLabel",
+        "RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/LowerRow/PressureCard/PressurePadding/PressureContent/PressureValueLabel",
         "Pressure | job",
         "dashboard pressure"):
         return
     if not _assert_label_contains(
-        "RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/RoleAuthorityLabel",
+        "RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent/RoleAuthorityLabel",
         "Can suggest",
         "dashboard role authority"):
         return
     if not _assert_label_contains(
-        "RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/ObjectivesLabel",
+        "RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent/ObjectivesLabel",
         "Main objectives",
         "dashboard objectives"):
         return
     if not _assert_label_contains(
-        "RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/NewsFeedLabel",
+        "RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent/NewsFeedLabel",
         "News feed",
         "dashboard news feed"):
         return

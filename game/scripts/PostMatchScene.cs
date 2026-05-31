@@ -52,14 +52,14 @@ public partial class PostMatchScene : Control
         _pressureValueLabel = GetNode<Label>("RootMargin/MainColumn/SummaryGrid/PressureCard/CardPadding/CardContent/CardValueLabel");
         _pressureMetaLabel = GetNode<Label>("RootMargin/MainColumn/SummaryGrid/PressureCard/CardPadding/CardContent/CardMetaLabel");
 
-        _consequencesCard = GetNode<PanelContainer>("RootMargin/MainColumn/ContentRow/ConsequencesCard");
-        _deltasLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/ConsequencesScroll/ConsequencesStack/DeltasLabel");
-        _tableImpactLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/ConsequencesScroll/ConsequencesStack/TableImpactLabel");
-        _tacticalLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/ConsequencesScroll/ConsequencesStack/TacticalLabel");
-        _pressureLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/ConsequencesScroll/ConsequencesStack/PressureLabel");
+        _consequencesCard = GetNode<PanelContainer>("RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ConsequencesCard");
+        _deltasLabel = GetNode<Label>("RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/ConsequencesScroll/ConsequencesStack/DeltasLabel");
+        _tableImpactLabel = GetNode<Label>("RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/ConsequencesScroll/ConsequencesStack/TableImpactLabel");
+        _tacticalLabel = GetNode<Label>("RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/ConsequencesScroll/ConsequencesStack/TacticalLabel");
+        _pressureLabel = GetNode<Label>("RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/ConsequencesScroll/ConsequencesStack/PressureLabel");
 
-        _eventsCard = GetNode<PanelContainer>("RootMargin/MainColumn/ContentRow/EventsCard");
-        _eventsLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/EventsCard/EventsPadding/EventsContent/EventsScroll/EventsLabel");
+        _eventsCard = GetNode<PanelContainer>("RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/EventsCard");
+        _eventsLabel = GetNode<Label>("RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/EventsCard/EventsPadding/EventsContent/EventsScroll/EventsLabel");
 
         _actionCard = GetNode<PanelContainer>("RootMargin/MainColumn/ActionCard");
         _nextStepLabel = GetNode<Label>("RootMargin/MainColumn/ActionCard/ActionPadding/ActionContent/NextStepLabel");
@@ -96,8 +96,8 @@ public partial class PostMatchScene : Control
         TouchlineTheme.ApplyMutedStyle(_tableMetaLabel, 14);
         TouchlineTheme.ApplyMutedStyle(_pressureMetaLabel, 14);
 
-        TouchlineTheme.ApplyEyebrowStyle(GetNode<Label>("RootMargin/MainColumn/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/ConsequencesEyebrow"));
-        TouchlineTheme.ApplyEyebrowStyle(GetNode<Label>("RootMargin/MainColumn/ContentRow/EventsCard/EventsPadding/EventsContent/EventsEyebrow"));
+        TouchlineTheme.ApplyEyebrowStyle(GetNode<Label>("RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/ConsequencesEyebrow"));
+        TouchlineTheme.ApplyEyebrowStyle(GetNode<Label>("RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/EventsCard/EventsPadding/EventsContent/EventsEyebrow"));
         TouchlineTheme.ApplyEyebrowStyle(GetNode<Label>("RootMargin/MainColumn/ActionCard/ActionPadding/ActionContent/ActionEyebrow"));
         TouchlineTheme.ApplyMutedStyle(_deltasLabel, 15);
         TouchlineTheme.ApplyMutedStyle(_tableImpactLabel, 15);

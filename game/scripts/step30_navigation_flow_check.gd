@@ -30,9 +30,9 @@ func _process(_delta: float) -> bool:
             _fail("CareerSetup did not load from MainMenu")
             return false
 
-        var manager_name_input := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/ManagerNameInput") as LineEdit
-        var seed_input := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/SeedInput") as SpinBox
-        var start_button := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/ActionsRow/StartCareerButton") as Button
+        var manager_name_input := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormLayout/FormScroll/FormContent/ManagerNameInput") as LineEdit
+        var seed_input := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormLayout/FormScroll/FormContent/SeedInput") as SpinBox
+        var start_button := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormLayout/FormScroll/FormContent/ActionsRow/StartCareerButton") as Button
         if manager_name_input == null or seed_input == null or start_button == null:
             _fail("CareerSetup controls are missing")
             return false
@@ -192,8 +192,8 @@ func _process(_delta: float) -> bool:
             return false
 
         var club_context := current_scene.get_node("RootMargin/Shell/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderInfo/ClubContextLabel") as Label
-        var player_rows := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/SelectionCard/SelectionPadding/SelectionContent/PlayerScroll/PlayerRows") as VBoxContainer
-        var open_profile_button := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/OpenProfileButton") as Button
+        var player_rows := current_scene.get_node("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/SelectionCard/SelectionPadding/SelectionContent/PlayerScroll/PlayerRows") as VBoxContainer
+        var open_profile_button := current_scene.get_node("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ActionCard/ActionPadding/ActionContent/OpenProfileButton") as Button
         if club_context == null or player_rows == null or open_profile_button == null:
             _fail("SquadScreen controls are missing")
             return false
@@ -332,7 +332,7 @@ func _process(_delta: float) -> bool:
             _fail("StandingsScreen did not load from ClubDashboard")
             return false
 
-        var club_summary := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent/ClubSummaryLabel") as Label
+        var club_summary := current_scene.get_node("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ContextCard/ContextPadding/ContextContent/ClubSummaryLabel") as Label
         var back_button := current_scene.get_node("RootMargin/Shell/RailCard/RailPadding/RailContent/FooterActions/BackButton") as Button
         if club_summary == null or back_button == null:
             _fail("StandingsScreen controls are missing")
@@ -367,7 +367,7 @@ func _process(_delta: float) -> bool:
             _fail("MatchdayScene did not load from ClubDashboard")
             return false
 
-        var back_button := current_scene.get_node("RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/BackButton") as Button
+        var back_button := current_scene.get_node("RootMargin/MainColumn/ActionCard/ActionPadding/ActionContent/BackButton") as Button
         if back_button == null:
             _fail("MatchdayScene back button is missing")
             return false
@@ -395,7 +395,7 @@ func _process(_delta: float) -> bool:
             _fail("MatchdayScene did not reopen for instant result flow")
             return false
 
-        var instant_result_button := current_scene.get_node("RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/InstantResultButton") as Button
+        var instant_result_button := current_scene.get_node("RootMargin/MainColumn/ActionCard/ActionPadding/ActionContent/InstantResultButton") as Button
         if instant_result_button == null or instant_result_button.disabled:
             _fail("Instant result button is unavailable for the Step 30 navigation check")
             return false

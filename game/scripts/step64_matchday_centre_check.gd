@@ -30,10 +30,10 @@ func _validate_matchday() -> void:
     var bench := _label_text("RootMargin/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent/BenchLabel")
     var club_mood := _label_text("RootMargin/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent/PressureReasonsLabel")
     var plan := _label_text("RootMargin/MainColumn/ContentRow/PlanCard/PlanPadding/PlanContent/TacticsLabel")
-    var controls := _label_text("RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/StatusLabel")
-    var live_button := current_scene.get_node("RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/StartMatchButton") as Button
-    var instant_button := current_scene.get_node("RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/InstantResultButton") as Button
-    var back_button := current_scene.get_node("RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/BackButton") as Button
+    var controls := _label_text("RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ActionCard/ActionPadding/ActionContent/StatusLabel")
+    var live_button := current_scene.get_node("RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ActionCard/ActionPadding/ActionContent/StartMatchButton") as Button
+    var instant_button := current_scene.get_node("RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ActionCard/ActionPadding/ActionContent/InstantResultButton") as Button
+    var back_button := current_scene.get_node("RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ActionCard/ActionPadding/ActionContent/BackButton") as Button
 
     if fixture.find("vs") == -1 or competition.find("Matchday") == -1:
         _fail("Compact fixture header is missing")

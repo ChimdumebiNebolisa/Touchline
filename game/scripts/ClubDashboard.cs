@@ -135,48 +135,48 @@ public partial class ClubDashboard : Control
         _shapeValueLabel = GetNode<Label>("RootMargin/Shell/MainColumn/SummaryGrid/ShapeCard/CardPadding/CardContent/CardValueLabel");
         _shapeMetaLabel = GetNode<Label>("RootMargin/Shell/MainColumn/SummaryGrid/ShapeCard/CardPadding/CardContent/CardMetaLabel");
 
-        _focusCard = GetNode<PanelContainer>("RootMargin/Shell/MainColumn/ContentRow/MainStack/FocusCard");
-        _fixturePreviewLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/MainStack/FocusCard/FocusPadding/FocusContent/FixturePreviewLabel");
-        _focusContextLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/MainStack/FocusCard/FocusPadding/FocusContent/FocusContextLabel");
-        _recommendedMoveLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/MainStack/FocusCard/FocusPadding/FocusContent/RecommendedMoveLabel");
-        _actionHintLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/MainStack/FocusCard/FocusPadding/FocusContent/ActionHintLabel");
+        _focusCard = GetNode<PanelContainer>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/FocusCard");
+        _fixturePreviewLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/FocusCard/FocusPadding/FocusContent/FixturePreviewLabel");
+        _focusContextLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/FocusCard/FocusPadding/FocusContent/FocusContextLabel");
+        _recommendedMoveLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/FocusCard/FocusPadding/FocusContent/RecommendedMoveLabel");
+        _actionHintLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/FocusCard/FocusPadding/FocusContent/ActionHintLabel");
 
-        _momentumCard = GetNode<PanelContainer>("RootMargin/Shell/MainColumn/ContentRow/MainStack/LowerRow/MomentumCard");
-        _formValueLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/MainStack/LowerRow/MomentumCard/MomentumPadding/MomentumContent/FormValueLabel");
-        _lastResultLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/MainStack/LowerRow/MomentumCard/MomentumPadding/MomentumContent/LastResultLabel");
-        _tableImpactLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/MainStack/LowerRow/MomentumCard/MomentumPadding/MomentumContent/TableImpactLabel");
+        _momentumCard = GetNode<PanelContainer>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/LowerRow/MomentumCard");
+        _formValueLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/LowerRow/MomentumCard/MomentumPadding/MomentumContent/FormValueLabel");
+        _lastResultLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/LowerRow/MomentumCard/MomentumPadding/MomentumContent/LastResultLabel");
+        _tableImpactLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/LowerRow/MomentumCard/MomentumPadding/MomentumContent/TableImpactLabel");
 
-        _pressureCard = GetNode<PanelContainer>("RootMargin/Shell/MainColumn/ContentRow/MainStack/LowerRow/PressureCard");
-        _pressureValueLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/MainStack/LowerRow/PressureCard/PressurePadding/PressureContent/PressureValueLabel");
-        _pressureReasonsLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/MainStack/LowerRow/PressureCard/PressurePadding/PressureContent/PressureReasonsLabel");
+        _pressureCard = GetNode<PanelContainer>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/LowerRow/PressureCard");
+        _pressureValueLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/LowerRow/PressureCard/PressurePadding/PressureContent/PressureValueLabel");
+        _pressureReasonsLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/LowerRow/PressureCard/PressurePadding/PressureContent/PressureReasonsLabel");
 
-        _insightCard = GetNode<PanelContainer>("RootMargin/Shell/MainColumn/ContentRow/InsightCard");
-        _squadStatusLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/SquadStatusLabel");
-        _tacticsSummaryLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/TacticsSummaryLabel");
-        _roleAuthorityLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/RoleAuthorityLabel");
-        _objectivesLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/ObjectivesLabel");
-        _staffLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/StaffLabel");
-        _newsFeedLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/NewsFeedLabel");
-        _trainingScoutingLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/TrainingScoutingLabel");
-        _trainingFocusOption = GetNode<OptionButton>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/TrainingFocusOption");
-        _trainingIntensityOption = GetNode<OptionButton>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/TrainingIntensityOption");
-        _applyTrainingButton = GetNode<Button>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/ApplyTrainingButton");
-        _scoutingTargetOption = GetNode<OptionButton>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/ScoutingTargetOption");
-        _scoutingDepthOption = GetNode<OptionButton>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/ScoutingDepthOption");
-        _startScoutingButton = GetNode<Button>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/StartScoutingButton");
-        _advanceDayButton = GetNode<Button>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/AdvanceDayButton");
-        _advanceWeekButton = GetNode<Button>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/AdvanceWeekButton");
-        _staffMarketButton = GetNode<Button>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/StaffMarketButton");
-        _youthAcademyLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/YouthAcademyLabel");
-        _youthAcademyButton = GetNode<Button>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/YouthAcademyButton");
-        _recruitmentLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/RecruitmentLabel");
-        _careerMarketLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/CareerMarketLabel");
-        _recruitmentButton = GetNode<Button>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/RecruitmentButton");
-        _contractButton = GetNode<Button>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/ContractButton");
-        _jobMarketButton = GetNode<Button>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/JobMarketButton");
-        _resolveEventButton = GetNode<Button>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/ResolveEventButton");
-        _priorityLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/PriorityLabel");
-        _statusLabel = GetNode<Label>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/StatusLabel");
+        _insightCard = GetNode<PanelContainer>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard");
+        _squadStatusLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent/SquadStatusLabel");
+        _tacticsSummaryLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent/TacticsSummaryLabel");
+        _roleAuthorityLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent/RoleAuthorityLabel");
+        _objectivesLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent/ObjectivesLabel");
+        _staffLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent/StaffLabel");
+        _newsFeedLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent/NewsFeedLabel");
+        _trainingScoutingLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent/TrainingScoutingLabel");
+        _trainingFocusOption = GetNode<OptionButton>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent/TrainingFocusOption");
+        _trainingIntensityOption = GetNode<OptionButton>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent/TrainingIntensityOption");
+        _applyTrainingButton = GetNode<Button>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent/ApplyTrainingButton");
+        _scoutingTargetOption = GetNode<OptionButton>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent/ScoutingTargetOption");
+        _scoutingDepthOption = GetNode<OptionButton>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent/ScoutingDepthOption");
+        _startScoutingButton = GetNode<Button>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent/StartScoutingButton");
+        _advanceDayButton = GetNode<Button>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent/AdvanceDayButton");
+        _advanceWeekButton = GetNode<Button>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent/AdvanceWeekButton");
+        _staffMarketButton = GetNode<Button>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent/StaffMarketButton");
+        _youthAcademyLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent/YouthAcademyLabel");
+        _youthAcademyButton = GetNode<Button>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent/YouthAcademyButton");
+        _recruitmentLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent/RecruitmentLabel");
+        _careerMarketLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent/CareerMarketLabel");
+        _recruitmentButton = GetNode<Button>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent/RecruitmentButton");
+        _contractButton = GetNode<Button>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent/ContractButton");
+        _jobMarketButton = GetNode<Button>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent/JobMarketButton");
+        _resolveEventButton = GetNode<Button>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent/ResolveEventButton");
+        _priorityLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent/PriorityLabel");
+        _statusLabel = GetNode<Label>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent/StatusLabel");
     }
 
     private void EnsureStage1DashboardLabels()
@@ -187,13 +187,14 @@ public partial class ClubDashboard : Control
         EnsureLabel(headerInfo, ref headerInsertIndex, "CareerFoundationLabel");
         EnsureLabel(headerInfo, ref headerInsertIndex, "ClubFoundationLabel");
 
-        var insightContent = GetNode<VBoxContainer>("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent");
+        var insightContent = GetNode<VBoxContainer>("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent");
         var priorityNode = insightContent.GetNode("PriorityLabel");
         var insightInsertIndex = priorityNode.GetIndex();
         EnsureLabel(insightContent, ref insightInsertIndex, "RoleAuthorityLabel");
         EnsureLabel(insightContent, ref insightInsertIndex, "ObjectivesLabel");
         EnsureLabel(insightContent, ref insightInsertIndex, "StaffLabel");
         EnsureLabel(insightContent, ref insightInsertIndex, "NewsFeedLabel");
+        EnsureSectionEyebrow(insightContent, ref insightInsertIndex, "TrainingSectionEyebrow", "TRAINING / SCOUTING");
         EnsureLabel(insightContent, ref insightInsertIndex, "TrainingScoutingLabel");
         EnsureOptionButton(insightContent, ref insightInsertIndex, "TrainingFocusOption");
         EnsureOptionButton(insightContent, ref insightInsertIndex, "TrainingIntensityOption");
@@ -206,9 +207,11 @@ public partial class ClubDashboard : Control
         EnsureButton(insightContent, ref insightInsertIndex, "StaffMarketButton", "Review Staff Market");
         EnsureLabel(insightContent, ref insightInsertIndex, "YouthAcademyLabel");
         EnsureButton(insightContent, ref insightInsertIndex, "YouthAcademyButton", "Review Youth Academy");
+        EnsureSectionEyebrow(insightContent, ref insightInsertIndex, "RecruitmentSectionEyebrow", "RECRUITMENT / CONTRACTS");
         EnsureLabel(insightContent, ref insightInsertIndex, "RecruitmentLabel");
         EnsureButton(insightContent, ref insightInsertIndex, "RecruitmentButton", "Progress Recruitment Foundation");
         EnsureButton(insightContent, ref insightInsertIndex, "ContractButton", "Review Contract Terms");
+        EnsureSectionEyebrow(insightContent, ref insightInsertIndex, "CareerMarketSectionEyebrow", "CAREER / JOB MARKET");
         EnsureLabel(insightContent, ref insightInsertIndex, "CareerMarketLabel");
         EnsureButton(insightContent, ref insightInsertIndex, "JobMarketButton", "Generate Job Market Event");
         EnsureButton(insightContent, ref insightInsertIndex, "ResolveEventButton", "Resolve Decision Event");
@@ -229,6 +232,14 @@ public partial class ClubDashboard : Control
         };
         container.AddChild(label);
         container.MoveChild(label, insertIndex++);
+    }
+
+    private static void EnsureSectionEyebrow(VBoxContainer container, ref int insertIndex, string labelName, string text)
+    {
+        EnsureLabel(container, ref insertIndex, labelName);
+        var label = container.GetNode<Label>(labelName);
+        label.Text = text;
+        TouchlineTheme.ApplyEyebrowStyle(label);
     }
 
     private static void EnsureButton(VBoxContainer container, ref int insertIndex, string buttonName, string text)
@@ -399,9 +410,9 @@ public partial class ClubDashboard : Control
             ? "Table position unavailable."
             : $"{currentRow.Points} pts | GD {FormatSigned(currentRow.GoalDifference)} | {currentRow.Played} played";
         _moraleValueLabel.Text = $"{state.SquadMorale}";
-        _moraleMetaLabel.Text = $"Squad morale {DescribePulse(state.SquadMorale)} | Fan morale {state.FanMorale} | Player trust {state.CareerProfile.PlayerTrust}";
+        _moraleMetaLabel.Text = $"Morale {DescribePulse(state.SquadMorale)} | Fans {state.FanMorale}";
         _boardValueLabel.Text = $"{state.BoardMorale}";
-        _boardMetaLabel.Text = $"Board morale | Board trust {state.CareerProfile.BoardTrust} | Job pressure {state.JobPressure} | {state.BudgetSummary}";
+        _boardMetaLabel.Text = $"Trust {state.CareerProfile.BoardTrust} | Pressure {state.JobPressure}";
         _shapeValueLabel.Text = state.TacticalFormation;
         _shapeMetaLabel.Text = $"{state.TeamStyleName} | Press {state.PressIntensity} | Tempo {state.Tempo} | Risk {state.Risk}";
 
@@ -425,19 +436,19 @@ public partial class ClubDashboard : Control
         _pressureValueLabel.Text = state.PressureCategorySummary;
         _pressureReasonsLabel.Text = PerceptionSystem.BuildPressureReasonSummary(state);
 
-        _squadStatusLabel.Text = $"{state.BuildLineupReadinessSummary()}\n{state.SquadStatusSummary}";
-        _tacticsSummaryLabel.Text = $"{state.BuildTacticalPlanSummary()}\n{state.TacticsFoundationSummary}";
-        _roleAuthorityLabel.Text = $"Role authority | {state.RoleAuthoritySummary}";
-        _objectivesLabel.Text = $"Main objectives\n{TakeLines(state.MainObjectivesSummary, 3)}";
-        _staffLabel.Text = $"Staff\n{TakeLines(state.StaffSummary, 2)}\nImpact\n{TakeLines(state.StaffImpactSummary, 2)}";
-        _newsFeedLabel.Text = $"News\n{TakeLines(state.NewsFeedSummary, 2)}\nEvents\n{TakeLines(state.DecisionEventSummary, 2)}";
-        _trainingScoutingLabel.Text = $"Training/scouting\n{TakeLines(state.TrainingScoutingSummary, 4)}";
+        _squadStatusLabel.Text = TakeLines($"{state.BuildLineupReadinessSummary()}\n{state.SquadStatusSummary}", 2);
+        _tacticsSummaryLabel.Text = TakeLines($"{state.BuildTacticalPlanSummary()}\n{state.TacticsFoundationSummary}", 2);
+        _roleAuthorityLabel.Text = $"Role authority | {TakeLines(state.RoleAuthoritySummary, 1)}";
+        _objectivesLabel.Text = TakeLines(state.MainObjectivesSummary, 3);
+        _staffLabel.Text = TakeLines($"{state.StaffSummary}\n{state.StaffImpactSummary}", 2);
+        _newsFeedLabel.Text = TakeLines($"{state.NewsFeedSummary}\n{state.DecisionEventSummary}", 2);
+        _trainingScoutingLabel.Text = TakeLines(state.TrainingScoutingSummary, 3);
         PopulateTrainingScoutingControls(state);
         _youthAcademyLabel.Text = $"Youth academy\n{TakeLines(state.YouthAcademySummary, 3)}";
         _youthAcademyButton.Disabled = false;
         ApplyRoleActionLabels(state);
-        _recruitmentLabel.Text = $"Recruitment/contracts\n{TakeLines(state.RecruitmentFoundationSummary, 4)}\nPromises\n{TakeLines(state.PromiseSummary, 2)}";
-        _careerMarketLabel.Text = $"Career/job market\n{TakeLines(state.CareerMarketSummary, 4)}\nHistory\n{TakeLines(state.CareerHistorySummary, 2)}";
+        _recruitmentLabel.Text = TakeLines($"{state.RecruitmentFoundationSummary}\n{state.PromiseSummary}", 3);
+        _careerMarketLabel.Text = TakeLines($"{state.CareerMarketSummary}\n{state.CareerHistorySummary}", 3);
         _priorityLabel.Text = BuildPrioritySummary(state);
         _statusLabel.Text = hasMatchReport
             ? $"{state.LastMatchReport!.FixtureLabel}: {state.LastMatchReport.Scoreline} | Cause: {state.LastMatchReport.CauseSummary}"

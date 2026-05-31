@@ -60,23 +60,23 @@ public partial class MatchdayScene : Control
         _readinessValueLabel = GetNode<Label>("RootMargin/MainColumn/SummaryGrid/ReadinessCard/CardPadding/CardContent/CardValueLabel");
         _readinessMetaLabel = GetNode<Label>("RootMargin/MainColumn/SummaryGrid/ReadinessCard/CardPadding/CardContent/CardMetaLabel");
 
-        _contextCard = GetNode<PanelContainer>("RootMargin/MainColumn/ContentRow/ContextCard");
-        _kickoffContextLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent/KickoffContextLabel");
-        _lineupLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent/LineupLabel");
-        _benchLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent/BenchLabel");
-        _pressureReasonsLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent/PressureReasonsLabel");
+        _contextCard = GetNode<PanelContainer>("RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ContextCard");
+        _kickoffContextLabel = GetNode<Label>("RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ContextCard/ContextPadding/ContextContent/KickoffContextLabel");
+        _lineupLabel = GetNode<Label>("RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ContextCard/ContextPadding/ContextContent/LineupLabel");
+        _benchLabel = GetNode<Label>("RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ContextCard/ContextPadding/ContextContent/BenchLabel");
+        _pressureReasonsLabel = GetNode<Label>("RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ContextCard/ContextPadding/ContextContent/PressureReasonsLabel");
 
-        _planCard = GetNode<PanelContainer>("RootMargin/MainColumn/ContentRow/PlanCard");
-        _pressureLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/PlanCard/PlanPadding/PlanContent/PressureLabel");
-        _tacticsLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/PlanCard/PlanPadding/PlanContent/TacticsLabel");
-        _opponentFocusLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/PlanCard/PlanPadding/PlanContent/OpponentFocusLabel");
-        _readinessLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/PlanCard/PlanPadding/PlanContent/ReadinessLabel");
+        _planCard = GetNode<PanelContainer>("RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/PlanCard");
+        _pressureLabel = GetNode<Label>("RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/PlanCard/PlanPadding/PlanContent/PressureLabel");
+        _tacticsLabel = GetNode<Label>("RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/PlanCard/PlanPadding/PlanContent/TacticsLabel");
+        _opponentFocusLabel = GetNode<Label>("RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/PlanCard/PlanPadding/PlanContent/OpponentFocusLabel");
+        _readinessLabel = GetNode<Label>("RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/PlanCard/PlanPadding/PlanContent/ReadinessLabel");
 
-        _actionCard = GetNode<PanelContainer>("RootMargin/MainColumn/ContentRow/ActionCard");
-        _statusLabel = GetNode<Label>("RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/StatusLabel");
-        _backButton = GetNode<Button>("RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/BackButton");
-        _instantResultButton = GetNode<Button>("RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/InstantResultButton");
-        _startMatchButton = GetNode<Button>("RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/StartMatchButton");
+        _actionCard = GetNode<PanelContainer>("RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ActionCard");
+        _statusLabel = GetNode<Label>("RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ActionCard/ActionPadding/ActionContent/StatusLabel");
+        _backButton = GetNode<Button>("RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ActionCard/ActionPadding/ActionContent/BackButton");
+        _instantResultButton = GetNode<Button>("RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ActionCard/ActionPadding/ActionContent/InstantResultButton");
+        _startMatchButton = GetNode<Button>("RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ActionCard/ActionPadding/ActionContent/StartMatchButton");
     }
 
     private void ApplyShellStyles()
@@ -109,9 +109,9 @@ public partial class MatchdayScene : Control
         TouchlineTheme.ApplyMutedStyle(_formMetaLabel, 14);
         TouchlineTheme.ApplyMutedStyle(_pulseMetaLabel, 14);
         TouchlineTheme.ApplyMutedStyle(_readinessMetaLabel, 14);
-        TouchlineTheme.ApplyEyebrowStyle(GetNode<Label>("RootMargin/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent/ContextEyebrow"));
-        TouchlineTheme.ApplyEyebrowStyle(GetNode<Label>("RootMargin/MainColumn/ContentRow/PlanCard/PlanPadding/PlanContent/PlanEyebrow"));
-        TouchlineTheme.ApplyEyebrowStyle(GetNode<Label>("RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/ActionEyebrow"));
+        TouchlineTheme.ApplyEyebrowStyle(GetNode<Label>("RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ContextCard/ContextPadding/ContextContent/ContextEyebrow"));
+        TouchlineTheme.ApplyEyebrowStyle(GetNode<Label>("RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/PlanCard/PlanPadding/PlanContent/PlanEyebrow"));
+        TouchlineTheme.ApplyEyebrowStyle(GetNode<Label>("RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ActionCard/ActionPadding/ActionContent/ActionEyebrow"));
         TouchlineTheme.ApplyMutedStyle(_kickoffContextLabel, 15);
         TouchlineTheme.ApplyMutedStyle(_lineupLabel, 15);
         TouchlineTheme.ApplyMutedStyle(_benchLabel, 15);

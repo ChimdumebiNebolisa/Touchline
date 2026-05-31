@@ -38,7 +38,7 @@ func _process(_delta: float) -> bool:
         _fail("ClubDashboard did not load")
         return false
 
-    var career_market_label := current_scene.get_node_or_null("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/CareerMarketLabel")
+    var career_market_label := current_scene.get_node_or_null("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent/CareerMarketLabel")
     if career_market_label == null:
         _fail("Dashboard career label is missing")
         return false

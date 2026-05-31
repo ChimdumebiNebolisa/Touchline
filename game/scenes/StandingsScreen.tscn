@@ -20,24 +20,6 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.0313726, 0.0509804, 0.0666667, 1)
 
-[node name="TopBand" type="ColorRect" parent="."]
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-anchor_bottom = 0.24
-grow_horizontal = 2
-color = Color(0.0509804, 0.0862745, 0.117647, 1)
-
-[node name="RightWash" type="ColorRect" parent="."]
-layout_mode = 1
-anchors_preset = 9
-anchor_left = 0.72
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0.0392157, 0.0666667, 0.0901961, 0.45)
-
 [node name="RootMargin" type="MarginContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
@@ -55,7 +37,7 @@ layout_mode = 2
 theme_override_constants/separation = 18
 
 [node name="RailCard" type="PanelContainer" parent="RootMargin/Shell"]
-custom_minimum_size = Vector2(272, 0)
+custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
 
 [node name="RailPadding" type="MarginContainer" parent="RootMargin/Shell/RailCard"]
@@ -419,151 +401,160 @@ layout_mode = 2
 text = "Fixture unavailable."
 autowrap_mode = 3
 
-[node name="ContentRow" type="HBoxContainer" parent="RootMargin/Shell/MainColumn"]
+[node name="MainScroll" type="ScrollContainer" parent="RootMargin/Shell/MainColumn"]
 layout_mode = 2
 size_flags_vertical = 3
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 2
+
+[node name="ScrollContent" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/MainScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 14
+[node name="ContentRow" type="HBoxContainer" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent"]
+layout_mode = 2
 theme_override_constants/separation = 18
 
-[node name="TableCard" type="PanelContainer" parent="RootMargin/Shell/MainColumn/ContentRow"]
+[node name="TableCard" type="PanelContainer" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="TablePadding" type="MarginContainer" parent="RootMargin/Shell/MainColumn/ContentRow/TableCard"]
+[node name="TablePadding" type="MarginContainer" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/TableCard"]
 layout_mode = 2
 theme_override_constants/margin_left = 20
 theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 20
 theme_override_constants/margin_bottom = 20
 
-[node name="TableContent" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/ContentRow/TableCard/TablePadding"]
+[node name="TableContent" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/TableCard/TablePadding"]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="TableHeading" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/TableCard/TablePadding/TableContent"]
+[node name="TableHeading" type="Label" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/TableCard/TablePadding/TableContent"]
 layout_mode = 2
 text = "League Table"
 
-[node name="TableHintLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/TableCard/TablePadding/TableContent"]
+[node name="TableHintLabel" type="Label" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/TableCard/TablePadding/TableContent"]
 layout_mode = 2
 text = "Full standings for the active division. The club row stays highlighted for quick scanning."
 autowrap_mode = 3
 
-[node name="TableHeaderRow" type="HBoxContainer" parent="RootMargin/Shell/MainColumn/ContentRow/TableCard/TablePadding/TableContent"]
+[node name="TableHeaderRow" type="HBoxContainer" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/TableCard/TablePadding/TableContent"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="PosHeader" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow"]
+[node name="PosHeader" type="Label" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow"]
 custom_minimum_size = Vector2(48, 0)
 layout_mode = 2
 text = "POS"
 horizontal_alignment = 1
 
-[node name="ClubHeader" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow"]
+[node name="ClubHeader" type="Label" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow"]
 custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 text = "CLUB"
 
-[node name="PHeader" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow"]
+[node name="PHeader" type="Label" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow"]
 custom_minimum_size = Vector2(44, 0)
 layout_mode = 2
 text = "P"
 horizontal_alignment = 1
 
-[node name="WHeader" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow"]
+[node name="WHeader" type="Label" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow"]
 custom_minimum_size = Vector2(44, 0)
 layout_mode = 2
 text = "W"
 horizontal_alignment = 1
 
-[node name="DHeader" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow"]
+[node name="DHeader" type="Label" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow"]
 custom_minimum_size = Vector2(44, 0)
 layout_mode = 2
 text = "D"
 horizontal_alignment = 1
 
-[node name="LHeader" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow"]
+[node name="LHeader" type="Label" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow"]
 custom_minimum_size = Vector2(44, 0)
 layout_mode = 2
 text = "L"
 horizontal_alignment = 1
 
-[node name="GFHeader" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow"]
+[node name="GFHeader" type="Label" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow"]
 custom_minimum_size = Vector2(48, 0)
 layout_mode = 2
 text = "GF"
 horizontal_alignment = 1
 
-[node name="GAHeader" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow"]
+[node name="GAHeader" type="Label" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow"]
 custom_minimum_size = Vector2(48, 0)
 layout_mode = 2
 text = "GA"
 horizontal_alignment = 1
 
-[node name="GDHeader" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow"]
+[node name="GDHeader" type="Label" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow"]
 custom_minimum_size = Vector2(52, 0)
 layout_mode = 2
 text = "GD"
 horizontal_alignment = 1
 
-[node name="PtsHeader" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow"]
+[node name="PtsHeader" type="Label" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/TableCard/TablePadding/TableContent/TableHeaderRow"]
 custom_minimum_size = Vector2(52, 0)
 layout_mode = 2
 text = "PTS"
 horizontal_alignment = 1
 
-[node name="TableScroll" type="ScrollContainer" parent="RootMargin/Shell/MainColumn/ContentRow/TableCard/TablePadding/TableContent"]
+[node name="TableScroll" type="ScrollContainer" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/TableCard/TablePadding/TableContent"]
 layout_mode = 2
 size_flags_vertical = 3
 follow_focus = true
 horizontal_scroll_mode = 0
 
-[node name="TableRows" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/ContentRow/TableCard/TablePadding/TableContent/TableScroll"]
+[node name="TableRows" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/TableCard/TablePadding/TableContent/TableScroll"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 8
 
-[node name="ContextCard" type="PanelContainer" parent="RootMargin/Shell/MainColumn/ContentRow"]
+[node name="ContextCard" type="PanelContainer" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow"]
 custom_minimum_size = Vector2(332, 0)
 layout_mode = 2
 
-[node name="ContextPadding" type="MarginContainer" parent="RootMargin/Shell/MainColumn/ContentRow/ContextCard"]
+[node name="ContextPadding" type="MarginContainer" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ContextCard"]
 layout_mode = 2
 theme_override_constants/margin_left = 20
 theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 20
 theme_override_constants/margin_bottom = 20
 
-[node name="ContextContent" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/ContentRow/ContextCard/ContextPadding"]
+[node name="ContextContent" type="VBoxContainer" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ContextCard/ContextPadding"]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="ContextHeading" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent"]
+[node name="ContextHeading" type="Label" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ContextCard/ContextPadding/ContextContent"]
 layout_mode = 2
 text = "Club Position"
 
-[node name="ContextHintLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent"]
+[node name="ContextHintLabel" type="Label" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ContextCard/ContextPadding/ContextContent"]
 layout_mode = 2
 text = "Quick context for the selected club."
 autowrap_mode = 3
 
-[node name="ClubSummaryLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent"]
+[node name="ClubSummaryLabel" type="Label" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ContextCard/ContextPadding/ContextContent"]
 layout_mode = 2
 text = "Club summary unavailable."
 autowrap_mode = 3
 
-[node name="FormLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent"]
+[node name="FormLabel" type="Label" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ContextCard/ContextPadding/ContextContent"]
 layout_mode = 2
 text = "Form unavailable."
 autowrap_mode = 3
 
-[node name="NextFixtureLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent"]
+[node name="NextFixtureLabel" type="Label" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ContextCard/ContextPadding/ContextContent"]
 layout_mode = 2
 text = "Next fixture unavailable."
 autowrap_mode = 3
 
-[node name="TableNoteLabel" type="Label" parent="RootMargin/Shell/MainColumn/ContentRow/ContextCard/ContextPadding/ContextContent"]
+[node name="TableNoteLabel" type="Label" parent="RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/ContextCard/ContextPadding/ContextContent"]
 layout_mode = 2
 text = "Table note unavailable."
 autowrap_mode = 3

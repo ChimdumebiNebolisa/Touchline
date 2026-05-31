@@ -23,9 +23,9 @@ func _process(_delta: float) -> bool:
             _fail("CareerSetup did not load")
             return false
 
-        var manager_name := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/ManagerNameInput") as LineEdit
-        var seed_input := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/SeedInput") as SpinBox
-        var start_button := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormContent/ActionsRow/StartCareerButton") as Button
+        var manager_name := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormLayout/FormScroll/FormContent/ManagerNameInput") as LineEdit
+        var seed_input := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormLayout/FormScroll/FormContent/SeedInput") as SpinBox
+        var start_button := current_scene.get_node("RootMargin/MainColumn/ContentRow/FormCard/FormPadding/FormLayout/FormScroll/FormContent/ActionsRow/StartCareerButton") as Button
         if manager_name == null or seed_input == null or start_button == null:
             _fail("CareerSetup controls missing")
             return false
@@ -55,7 +55,7 @@ func _process(_delta: float) -> bool:
             return false
 
         var header_status := current_scene.get_node("RootMargin/Shell/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderStatus/HeaderStatusLabel") as Label
-        var pressure_reasons := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/MainStack/LowerRow/PressureCard/PressurePadding/PressureContent/PressureReasonsLabel") as Label
+        var pressure_reasons := current_scene.get_node("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/MainStack/LowerRow/PressureCard/PressurePadding/PressureContent/PressureReasonsLabel") as Label
         var matchday_button := current_scene.get_node("RootMargin/Shell/RailCard/RailPadding/RailContent/NavButtons/MatchdayButton") as Button
         if header_status == null or pressure_reasons == null or matchday_button == null:
             _fail("Dashboard context controls missing")
@@ -77,8 +77,8 @@ func _process(_delta: float) -> bool:
             _fail("MatchdayScene did not load")
             return false
 
-        var status_label := current_scene.get_node("RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/StatusLabel") as Label
-        var instant_button := current_scene.get_node("RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/InstantResultButton") as Button
+        var status_label := current_scene.get_node("RootMargin/MainColumn/ActionCard/ActionPadding/ActionContent/StatusLabel") as Label
+        var instant_button := current_scene.get_node("RootMargin/MainColumn/ActionCard/ActionPadding/ActionContent/InstantResultButton") as Button
         if status_label == null or instant_button == null:
             _fail("Matchday action controls missing")
             return false
@@ -165,7 +165,7 @@ func _process(_delta: float) -> bool:
 
         var game_state := root.get_node("GameState")
         var date_label := current_scene.get_node("RootMargin/Shell/MainColumn/HeaderCard/HeaderPadding/HeaderContent/HeaderInfo/DateLabel") as Label
-        var status_label := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/StatusLabel") as Label
+        var status_label := current_scene.get_node("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent/StatusLabel") as Label
         if game_state == null or date_label == null or status_label == null:
             _fail("Loaded dashboard context controls missing")
             return false

@@ -38,15 +38,15 @@ func _process(_delta: float) -> bool:
             _fail("ClubDashboard did not load")
             return false
 
-        var training_focus := _option("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/TrainingFocusOption")
-        var training_intensity := _option("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/TrainingIntensityOption")
-        var apply_training := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/ApplyTrainingButton") as Button
-        var scouting_target := _option("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/ScoutingTargetOption")
-        var scouting_depth := _option("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/ScoutingDepthOption")
-        var start_scouting := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/StartScoutingButton") as Button
-        var advance_day := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/AdvanceDayButton") as Button
-        var advance_week := current_scene.get_node("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/AdvanceWeekButton") as Button
-        var summary := _label("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/TrainingScoutingLabel")
+        var training_focus := _option("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent/TrainingFocusOption")
+        var training_intensity := _option("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent/TrainingIntensityOption")
+        var apply_training := current_scene.get_node("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent/ApplyTrainingButton") as Button
+        var scouting_target := _option("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent/ScoutingTargetOption")
+        var scouting_depth := _option("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent/ScoutingDepthOption")
+        var start_scouting := current_scene.get_node("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent/StartScoutingButton") as Button
+        var advance_day := current_scene.get_node("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent/AdvanceDayButton") as Button
+        var advance_week := current_scene.get_node("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent/AdvanceWeekButton") as Button
+        var summary := _label("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent/TrainingScoutingLabel")
         if training_focus == null or training_intensity == null or apply_training == null or scouting_target == null or scouting_depth == null or start_scouting == null or advance_day == null or advance_week == null or summary == null:
             _fail("Dashboard training/scouting controls are missing")
             return false
@@ -54,7 +54,7 @@ func _process(_delta: float) -> bool:
         _select_text(training_focus, "Pressing")
         _select_text(training_intensity, "Demanding")
         apply_training.emit_signal("pressed")
-        summary = _label("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/TrainingScoutingLabel")
+        summary = _label("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent/TrainingScoutingLabel")
         if summary.text.find("Pressing") == -1 or summary.text.find("Demanding") == -1:
             _fail("Training controls did not update dashboard state: %s" % summary.text)
             return false
@@ -62,7 +62,7 @@ func _process(_delta: float) -> bool:
         _select_text(scouting_target, "Specific player: pressing winger")
         _select_text(scouting_depth, "Full report")
         start_scouting.emit_signal("pressed")
-        summary = _label("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/TrainingScoutingLabel")
+        summary = _label("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent/TrainingScoutingLabel")
         if summary.text.find("Full report") == -1 or summary.text.find("pressing winger") == -1:
             _fail("Scouting controls did not update dashboard state: %s" % summary.text)
             return false

@@ -40,7 +40,7 @@ func _process(_delta: float) -> bool:
             _fail("MatchdayScene did not load")
             return false
 
-        var instant_button := current_scene.get_node("RootMargin/MainColumn/ContentRow/ActionCard/ActionPadding/ActionContent/InstantResultButton") as Button
+        var instant_button := current_scene.get_node("RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ActionCard/ActionPadding/ActionContent/InstantResultButton") as Button
         if instant_button == null:
             _fail("InstantResultButton missing")
             return false
@@ -54,9 +54,9 @@ func _process(_delta: float) -> bool:
             _fail("PostMatchScene did not load")
             return false
 
-        var table_impact := current_scene.get_node("RootMargin/MainColumn/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/ConsequencesScroll/ConsequencesStack/TableImpactLabel") as Label
-        var tactical := current_scene.get_node("RootMargin/MainColumn/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/ConsequencesScroll/ConsequencesStack/TacticalLabel") as Label
-        var pressure := current_scene.get_node("RootMargin/MainColumn/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/ConsequencesScroll/ConsequencesStack/PressureLabel") as Label
+        var table_impact := current_scene.get_node("RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/ConsequencesScroll/ConsequencesStack/TableImpactLabel") as Label
+        var tactical := current_scene.get_node("RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/ConsequencesScroll/ConsequencesStack/TacticalLabel") as Label
+        var pressure := current_scene.get_node("RootMargin/MainColumn/MainScroll/ScrollContent/ContentRow/ConsequencesCard/ConsequencesPadding/ConsequencesContent/ConsequencesScroll/ConsequencesStack/PressureLabel") as Label
         var continue_button := current_scene.get_node("RootMargin/MainColumn/ActionCard/ActionPadding/ActionContent/ContinueButton") as Button
 
         if table_impact == null or tactical == null or pressure == null or continue_button == null:

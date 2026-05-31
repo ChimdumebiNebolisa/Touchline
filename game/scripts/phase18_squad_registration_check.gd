@@ -58,7 +58,7 @@ func _process(_delta: float) -> bool:
         _fail("ClubDashboard did not load")
         return false
 
-    var training_label := current_scene.get_node_or_null("RootMargin/Shell/MainColumn/ContentRow/InsightCard/InsightPadding/InsightContent/TrainingScoutingLabel")
+    var training_label := current_scene.get_node_or_null("RootMargin/Shell/MainColumn/MainScroll/ScrollContent/ContentRow/InsightCard/InsightPadding/InsightScroll/InsightContent/TrainingScoutingLabel")
     if training_label == null:
         _fail("Dashboard training/registration label is missing")
         return false
